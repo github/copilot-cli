@@ -1,0 +1,19 @@
+# https://thehub.github.com/epd/engineering/products-and-services/internal/service-catalog/service-ownership/
+# https://github.com/github/durable-ownership/blob/master/ownership.schema.json
+# this file need to be in the github repo for the service catalog to use it
+# if you change it, please also change the corresponding file in the real repo githubnext/copilot-cli
+version: 1
+ownership:
+  - name: github-copilot-cli
+    long_name: GitHub Copilot CLI
+    description: Terminal app that suggests commands from natural language descriptions
+    kind: logical
+    maintainer: johanrosenkilde
+    team: github/next
+    exec_sponsor: oegerikus
+    product_manager: mattrothenberg
+    repo: https://github.com/githubnext/copilot-cli
+    sev3:
+      slack: next-copilot-cli
+      tta: "1 business day"
+    qos: experimental
