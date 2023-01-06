@@ -5,7 +5,7 @@
 version: 1
 ownership:
   - name: github-copilot-cli
-    long_name: Github Copilot CLI
+    long_name: GitHub Copilot CLI
     description: Terminal app that suggests commands from natural language descriptions
     kind: logical
     maintainer: johanrosenkilde
