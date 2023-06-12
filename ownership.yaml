@@ -11,7 +11,7 @@ ownership:
     maintainer: johanrosenkilde
     team: github/next
     exec_sponsor: kdaigle
-    product_manager: mattrothenberg
+    product_manager: mattrothenberg (inactive) # FIXME: Replace this.
     repo: https://github.com/githubnext/copilot-cli
     sev3:
       slack: next-copilot-cli
