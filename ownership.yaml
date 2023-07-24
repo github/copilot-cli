@@ -10,8 +10,8 @@ ownership:
     kind: logical
     maintainer: johanrosenkilde
     team: github/next
-    exec_sponsor: kdaigle
-    product_manager: mattrothenberg
+    exec_sponsor: lostintangent
+    product_manager: johanrosenkilde
     repo: https://github.com/githubnext/copilot-cli
     sev3:
       slack: next-copilot-cli
