@@ -15,5 +15,8 @@ ownership:
     repo: https://github.com/githubnext/copilot-cli
     sev3:
       slack: next-copilot-cli
+      issue: https://github.com/githubnext/copilot-cli/issues
       tta: "1 business day"
     qos: experimental
+    tier: 3
+    team_slack: next
