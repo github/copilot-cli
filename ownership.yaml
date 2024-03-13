@@ -8,13 +8,13 @@ ownership:
     long_name: GitHub Copilot CLI
     description: Terminal app that suggests commands from natural language descriptions
     kind: logical
-    maintainer: johanrosenkilde
+    maintainer: drifkin
     team: github/next
     exec_sponsor: lostintangent
-    product_manager: johanrosenkilde
+    product_manager: drifkin
     repo: https://github.com/githubnext/copilot-cli
     sev3:
-      slack: next-copilot-cli
+      slack: next
       issue: https://github.com/githubnext/copilot-cli/issues
       tta: "1 business day"
     qos: experimental
