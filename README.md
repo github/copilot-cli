@@ -56,7 +56,7 @@ If you're not currently logged in to GitHub, you'll be prompted to use the `/log
 
 #### Authenticate with a Personal Access Token (PAT)
 
-You can also authenticate using a fine-graned PAT with the "Copilot Rrequests" permission enabled.
+You can also authenticate using a fine-grained PAT with the "Copilot Requests" permission enabled.
 
 1. Visit https://github.com/settings/personal-access-tokens/new
 2. Under "Permissions," click "add permissions" and select "Copilot Requests"
@@ -69,9 +69,9 @@ Launch `copilot` in a folder that contains code you want to work with.
 
 By default, `copilot` utilizes Claude Sonnet 4. We also support GPT-5 via an environment variable. Run `COPILOT_MODEL=gpt-5 copilot` to launch in GPT-5 mode. Or on Windows, run `set COPILOT_MODEL=gpt-5` before running `copilot`.
 
-Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests)
+Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
-For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli)
+For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
 
 ## 📢 Feedback and Participation
