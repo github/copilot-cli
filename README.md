@@ -56,7 +56,7 @@ If you're not currently logged in to GitHub, you'll be prompted to use the `/log
 
 #### Authenticate with a Personal Access Token (PAT)
 
-You can also authenticate using a fine-graned PAT with the "Copilot Rrequests" permission enabled.
+You can also authenticate using a fine-grained PAT with the "Copilot Requests" permission enabled.
 
 1. Visit https://github.com/settings/personal-access-tokens/new
 2. Under "Permissions," click "add permissions" and select "Copilot Requests"
