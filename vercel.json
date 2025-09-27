@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "functions": {
+    "pages/api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "regions": ["iad1"],
+  "framework": "nextjs"
+}
