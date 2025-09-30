@@ -67,7 +67,7 @@ You can also authenticate using a fine-grained PAT with the "Copilot Requests" p
 
 Launch `copilot` in a folder that contains code you want to work with. 
 
-By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5
+By default, `copilot` utilizes Claude Sonnet 4. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4.5 and GPT-5
 
 Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
