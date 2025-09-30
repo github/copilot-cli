@@ -51,7 +51,7 @@ Other:
 
 ```bash
 yay -S github-copilot
-````
+```
 </details>
 
 ### Launching the CLI
