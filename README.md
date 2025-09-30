@@ -44,6 +44,16 @@ Install globally with npm:
 npm install -g @github/copilot
 ```
 
+Other:
+
+<details>
+<summary><strong>AUR (Arch)</strong></summary>
+
+```bash
+yay -S github-copilot
+````
+</details>
+
 ### Launching the CLI
 
 ```bash
