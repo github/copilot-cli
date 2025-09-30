@@ -44,6 +44,11 @@ Install globally with npm:
 npm install -g @github/copilot
 ```
 
+Or use npx without installing:
+```bash
+npx @github/copilot@latest
+```
+
 ### Launching the CLI
 
 ```bash
