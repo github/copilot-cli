@@ -54,6 +54,13 @@ On first launch, you'll be greeted with our adorable animated banner! If you'd l
 
 If you're not currently logged in to GitHub, you'll be prompted to use the `/login` slash command. Enter this command and follow the on-screen instructions to authenticate.
 
+### Updating the CLI
+
+Update the GitHub Copilot CLI to the latest version:
+```bash
+npm update -g @github/copilot
+```
+
 #### Authenticate with a Personal Access Token (PAT)
 
 You can also authenticate using a fine-grained PAT with the "Copilot Requests" permission enabled.
