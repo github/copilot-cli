@@ -20,6 +20,23 @@ We're bringing the power of GitHub Copilot coding agent directly to your termina
 
 We're still early in our journey, but with your feedback, we're rapidly iterating to make the GitHub Copilot CLI the best possible companion in your terminal.
 
+## ⚡ Quick Start
+
+Get up and running in 3 steps:
+
+```bash
+# 1. Install
+npm install -g @github/copilot
+
+# 2. Launch
+copilot
+
+# 3. Authenticate (first time only)
+/login
+```
+
+That's it! Start typing your coding questions or tasks in natural language.
+
 ## 📦 Getting Started
 
 ### Supported Platforms
@@ -35,7 +52,7 @@ We're still early in our journey, but with your feedback, we're rapidly iteratin
 - (On Windows) **PowerShell** v6 or higher
 - An **active Copilot subscription**. See [Copilot plans](https://github.com/features/copilot/plans?ref_cta=Copilot+plans+signup&ref_loc=install-copilot-cli&ref_page=docs).
 
-If you have access to GitHub Copilot via your organization of enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings. See [Managing policies and features for GitHub Copilot in your organization](http://docs.github.com/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization) for more information.
+If you have access to GitHub Copilot via your organization or enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings. See [Managing policies and features for GitHub Copilot in your organization](http://docs.github.com/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization) for more information.
 
 ### Installation
 
@@ -67,7 +84,24 @@ You can also authenticate using a fine-grained PAT with the "Copilot Requests" p
 
 Launch `copilot` in a folder that contains code you want to work with. 
 
-By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5
+By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5.
+
+#### Common Commands
+
+Once inside the CLI, you can use these slash commands:
+
+- `/login` - Authenticate with your GitHub account
+- `/model` - Switch between available AI models
+- `/feedback` - Submit feedback about your experience
+- `/clear` - Clear the current conversation
+- `/exit` - Exit the CLI
+
+#### Usage Tips
+
+- **Start specific:** Begin prompts in the directory you want to work in for better context
+- **Use natural language:** Describe what you want to accomplish in plain English
+- **Review before approving:** Always review suggested changes before accepting them
+- **Leverage GitHub context:** The CLI can access your repositories, issues, and PRs
 
 Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
@@ -78,6 +112,19 @@ For more information about how to use the GitHub Copilot CLI, see [our official 
 
 We're excited to have you join us early in the Copilot CLI journey.
 
-This is an early-stage preview, and we're building quickly. Expect frequent updates--please keep your client up to date for the latest features and fixes!
+This is an early-stage preview, and we're building quickly. Expect frequent updates—please keep your client up to date for the latest features and fixes!
 
-Your insights are invaluable! Open issue in this repo, join Discussions, and run `/feedback` from the CLI to submit a confidential feedback survey!
+### How to Provide Feedback
+
+Your insights are invaluable! Here's how you can help:
+
+- **Report issues:** Open an issue in this repo with detailed bug reports
+- **Join discussions:** Participate in GitHub Discussions to share ideas
+- **Quick feedback:** Run `/feedback` from within the CLI for a confidential survey
+- **Stay updated:** Check the [changelog](./changelog.md) for recent updates
+
+### Getting Help
+
+- **Documentation:** See our [official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli)
+- **Issues:** Search existing issues before creating new ones
+- **Community:** Join discussions with other users and maintainers
