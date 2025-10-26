@@ -1,0 +1,7 @@
+iraqi-league-login-system/
+│
+├── index.html         ← صفحة تسجيل الدخول
+├── login.php          ← كود التحقق من المستخدم
+├── db.php             ← ملف الاتصال بقاعدة البيانات
+├── dashboard.php      ← صفحة لوحة التحكم بعد الدخول
+└── README.md          ← وصف المشروع
