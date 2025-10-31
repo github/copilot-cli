@@ -1,0 +1,196 @@
+-- AUTO👾 Dance GUI (LocalScript)
+-- วางไฟล์นี้เป็น LocalScript ใต้ StarterGui
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local VirtualUser = game:GetService("VirtualUser")
+
+local player = Players.LocalPlayer
+
+-- Animation ID ตามที่ขอ
+local ANIM_ID = "rbxassetid://104767795538635"
+
+-- สร้าง GUI programmatically
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AUTO👾"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "Main"
+mainFrame.Size = UDim2.new(0, 300, 0, 140)
+mainFrame.Position = UDim2.new(0, 20, 0, 80)
+mainFrame.AnchorPoint = Vector2.new(0, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+mainFrame.BackgroundTransparency = 0
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner", mainFrame)
+uiCorner.CornerRadius = UDim.new(0, 12)
+
+local gradient = Instance.new("UIGradient", mainFrame)
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(30,30,45)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(18,18,28))
+}
+gradient.Rotation = 90
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, -24, 0, 36)
+title.Position = UDim2.new(0, 12, 0, 8)
+title.BackgroundTransparency = 1
+title.Text = "AUTO👾"
+title.TextColor3 = Color3.fromRGB(200,200,255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+local openCloseBtn = Instance.new("TextButton", mainFrame)
+openCloseBtn.Name = "OpenClose"
+openCloseBtn.Size = UDim2.new(0, 36, 0, 36)
+openCloseBtn.Position = UDim2.new(1, -48, 0, 8)
+openCloseBtn.BackgroundColor3 = Color3.fromRGB(40,40,60)
+openCloseBtn.AutoButtonColor = true
+openCloseBtn.Text = "▤"
+openCloseBtn.TextColor3 = Color3.fromRGB(220,220,255)
+openCloseBtn.Font = Enum.Font.GothamMedium
+openCloseBtn.TextSize = 20
+local ocCorner = Instance.new("UICorner", openCloseBtn)
+ocCorner.CornerRadius = UDim.new(0,8)
+
+-- Container for controls (so we can hide/show nicely)
+local controls = Instance.new("Frame", mainFrame)
+controls.Name = "Controls"
+controls.Size = UDim2.new(1, -24, 1, -56)
+controls.Position = UDim2.new(0, 12, 0, 48)
+controls.BackgroundTransparency = 1
+
+local function makeButton(name, posY, text)
+	local btn = Instance.new("TextButton", controls)
+	btn.Name = name
+	btn.Size = UDim2.new(1, 0, 0, 36)
+	btn.Position = UDim2.new(0, 0, 0, posY)
+	btn.BackgroundColor3 = Color3.fromRGB(50,50,70)
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(235,235,255)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 16
+	local c = Instance.new("UICorner", btn)
+	c.CornerRadius = UDim.new(0,10)
+	local stroke = Instance.new("UIStroke", btn)
+	stroke.Color = Color3.fromRGB(80,80,110)
+	stroke.Transparency = 0.6
+	return btn
+end
+
+local playBtn = makeButton("PlayDance", 0, "เล่นท่าเต้น")
+local stopBtn = makeButton("StopDance", 44, "หยุดท่าเต้น")
+local lockToggleBtn = makeButton("AntiLock", 88, "กันล็อค: ปิด")
+
+-- Nicely animate open/close
+local opened = true
+openCloseBtn.MouseButton1Click:Connect(function()
+	opened = not opened
+	local goal = {}
+	if opened then
+		goal.Size = UDim2.new(1, -24, 1, -56)
+		openCloseBtn.Rotation = 0
+	else
+		goal.Size = UDim2.new(1, -24, 0, 0)
+		openCloseBtn.Rotation = 90
+	end
+	TweenService:Create(controls, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = goal.Size or controls.Size}):Play()
+end)
+
+-- Animation handling
+local animation = Instance.new("Animation")
+animation.Name = "AutoDanceAnim"
+animation.AnimationId = ANIM_ID
+
+local currentTrack = nil
+local function getHumanoid()
+	local char = player.Character or player.CharacterAdded:Wait()
+	return char:FindFirstChildOfClass("Humanoid")
+end
+
+local function playDance()
+	local humanoid = getHumanoid()
+	if not humanoid then return end
+	-- stop existing
+	if currentTrack and currentTrack.IsPlaying then
+		currentTrack:Stop()
+	end
+	local track = humanoid:LoadAnimation(animation)
+	track.Priority = Enum.AnimationPriority.Action
+	track:Play()
+	currentTrack = track
+end
+
+local function stopDance()
+	if currentTrack then
+		currentTrack:Stop()
+		currentTrack = nil
+	end
+end
+
+playBtn.MouseButton1Click:Connect(playDance)
+stopBtn.MouseButton1Click:Connect(stopDance)
+
+-- Anti-lock (Anti-AFK)
+local antiLockEnabled = false
+local idledConn = nil
+
+local function setAntiLock(on)
+	antiLockEnabled = on
+	if antiLockEnabled then
+		lockToggleBtn.Text = "กันล็อค: เปิด"
+		-- Connect to Idled and simulate input
+		if not idledConn then
+			idledConn = player.Idled:Connect(function()
+				-- Simulate controller to avoid idle kick
+				VirtualUser:CaptureController()
+				VirtualUser:ClickButton2(Vector2.new(0,0))
+			end)
+		end
+	else
+		lockToggleBtn.Text = "กันล็อค: ปิด"
+		if idledConn then
+			idledConn:Disconnect()
+			idledConn = nil
+		end
+	end
+end
+
+lockToggleBtn.MouseButton1Click:Connect(function()
+	setAntiLock(not antiLockEnabled)
+end)
+
+-- Ensure humanoid reconnection across respawn
+player.CharacterAdded:Connect(function(char)
+	-- small delay to allow humanoid to exist
+	wait(0.2)
+	-- Stop previous track on respawn to avoid errors; you can auto-play if desired
+	if currentTrack then
+		currentTrack:Stop()
+		currentTrack = nil
+	end
+end)
+
+-- Initial state
+setAntiLock(false)
+
+-- Optional: hotkeys (P = play/stop)
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.P then
+		if currentTrack and currentTrack.IsPlaying then
+			stopDance()
+		else
+			playDance()
+		end
+	end
+end)
+
+-- End of script
