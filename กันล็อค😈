@@ -1,0 +1,398 @@
+-- AUTO👾 Dance GUI (LocalScript)
+-- วางไฟล์นี้เป็น LocalScript ใต้ StarterGui
+-- พฤติกรรม:
+--  - เมื่อเปิดกันล็อค (AntiLock) จะเล่นแอนิเมชัน 104767795538635 (วน)
+--  - เมื่อปิดกันล็อค จะหยุดแอนิเมชันที่เล่นโดยสคริปต์นี้
+--  - มีปุ่มเปิด/ปิด GUI (ปุ่มเล็กที่มุม) เพื่อแสดง/ซ่อนหน้าต่างหลัก
+--  - หน้าต่างหลักสามารถย้ายตำแหน่งได้โดยลากจากแถบ title
+--  - ปลอดภัยต่อ respawn และตรวจจับแทร็กที่มี AnimationId ตรงกับ ANIM_ID เพื่อหยุด
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local VirtualUser = game:GetService("VirtualUser")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+-- Animation ID ตามที่ขอ (ใช้เมื่อต้องเล่น/ตรวจจับเพื่อหยุด)
+local ANIM_ID = "rbxassetid://104767795538635"
+
+-- สร้าง ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AUTO👾"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main window
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "Main"
+mainFrame.Size = UDim2.new(0, 300, 0, 140)
+mainFrame.Position = UDim2.new(0, 20, 0, 80)
+mainFrame.AnchorPoint = Vector2.new(0, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner", mainFrame)
+uiCorner.CornerRadius = UDim.new(0, 12)
+
+local gradient = Instance.new("UIGradient", mainFrame)
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(30,30,45)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(18,18,28))
+}
+gradient.Rotation = 90
+
+-- Title (ใช้ลาก)
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, -24, 0, 36)
+title.Position = UDim2.new(0, 12, 0, 8)
+title.BackgroundTransparency = 1
+title.Text = "AUTO👾"
+title.TextColor3 = Color3.fromRGB(200,200,255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Name = "Title"
+
+-- Collapse button (ซ่อน/แสดง controls ภายใน)
+local openCloseBtn = Instance.new("TextButton", mainFrame)
+openCloseBtn.Name = "OpenClose"
+openCloseBtn.Size = UDim2.new(0, 36, 0, 36)
+openCloseBtn.Position = UDim2.new(1, -48, 0, 8)
+openCloseBtn.BackgroundColor3 = Color3.fromRGB(40,40,60)
+openCloseBtn.AutoButtonColor = true
+openCloseBtn.Text = "▤"
+openCloseBtn.TextColor3 = Color3.fromRGB(220,220,255)
+openCloseBtn.Font = Enum.Font.GothamMedium
+openCloseBtn.TextSize = 20
+local ocCorner = Instance.new("UICorner", openCloseBtn)
+ocCorner.CornerRadius = UDim.new(0,8)
+
+-- Controls (collapsible)
+local controls = Instance.new("Frame", mainFrame)
+controls.Name = "Controls"
+controls.Size = UDim2.new(1, -24, 1, -56)
+controls.Position = UDim2.new(0, 12, 0, 48)
+controls.BackgroundTransparency = 1
+
+local function makeButton(name, posY, text)
+	local btn = Instance.new("TextButton", controls)
+	btn.Name = name
+	btn.Size = UDim2.new(1, 0, 0, 36)
+	btn.Position = UDim2.new(0, 0, 0, posY)
+	btn.BackgroundColor3 = Color3.fromRGB(50,50,70)
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(235,235,255)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 16
+	local c = Instance.new("UICorner", btn)
+	c.CornerRadius = UDim.new(0,10)
+	local stroke = Instance.new("UIStroke", btn)
+	stroke.Color = Color3.fromRGB(80,80,110)
+	stroke.Transparency = 0.6
+	return btn
+end
+
+-- AntiLock button (เปิด/ปิด) — เมื่อเปิด จะเล่น ANIM_ID
+local lockToggleBtn = makeButton("AntiLock", 0, "กันล็อค: ปิด")
+
+-- Small persistent toggle to show/hide the main GUI
+local toggleGuiBtn = Instance.new("TextButton")
+toggleGuiBtn.Name = "ToggleGUI"
+toggleGuiBtn.Size = UDim2.new(0, 44, 0, 44)
+toggleGuiBtn.Position = UDim2.new(0, 20, 0, 20) -- มุมซ้ายบน; ปรับได้
+toggleGuiBtn.AnchorPoint = Vector2.new(0,0)
+toggleGuiBtn.BackgroundColor3 = Color3.fromRGB(35,35,50)
+toggleGuiBtn.AutoButtonColor = true
+toggleGuiBtn.Text = "AUTO"
+toggleGuiBtn.TextColor3 = Color3.fromRGB(220,220,255)
+toggleGuiBtn.Font = Enum.Font.GothamBold
+toggleGuiBtn.TextSize = 12
+toggleGuiBtn.Parent = screenGui
+local tgCorner = Instance.new("UICorner", toggleGuiBtn)
+tgCorner.CornerRadius = UDim.new(0,10)
+local tgStroke = Instance.new("UIStroke", toggleGuiBtn)
+tgStroke.Color = Color3.fromRGB(70,70,95)
+tgStroke.Transparency = 0.6
+
+-- Collapse/open animation for controls
+local opened = true
+openCloseBtn.MouseButton1Click:Connect(function()
+	opened = not opened
+	local goalSize
+	if opened then
+		goalSize = UDim2.new(1, -24, 1, -56)
+		TweenService:Create(openCloseBtn, TweenInfo.new(0.25), {Rotation = 0}):Play()
+	else
+		goalSize = UDim2.new(1, -24, 0, 0)
+		TweenService:Create(openCloseBtn, TweenInfo.new(0.25), {Rotation = 90}):Play()
+	end
+	TweenService:Create(controls, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = goalSize}):Play()
+end)
+
+-- Toggle full GUI visibility (persistent small button)
+toggleGuiBtn.MouseButton1Click:Connect(function()
+	mainFrame.Visible = not mainFrame.Visible
+	-- Visually indicate state on the small button
+	if mainFrame.Visible then
+		toggleGuiBtn.BackgroundColor3 = Color3.fromRGB(35,35,50)
+		toggleGuiBtn.Text = "AUTO"
+	else
+		toggleGuiBtn.BackgroundColor3 = Color3.fromRGB(60,20,20)
+		toggleGuiBtn.Text = "HIDDEN"
+	end
+end)
+
+-- ========== Animation handling ==========
+local animation = Instance.new("Animation")
+animation.Name = "AutoDanceAnim"
+animation.AnimationId = ANIM_ID
+
+local currentTrack = nil
+local playLock = false
+
+local function safeStopCurrentTrack()
+	if currentTrack then
+		pcall(function()
+			currentTrack:Stop()
+		end)
+		currentTrack = nil
+	end
+end
+
+local function loadAnimationOnAnimator(humanoid)
+	if not humanoid then return nil end
+	-- Prefer Animator
+	local animator = humanoid:FindFirstChildOfClass("Animator")
+	if not animator then
+		-- create an Animator under the humanoid (safe client-side)
+		animator = Instance.new("Animator")
+		animator.Name = "AUTO_Animator"
+		animator.Parent = humanoid
+	end
+	local ok, track = pcall(function()
+		return animator:LoadAnimation(animation)
+	end)
+	if ok and track then
+		return track
+	end
+	-- Fallback to humanoid:LoadAnimation
+	ok, track = pcall(function()
+		return humanoid:LoadAnimation(animation)
+	end)
+	if ok and track then
+		return track
+	end
+	return nil
+end
+
+local function playDance()
+	if playLock then return end
+	playLock = true
+	local humanoid
+	local ok = pcall(function()
+		local char = player.Character or player.CharacterAdded:Wait()
+		humanoid = char:WaitForChild("Humanoid", 5)
+	end)
+	if not ok or not humanoid then
+		playLock = false
+		return
+	end
+
+	-- Stop any existing track we started before loading new one
+	safeStopCurrentTrack()
+
+	local ok2, track = pcall(function()
+		return loadAnimationOnAnimator(humanoid)
+	end)
+	track = ok2 and track or nil
+	if not track then
+		playLock = false
+		return
+	end
+
+	track.Priority = Enum.AnimationPriority.Action
+	track.Looped = true
+	pcall(function() track:Play() end)
+	currentTrack = track
+	playLock = false
+end
+
+local function stopDance()
+	if playLock then return end
+	playLock = true
+	safeStopCurrentTrack()
+	playLock = false
+end
+
+-- Stop any playing tracks on a humanoid whose Animation.AnimationId matches ANIM_ID
+local function stopSpecifiedDanceOnHumanoid(humanoid)
+	if not humanoid then return end
+	pcall(function()
+		for _, track in ipairs(humanoid:GetPlayingAnimationTracks()) do
+			local anim = nil
+			pcall(function() anim = track.Animation end)
+			if anim then
+				-- Compare as strings to be robust
+				if tostring(anim.AnimationId) == tostring(ANIM_ID) then
+					pcall(function() track:Stop() end)
+				end
+			end
+		end
+	end)
+end
+
+local function stopDanceOnCurrentCharacter()
+	local char = player.Character
+	if not char then return end
+	local humanoid = char:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		stopSpecifiedDanceOnHumanoid(humanoid)
+	end
+end
+
+-- ========== Anti-lock (Anti-AFK) ==========
+local antiLockEnabled = false
+local idledConn = nil
+
+local function connectIdled()
+	if idledConn then return end
+	idledConn = player.Idled:Connect(function()
+		pcall(function()
+			VirtualUser:CaptureController()
+			VirtualUser:ClickButton2(Vector2.new(0,0))
+		end)
+	end)
+end
+
+local function disconnectIdled()
+	if idledConn then
+		pcall(function() idledConn:Disconnect() end)
+		idledConn = nil
+	end
+end
+
+local function setAntiLock(on)
+	antiLockEnabled = on
+	if antiLockEnabled then
+		lockToggleBtn.Text = "กันล็อค: เปิด"
+		connectIdled()
+		-- เล่นท่าเต้นที่กำหนดเมื่อเปิดกันล็อค
+		pcall(playDance)
+	else
+		lockToggleBtn.Text = "กันล็อค: ปิด"
+		disconnectIdled()
+		-- หยุดแทร็กที่เราเล่น และพยายามหยุดแทร็กอื่นๆ ที่มี ANIM_ID เพื่อความแน่นอน
+		pcall(stopDance)
+		pcall(stopDanceOnCurrentCharacter)
+	end
+end
+
+lockToggleBtn.MouseButton1Click:Connect(function()
+	setAntiLock(not antiLockEnabled)
+end)
+
+-- ========== Character handling (respawn-safe) ==========
+player.CharacterAdded:Connect(function(char)
+	-- รอ humanoid
+	local humanoid = char:WaitForChild("Humanoid", 5)
+	if humanoid then
+		-- หยุดแทร็กที่อาจค้างมาจากที่อื่นก่อน
+		pcall(function() stopSpecifiedDanceOnHumanoid(humanoid) end)
+	end
+	-- ถ้า anti-lock เปิดอยู่ ให้เริ่มเล่นใหม่และเชื่อม idled
+	if antiLockEnabled then
+		connectIdled()
+		pcall(playDance)
+	end
+end)
+
+player.CharacterRemoving:Connect(function(char)
+	local humanoid = char:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		pcall(function() stopSpecifiedDanceOnHumanoid(humanoid) end)
+	end
+	-- หยุด internal track ref (จะถูกสร้างใหม่หลัง respawn ถ้าจำเป็น)
+	safeStopCurrentTrack()
+end)
+
+-- เรียกตอนเริ่มต้นเพื่อหยุดท่าเต้นที่อาจกำลังเล่นอยู่
+pcall(stopDanceOnCurrentCharacter)
+setAntiLock(false)
+
+-- ========== Draggable UI ==========
+local dragging = false
+local dragInput, dragStart
+local startPos = mainFrame.Position
+
+local function updateDrag(input)
+	if not dragging then return end
+	local delta = input.Position - dragStart
+	mainFrame.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+title.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		updateDrag(input)
+	end
+end)
+
+-- Allow dragging also from openCloseBtn (optional)
+openCloseBtn.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+openCloseBtn.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+-- (ออฟชั่น) hotkey: กด G เพื่อซ่อน/แสดง GUI
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.G then
+		mainFrame.Visible = not mainFrame.Visible
+		if mainFrame.Visible then
+			toggleGuiBtn.BackgroundColor3 = Color3.fromRGB(35,35,50)
+			toggleGuiBtn.Text = "AUTO"
+		else
+			toggleGuiBtn.BackgroundColor3 = Color3.fromRGB(60,20,20)
+			toggleGuiBtn.Text = "HIDDEN"
+		end
+	end
+end)
