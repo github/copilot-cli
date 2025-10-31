@@ -1,4 +1,7 @@
 # GitHub Copilot CLI (Public Preview)
+[![@github/copilot downloads](https://img.shields.io/npm/dw/@github/copilot.svg)](https://npm-compare.com/@github/copilot) 
+[![@github/copilot version](https://img.shields.io/npm/v/@github/copilot.svg)](https://www.npmjs.com/package/@github/copilot)
+[![@github/copilot license](https://img.shields.io/npm/l/@github/copilot.svg)](https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms)
 
 The power of GitHub Copilot, now in your terminal.
 
