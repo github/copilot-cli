@@ -3,21 +3,23 @@ name: Copilot CLI Integration Agents
 description: Pre-built agents for integrating GitHub Copilot CLI with external platforms and services
 tags: [cli, integrations, api, agents, automation]
 items:
-  - path: .github/agents/awesome-copilot-discovery.agent.md
+  - path: agents/awesome-copilot-discovery.agent.md
     kind: instruction
-  - path: .github/agents/commander-brandynette.agent.md
+  - path: agents/commander-brandynette.agent.md
     kind: instruction
-  - path: .github/agents/csharp-dotnet.agent.md
+  - path: agents/csharp-dotnet.agent.md
     kind: instruction
-  - path: .github/agents/github-issue-helper.agent.md
+  - path: agents/github-issue-helper.agent.md
     kind: instruction
-  - path: .github/agents/huggingface-ml.agent.md
+  - path: agents/huggingface-ml.agent.md
     kind: instruction
-  - path: .github/agents/reddit-devvit.agent.md
+  - path: agents/reddit-devvit.agent.md
     kind: instruction
-  - path: .github/agents/stripe-integration.agent.md
+  - path: agents/security-best-practices.agent.md
     kind: instruction
-  - path: .github/agents/unity-avatar-system.agent.md
+  - path: agents/stripe-integration.agent.md
+    kind: instruction
+  - path: agents/unity-avatar-system.agent.md
     kind: instruction
 display:
   ordering: alpha

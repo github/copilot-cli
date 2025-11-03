@@ -14,6 +14,7 @@ Pre-built agents for integrating Copilot CLI with external platforms and service
 - **GitHub Issue Helper**: Issue triage, creation, and management for copilot-cli repository
 - **Hugging Face ML**: AI/ML model integration for text, vision, audio, and multimodal tasks
 - **Reddit Devvit Helper**: Reddit app development using the Devvit platform
+- **Security & Code Quality**: OWASP security, WCAG 2.2 accessibility, performance optimization, object calisthenics
 - **Stripe Integration**: Payment processing, subscriptions, and financial operations
 - **Unity Avatar System**: Character controllers, MCP workflows, and game development
 
@@ -39,6 +40,12 @@ Advanced multi-agent coordination and workflow automation.
 - **Commander Brandynette**: Meta-orchestration agent for coordinating complex multi-agent workflows, URL management, cross-platform integrations
 - **Awesome Copilot Discovery**: Resource discovery and meta-prompting from awesome-copilot
 - **GitHub Issue Helper**: Issue management integration for orchestrated workflows
+
+### `security-best-practices.collection.yml`
+Security, accessibility, performance, and code quality best practices.
+
+**Included Agent:**
+- **Security & Code Quality**: OWASP Top 10 security, WCAG 2.2 AA accessibility, frontend/backend/database performance optimization, object calisthenics for domain code, and self-explanatory code practices
 
 ## Using Custom Agents
 

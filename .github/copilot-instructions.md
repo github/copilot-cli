@@ -453,3 +453,85 @@ When users need to coordinate multiple agents or manage complex workflows:
 - Collection Manifest: `collections/meta-orchestration.collection.yml`
 - MCP Documentation: https://modelcontextprotocol.io/docs
 - Orchestration Patterns: https://microservices.io/patterns/
+
+### Security & Code Quality Best Practices
+
+When users need secure, accessible, performant, and maintainable code:
+
+**Key Concepts**:
+- **OWASP Security**: Protecting against Top 10 vulnerabilities (access control, crypto failures, injection, etc.)
+- **WCAG 2.2 AA Accessibility**: Ensuring code is usable by everyone including assistive technology users
+- **Performance Optimization**: Frontend, backend, and database optimization strategies
+- **Object Calisthenics**: 9 rules for clean domain code (single responsibility, small classes, no getters/setters)
+- **Self-Explanatory Code**: Writing code that documents itself with minimal comments
+
+**Security Implementation**:
+- Parameterized queries to prevent SQL injection
+- Environment variables for secret management (never hardcode)
+- Rate limiting and account lockout for authentication
+- Security headers (CSP, HSTS, X-Content-Type-Options)
+- HTTPS everywhere with proper certificate validation
+- Input validation with allowlists for SSRF prevention
+
+**Accessibility Requirements**:
+- Keyboard navigation with skip links and focus management
+- 4.5:1 contrast ratio for text, 3:1 for UI components
+- Semantic HTML with proper ARIA attributes
+- Alt text for informative images, hidden decorative images
+- Form labels and error messages with aria-invalid
+- People-first language ("person using screen reader")
+
+**Performance Strategies**:
+- Frontend: Lazy loading, code splitting, image optimization (WebP/AVIF), CDN
+- Backend: Async/await, caching (Redis), connection pooling, efficient algorithms
+- Database: Indexed queries, N+1 prevention, pagination, avoid SELECT *
+- Profiling: Chrome DevTools, Lighthouse, Core Web Vitals monitoring
+
+**Object Calisthenics (Domain Code)**:
+1. One level of indentation per method
+2. No ELSE keyword (use guard clauses)
+3. Wrap primitives in value objects
+4. First class collections (encapsulate lists)
+5. One dot per line
+6. No abbreviations (meaningful names)
+7. Keep entities small (<50 lines, <10 methods)
+8. Two instance variables maximum (loggers don't count)
+9. No getters/setters in domain classes (use factory methods)
+
+**Code Commenting Guidelines**:
+- Comment WHY, not WHAT
+- Explain complex business logic and algorithms
+- Document regex patterns and API constraints
+- Use standard annotations (TODO, FIXME, HACK, SECURITY, PERF)
+- Avoid obvious comments, dead code, changelog comments
+- Refactor instead of commenting when possible
+
+**Integration Patterns**:
+- **+ Stripe**: Validate webhook signatures, secure API keys, idempotent payments
+- **+ Unity**: Optimize assets, accessible UI, secure multiplayer
+- **+ C# .NET**: Async best practices, Clean Architecture, Span<T> for performance
+- **+ Hugging Face**: Validate model inputs, optimize inference, accessible AI content
+
+**Command Patterns**:
+```bash
+# Security audits
+npm audit --audit-level=moderate
+dotnet list package --vulnerable
+bandit -r . --severity-level medium
+
+# Accessibility testing
+npx lighthouse https://example.com --only-categories=accessibility
+axe-core test.html
+
+# Performance profiling
+node --prof app.js
+dotnet trace collect --process-id <PID>
+```
+
+**Resources**:
+- OWASP Top 10: https://owasp.org/www-project-top-ten/
+- WCAG 2.2: https://www.w3.org/TR/WCAG22/
+- Web.dev Performance: https://web.dev/performance/
+- Object Calisthenics: https://www.cs.helsinki.fi/u/luontola/tdd-2009/ext/ObjectCalisthenics.pdf
+- Agent Documentation: `.github/agents/security-best-practices.agent.md`
+

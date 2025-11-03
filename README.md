@@ -75,23 +75,27 @@ For more information about how to use the GitHub Copilot CLI, see [our official 
 
 ## Custom Agents
 
-This repository includes the following custom agents:
+This repository includes comprehensive custom agents:
 
-- **Commander Brandynette** (`.github/agents/commander-brandynette.agent.md`) - Meta-orchestration agent for coordinating multi-agent workflows, URL management, and cross-platform integrations
-- **C# .NET Development** (`.github/agents/csharp-dotnet.agent.md`) - Expert guidance for C# and .NET development with ASP.NET, async patterns, xUnit testing
-- **GitHub Issue Helper** (`.github/agents/github-issue-helper.agent.md`) - Assists with issue triage, labeling, and common troubleshooting patterns
-- **Reddit Devvit** (`.github/agents/reddit-devvit.agent.md`) - Helps build Reddit apps using the Devvit platform
-- **Stripe Integration** (`.github/agents/stripe-integration.agent.md`) - Guides payment processing, subscriptions, and Stripe API integration
-- **Unity Avatar System** (`.github/agents/unity-avatar-system.agent.md`) - Assists with Unity game development and MCP server integration
-- **Hugging Face ML** (`.github/agents/huggingface-ml.agent.md`) - Integrates AI/ML models for text, vision, audio, and multimodal tasks
-- **Awesome Copilot Discovery** (`.github/agents/awesome-copilot-discovery.agent.md`) - Discovers and suggests relevant Copilot collections and agents
+1. **Commander Brandynette** - Meta-orchestration agent coordinating all specialized agents with URL management, workflow automation (sequential/parallel/conditional/event-driven), and cross-platform integration
+2. **GitHub Issue Helper** - Issue triage, labeling, and management automation for this repository
+3. **Reddit Devvit** - Reddit app development using the Devvit platform
+4. **Stripe Integration** - Payment processing, subscriptions, and invoicing with MCP
+5. **Unity Avatar System** - Unity 6.2 LTS game development with 8 MCP server stack
+6. **Hugging Face ML** - AI/ML model integration for text, vision, audio, and multimodal tasks
+7. **C# .NET Development** - Expert C# and .NET development with async patterns, Clean Architecture, and testing
+8. **Security & Code Quality** - OWASP security, WCAG 2.2 accessibility, performance optimization, object calisthenics, and self-explanatory code practices
+9. **Awesome Copilot Discovery** - Meta discovery of Copilot collections, agents, and prompts
 
-##### Available Collections
+## Available Collections
 
-- **`integrations.collection.yml`**: External platform integrations (GitHub, Reddit, Stripe, Unity, Hugging Face, awesome-copilot) - 8 agents
-- **`development-workflows.collection.yml`**: Agentic workflows for game dev, payments, and meta discovery - 3 agents
-- **`development-languages.collection.yml`**: Language-specific agents for C#/.NET and Unity game development - 2 agents
-- **`meta-orchestration.collection.yml`**: Multi-agent coordination, URL management, and workflow automation - 3 agents
+This repository includes 5 curated collections:
+
+1. **Platform Integrations** (9 agents) - All platform integration agents in one collection
+2. **Development Workflows** (3 agents) - Workflow-focused agents for common development tasks
+3. **Development Languages** (2 agents) - Language-specific development agents
+4. **Meta Orchestration** (3 agents) - Meta-orchestration and workflow automation
+5. **Security & Code Quality** (1 agent) - Security, accessibility, performance, and code quality best practices
 
 
 ## 📢 Feedback and Participation

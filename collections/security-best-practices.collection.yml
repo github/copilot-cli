@@ -1,0 +1,10 @@
+id: security-best-practices
+name: Security & Code Quality
+description: Security frameworks (OWASP), accessibility guidelines (WCAG 2.2), performance optimization, object calisthenics, and self-explanatory code best practices for building secure, accessible, maintainable, and high-performance applications.
+tags: [security, accessibility, performance, code-quality, owasp, wcag, a11y, optimization, best-practices, clean-code]
+items:
+  - path: agents/security-best-practices.agent.md
+    kind: instruction
+display:
+  ordering: alpha
+  show_badge: true
