@@ -73,6 +73,24 @@ Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premi
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
+## Custom Agents
+
+This repository includes the following custom agents:
+
+- **C# .NET Development** (`.github/agents/csharp-dotnet.agent.md`) - Expert guidance for C# and .NET development with ASP.NET, async patterns, xUnit testing
+- **GitHub Issue Helper** (`.github/agents/github-issue-helper.agent.md`) - Assists with issue triage, labeling, and common troubleshooting patterns
+- **Reddit Devvit** (`.github/agents/reddit-devvit.agent.md`) - Helps build Reddit apps using the Devvit platform
+- **Stripe Integration** (`.github/agents/stripe-integration.agent.md`) - Guides payment processing, subscriptions, and Stripe API integration
+- **Unity Avatar System** (`.github/agents/unity-avatar-system.agent.md`) - Assists with Unity game development and MCP server integration
+- **Hugging Face ML** (`.github/agents/huggingface-ml.agent.md`) - Integrates AI/ML models for text, vision, audio, and multimodal tasks
+- **Awesome Copilot Discovery** (`.github/agents/awesome-copilot-discovery.agent.md`) - Discovers and suggests relevant Copilot collections and agents
+
+##### Available Collections
+
+- **`integrations.collection.yml`**: External platform integrations (GitHub, Reddit, Stripe, Unity, Hugging Face, awesome-copilot)
+- **`development-workflows.collection.yml`**: Agentic workflows for game dev, payments, and meta discovery
+- **`development-languages.collection.yml`**: Language-specific agents for C#/.NET and Unity game development
+
 
 ## 📢 Feedback and Participation
 

@@ -1,0 +1,14 @@
+id: copilot-cli-development-workflows
+name: Copilot CLI Development Workflows
+description: Agentic workflows for game development, payment processing, and meta discovery
+tags: [development, workflows, gamedev, payments, meta]
+items:
+  - path: .github/agents/unity-avatar-system.agent.md
+    kind: instruction
+  - path: .github/agents/stripe-integration.agent.md
+    kind: instruction
+  - path: .github/agents/awesome-copilot-discovery.agent.md
+    kind: instruction
+display:
+  ordering: manual
+  show_badge: true

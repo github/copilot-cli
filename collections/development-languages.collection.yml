@@ -1,0 +1,12 @@
+id: copilot-cli-development-languages
+name: Development Languages & Frameworks
+description: Language-specific agents for C#/.NET, Unity game development, and other frameworks
+tags: [languages, frameworks, csharp, dotnet, unity, gamedev]
+items:
+  - path: .github/agents/csharp-dotnet.agent.md
+    kind: instruction
+  - path: .github/agents/unity-avatar-system.agent.md
+    kind: instruction
+display:
+  ordering: alpha
+  show_badge: true
