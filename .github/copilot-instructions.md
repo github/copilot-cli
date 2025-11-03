@@ -535,3 +535,149 @@ dotnet trace collect --process-id <PID>
 - Object Calisthenics: https://www.cs.helsinki.fi/u/luontola/tdd-2009/ext/ObjectCalisthenics.pdf
 - Agent Documentation: `.github/agents/security-best-practices.agent.md`
 
+### Markdown Documentation Best Practices
+
+When users need well-structured, accessible, and maintainable documentation:
+
+**Key Concepts**:
+- **Structure & Hierarchy**: Proper heading levels (H2, H3), never use H1
+- **Formatting Standards**: Consistent code blocks with language specification, proper lists, tables
+- **Accessibility**: Alt text for images, descriptive link text, semantic structure
+- **Readability**: Line length under 400 characters, proper whitespace
+- **Validation**: Front matter requirements, content compliance
+
+**Heading Guidelines**:
+```markdown
+<!-- GOOD: Clear hierarchy -->
+## Installation
+### Prerequisites
+### Step-by-Step Guide
+
+## Configuration
+### Environment Variables
+
+<!-- BAD: Skipped levels, using H1 -->
+# Title (never use H1)
+## Section
+#### Subsection (skipped H3)
+```
+
+**Code Blocks**:
+```markdown
+<!-- GOOD: Language specified -->
+```javascript
+const example = 'Always specify language';
+\`\`\`
+
+```python
+def example():
+    return "Python code"
+\`\`\`
+
+<!-- BAD: No language -->
+```
+code without language
+\`\`\`
+```
+
+**Images & Accessibility**:
+```markdown
+<!-- GOOD: Descriptive alt text -->
+![Architecture diagram showing three-tier application with frontend, API, and database](architecture.png)
+
+<!-- BAD: Missing alt text -->
+![](screenshot.png)
+```
+
+**Links**:
+```markdown
+<!-- GOOD: Descriptive -->
+Read the [installation guide](docs/install.md) for setup.
+
+<!-- BAD: Non-descriptive -->
+Click [here](docs/install.md).
+```
+
+**Common Patterns**:
+- README structure: Description, Features, Installation, Quick Start, Documentation, License
+- API documentation: Syntax, Parameters, Returns, Examples, Throws
+- Changelog format: [Version] - Date, Added/Changed/Deprecated/Removed/Fixed/Security
+
+**Resources**:
+- GitHub Flavored Markdown: https://github.github.com/gfm/
+- CommonMark Spec: https://spec.commonmark.org/
+- Markdown Guide: https://www.markdownguide.org/
+- Agent Documentation: `.github/agents/markdown-documentation.agent.md`
+
+### Memory Bank Project Context Management
+
+When users need to maintain project continuity across sessions:
+
+**Key Concepts**:
+- **Memory Bank**: Structured documentation system that survives memory resets
+- **Core Files**: Required documents (projectbrief, productContext, activeContext, systemPatterns, techContext, progress)
+- **Task Management**: Detailed task tracking with progress logs and subtasks
+- **Project Intelligence**: Learning journal capturing patterns and preferences
+
+**Core Files Structure**:
+```
+memory-bank/
+├── projectbrief.md          # Foundation document
+├── productContext.md        # Why this exists
+├── activeContext.md         # Current work focus
+├── systemPatterns.md        # Architecture & patterns
+├── techContext.md           # Technologies used
+├── progress.md              # Status & known issues
+├── instructions.md          # Project intelligence
+└── tasks/                   # Task management
+    ├── _index.md            # Master task list
+    ├── TASK001-feature.md   # Individual tasks
+    └── TASK002-bugfix.md
+```
+
+**Task Management**:
+```markdown
+# [TASK001] - Feature Name
+
+**Status:** In Progress  
+**Added:** 2025-03-15  
+**Updated:** 2025-03-18
+
+## Progress Tracking
+**Overall Status:** In Progress - 60% Complete
+
+### Subtasks
+| ID | Description | Status | Updated | Notes |
+|----|-------------|--------|---------|-------|
+| 1.1 | Subtask 1 | Complete | 2025-03-15 | Done |
+| 1.2 | Subtask 2 | In Progress | 2025-03-18 | 50% |
+
+## Progress Log
+### 2025-03-18
+- Completed subtask 1.1
+- Started work on subtask 1.2
+```
+
+**Task Commands**:
+- `add task [name]` - Create new task with unique ID
+- `update task [ID]` - Update progress and status
+- `show tasks [filter]` - View tasks (all, active, pending, completed, blocked)
+
+**Core Workflows**:
+- **Plan Mode**: Read all files → propose approach → create task → update context
+- **Act Mode**: Read task file → implement → update progress → update status
+- **Update Memory Bank**: Review ALL files → update recent changes → update progress
+
+**Best Practices**:
+- Read ALL memory bank files at start of every task (not optional)
+- Update activeContext.md every session
+- Update progress.md after significant milestones
+- Add progress log entries with dates
+- Maintain task files with detailed thought process
+
+**Resources**:
+- Memory Bank methodology documentation
+- Task tracking patterns
+- Agent Documentation: `.github/agents/memory-bank.agent.md`
+
+

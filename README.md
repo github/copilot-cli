@@ -80,22 +80,25 @@ This repository includes comprehensive custom agents:
 1. **Commander Brandynette** - Meta-orchestration agent coordinating all specialized agents with URL management, workflow automation (sequential/parallel/conditional/event-driven), and cross-platform integration
 2. **GitHub Issue Helper** - Issue triage, labeling, and management automation for this repository
 3. **Reddit Devvit** - Reddit app development using the Devvit platform
-4. **Stripe Integration** - Payment processing, subscriptions, and invoicing with MCP
+4. **Stripe Integration** - Payment processing, subscriptions, and invoicing with MCP (verified customer: cus_T7HI2eMoOvIsqA)
 5. **Unity Avatar System** - Unity 6.2 LTS game development with 8 MCP server stack
 6. **Hugging Face ML** - AI/ML model integration for text, vision, audio, and multimodal tasks
 7. **C# .NET Development** - Expert C# and .NET development with async patterns, Clean Architecture, and testing
 8. **Security & Code Quality** - OWASP security, WCAG 2.2 accessibility, performance optimization, object calisthenics, and self-explanatory code practices
-9. **Awesome Copilot Discovery** - Meta discovery of Copilot collections, agents, and prompts
+9. **Markdown Documentation** - Expert markdown formatting, structure, accessibility, and documentation best practices
+10. **Memory Bank** - Project context management with task tracking, maintaining continuity across sessions
+11. **Awesome Copilot Discovery** - Meta discovery of Copilot collections, agents, and prompts
 
 ## Available Collections
 
-This repository includes 5 curated collections:
+This repository includes 6 curated collections:
 
-1. **Platform Integrations** (9 agents) - All platform integration agents in one collection
+1. **Platform Integrations** (11 agents) - All platform integration agents in one collection
 2. **Development Workflows** (3 agents) - Workflow-focused agents for common development tasks
 3. **Development Languages** (2 agents) - Language-specific development agents
 4. **Meta Orchestration** (3 agents) - Meta-orchestration and workflow automation
 5. **Security & Code Quality** (1 agent) - Security, accessibility, performance, and code quality best practices
+6. **Documentation Tools** (2 agents) - Markdown documentation and Memory Bank context management
 
 
 ## 📢 Feedback and Participation

@@ -13,9 +13,11 @@ Pre-built agents for integrating Copilot CLI with external platforms and service
 - **C# .NET Development**: Expert guidance for C# and .NET with ASP.NET, async patterns, xUnit testing
 - **GitHub Issue Helper**: Issue triage, creation, and management for copilot-cli repository
 - **Hugging Face ML**: AI/ML model integration for text, vision, audio, and multimodal tasks
+- **Markdown Documentation**: Expert markdown formatting, structure, accessibility, documentation best practices
+- **Memory Bank**: Project context management with task tracking, maintaining continuity across sessions
 - **Reddit Devvit Helper**: Reddit app development using the Devvit platform
 - **Security & Code Quality**: OWASP security, WCAG 2.2 accessibility, performance optimization, object calisthenics
-- **Stripe Integration**: Payment processing, subscriptions, and financial operations
+- **Stripe Integration**: Payment processing, subscriptions, and financial operations (verified customer: cus_T7HI2eMoOvIsqA)
 - **Unity Avatar System**: Character controllers, MCP workflows, and game development
 
 ### `development-workflows.collection.yml`
@@ -46,6 +48,13 @@ Security, accessibility, performance, and code quality best practices.
 
 **Included Agent:**
 - **Security & Code Quality**: OWASP Top 10 security, WCAG 2.2 AA accessibility, frontend/backend/database performance optimization, object calisthenics for domain code, and self-explanatory code practices
+
+### `documentation-tools.collection.yml`
+Essential tools for creating documentation and maintaining project context.
+
+**Included Agents:**
+- **Markdown Documentation**: Expert markdown formatting following GitHub/CommonMark standards, proper heading hierarchy, code blocks with syntax highlighting, accessible images with alt text, table formatting, and documentation patterns
+- **Memory Bank**: Project context management using Memory Bank methodology - tracks project state, active context, system patterns, progress, and tasks with detailed tracking across sessions
 
 ## Using Custom Agents
 

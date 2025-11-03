@@ -13,6 +13,10 @@ items:
     kind: instruction
   - path: agents/huggingface-ml.agent.md
     kind: instruction
+  - path: agents/markdown-documentation.agent.md
+    kind: instruction
+  - path: agents/memory-bank.agent.md
+    kind: instruction
   - path: agents/reddit-devvit.agent.md
     kind: instruction
   - path: agents/security-best-practices.agent.md

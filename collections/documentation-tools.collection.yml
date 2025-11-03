@@ -1,0 +1,12 @@
+id: documentation-tools
+name: Documentation & Context Management
+description: Essential tools for creating well-structured markdown documentation and maintaining project context across sessions with Memory Bank methodology
+tags: [documentation, markdown, memory-bank, context-management, project-intelligence, task-tracking]
+items:
+  - path: agents/markdown-documentation.agent.md
+    kind: instruction
+  - path: agents/memory-bank.agent.md
+    kind: instruction
+display:
+  ordering: alpha
+  show_badge: true
