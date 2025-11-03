@@ -9,6 +9,7 @@ Pre-built agents for integrating Copilot CLI with external platforms and service
 
 **Included Agents:**
 - **Awesome Copilot Discovery**: Meta discovery of Copilot collections, agents, and prompts
+- **Commander Brandynette**: Meta-orchestration for multi-agent workflows, URL management, cross-platform integration
 - **C# .NET Development**: Expert guidance for C# and .NET with ASP.NET, async patterns, xUnit testing
 - **GitHub Issue Helper**: Issue triage, creation, and management for copilot-cli repository
 - **Hugging Face ML**: AI/ML model integration for text, vision, audio, and multimodal tasks
@@ -30,6 +31,14 @@ Language-specific agents for modern development frameworks.
 **Included Agents:**
 - **C# .NET Development**: Expert guidance for C# and .NET with ASP.NET Core, async patterns, xUnit testing, Clean Architecture
 - **Unity Avatar System**: Game development with Unity 6.2 LTS, character controllers, and MCP workflows
+
+### `meta-orchestration.collection.yml`
+Advanced multi-agent coordination and workflow automation.
+
+**Included Agents:**
+- **Commander Brandynette**: Meta-orchestration agent for coordinating complex multi-agent workflows, URL management, cross-platform integrations
+- **Awesome Copilot Discovery**: Resource discovery and meta-prompting from awesome-copilot
+- **GitHub Issue Helper**: Issue management integration for orchestrated workflows
 
 ## Using Custom Agents
 

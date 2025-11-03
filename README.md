@@ -77,6 +77,7 @@ For more information about how to use the GitHub Copilot CLI, see [our official 
 
 This repository includes the following custom agents:
 
+- **Commander Brandynette** (`.github/agents/commander-brandynette.agent.md`) - Meta-orchestration agent for coordinating multi-agent workflows, URL management, and cross-platform integrations
 - **C# .NET Development** (`.github/agents/csharp-dotnet.agent.md`) - Expert guidance for C# and .NET development with ASP.NET, async patterns, xUnit testing
 - **GitHub Issue Helper** (`.github/agents/github-issue-helper.agent.md`) - Assists with issue triage, labeling, and common troubleshooting patterns
 - **Reddit Devvit** (`.github/agents/reddit-devvit.agent.md`) - Helps build Reddit apps using the Devvit platform
@@ -87,9 +88,10 @@ This repository includes the following custom agents:
 
 ##### Available Collections
 
-- **`integrations.collection.yml`**: External platform integrations (GitHub, Reddit, Stripe, Unity, Hugging Face, awesome-copilot)
-- **`development-workflows.collection.yml`**: Agentic workflows for game dev, payments, and meta discovery
-- **`development-languages.collection.yml`**: Language-specific agents for C#/.NET and Unity game development
+- **`integrations.collection.yml`**: External platform integrations (GitHub, Reddit, Stripe, Unity, Hugging Face, awesome-copilot) - 8 agents
+- **`development-workflows.collection.yml`**: Agentic workflows for game dev, payments, and meta discovery - 3 agents
+- **`development-languages.collection.yml`**: Language-specific agents for C#/.NET and Unity game development - 2 agents
+- **`meta-orchestration.collection.yml`**: Multi-agent coordination, URL management, and workflow automation - 3 agents
 
 
 ## 📢 Feedback and Participation

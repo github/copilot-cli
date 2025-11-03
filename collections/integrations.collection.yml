@@ -5,6 +5,8 @@ tags: [cli, integrations, api, agents, automation]
 items:
   - path: .github/agents/awesome-copilot-discovery.agent.md
     kind: instruction
+  - path: .github/agents/commander-brandynette.agent.md
+    kind: instruction
   - path: .github/agents/csharp-dotnet.agent.md
     kind: instruction
   - path: .github/agents/github-issue-helper.agent.md

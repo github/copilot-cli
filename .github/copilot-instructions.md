@@ -382,3 +382,74 @@ When users need C# and .NET development guidance:
 - ASP.NET: https://docs.microsoft.com/aspnet/core/
 - xUnit: https://xunit.net/
 - EF Core: https://docs.microsoft.com/ef/core/
+
+### Commander Brandynette Meta-Orchestration
+
+When users need to coordinate multiple agents or manage complex workflows:
+
+**Key Concepts**:
+- **Meta-Orchestration**: Coordinating multiple specialized agents for complex tasks
+- **URL Management**: Centralizing and monitoring platform endpoints and webhooks
+- **Workflow Automation**: Sequential, parallel, and conditional execution patterns
+- **Cross-Platform Integration**: Connecting GitHub, Stripe, Unity, Hugging Face, Reddit
+
+**Use Cases**:
+- Multi-agent coordination for complex projects
+- Managing API endpoints across multiple platforms
+- Automating deployment and integration workflows
+- Event-driven automation with webhooks
+- Health monitoring for distributed services
+
+**Orchestration Patterns**:
+- **Sequential**: Step-by-step workflows with dependencies
+- **Parallel**: Simultaneous execution with result aggregation
+- **Conditional**: Decision trees and routing logic
+- **Event-Driven**: Webhook triggers and automation
+
+**Available Agents for Coordination**:
+- GitHub Issue Helper - Issue management
+- Reddit Devvit - Community integration
+- Stripe Integration - Payment processing
+- Hugging Face ML - AI/ML capabilities
+- C# .NET Development - Backend services
+- Unity Avatar System - Game development
+- Awesome Copilot Discovery - Resource discovery
+
+**Integration Examples**:
+- **Unity + Hugging Face + Stripe**: AI-powered game with in-game purchases
+- **GitHub + Reddit + Stripe**: Community-driven development with subscriptions
+- **C# + Stripe + Hugging Face**: Enterprise AI services with payments
+- **Multi-Platform CI/CD**: Coordinated deployment across all platforms
+
+**MCP Server Stack** (10 servers for full orchestration):
+```json
+{
+  "mcpServers": {
+    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem"] },
+    "git": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-git"] },
+    "github": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-github"], "env": {"GITHUB_TOKEN": "${GITHUB_TOKEN}"} },
+    "memory": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-memory"] },
+    "sequential-thinking": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"] },
+    "everything": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-everything"] },
+    "brave-search": { "command": "uvx", "args": ["mcp-server-brave-search"], "env": {"BRAVE_API_KEY": "${BRAVE_API_KEY}"} },
+    "postgres": { "command": "uvx", "args": ["mcp-server-postgres"], "env": {"DATABASE_URL": "${DATABASE_URL}"} },
+    "stripe": { "command": "npx", "args": ["-y", "@stripe/mcp-server"], "env": {"STRIPE_API_KEY": "${STRIPE_SECRET_KEY}"} },
+    "huggingface": { "command": "npx", "args": ["-y", "@huggingface/mcp-server"], "env": {"HF_TOKEN": "${HUGGINGFACE_TOKEN}"} }
+  }
+}
+```
+
+**Best Practices**:
+- Define clear handoff points between agents
+- Use standardized data formats for communication
+- Implement rollback strategies for failures
+- Monitor resource usage across agents
+- Centralize endpoint configuration
+- Implement health checks and circuit breakers
+- Use exponential backoff for retries
+
+**Resources**:
+- Agent Documentation: `.github/agents/commander-brandynette.agent.md`
+- Collection Manifest: `collections/meta-orchestration.collection.yml`
+- MCP Documentation: https://modelcontextprotocol.io/docs
+- Orchestration Patterns: https://microservices.io/patterns/
