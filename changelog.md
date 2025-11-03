@@ -1,3 +1,16 @@
+## 0.0.354 - 2025-11-03
+
+- Exit with nonzero code when `-p` mode fails due to LLM backend errors (auth failures, quota exhaustion, network issues)
+- Support for MCP server tool notifications
+- Support for `COPILOT_GITHUB_TOKEN` environment variable for authentication (takes precedence over `GH_TOKEN`)
+- Improved shell command safety with better heredoc handling outside of commands
+- Diff hunk lines now properly fill the width of the diff box
+- MCP servers in GitHub Actions environments automatically use `GITHUB_WORKSPACE` as working directory
+- `/delegate` command now works correctly when no local changes exist
+- Custom agents with special characters in filenames no longer fail
+- Better error messages when using unsupported models with `/model` command
+- Alternative model providers now work correctly when using different OpenAI base URLs
+
 ## 0.0.353 - 2025-10-28
 
 - Added support for custom agents. Custom agent definitions are pulled from `~/.copilot/agents`, `.github/agents` in your repository, or your organization's `.github` repository. You can explicitly invoke an agent with the `/agent` slash command interactively or `--agent <agent>` noninteractively. Agents are also provided as tools that the model can call during completion of a task
