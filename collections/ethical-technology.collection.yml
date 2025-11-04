@@ -1,7 +1,7 @@
-id: copilot-cli-integrations
-name: Copilot CLI Integration Agents
-description: Pre-built agents for integrating GitHub Copilot CLI with external platforms and services
-tags: [cli, integrations, api, agents, automation]
+id: copilot-cli-ethical-technology
+name: Ethical Technology - Holly Greed Principle
+description: All agents unified by the Holly Greed Principle - sustainable, win-win development that benefits users, businesses, and the planet
+tags: [ethical, sustainable, win-win, holly-greed, optimization, security, transparency]
 items:
   - path: agents/awesome-copilot-discovery.agent.md
     kind: instruction

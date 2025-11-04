@@ -1,0 +1,14 @@
+id: copilot-cli-infrastructure
+name: Infrastructure & Data Management
+description: Agents for container optimization, database administration, and Python MCP server development
+tags: [infrastructure, docker, database, containers, devops, optimization, security, mcp, python]
+items:
+  - path: agents/docker-containerization.agent.md
+    kind: instruction
+  - path: agents/database-management.agent.md
+    kind: instruction
+  - path: agents/python-mcp-development.agent.md
+    kind: instruction
+display:
+  ordering: alpha
+  show_badge: false

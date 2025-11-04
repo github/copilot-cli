@@ -87,17 +87,23 @@ This repository includes comprehensive custom agents:
 8. **Security & Code Quality** - OWASP security, WCAG 2.2 accessibility, performance optimization, object calisthenics, and self-explanatory code practices
 9. **Markdown Documentation** - Expert markdown formatting, structure, accessibility, and documentation best practices
 10. **Memory Bank** - Project context management with task tracking, maintaining continuity across sessions
-11. **Awesome Copilot Discovery** - Meta discovery of Copilot collections, agents, and prompts
+11. **Docker Containerization** - Container optimization with multi-stage builds, security best practices, and sustainable infrastructure
+12. **Database Management** - Database administration, SQL optimization, and responsible data stewardship for PostgreSQL and SQL Server
+13. **Python MCP Development** - Building Model Context Protocol servers in Python with FastMCP, type-safe tools, and ethical API design
+14. **Awesome Copilot Discovery** - Meta discovery of Copilot collections, agents, and prompts
 
 ## Available Collections
 
-This repository includes 6 curated collections:
+This repository includes 8 curated collections:
 
-1. **Platform Integrations** (11 agents) - All platform integration agents in one collection
+1. **Platform Integrations** (14 agents) - All platform integration agents in one collection
 2. **Development Workflows** (3 agents) - Workflow-focused agents for common development tasks
 3. **Development Languages** (2 agents) - Language-specific development agents
 4. **Meta Orchestration** (3 agents) - Meta-orchestration and workflow automation
 5. **Security & Code Quality** (1 agent) - Security, accessibility, performance, and code quality best practices
+6. **Documentation Tools** (2 agents) - Markdown documentation and memory bank project context management
+7. **Infrastructure & Data** (3 agents) - Docker containerization, database management, and Python MCP development
+8. **Ethical Technology** (14 agents) - All agents unified by the Holly Greed Principle of sustainable, win-win development
 6. **Documentation Tools** (2 agents) - Markdown documentation and Memory Bank context management
 
 
