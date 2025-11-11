@@ -1,0 +1,135 @@
+{
+  "folders": [
+    {
+      "name": "Stilya Fashion AI",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.autoImportCompletions": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "black",
+    "python.sortImports.args": ["--profile", "black"],
+    
+    "github.copilot.enable": {
+      "*": true,
+      "yaml": true,
+      "plaintext": true,
+      "markdown": true,
+      "python": true
+    },
+    
+    "github.copilot.advanced": {
+      "length": 3000,
+      "temperature": 0.1,
+      "top_p": 1,
+      "indentationMode": {
+        "python": "spaces"
+      }
+    },
+    
+    "files.associations": {
+      "*.md": "markdown",
+      ".copilot/*": "markdown"
+    },
+    
+    "search.exclude": {
+      "**/.git": true,
+      "**/node_modules": true,
+      "**/__pycache__": true,
+      "**/.pytest_cache": true,
+      "**/venv": true,
+      "**/.venv": true
+    },
+    
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/node_modules/**": true,
+      "**/__pycache__/**": true,
+      "**/venv/**": true
+    },
+    
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true,
+      "source.fixAll": true
+    },
+    
+    "terminal.integrated.env.windows": {
+      "PYTHONPATH": "${workspaceFolder}/src"
+    },
+    "terminal.integrated.env.linux": {
+      "PYTHONPATH": "${workspaceFolder}/src"
+    },
+    "terminal.integrated.env.osx": {
+      "PYTHONPATH": "${workspaceFolder}/src"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance", 
+      "github.copilot",
+      "github.copilot-chat",
+      "ms-vscode.vscode-json",
+      "ms-azuretools.vscode-docker",
+      "ms-azuretools.azure-dev",
+      "ms-azuretools.vscode-azureresourcegroups"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Setup Virtual Environment",
+        "type": "shell",
+        "command": "python",
+        "args": ["-m", "venv", "venv"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Install Dependencies",
+        "type": "shell",
+        "command": "${workspaceFolder}/venv/bin/pip",
+        "windows": {
+          "command": "${workspaceFolder}/venv/Scripts/pip.exe"
+        },
+        "args": ["install", "-r", "requirements.txt"],
+        "group": "build",
+        "dependsOn": "Setup Virtual Environment"
+      },
+      {
+        "label": "Run Tests",
+        "type": "shell",
+        "command": "${workspaceFolder}/venv/bin/python",
+        "windows": {
+          "command": "${workspaceFolder}/venv/Scripts/python.exe"
+        },
+        "args": ["test_stilya.py"],
+        "group": "test",
+        "dependsOn": "Install Dependencies"
+      },
+      {
+        "label": "Start API Server",
+        "type": "shell",
+        "command": "${workspaceFolder}/venv/bin/uvicorn",
+        "windows": {
+          "command": "${workspaceFolder}/venv/Scripts/uvicorn.exe"
+        },
+        "args": ["stilya.communication.api:app", "--reload", "--host", "0.0.0.0", "--port", "8000"],
+        "group": "build",
+        "dependsOn": "Install Dependencies",
+        "isBackground": true
+      }
+    ]
+  }
+}

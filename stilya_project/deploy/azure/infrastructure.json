@@ -1,0 +1,373 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "type": "string",
+            "defaultValue": "stilya-fashion-ai",
+            "metadata": {
+                "description": "Name of the Stilya Fashion AI application"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "dev",
+            "allowedValues": ["dev", "staging", "prod"],
+            "metadata": {
+                "description": "Environment (dev, staging, prod)"
+            }
+        },
+        "containerImage": {
+            "type": "string",
+            "defaultValue": "stilyafashionai/api:latest",
+            "metadata": {
+                "description": "Container image for the application"
+            }
+        },
+        "minReplicas": {
+            "type": "int",
+            "defaultValue": 2,
+            "metadata": {
+                "description": "Minimum number of replicas"
+            }
+        },
+        "maxReplicas": {
+            "type": "int",
+            "defaultValue": 10,
+            "metadata": {
+                "description": "Maximum number of replicas"
+            }
+        }
+    },
+    "variables": {
+        "resourcePrefix": "[concat(parameters('appName'), '-', parameters('environment'))]",
+        "containerAppEnvironmentName": "[concat(variables('resourcePrefix'), '-env')]",
+        "containerAppName": "[concat(variables('resourcePrefix'), '-app')]",
+        "keyVaultName": "[concat(variables('resourcePrefix'), '-kv')]",
+        "storageAccountName": "[concat(replace(variables('resourcePrefix'), '-', ''), 'storage')]",
+        "applicationInsightsName": "[concat(variables('resourcePrefix'), '-ai')]",
+        "logAnalyticsWorkspaceName": "[concat(variables('resourcePrefix'), '-law')]",
+        "serviceBusNamespaceName": "[concat(variables('resourcePrefix'), '-sb')]",
+        "redisCacheName": "[concat(variables('resourcePrefix'), '-redis')]",
+        "postgresServerName": "[concat(variables('resourcePrefix'), '-postgres')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2022-10-01",
+            "name": "[variables('logAnalyticsWorkspaceName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "sku": {
+                    "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('applicationInsightsName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "web",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+            ],
+            "properties": {
+                "Application_Type": "web",
+                "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2023-02-01",
+            "name": "[variables('keyVaultName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "tenantId": "[subscription().tenantId]",
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": true,
+                "enableSoftDelete": true,
+                "softDeleteRetentionInDays": 7,
+                "enableRbacAuthorization": true,
+                "publicNetworkAccess": "Enabled",
+                "accessPolicies": []
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-01-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "blob": {
+                            "enabled": true
+                        },
+                        "file": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2022-10-01-preview",
+            "name": "[variables('serviceBusNamespaceName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Cache/Redis",
+            "apiVersion": "2023-08-01",
+            "name": "[variables('redisCacheName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "sku": {
+                    "name": "Basic",
+                    "family": "C",
+                    "capacity": 1
+                },
+                "enableNonSslPort": false,
+                "minimumTlsVersion": "1.2",
+                "publicNetworkAccess": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.DBforPostgreSQL/flexibleServers",
+            "apiVersion": "2022-12-01",
+            "name": "[variables('postgresServerName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_B1ms",
+                "tier": "Burstable"
+            },
+            "properties": {
+                "administratorLogin": "stilya_admin",
+                "administratorLoginPassword": "[concat('P@ssw0rd', uniqueString(resourceGroup().id))]",
+                "version": "14",
+                "storage": {
+                    "storageSizeGB": 32
+                },
+                "backup": {
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled"
+                },
+                "highAvailability": {
+                    "mode": "Disabled"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
+            "apiVersion": "2022-12-01",
+            "name": "[concat(variables('postgresServerName'), '/stilya_db')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('postgresServerName'))]"
+            ],
+            "properties": {
+                "charset": "UTF8",
+                "collation": "en_US.utf8"
+            }
+        },
+        {
+            "type": "Microsoft.App/managedEnvironments",
+            "apiVersion": "2023-05-01",
+            "name": "[variables('containerAppEnvironmentName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+            ],
+            "properties": {
+                "appLogsConfiguration": {
+                    "destination": "log-analytics",
+                    "logAnalyticsConfiguration": {
+                        "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName')), '2022-10-01').customerId]",
+                        "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName')), '2022-10-01').primarySharedKey]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.App/containerApps",
+            "apiVersion": "2023-05-01",
+            "name": "[variables('containerAppName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.App/managedEnvironments', variables('containerAppEnvironmentName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusNamespaceName'))]",
+                "[resourceId('Microsoft.Cache/Redis', variables('redisCacheName'))]",
+                "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('postgresServerName'))]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', variables('containerAppEnvironmentName'))]",
+                "configuration": {
+                    "ingress": {
+                        "external": true,
+                        "targetPort": 8000,
+                        "allowInsecure": false,
+                        "traffic": [
+                            {
+                                "weight": 100,
+                                "latestRevision": true
+                            }
+                        ]
+                    },
+                    "secrets": [
+                        {
+                            "name": "azure-client-secret",
+                            "keyVaultUrl": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/secrets/azure-client-secret')]",
+                            "identity": "system"
+                        },
+                        {
+                            "name": "openai-api-key",
+                            "keyVaultUrl": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/secrets/openai-api-key')]",
+                            "identity": "system"
+                        },
+                        {
+                            "name": "postgres-password",
+                            "keyVaultUrl": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/secrets/postgres-password')]",
+                            "identity": "system"
+                        },
+                        {
+                            "name": "redis-key",
+                            "keyVaultUrl": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/secrets/redis-key')]",
+                            "identity": "system"
+                        }
+                    ]
+                },
+                "template": {
+                    "revisionSuffix": "[uniqueString(utcNow())]",
+                    "containers": [
+                        {
+                            "image": "[parameters('containerImage')]",
+                            "name": "stilya-api",
+                            "env": [
+                                {
+                                    "name": "ENVIRONMENT",
+                                    "value": "[parameters('environment')]"
+                                },
+                                {
+                                    "name": "AZURE_CLIENT_ID",
+                                    "value": "[reference(resourceId('Microsoft.App/containerApps', variables('containerAppName')), '2023-05-01', 'full').identity.principalId]"
+                                },
+                                {
+                                    "name": "AZURE_CLIENT_SECRET",
+                                    "secretRef": "azure-client-secret"
+                                },
+                                {
+                                    "name": "AZURE_TENANT_ID",
+                                    "value": "[subscription().tenantId]"
+                                },
+                                {
+                                    "name": "AZURE_KEY_VAULT_URL",
+                                    "value": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]"
+                                },
+                                {
+                                    "name": "AZURE_STORAGE_ACCOUNT_NAME",
+                                    "value": "[variables('storageAccountName')]"
+                                },
+                                {
+                                    "name": "AZURE_SERVICE_BUS_NAMESPACE",
+                                    "value": "[concat(variables('serviceBusNamespaceName'), '.servicebus.windows.net')]"
+                                },
+                                {
+                                    "name": "AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING",
+                                    "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').ConnectionString]"
+                                },
+                                {
+                                    "name": "OPENAI_API_KEY",
+                                    "secretRef": "openai-api-key"
+                                },
+                                {
+                                    "name": "DATABASE_URL",
+                                    "value": "[concat('postgresql://stilya_admin:', reference(resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('postgresServerName')), '2022-12-01').administratorLoginPassword, '@', variables('postgresServerName'), '.postgres.database.azure.com:5432/stilya_db')]"
+                                },
+                                {
+                                    "name": "REDIS_URL",
+                                    "value": "[concat('redis://', variables('redisCacheName'), '.redis.cache.windows.net:6380')]"
+                                },
+                                {
+                                    "name": "REDIS_PASSWORD",
+                                    "secretRef": "redis-key"
+                                }
+                            ],
+                            "resources": {
+                                "cpu": 1.0,
+                                "memory": "2Gi"
+                            }
+                        }
+                    ],
+                    "scale": {
+                        "minReplicas": "[parameters('minReplicas')]",
+                        "maxReplicas": "[parameters('maxReplicas')]",
+                        "rules": [
+                            {
+                                "name": "http-rule",
+                                "http": {
+                                    "metadata": {
+                                        "concurrentRequests": "30"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "cpu-rule",
+                                "custom": {
+                                    "type": "cpu",
+                                    "metadata": {
+                                        "type": "Utilization",
+                                        "value": "70"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "applicationUrl": {
+            "type": "string",
+            "value": "[concat('https://', reference(resourceId('Microsoft.App/containerApps', variables('containerAppName')), '2023-05-01').configuration.ingress.fqdn)]"
+        },
+        "keyVaultName": {
+            "type": "string",
+            "value": "[variables('keyVaultName')]"
+        },
+        "applicationInsightsName": {
+            "type": "string",
+            "value": "[variables('applicationInsightsName')]"
+        },
+        "containerAppName": {
+            "type": "string",
+            "value": "[variables('containerAppName')]"
+        },
+        "managedIdentityPrincipalId": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.App/containerApps', variables('containerAppName')), '2023-05-01', 'full').identity.principalId]"
+        }
+    ]
+}

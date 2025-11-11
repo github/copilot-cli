@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "Stilya Fashion AI Assistant",
+    "description": "Multi-agent AI system for personal fashion recommendations",
+    "type": "python-azure-ai",
+    "owner": "Vizyon sahibi girişimci (kod bilgisi yok)",
+    "ai_assistant_role": "Kalıcı kod ortağı ve sistem mimarı"
+  },
+  "context": {
+    "primary_files": [
+      ".copilot/PROJECT_CONTEXT.md",
+      "README.md", 
+      "src/stilya/orchestration/manager.py",
+      "src/stilya/communication/models.py"
+    ],
+    "architecture": "multi-agent-orchestration",
+    "deployment_target": "azure-container-apps",
+    "performance_requirements": {
+      "accuracy": "99.99%",
+      "search_speed": "<10ms",
+      "creativity_score": ">84%",
+      "empathy_level": ">90%"
+    }
+  },
+  "development": {
+    "patterns": {
+      "async_preferred": true,
+      "azure_native": true,
+      "type_hints_required": true,
+      "error_handling": "comprehensive",
+      "logging": "structured"
+    },
+    "forbidden": [
+      "sync_operations",
+      "hardcoded_secrets", 
+      "manual_deployment",
+      "bypassing_orchestration"
+    ]
+  },
+  "memory": {
+    "persist_context": true,
+    "remember_user_preferences": true,
+    "track_project_evolution": true,
+    "maintain_architecture_consistency": true
+  },
+  "automation": {
+    "full_deployment": true,
+    "testing": "comprehensive",
+    "monitoring": "azure_native",
+    "scaling": "auto"
+  }
+}
