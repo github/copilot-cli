@@ -1,5 +1,15 @@
 name: Close Non-Descriptive Issues
 
+# This workflow automatically closes issues with non-descriptive titles to maintain
+# issue quality. It detects and closes:
+# 1. Single-word titles (e.g., "bug", "help")
+# 2. Very short titles (< 10 characters) with fewer than 3 words
+# 3. Vague phrases in multiple languages (English, Arabic, Chinese, Japanese)
+#    Examples: "open app", "فتح اتطبيق", "打开应用", etc.
+#
+# Issues are labeled as 'invalid' and closed with a helpful message encouraging
+# users to open a new issue with a more descriptive title.
+
 on:
   issues:
     types:
