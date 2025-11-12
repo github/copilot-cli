@@ -1,4 +1,4 @@
-name: Close Single-Word Issues
+name: Close Non-Descriptive Issues
 
 on:
   issues:
@@ -13,20 +13,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Close Single-Word Issue
+      - name: Close Non-Descriptive Issue
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const issueTitle = context.payload.issue.title.trim();
+
+            // Check if it's a single word (no whitespace)
             const isSingleWord = /^\S+$/.test(issueTitle);
 
-            if (isSingleWord) {
+            // Check if title is too short (less than 10 characters)
+            const isTooShort = issueTitle.length < 10;
+
+            // Count words (split by whitespace and filter out empty strings)
+            const words = issueTitle.split(/\s+/).filter(word => word.length > 0);
+            const hasFewerThanThreeWords = words.length < 3;
+
+            // Check if title contains only very common/vague words
+            const vaguePhrases = [
+              /^(open|close|start|stop|launch|run|help|issue|problem|bug|error|fix)\s*(the|an|a)?\s*(app|application|program|cli|tool|issue)?$/i,
+              /^(فتح|إغلاق|مساعدة|مشكلة|خطأ)\s*([اأإ]?[تل]?تطبيق|[اأإ]?[تل]?برنامج)?$/,  // Arabic
+              /^(开|关|打开|关闭|启动|帮助|问题|错误)\s*(应用|程序)?$/,  // Chinese
+              /^(開く|閉じる|起動|ヘルプ|問題|エラー)\s*(アプリ|プログラム)?$/,  // Japanese
+            ];
+
+            const isVaguePhrase = vaguePhrases.some(pattern => pattern.test(issueTitle));
+
+            const shouldClose = isSingleWord || (isTooShort && hasFewerThanThreeWords) || isVaguePhrase;
+
+            if (shouldClose) {
               const issueNumber = context.payload.issue.number;
               const repo = context.repo.repo;
 
               // Close the issue and add the invalid label
-              github.rest.issues.update({
+              await github.rest.issues.update({
                 owner: context.repo.owner,
                 repo: repo,
                 issue_number: issueNumber,
@@ -39,6 +60,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: repo,
                 issue_number: issueNumber,
-                body: `This issue may have been opened accidentally. I'm going to close it now, but feel free to open a new issue with a more descriptive title.`
+                body: `This issue may have been opened accidentally or has a non-descriptive title. I'm going to close it now, but feel free to open a new issue with a more descriptive title that explains the problem or feature request in detail.`
               });
             }
