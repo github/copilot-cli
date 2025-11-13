@@ -1,3 +1,28 @@
+## 0.0.356 - 2025-11-13
+
+- GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini are now available in GitHub Copilot CLI. See the [GitHub Changelog](https://github.blog/changelog/2025-11-13-openais-gpt-5-1-gpt-5-1-codex-and-gpt-5-1-codex-mini-are-now-in-public-preview-for-github-copilot/) for more details
+
+## 0.0.355 - 2025-11-12
+
+- Enabled the CLI agent to read its own `/help` and README to answer questions about its capabilities
+- Improved parsing of VSCode-formatted custom agents with the `.agent.md` suffix
+- Sanitize tool names to fix issues like https://github.com/github/copilot-cli/issues/456
+- Bundled `ripgrep` and added `grep` and `glob` tools for more performant searching of codebases
+- Fixed malformed tool call handling before it reaches the UI (partially addresses https://github.com/github/copilot-cli/issues/393)
+- Prevent double line wraps in markdown messages
+- Fixed a bug where the file selector was used in multi-line input that led to unexpected up/down arrow behavior (fixes https://github.com/github/copilot-cli/issues/350)
+- Fixed a bug where remote MCP server configuration in custom agents was not fetched properly
+- Added more detail and improved the styling of the `/session` command's output
+- Removed the internal `NODE_ENV` variable from the shell tool's environment (fixes https://github.com/github/copilot-cli/issues/151)
+- Fixed a memory leak when using the interactive shell tool
+- Improved line number formatting in file view output (fixes https://github.com/github/copilot-cli/issues/471)
+- Lowered the default shell tool timeout and updated prompt language to not imply that timeout means failure
+- Ensured that we query the terminal background color before rendering (fixes https://github.com/github/copilot-cli/issues/36)
+- Ensured that the agent won't run `pkill` on its own PID
+- Fixed a bug where `copilot` would not quit after an abort signal (fixes https://github.com/github/copilot-cli/issues/529)
+- Ensure `!` commands on Windows use PowerShell when available (fixes https://github.com/github/copilot-cli/issues/504)
+- Fixed a bug in Windows Terminal where keyboard input was not accepted
+
 ## 0.0.354 - 2025-11-03
 
 - Exit with nonzero code when `-p` mode fails due to LLM backend errors (auth failures, quota exhaustion, network issues)
