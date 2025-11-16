@@ -1,0 +1,559 @@
+{
+  "version": "1.0",
+  "title": "Programa Online Group",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "gradient",
+        "background_color": "#0B1220",
+        "background_color_b": "#0EA5E9",
+        "padding": {
+          "unit": "px",
+          "top": 100,
+          "right": 20,
+          "bottom": 100,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "TREINE COMO UM PELOTÃO: JUNTOS SOMOS MAIS FORTES",
+                "header_size": "h1",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 52
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-subheading",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 24px; color: #FFFFFF; text-align: center; margin: 20px 0;'>Programa Online em Grupo<br>Treinos Semanais + Comunidade + Suporte</p>"
+              }
+            },
+            {
+              "id": "hero-price",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "R$ 97/mês",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 64
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "ENTRAR NO PELOTÃO →",
+                "link": {
+                  "url": "#formulario-inscricao"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 22
+                },
+                "background_color": "#FFFFFF",
+                "color": "#0B1220",
+                "padding": {
+                  "unit": "px",
+                  "top": 25,
+                  "right": 60,
+                  "bottom": 25,
+                  "left": 60
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 16px; color: #FFFFFF; text-align: center; margin-top: 20px;'>⚡ Vagas limitadas: Apenas 50 recrutas por turma</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "included-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "included-heading",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "included-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "O QUE ESTÁ INCLUÍDO NO PROGRAMA",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "included-grid",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "included-1",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "included-1-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-calendar-week",
+                    "title": "4 Treinos Semanais",
+                    "description": "Novos treinos toda semana. Progression overload planejado. Para todos os níveis.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "included-2",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "included-2-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-video",
+                    "title": "Lives Semanais",
+                    "description": "Toda terça às 20h. Tira dúvidas, aprende técnica, motiva-se com o pelotão.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "included-3",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "included-3-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-users",
+                    "title": "Comunidade Privada",
+                    "description": "Grupo exclusivo no WhatsApp/Telegram. Troque experiências, resultados e motivação.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "included-4",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "included-4-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-book",
+                    "title": "Biblioteca de Conteúdo",
+                    "description": "Acesso vitalício a 80+ artigos, vídeos técnicos e guias de nutrição.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "included-5",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "included-5-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-chart-line",
+                    "title": "App de Tracking",
+                    "description": "Registre seus treinos, acompanhe evolução, compare com o pelotão.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "included-6",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "included-6-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-trophy",
+                    "title": "Desafios Mensais",
+                    "description": "Compete com o pelotão. Prêmios para os top performers. Medalhas digitais.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "comparison-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#F8F9FA",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "comparison-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "comparison-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "PROGRAMA GROUP vs PERSONAL 1-ON-1",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "comparison-table",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='max-width: 800px; margin: 40px auto;'><table style='width: 100%; font-family: Inter; border-collapse: collapse;'><tr style='background: #0B1220; color: #FFFFFF;'><th style='padding: 15px; text-align: left;'>Recurso</th><th style='padding: 15px; text-align: center;'>GROUP (R$97)</th><th style='padding: 15px; text-align: center;'>1-ON-1 (R$497)</th></tr><tr><td style='padding: 15px; border-bottom: 1px solid #ddd;'>Treinos Semanais</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓ Genérico</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓ Personalizado</td></tr><tr><td style='padding: 15px; border-bottom: 1px solid #ddd;'>Plano Nutricional</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓ Guias Gerais</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓ Customizado</td></tr><tr><td style='padding: 15px; border-bottom: 1px solid #ddd;'>Suporte Direto</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>Grupo</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>WhatsApp Privado</td></tr><tr><td style='padding: 15px; border-bottom: 1px solid #ddd;'>Lives</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓ Semanais</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓ Mensais</td></tr><tr><td style='padding: 15px; border-bottom: 1px solid #ddd;'>Comunidade</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓</td><td style='padding: 15px; text-align: center; border-bottom: 1px solid #ddd;'>✓</td></tr><tr><td style='padding: 15px;'>Sessões 1-on-1</td><td style='padding: 15px; text-align: center;'>—</td><td style='padding: 15px; text-align: center;'>4/mês</td></tr></table></div><p style='font-family: Oswald; font-size: 20px; color: #0EA5E9; text-align: center; margin-top: 30px;'>DEPENDE! Do quanto você precisa de atenção individual.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testimonials-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "testimonials-heading",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "testimonials-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "O PELOTÃO JÁ ESTÁ EM MOVIMENTO",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "testimonials-slider",
+          "elType": "widget",
+          "widgetType": "testimonial-carousel",
+          "settings": {
+            "slides": [
+              {
+                "name": "Ana Paula L.",
+                "title": "Membro há 6 meses",
+                "content": "A comunidade é incrível! Quando eu não queria treinar, o grupo me puxava. Já perdi 12kg e fiz amigos de verdade.",
+                "image": "avatar-placeholder"
+              },
+              {
+                "name": "Marcos V.",
+                "title": "Membro há 4 meses",
+                "content": "Melhor custo-benefício impossível. Treinos profissionais, suporte constante, e ainda aprendo com as dúvidas dos outros nas lives.",
+                "image": "avatar-placeholder"
+              },
+              {
+                "name": "Juliana R.",
+                "title": "Membro há 8 meses",
+                "content": "Tentei academias tradicionais por anos. Nunca tive consistência. O Programa Group me deu estrutura, motivação e resultados.",
+                "image": "avatar-placeholder"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cta-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        },
+        "anchor": "formulario-inscricao"
+      },
+      "elements": [
+        {
+          "id": "cta-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "cta-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "JUNTE-SE AO PELOTÃO HOJE",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-price",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "R$ 97/mês",
+                "header_size": "h1",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 72
+                },
+                "color": "#0EA5E9",
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 18px; color: #FFFFFF; text-align: center; margin: 20px 0;'>Cancele quando quiser. Sem multa, sem burocracia.</p>"
+              }
+            },
+            {
+              "id": "contact-form",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_fields": [
+                  {
+                    "field_type": "text",
+                    "field_label": "Nome Completo",
+                    "required": true
+                  },
+                  {
+                    "field_type": "email",
+                    "field_label": "Email",
+                    "required": true
+                  },
+                  {
+                    "field_type": "tel",
+                    "field_label": "WhatsApp",
+                    "required": true
+                  },
+                  {
+                    "field_type": "select",
+                    "field_label": "Nível de Experiência",
+                    "required": true,
+                    "field_options": "Iniciante (nunca treinei)|Intermediário (treino há menos de 1 ano)|Avançado (treino há mais de 1 ano)"
+                  }
+                ],
+                "button_text": "ENTRAR NO PELOTÃO →",
+                "button_size": "lg",
+                "submit_actions": ["email", "redirect"],
+                "email_to": "contato@treinadordavid.com",
+                "email_subject": "Nova Inscrição - Programa Online Group",
+                "redirect_to": "/obrigado-programa-group",
+                "button_typography_font_family": "Oswald",
+                "button_background_color": "#0EA5E9",
+                "button_text_color": "#FFFFFF"
+              }
+            },
+            {
+              "id": "cta-guarantee",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 14px; color: #0EA5E9; text-align: center; margin-top: 30px;'>🛡️ Garantia de 7 dias - Não gostou? Devolvo 100%</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#000000",
+        "padding": {
+          "unit": "px",
+          "top": 40,
+          "right": 20,
+          "bottom": 40,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "footer-signature",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 24px; color: #0EA5E9; text-align: center;'>Semper Fidelis<br>— Treinador David</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

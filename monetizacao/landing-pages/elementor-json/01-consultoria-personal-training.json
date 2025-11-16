@@ -1,0 +1,692 @@
+{
+  "version": "1.0",
+  "title": "Consultoria Personal Training 1-on-1",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 100,
+          "right": 20,
+          "bottom": 100,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "TRANSFORME SEU CORPO COM DISCIPLINA MILITAR",
+                "header_size": "h1",
+                "typography_typography": "custom",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 56
+                },
+                "typography_font_weight": "700",
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-subheading",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 22px; color: #0EA5E9; text-align: center; margin: 20px 0;'>30 Anos de Experiência USMC + Personal Training<br>Resultados Garantidos ou Seu Dinheiro de Volta</p>"
+              }
+            },
+            {
+              "id": "hero-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "AGENDAR CONSULTORIA GRATUITA →",
+                "link": {
+                  "url": "#formulario-consultoria"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 20
+                },
+                "background_color": "#0EA5E9",
+                "color": "#FFFFFF",
+                "border_radius": {
+                  "unit": "px",
+                  "top": 5,
+                  "right": 5,
+                  "bottom": 5,
+                  "left": 5
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": 20,
+                  "right": 50,
+                  "bottom": 20,
+                  "left": 50
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-catchphrase",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 18px; color: #0EA5E9; text-align: center; margin-top: 30px; font-weight: 700;'>DEPENDE! Do seu comprometimento. Eu entrego o método.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "benefits-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "benefits-heading",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "benefits-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "O QUE VOCÊ RECEBE NA CONSULTORIA 1-ON-1",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "benefits-columns",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "benefit-1",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "benefit-1-icon",
+                  "elType": "widget",
+                  "widgetType": "icon",
+                  "settings": {
+                    "icon": "fas fa-dumbbell",
+                    "icon_color": "#0EA5E9",
+                    "icon_size": {
+                      "unit": "px",
+                      "size": 48
+                    },
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "benefit-1-title",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Treino Personalizado",
+                    "header_size": "h3",
+                    "typography_font_family": "Oswald",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 24
+                    },
+                    "color": "#0B1220",
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "benefit-1-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='font-family: Inter; font-size: 16px; color: #0B1220; text-align: center;'>Programa 100% adaptado ao seu corpo, objetivos e limitações. Nada de planilha genérica.</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "benefit-2",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "benefit-2-icon",
+                  "elType": "widget",
+                  "widgetType": "icon",
+                  "settings": {
+                    "icon": "fas fa-utensils",
+                    "icon_color": "#0EA5E9",
+                    "icon_size": {
+                      "unit": "px",
+                      "size": 48
+                    },
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "benefit-2-title",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Plano Nutricional",
+                    "header_size": "h3",
+                    "typography_font_family": "Oswald",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 24
+                    },
+                    "color": "#0B1220",
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "benefit-2-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='font-family: Inter; font-size: 16px; color: #0B1220; text-align: center;'>Dieta estratégica adaptada à sua rotina. Sem frescura, sem dieta da moda.</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "benefit-3",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "benefit-3-icon",
+                  "elType": "widget",
+                  "widgetType": "icon",
+                  "settings": {
+                    "icon": "fas fa-comments",
+                    "icon_color": "#0EA5E9",
+                    "icon_size": {
+                      "unit": "px",
+                      "size": 48
+                    },
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "benefit-3-title",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Suporte Direto",
+                    "header_size": "h3",
+                    "typography_font_family": "Oswald",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 24
+                    },
+                    "color": "#0B1220",
+                    "align": "center"
+                  }
+                },
+                {
+                  "id": "benefit-3-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='font-family: Inter; font-size: 16px; color: #0B1220; text-align: center;'>WhatsApp direto comigo. Respondo em até 24h. Você nunca está sozinho nessa missão.</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "price-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "price-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "price-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "INVESTIMENTO",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 36
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "price-amount",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "R$ 497/mês",
+                "header_size": "h1",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 72
+                },
+                "color": "#0EA5E9",
+                "align": "center"
+              }
+            },
+            {
+              "id": "price-description",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<ul style='font-family: Inter; font-size: 18px; color: #FFFFFF; max-width: 600px; margin: 30px auto; line-height: 2;'><li>✓ Treino personalizado atualizado semanalmente</li><li>✓ Plano nutricional completo</li><li>✓ Acesso direto via WhatsApp</li><li>✓ 4 sessões de acompanhamento/mês</li><li>✓ Ajustes ilimitados no plano</li><li>✓ Garantia de 30 dias</li></ul>"
+              }
+            },
+            {
+              "id": "price-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "COMEÇAR AGORA →",
+                "link": {
+                  "url": "#formulario-consultoria"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 24
+                },
+                "background_color": "#0EA5E9",
+                "color": "#FFFFFF",
+                "padding": {
+                  "unit": "px",
+                  "top": 25,
+                  "right": 60,
+                  "bottom": 25,
+                  "left": 60
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "price-guarantee",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 14px; color: #0EA5E9; text-align: center; margin-top: 20px;'>🛡️ Garantia incondicional de 30 dias - Se não gostar, devolvo 100% do investimento</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testimonials-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "testimonials-heading",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "testimonials-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "RESULTADOS REAIS DE QUEM JÁ SERVIU",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "testimonials-grid",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "testimonial-1",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "testimonial-1-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='background: #F8F9FA; padding: 30px; border-left: 4px solid #0EA5E9; margin: 20px;'><p style='font-family: Inter; font-size: 16px; color: #0B1220; font-style: italic;'>\"Perdi 18kg em 4 meses seguindo o método do TD. Sem frescura, só disciplina e resultados. Melhor investimento que fiz na minha saúde.\"</p><p style='font-family: Oswald; font-size: 18px; color: #0EA5E9; margin-top: 15px;'>— Carlos M., 42 anos</p></div>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "testimonial-2",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "testimonial-2-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='background: #F8F9FA; padding: 30px; border-left: 4px solid #0EA5E9; margin: 20px;'><p style='font-family: Inter; font-size: 16px; color: #0B1220; font-style: italic;'>\"Aos 55 anos achei que era tarde. O Treinador David provou que DEPENDE só de você querer. Hoje estou mais forte que aos 30.\"</p><p style='font-family: Oswald; font-size: 18px; color: #0EA5E9; margin-top: 15px;'>— Roberto S., 55 anos</p></div>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faq-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#F8F9FA",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "faq-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "faq-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "PERGUNTAS FREQUENTES",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "items": [
+                  {
+                    "title": "Preciso ter experiência na academia?",
+                    "content": "NEGATIVO. Trabalho com todos os níveis, de iniciante a avançado. O treino é 100% adaptado ao seu nível atual."
+                  },
+                  {
+                    "title": "E se eu tiver alguma lesão ou limitação?",
+                    "content": "Trabalho ao redor das suas limitações. 30 anos de experiência me ensinaram a adaptar qualquer treino. Sempre com segurança em primeiro lugar."
+                  },
+                  {
+                    "title": "Como funciona o acompanhamento?",
+                    "content": "4 sessões mensais (presencial ou online) + suporte direto via WhatsApp. Ajusto seu treino sempre que necessário, sem custo adicional."
+                  },
+                  {
+                    "title": "Qual a garantia?",
+                    "content": "30 dias incondicional. Se não estiver satisfeito por QUALQUER motivo, devolvo 100% do investimento. Sem perguntas, sem burocracia."
+                  },
+                  {
+                    "title": "Quanto tempo para ver resultados?",
+                    "content": "DEPENDE! Do seu comprometimento. Mas geralmente: 2 semanas para sentir diferença, 4 semanas para VER diferença, 12 semanas para transformação completa."
+                  }
+                ],
+                "title_typography_font_family": "Oswald",
+                "content_typography_font_family": "Inter"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "form-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        },
+        "anchor": "formulario-consultoria"
+      },
+      "elements": [
+        {
+          "id": "form-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "form-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "AGENDE SUA CONSULTORIA GRATUITA",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "form-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 18px; color: #0EA5E9; text-align: center; margin: 20px 0;'>Preencha o formulário abaixo. Vou analisar seu caso e entrar em contato em até 24h.</p>"
+              }
+            },
+            {
+              "id": "contact-form",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_fields": [
+                  {
+                    "field_type": "text",
+                    "field_label": "Nome Completo",
+                    "required": true,
+                    "placeholder": "Seu nome completo"
+                  },
+                  {
+                    "field_type": "email",
+                    "field_label": "Email",
+                    "required": true,
+                    "placeholder": "seu@email.com"
+                  },
+                  {
+                    "field_type": "tel",
+                    "field_label": "WhatsApp",
+                    "required": true,
+                    "placeholder": "(00) 00000-0000"
+                  },
+                  {
+                    "field_type": "number",
+                    "field_label": "Idade",
+                    "required": true,
+                    "placeholder": "Sua idade"
+                  },
+                  {
+                    "field_type": "select",
+                    "field_label": "Objetivo Principal",
+                    "required": true,
+                    "field_options": "Perder Gordura|Ganhar Massa Muscular|Definição|Condicionamento|Reabilitação"
+                  },
+                  {
+                    "field_type": "textarea",
+                    "field_label": "Conte-me sobre sua situação atual",
+                    "required": true,
+                    "placeholder": "Ex: Quantos kg quer perder/ganhar, lesões, experiência anterior, etc.",
+                    "rows": 5
+                  }
+                ],
+                "button_text": "SOLICITAR CONSULTORIA →",
+                "button_size": "lg",
+                "submit_actions": ["email", "redirect"],
+                "email_to": "contato@treinadordavid.com",
+                "email_subject": "Nova Solicitação - Consultoria Personal Training",
+                "redirect_to": "/obrigado-consultoria",
+                "button_typography_font_family": "Oswald",
+                "button_background_color": "#0EA5E9",
+                "button_text_color": "#FFFFFF"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#000000",
+        "padding": {
+          "unit": "px",
+          "top": 40,
+          "right": 20,
+          "bottom": 40,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "footer-signature",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 24px; color: #0EA5E9; text-align: center;'>Semper Fidelis<br>— Treinador David</p><p style='font-family: Inter; font-size: 14px; color: #FFFFFF; text-align: center; margin-top: 20px;'>© 2026 Treinador David. Todos os direitos reservados.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
