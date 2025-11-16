@@ -1,0 +1,91 @@
+Date,Platform,Content_Type,Content_ID,Post_Link,Impressions,Reach,Engagement,Likes,Comments,Shares,Saves,Profile_Visits,Followers_Gained,Engagement_Rate,Click_Through_Rate,Best_Performing_Element,Notes,Action_Items
+2025-01-01,Instagram,Carrossel,IG-001,https://...,,,,,,,,,,,,Hook forte,"Teste A/B hook diferente"
+2025-01-01,Instagram,Story,Story-001,,,,,,,,,,,,,Tip manhã,70% completion,Manter formato
+2025-01-01,Facebook,Long-form,FB-001,https://...,,,,,,,,,,,,Discussão ativa,150 comentários,"Criar série similar"
+2025-01-01,Twitter,Tweet,Tweet-001,https://...,,,,,,,,,,,,Quote motivacional,Alta viralização,"Repost em 30 dias"
+2025-01-02,Instagram,Carrossel,IG-002,https://...,,,,,,,,,,,,Educacional científico,"Alto save rate - 600 saves",Expandir para YouTube
+2025-01-02,LinkedIn,Article,LI-001,https://...,,,,,,,,,,,,USMC story,30+ comentários qualificados,Criar série USMC
+2025-01-03,Instagram,Reel,Reel-001,https://...,,,,,,,,,,,,Técnica agachamento,40K+ views,Fazer mais técnica
+2025-01-03,TikTok,Video,TT-001,https://...,,,,,,,,,,,,Quick tip,Trending sound funcionou,Usar mais trending
+2025-01-04,Instagram,Single,IG-003,https://...,,,,,,,,,,,,Monday motivation,Alto share - 350 shares,"Mondays sempre motivação"
+2025-01-04,YouTube,Long,YT-001,https://...,,,,,,,,,,,,Guia completo,12min - boa retenção,Manter 10-12min sweet spot
+2025-01-05,Instagram,Quote,IG-005,https://...,,,,,,,,,,,,DEPENDE brand,Muito compartilhado,Série DEPENDE mensal
+2025-01-05,Pinterest,Pin,Pin-001,https://...,,,,,,,,,,,,Infográfico,100+ saves em 24h,Mais infográficos
+
+INSTRUÇÕES USO:
+1. Preencher TODOS os campos após 48h de publicação (dados estabilizam)
+2. Engagement_Rate = (Engagement / Reach) * 100
+3. Best_Performing_Element = O que fez o post se destacar (hook, timing, tema, formato)
+4. Notes = Observações qualitativas importantes
+5. Action_Items = O que fazer baseado nesta performance
+
+MÉTRICAS CHAVE POR PLATAFORMA:
+
+INSTAGRAM:
+- Impressions: Quantas vezes foi visto
+- Reach: Quantas pessoas únicas viram
+- Engagement: Likes + Comments + Shares + Saves
+- ER target: >5% (bom), >8% (excelente)
+- Saves: Indicador de valor/referência
+- Shares: Indicador de viralização
+
+FACEBOOK:
+- Reach orgânico
+- Engagement (reactions + comments + shares)
+- ER target: >3% (bom)
+- Shares: Principal métrica viralização
+- Video watch time (para vídeos)
+
+LINKEDIN:
+- Impressions
+- Engagement
+- ER target: >10% (networking profissional)
+- Profile visits: Networking
+- New connections: Growth
+
+TWITTER:
+- Impressions
+- Engagements (likes + RTs + replies)
+- ER target: >3%
+- Retweets: Viralização
+- Profile visits
+
+TIKTOK:
+- Views
+- Completion rate: % que assistiu até o fim
+- ER target: >8%
+- Shares: Viral potential
+- For You Page %: Quantos views vieram do FYP
+
+YOUTUBE:
+- Views
+- Watch time: Tempo total assistido
+- AVD: Average view duration
+- CTR: Click-through rate thumbnail
+- ER target (likes/comments): >5%
+
+PINTEREST:
+- Impressions
+- Saves (principal métrica!)
+- Outbound clicks
+- ER target: Saves >3% impressions
+
+ANÁLISE SEMANAL:
+- Compilar top 5 performers
+- Identificar padrões (tema, formato, horário)
+- Bottom 3 performers - entender por quê
+- Ajustar estratégia próxima semana
+
+ANÁLISE MENSAL:
+- Growth followers cada plataforma
+- Engagement rate médio
+- Tipos conteúdo que performaram melhor
+- ROI (tempo investido vs resultado)
+- Repurposing wins (derivados que superaram original)
+
+ANÁLISE TRIMESTRAL:
+- Shift estratégia se necessário
+- Identificar seasonal patterns
+- Planejar próximo trimestre
+- Competitor analysis
+- Tool/workflow optimizations

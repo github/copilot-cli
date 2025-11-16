@@ -1,0 +1,95 @@
+{
+  "name": "Treinador David – Sistema AAA de Conteúdo e Identidade",
+  "description": "Define todas as regras fixas de conteúdo, identidade visual, estrutura técnica e estilo editorial para treinadordavid.com, garantindo consistência técnica, SEO, acessibilidade WCAG AAA e fidelidade à voz de marca.",
+  "version": "1.0",
+  "author": "Treinador David",
+  "rules": {
+    "core_files": {
+      "treinadordavid-core.php": "/wp-content/mu-plugins/",
+      "td-fonts-loader.php": "/wp-content/mu-plugins/",
+      "treinadordavid-core.css": "/wp-content/",
+      "fonts.css": "/wp-content/themes/hello-child-treinadordavid/fonts/",
+      "config_constant": "define('TD_CORE_USE_LOCAL_FONTS', true);"
+    },
+    "branding": {
+      "headings_font": "Oswald",
+      "body_font": "Inter",
+      "no_gradients": true,
+      "colors_AAA": {
+        "Azul Decorativo": "#0EA5E9",
+        "Azul Texto": "#0369A1",
+        "Azul Escuro": "#0B1220",
+        "Texto Principal": "#0F172A",
+        "Texto Secundário": "#475569",
+        "Fundo Branco": "#FFFFFF",
+        "Fundo Secundário": "#F8FAFC",
+        "CTA Laranja": "#C2410C",
+        "Sucesso Verde": "#15803D",
+        "Erro Vermelho": "#B91C1C"
+      }
+    },
+    "structure": {
+      "must_start_with": "<span id='main-content' tabindex='-1'></span>",
+      "must_end_with": "[td_signature]",
+      "heading_hierarchy": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "no_skipped_levels": true
+    },
+    "shortcodes": {
+      "td_quick_answer": "[td_quick_answer title='Em resumo']...[/td_quick_answer]",
+      "td_speakable": "[td_speakable]...[/td_speakable]",
+      "td_science": "[td_science title='Evidência Científica']...[/td_science]",
+      "td_card": "[td_card title='Título' meta='Autor' ref='Fonte']...[/td_card]",
+      "td_qa": "[td_qa title='Q&A do Treinador']...[/td_qa]",
+      "td_qa_card": "[td_qa_card q='Pergunta' badge='Dúvida']...[/td_qa_card]",
+      "td_sep": "[td_sep label='Resumo']",
+      "td_audio": "[td_audio src='url.mp3']",
+      "td_video": "[td_video src='url.mp4']",
+      "td_signature": "[td_signature]"
+    },
+    "typography": {
+      "h1_entry_title": {
+        "font_size": "clamp(3rem, 6vw + 1rem, 4.5rem)",
+        "font_weight": 800,
+        "line_height": 1.1
+      },
+      "headings": {
+        "font_family": "Oswald, Impact, 'Arial Black', sans-serif",
+        "font_weight": 700
+      }
+    },
+    "editorial_style": {
+      "tone": "Firme, direta, com autoridade de treinador e pesquisador.",
+      "voice": "Mistura de ciência, vivência e performance mental.",
+      "avoid": [
+        "jargões desnecessários",
+        "frases longas"
+      ],
+      "include": [
+        "ação prática",
+        "conclusão direta",
+        "introdução contextualizada"
+      ]
+    },
+    "seo": {
+      "auto_schema": true,
+      "include_keywords": true,
+      "internal_links_minimum": 3,
+      "aaa_contrast_required": true
+    },
+    "debug_checklist": [
+      "Nenhum <h1> duplicado",
+      "Fontes Oswald + Inter carregadas",
+      "Nenhum gradiente",
+      "Cores AAA corretas",
+      "Shortcodes válidos",
+      "Schema presente",
+      "[td_signature] no final"
+    ]
+  },
+  "prompt_base": "\nYou are “Treinador David Assistant”.\nYour purpose is to help write, revise, and debug articles for treinadordavid.com.\nAlways follow the Treinador David Core and Fonts Loader architecture.\nDo not use gradients or non-AAA colors.\nAll headings must follow the H1–H6 hierarchy.\nAlways use [td_signature] at the end.\nUse Inter for body, Oswald for headings.\nMaintain WCAG AAA contrast.\nIf a shortcode or style is missing or incorrect, fix it automatically.\n"
+}

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequências de Email Marketing - Automação de Vendas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0B1220 0%, #1E293B 100%);
+            color: #F8FAFC;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #1E293B;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #0EA5E9;
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .subtitle {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 1.3em;
+            margin-bottom: 40px;
+        }
+        .sequence-section {
+            background: #334155;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 10px;
+            border-left: 5px solid #0EA5E9;
+        }
+        .sequence-header {
+            color: #0EA5E9;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .email-card {
+            background: #1E293B;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 2px solid #475569;
+            transition: all 0.3s;
+        }
+        .email-card:hover {
+            border-color: #0EA5E9;
+            transform: translateX(5px);
+        }
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .email-day {
+            background: #0EA5E9;
+            color: #0B1220;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .email-subject {
+            color: #FBBF24;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .email-body {
+            background: #0B1220;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+        .cta-example {
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-align: center;
+            font-weight: bold;
+            margin: 15px 0;
+            display: inline-block;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            background: #475569;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .tab:hover, .tab.active {
+            background: #0EA5E9;
+            transform: translateY(-2px);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .stat-box {
+            background: #475569;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            color: #0EA5E9;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #94A3B8;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ SEQUÊNCIAS DE EMAIL MARKETING</h1>
+        <p class="subtitle">Automação Completa para Conversão de Leads em Clientes Pagantes</p>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number">45%</div>
+                <div class="stat-label">Taxa de Abertura Média</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">12%</div>
+                <div class="stat-label">Taxa de Cliques</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">18%</div>
+                <div class="stat-label">Conversão em Vendas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Sequências Completas</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showSequence('welcome')">SEQUÊNCIA DE BOAS-VINDAS</div>
+            <div class="tab" onclick="showSequence('nurture')">SEQUÊNCIA DE NUTRIÇÃO</div>
+            <div class="tab" onclick="showSequence('sales')">SEQUÊNCIA DE VENDAS</div>
+        </div>
+
+        <!-- SEQUÊNCIA DE BOAS-VINDAS -->
+        <div id="welcome" class="sequence-content">
+            <div class="sequence-section">
+                <h2 class="sequence-header">📧 SEQUÊNCIA 1: BOAS-VINDAS (7 Emails)</h2>
+                <p style="margin-bottom: 20px; font-size: 1.1em;">Objetivo: Construir relacionamento e estabelecer autoridade. Taxa de conversão esperada: 8-12%</p>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 0 - IMEDIATO</div>
+                    </div>
+                    <div class="email-subject">🎯 BEM-VINDO À TROPA, RECRUTA!</div>
+                    <div class="email-body">
+                        <p>SOLDADO,</p>
+                        <br>
+                        <p>Você acabou de tomar a MELHOR decisão da sua vida. Bem-vindo à comunidade de guerreiros que não aceitam mediocridade.</p>
+                        <br>
+                        <p>Eu sou [NOME], e nos próximos dias vou te mostrar EXATAMENTE como transformar seu corpo usando o método militar de fitness que já mudou a vida de mais de 10.000 pessoas.</p>
+                        <br>
+                        <p><strong>MAS PRIMEIRO, PRECISO SABER:</strong></p>
+                        <p>Qual é o seu MAIOR desafio com fitness agora?</p>
+                        <p>[ ] Perder gordura<br>
+                        [ ] Ganhar massa muscular<br>
+                        [ ] Falta de tempo<br>
+                        [ ] Falta de motivação</p>
+                        <br>
+                        <p>Responda esse email e me conte. Eu REALMENTE leio e respondo todos.</p>
+                        <br>
+                        <div class="cta-example">🎁 BAIXE SEU GUIA GRATUITO AGORA</div>
+                        <br>
+                        <p>Preparado para a transformação?</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong><br>
+                        Fitness Militar</p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 1</div>
+                    </div>
+                    <div class="email-subject">💪 O ERRO #1 Que IMPEDE Seus Resultados</div>
+                    <div class="email-body">
+                        <p>Atenção Recruta,</p>
+                        <br>
+                        <p>Ontem você se juntou à tropa. Hoje vou te mostrar o MAIOR erro que 99% das pessoas cometem (e que está SABOTANDO seus resultados).</p>
+                        <br>
+                        <p><strong>O ERRO É: Falta de CONSISTÊNCIA.</strong></p>
+                        <br>
+                        <p>Sabe aquele cara que começa segunda-feira empolgado, treina 3 dias e desiste? É por isso que ele NUNCA vai ter resultados.</p>
+                        <br>
+                        <p>A diferença entre você e os 90% que desistem está em uma palavra: SISTEMA.</p>
+                        <br>
+                        <p>Neste vídeo de 8 minutos, eu mostro os 3 pilares do sistema que uso com meus alunos:</p>
+                        <div class="cta-example">▶️ ASSISTIR VÍDEO AGORA</div>
+                        <br>
+                        <p>Amanhã vou te revelar o Protocolo de 20 Minutos que queima mais gordura que 1 hora de esteira.</p>
+                        <br>
+                        <p>Fique atento à sua caixa de entrada!</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 3</div>
+                    </div>
+                    <div class="email-subject">🔥 Protocolo de 20 Minutos (Queime Gordura RÁPIDO)</div>
+                    <div class="email-body">
+                        <p>Soldado,</p>
+                        <br>
+                        <p>Como prometido, aqui está o PROTOCOLO DE 20 MINUTOS que meus alunos usam para queimar gordura 3x mais rápido que cardio tradicional.</p>
+                        <br>
+                        <p><strong>POR QUE FUNCIONA?</strong></p>
+                        <p>• HIIT de alta intensidade<br>
+                        • Acelera metabolismo por 24-48h<br>
+                        • Preserva massa muscular<br>
+                        • Treino completo em 20 minutos</p>
+                        <br>
+                        <div class="cta-example">📥 BAIXAR PROTOCOLO GRÁTIS</div>
+                        <br>
+                        <p>Teste por 7 dias e me conta os resultados.</p>
+                        <br>
+                        <p>PS: Amanhã vou revelar o segredo da DIETA FLEXÍVEL (coma o que gosta e ainda perca peso).</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 5</div>
+                    </div>
+                    <div class="email-subject">🍕 Como Comer Pizza e AINDA Perder Peso (DEPENDE!)</div>
+                    <div class="email-body">
+                        <p>RECRUTA,</p>
+                        <br>
+                        <p>Sim, você leu certo. Você PODE comer pizza, hambúrguer, chocolate e AINDA ter um abdômen definido.</p>
+                        <br>
+                        <p><strong>DEPENDE!</strong></p>
+                        <br>
+                        <p>Depende de você entender os princípios da DIETA FLEXÍVEL (IIFYM - If It Fits Your Macros).</p>
+                        <br>
+                        <p>Neste artigo exclusivo, eu revelo:</p>
+                        <p>✅ Como calcular seus macros<br>
+                        ✅ Como encaixar "comidas proibidas" na dieta<br>
+                        ✅ O erro que TODOS cometem<br>
+                        ✅ Aplicativo grátis para tracking</p>
+                        <br>
+                        <div class="cta-example">📖 LER ARTIGO COMPLETO</div>
+                        <br>
+                        <p>Liberdade alimentar sem culpa. É isso que eu quero para você.</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 7</div>
+                    </div>
+                    <div class="email-subject">⚠️ ÚLTIMA CHANCE: Oferta Especial Para Você</div>
+                    <div class="email-body">
+                        <p>ATENÇÃO SOLDADO,</p>
+                        <br>
+                        <p>Você recebeu conteúdo GRATUITO de qualidade nos últimos 7 dias.</p>
+                        <br>
+                        <p>Agora eu tenho uma pergunta:</p>
+                        <br>
+                        <p><strong>Você está PRONTO para acelerar 10x seus resultados?</strong></p>
+                        <br>
+                        <p>Eu abri 10 vagas para meu programa de coaching personalizado com 50% de desconto EXCLUSIVO para novos membros da comunidade.</p>
+                        <br>
+                        <p><strong>O que você recebe:</strong></p>
+                        <p>✅ Treino personalizado semanal<br>
+                        ✅ Dieta customizada<br>
+                        ✅ Suporte via WhatsApp<br>
+                        ✅ Garantia de resultados em 90 dias</p>
+                        <br>
+                        <p style="color: #DC2626; font-size: 1.2em;"><strong>De R$ 797/mês por apenas R$ 397/mês</strong></p>
+                        <br>
+                        <div class="cta-example">🚀 GARANTIR MINHA VAGA AGORA</div>
+                        <br>
+                        <p>⏰ Esta oferta expira em 24 horas.</p>
+                        <br>
+                        <p>A escolha é sua: continuar fazendo sozinho ou ter um especialista te guiando até o resultado.</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEQUÊNCIA DE NUTRIÇÃO -->
+        <div id="nurture" class="sequence-content" style="display: none;">
+            <div class="sequence-section">
+                <h2 class="sequence-header">🌱 SEQUÊNCIA 2: NUTRIÇÃO E EDUCAÇÃO (10 Emails)</h2>
+                <p style="margin-bottom: 20px; font-size: 1.1em;">Objetivo: Educar e manter engajamento. Preparar para venda futura.</p>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 1</div>
+                    </div>
+                    <div class="email-subject">🥩 Proteína: Quanto Você REALMENTE Precisa?</div>
+                    <div class="email-body">
+                        <p>Soldado,</p>
+                        <br>
+                        <p>"Preciso comer 2g de proteína por kg de peso corporal?"</p>
+                        <br>
+                        <p><strong>DEPENDE!</strong></p>
+                        <br>
+                        <p>A verdade sobre proteína que ninguém te conta:</p>
+                        <p>• Para emagrecimento: 1.8-2.2g/kg<br>
+                        • Para hipertrofia: 2.0-2.4g/kg<br>
+                        • Para manutenção: 1.6-1.8g/kg</p>
+                        <br>
+                        <p>Mas tem mais: TIMING importa? DEPENDE!</p>
+                        <br>
+                        <div class="cta-example">📥 BAIXAR GUIA COMPLETO DE PROTEÍNA</div>
+                        <br>
+                        <p>Amanhã: Carboidratos - Vilão ou Herói?</p>
+                        <br>
+                        <p><strong>Coach [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 3</div>
+                    </div>
+                    <div class="email-subject">🍚 A Verdade Sobre Carboidratos (Você Foi ENGANADO)</div>
+                    <div class="email-body">
+                        <p>Atenção,</p>
+                        <br>
+                        <p>"Carboidrato engorda?"</p>
+                        <p>"Preciso cortar carbo para emagrecer?"</p>
+                        <p>"Low carb é melhor?"</p>
+                        <br>
+                        <p><strong>TODAS AS RESPOSTAS: DEPENDE!</strong></p>
+                        <br>
+                        <p>Carboidrato é COMBUSTÍVEL. Se você treina intenso, você PRECISA de carboidrato.</p>
+                        <br>
+                        <p>Neste vídeo de 12 minutos, eu quebro todos os mitos:</p>
+                        <div class="cta-example">▶️ ASSISTIR AGORA</div>
+                        <br>
+                        <p>Próximo email: Gorduras - As Boas e as RUINS</p>
+                        <br>
+                        <p><strong>Coach [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 7</div>
+                    </div>
+                    <div class="email-subject">💊 Suplementos: O Que Funciona VS Lixo Marketing</div>
+                    <div class="email-body">
+                        <p>Recruta,</p>
+                        <br>
+                        <p>Você já jogou R$ 500+ em suplementos que NÃO deram resultado algum?</p>
+                        <br>
+                        <p>Eu vou ser BRUTALMENTE honesto:</p>
+                        <br>
+                        <p><strong>90% DOS SUPLEMENTOS SÃO INÚTEIS.</strong></p>
+                        <br>
+                        <p>Os únicos que REALMENTE funcionam:</p>
+                        <p>✅ Creatina (3-5g/dia)<br>
+                        ✅ Whey Protein (praticidade)<br>
+                        ✅ Cafeína (pré-treino)<br>
+                        ✅ Vitamina D (se deficiente)</p>
+                        <br>
+                        <p>Todo o resto? Marketing puro.</p>
+                        <br>
+                        <div class="cta-example">📖 BAIXAR GUIA DE SUPLEMENTAÇÃO</div>
+                        <br>
+                        <p>Economize dinheiro. Invista em comida de verdade.</p>
+                        <br>
+                        <p><strong>Coach [NOME]</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEQUÊNCIA DE VENDAS -->
+        <div id="sales" class="sequence-content" style="display: none;">
+            <div class="sequence-section">
+                <h2 class="sequence-header">💰 SEQUÊNCIA 3: VENDAS AGRESSIVAS (5 Emails em 5 Dias)</h2>
+                <p style="margin-bottom: 20px; font-size: 1.1em;">Objetivo: Converter leads aquecidos em clientes pagantes. Taxa de conversão esperada: 15-25%</p>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 1 - ABERTURA</div>
+                    </div>
+                    <div class="email-subject">🚨 VAGAS ABERTAS: Programa de Transformação 90 Dias</div>
+                    <div class="email-body">
+                        <p>SOLDADO,</p>
+                        <br>
+                        <p>Eu acabei de abrir 20 VAGAS para meu programa de transformação mais intenso.</p>
+                        <br>
+                        <p><strong>Programa Transformação 90 Dias</strong></p>
+                        <br>
+                        <p>Este não é um programa para qualquer um. É para quem está SÉRIO sobre mudar de vida.</p>
+                        <br>
+                        <p><strong>O que você recebe:</strong></p>
+                        <p>✅ Treino personalizado semanal<br>
+                        ✅ Dieta 100% customizada<br>
+                        ✅ Suporte 24/7 via WhatsApp<br>
+                        ✅ Calls semanais de acompanhamento<br>
+                        ✅ Grupo VIP de alunos<br>
+                        ✅ GARANTIA de resultados ou reembolso total</p>
+                        <br>
+                        <p style="font-size: 1.3em; color: #0EA5E9;"><strong>Investimento: R$ 497/mês (por 3 meses)</strong></p>
+                        <br>
+                        <div class="cta-example">🔥 GARANTIR MINHA VAGA AGORA</div>
+                        <br>
+                        <p>⏰ As vagas fecham em 5 dias ou quando completar 20 alunos.</p>
+                        <br>
+                        <p>Não perca essa chance.</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 2 - PROVA SOCIAL</div>
+                    </div>
+                    <div class="email-subject">📸 Veja as Transformações REAIS Dos Meus Alunos</div>
+                    <div class="email-body">
+                        <p>Você viu a oferta ontem?</p>
+                        <br>
+                        <p>Algumas pessoas me perguntam: "Isso REALMENTE funciona?"</p>
+                        <br>
+                        <p>Deixa EU te mostrar:</p>
+                        <br>
+                        <p><strong>CASO 1: Carlos, 34 anos</strong><br>
+                        - Perdeu 22kg em 90 dias<br>
+                        - Saiu do sedentarismo total<br>
+                        - Hoje corre 10km facilmente</p>
+                        <br>
+                        <p><strong>CASO 2: Amanda, 29 anos</strong><br>
+                        - Ganhou 8kg de massa muscular<br>
+                        - Definiu abdômen pela primeira vez<br>
+                        - Confiança nas alturas</p>
+                        <br>
+                        <p><strong>CASO 3: Ricardo, 42 anos</strong><br>
+                        - Eliminou 18kg<br>
+                        - Normalizou pressão arterial<br>
+                        - Saiu de 4 medicamentos</p>
+                        <br>
+                        <div class="cta-example">📷 VER TODAS AS TRANSFORMAÇÕES</div>
+                        <br>
+                        <p>Restam 13 vagas. Não fique de fora.</p>
+                        <br>
+                        <div class="cta-example">🚀 SIM, EU QUERO ME TRANSFORMAR</div>
+                        <br>
+                        <p><strong>Coach [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 3 - URGÊNCIA</div>
+                    </div>
+                    <div class="email-subject">⏰ ÚLTIMA CHAMADA: Restam Apenas 7 Vagas</div>
+                    <div class="email-body">
+                        <p>URGENTE,</p>
+                        <br>
+                        <p>Das 20 vagas que abri segunda-feira, restam apenas 7.</p>
+                        <br>
+                        <p>Eu sei que você está em dúvida. Todo mundo fica.</p>
+                        <br>
+                        <p>Mas deixa eu te fazer uma pergunta:</p>
+                        <br>
+                        <p><strong>Onde você vai estar daqui a 90 dias?</strong></p>
+                        <br>
+                        <p>OPÇÃO A: Fazendo do mesmo jeito que você faz hoje, com os mesmos resultados ZERO.</p>
+                        <br>
+                        <p>OPÇÃO B: 90 dias mais magro/forte/saudável, com um corpo que você tem orgulho.</p>
+                        <br>
+                        <p>A escolha é sua. Mas o tempo está acabando.</p>
+                        <br>
+                        <p style="color: #DC2626; font-size: 1.3em;"><strong>⏰ RESTAM 7 VAGAS</strong></p>
+                        <br>
+                        <div class="cta-example">GARANTIR MINHA TRANSFORMAÇÃO AGORA</div>
+                        <br>
+                        <p>PS: Se você tem dúvidas, responda este email. Eu respondo pessoalmente.</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 4 - QUEBRA DE OBJEÇÕES</div>
+                    </div>
+                    <div class="email-subject">❓ "Não Tenho Tempo" e Outras Desculpas</div>
+                    <div class="email-body">
+                        <p>Soldado,</p>
+                        <br>
+                        <p>Deixa eu ser DIRETO:</p>
+                        <br>
+                        <p>Você não tem falta de tempo. Você tem falta de PRIORIDADE.</p>
+                        <br>
+                        <p><strong>As desculpas mais comuns:</strong></p>
+                        <br>
+                        <p>❌ "Não tenho tempo"<br>
+                        ✅ Treinos de 30-45 minutos, 4x por semana. Netflix você tem tempo, né?</p>
+                        <br>
+                        <p>❌ "É muito caro"<br>
+                        ✅ R$ 497/mês = R$ 16,50/dia. Menos que um almoço no restaurante.</p>
+                        <br>
+                        <p>❌ "Vou começar mês que vem"<br>
+                        ✅ Você disse isso mês passado. E no anterior. Quando você vai REALMENTE começar?</p>
+                        <br>
+                        <p>❌ "Não funciona pra mim"<br>
+                        ✅ Temos GARANTIA de 90 dias. Risco ZERO.</p>
+                        <br>
+                        <p><strong>CHEGA DE DESCULPAS. HORA DE RESULTADOS.</strong></p>
+                        <br>
+                        <p style="color: #DC2626; font-size: 1.3em;"><strong>⏰ ÚLTIMA CHANCE: 3 VAGAS</strong></p>
+                        <br>
+                        <div class="cta-example">COMEÇAR MINHA TRANSFORMAÇÃO HOJE</div>
+                        <br>
+                        <p><strong>Coach [NOME]</strong></p>
+                    </div>
+                </div>
+
+                <div class="email-card">
+                    <div class="email-header">
+                        <div class="email-day">DIA 5 - FECHAMENTO FINAL</div>
+                    </div>
+                    <div class="email-subject">🚨 VAGAS FECHADAS EM 6 HORAS [ÚLTIMA CHAMADA]</div>
+                    <div class="email-body">
+                        <p>ESTA É A ÚLTIMA VEZ QUE VOU FALAR SOBRE ISSO.</p>
+                        <br>
+                        <p>As vagas para o Programa Transformação 90 Dias fecham HOJE às 23:59.</p>
+                        <br>
+                        <p>Restam 2 vagas.</p>
+                        <br>
+                        <p>Se você ler este email amanhã, já era. Perdeu.</p>
+                        <br>
+                        <p>Próxima turma? Só em 60 dias. E vai ser MAIS CARO.</p>
+                        <br>
+                        <p><strong>Última chance de:</strong></p>
+                        <p>✅ Ter um corpo que você tem orgulho<br>
+                        ✅ Acordar com energia e disposição<br>
+                        ✅ Usar a roupa que você quer<br>
+                        ✅ Ter confiança e autoestima<br>
+                        ✅ Viver mais e melhor</p>
+                        <br>
+                        <p style="font-size: 1.5em; color: #DC2626;"><strong>⏰ 6 HORAS RESTANTES</strong></p>
+                        <br>
+                        <div class="cta-example">SIM, EU QUERO MINHA VAGA AGORA!</div>
+                        <br>
+                        <p>Não deixe para depois. DEPOIS vira NUNCA.</p>
+                        <br>
+                        <p>Nos vemos do outro lado.</p>
+                        <br>
+                        <p><strong>Comandante [NOME]</strong><br>
+                        Fitness Militar</p>
+                        <br>
+                        <p style="font-size: 0.9em; color: #94A3B8;">PS: Se você NÃO se inscrever, vou te remover desta lista. Eu só quero pessoas SÉRIAS aqui.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSequence(sequenceName) {
+            // Hide all sequences
+            document.querySelectorAll('.sequence-content').forEach(seq => {
+                seq.style.display = 'none';
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected sequence
+            document.getElementById(sequenceName).style.display = 'block';
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

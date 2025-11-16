@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Métricas - Treinador David</title>
+    <style>
+        * {margin: 0; padding: 0; box-sizing: border-box;}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F3F4F6;
+            padding: 20px;
+        }
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            color: #0B1220;
+            margin-bottom: 30px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #0EA5E9;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #0B1220;
+            font-family: 'Oswald', sans-serif;
+        }
+        .metric-change {
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .metric-change.positive {color: #10B981;}
+        .metric-change.negative {color: #EF4444;}
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .chart-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #0B1220;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>📊 Dashboard de Métricas - Treinador David</h1>
+
+        <!-- KPIs Principais -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Visitas Totais (30d)</div>
+                <div class="metric-value" id="total-visits">12,450</div>
+                <div class="metric-change positive">↑ 23% vs mês anterior</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Leads Gerados</div>
+                <div class="metric-value" id="total-leads">342</div>
+                <div class="metric-change positive">↑ 18%</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Conversão (Lead → Cliente)</div>
+                <div class="metric-value" id="conversion-rate">4.2%</div>
+                <div class="metric-change positive">↑ 0.8%</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Novos Clientes</div>
+                <div class="metric-value" id="new-customers">14</div>
+                <div class="metric-change positive">↑ 27%</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">MRR (Monthly Recurring Revenue)</div>
+                <div class="metric-value" id="mrr">R$ 45.800</div>
+                <div class="metric-change positive">↑ R$ 4.200</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">CAC (Custo Aquisição)</div>
+                <div class="metric-value" id="cac">R$ 164</div>
+                <div class="metric-change negative">↑ R$ 12</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">LTV (Lifetime Value)</div>
+                <div class="metric-value" id="ltv">R$ 1.850</div>
+                <div class="metric-change positive">↑ R$ 150</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">ROAS (Return on Ad Spend)</div>
+                <div class="metric-value" id="roas">3.4x</div>
+                <div class="metric-change positive">↑ 0.6x</div>
+            </div>
+        </div>
+
+        <!-- Gráfico: Visitas e Conversões -->
+        <div class="chart-container">
+            <div class="chart-title">Visitas e Conversões (Últimos 30 dias)</div>
+            <canvas id="visitsChart" height="80"></canvas>
+        </div>
+
+        <!-- Gráfico: Distribuição de Programas -->
+        <div class="chart-container">
+            <div class="chart-title">Clientes por Programa</div>
+            <canvas id="programsChart" height="80"></canvas>
+        </div>
+
+        <!-- Gráfico: Funil de Conversão -->
+        <div class="chart-container">
+            <div class="chart-title">Funil de Conversão</div>
+            <canvas id="funnelChart" height="80"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Visitas e Conversões
+        const visitsCtx = document.getElementById('visitsChart').getContext('2d');
+        new Chart(visitsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Dia 1', 'Dia 5', 'Dia 10', 'Dia 15', 'Dia 20', 'Dia 25', 'Dia 30'],
+                datasets: [{
+                    label: 'Visitas',
+                    data: [350, 420, 380, 510, 490, 560, 610],
+                    borderColor: '#0EA5E9',
+                    tension: 0.4
+                }, {
+                    label: 'Leads',
+                    data: [28, 35, 30, 42, 38, 45, 52],
+                    borderColor: '#10B981',
+                    tension: 0.4
+                }]
+            }
+        });
+
+        // Distribuição de Programas
+        const programsCtx = document.getElementById('programsChart').getContext('2d');
+        new Chart(programsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Programa Group', 'Personal 1-on-1', 'Desafio 30 Dias'],
+                datasets: [{
+                    data: [580, 85, 185],
+                    backgroundColor: ['#0EA5E9', '#0B1220', '#10B981']
+                }]
+            }
+        });
+
+        // Funil de Conversão
+        const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+        new Chart(funnelCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Visitas', 'Leads', 'Consultorias', 'Clientes'],
+                datasets: [{
+                    label: 'Quantidade',
+                    data: [12450, 342, 98, 14],
+                    backgroundColor: '#0EA5E9'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+            }
+        });
+
+        // Atualização em tempo real (exemplo com dados mock)
+        function updateMetrics() {
+            // Aqui você integraria com GA4 API ou backend
+            // Por agora, exemplo estático
+            console.log('Métricas atualizadas');
+        }
+
+        setInterval(updateMetrics, 60000); // Atualiza a cada 1 min
+    </script>
+</body>
+</html>

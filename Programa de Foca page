@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa Força Máxima: O Guia Definitivo para Ganhar Força Bruta</title>
+    <meta name="description" content="Aprenda como ganhar força máxima com nosso programa de powerlifting completo. Explore o método conjugado, periodização, exercícios básicos e calcule seu 1RM.">
+    <meta name="keywords" content="como ganhar força máxima, treino força, programa powerlifting, método conjugado, calculadora 1RM, periodização ondulatória">
+    <style>
+        /* Estilos básicos para legibilidade. Em um site real, isso estaria em um arquivo .css */
+        body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #F8FAFC; background-color: #0B1220; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background-color: #1E293B; padding: 30px; border-radius: 8px; }
+        h1, h2, h3 { font-family: 'Oswald', sans-serif; color: #0EA5E9; text-transform: uppercase; letter-spacing: 1px; }
+        h1 { font-size: 2.8em; text-align: center; border-bottom: 2px solid #0EA5E9; padding-bottom: 10px; margin-bottom: 20px; }
+        h2 { font-size: 2em; margin-top: 40px; }
+        h3 { font-size: 1.5em; color: #94A3B8; }
+        p, li { font-size: 1.1em; }
+        a { color: #0EA5E9; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        strong { color: #FFFFFF; }
+        .cta-button { display: inline-block; background-color: #0EA5E9; color: #FFFFFF; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; text-align: center; margin-top: 20px; font-size: 1.2em; }
+        .interactive-feature { background-color: #334155; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #0EA5E9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #475569; padding: 12px; text-align: left; }
+        th { background-color: #0EA5E9; color: #0B1220; }
+        input, select, button { width: calc(100% - 22px); padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #475569; background-color: #1E293B; color: #F8FAFC; font-size: 1em; }
+        button { background-color: #0EA5E9; color: #0B1220; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Programa Força Máxima</h1>
+    <p style="text-align: center; font-size: 1.2em; color: #94A3B8;">O Guia Definitivo para Destruir Seus Limites e Construir Força Bruta com Base em Ciência e Técnica.</p>
+
+    <h2>Introdução: O Que é Força Máxima e Por Que Você Deveria se Importar?</h2>
+    <p>Força máxima não é apenas sobre levantar pesos absurdos. É a maior força que seu sistema neuromuscular pode gerar em uma única contração voluntária. Se você busca um <strong>treino de força</strong> de verdade, quer saber <strong>como ganhar força máxima</strong> e talvez até se aventurar em um <strong>programa de powerlifting</strong>, você chegou ao lugar certo. Desenvolver força máxima é a base para praticamente todos os outros objetivos: mais potência, mais massa muscular (hipertrofia) e um corpo mais resiliente a lesões.</p>
+    <p>Este guia foi desenhado para atletas sérios que estão cansados de seguir treinos genéricos e querem um sistema estruturado para resultados mensuráveis. Vamos mergulhar nos princípios fundamentais, métodos de treino avançados como o <strong>método conjugado</strong>, e a importância da <strong>periodização</strong> para garantir progresso contínuo e seguro.</p>
+
+    <h2>Os Pilares Inegociáveis do Treino de Força</h2>
+    <p>Antes de mergulhar na estrutura do programa, você precisa dominar os fundamentos. Ignorar estes pilares é a receita para o fracasso, estagnação e lesões.</p>
+    
+    <h3>1. Técnica Adequada Acima de Tudo</h3>
+    <p>A carga é uma consequência da técnica, nunca o contrário. Uma execução perfeita garante que você está ativando os músculos corretos, maximizando o estímulo para a força e, mais importante, minimizando o risco de lesões. Grave seus levantamentos, estude os movimentos e seja humilde para diminuir o peso e corrigir falhas.</p>
+
+    <h3>2. Foco nos Exercícios Básicos (Compostos)</h3>
+    <p>A força é construída sobre a fundação de movimentos multiarticulares que recrutam grandes quantidades de massa muscular. A santíssima trindade do powerlifting é o ponto de partida:</p>
+    <ul>
+        <li><strong>Agachamento Livre (Squat):</strong> O rei dos exercícios para membros inferiores, construindo força brutal nas pernas, glúteos e core.</li>
+        <li><strong>Supino Reto (Bench Press):</strong> O principal movimento para desenvolver força de empurrar na parte superior do corpo, focando em peitoral, ombros e tríceps.</li>
+        <li><strong>Levantamento Terra (Deadlift):</strong> O teste definitivo de força total, trabalhando a cadeia posterior, costas, pegada e core de forma integrada.</li>
+    </ul>
+
+    <h3>3. Sobrecarga Progressiva</h3>
+    <p>Para ficar mais forte, você precisa consistentemente desafiar seu corpo a fazer mais do que ele está acostumado. Isso pode ser feito aumentando o peso na barra, adicionando mais repetições com o mesmo peso, aumentando o número de séries, ou diminuindo o tempo de descanso. A progressão é o motor do ganho de força.</p>
+    
+    <h2>A Estrutura do Programa: Método Conjugado e Periodização</h2>
+    <p>Nosso programa é baseado em uma variação do famoso <strong>Método Conjugado</strong>, popularizado pela Westside Barbell. Este sistema permite treinar múltiplas qualidades (força máxima, velocidade e hipertrofia) simultaneamente, evitando a estagnação comum em programas lineares simples.</p>
+    <p>A ideia central é alternar dias de <strong>Esforço Máximo (Max Effort)</strong>, onde você levanta cargas pesadíssimas, com dias de <strong>Esforço Dinâmico (Dynamic Effort)</strong>, onde o foco é mover cargas mais leves com velocidade máxima.</p>
+
+    <h3>Divisão Semanal</h3>
+    <ul>
+        <li><strong>Dia 1:</strong> Esforço Máximo - Membros Inferiores (Foco em Agachamento ou variações)</li>
+        <li><strong>Dia 2:</strong> Esforço Máximo - Membros Superiores (Foco em Supino ou variações)</li>
+        <li><strong>Dia 3:</strong> Descanso ou Recuperação Ativa</li>
+        <li><strong>Dia 4:</strong> Esforço Dinâmico - Membros Inferiores (Agachamento e Terra em velocidade)</li>
+        <li><strong>Dia 5:</strong> Esforço Dinâmico - Membros Superiores (Supino em velocidade)</li>
+        <li><strong>Dia 6 e 7:</strong> Descanso ou Recuperação Ativa</li>
+    </ul>
+
+    <h3>Entendendo a Periodização</h3>
+    <p>A <strong>periodização</strong> é o mapa que guia seu treino ao longo do tempo. Enquanto a <strong>periodização linear</strong> (aumentar a intensidade e diminuir o volume gradualmente) funciona bem para iniciantes, atletas intermediários e avançados se beneficiam mais da <strong>periodização ondulatória</strong>, onde a intensidade e o volume flutuam semanalmente. O método conjugado é uma forma de periodização ondulatória diária, pois você alterna o estímulo a cada sessão.</p>
+
+    <hr>
+
+    <h2>Ferramentas Interativas para o Atleta de Força</h2>
+    <p>Use estas ferramentas para calcular suas cargas, planejar seus treinos e acompanhar seu progresso. Conhecer seus números é fundamental para um <strong>treino de força</strong> inteligente.</p>
+
+    <div class="interactive-feature">
+        <h3>✅ Calculadora de 1RM (Uma Repetição Máxima)</h3>
+        <p>Estime sua carga máxima para uma repetição com base no peso que você consegue levantar para mais repetições. Use a fórmula de Epley, uma das mais precisas.</p>
+        <label for="weight-lifted">Peso Levantado (kg):</label>
+        <input type="number" id="weight-lifted" placeholder="Ex: 100">
+        <label for="reps-done">Repetições Realizadas:</label>
+        <input type="number" id="reps-done" placeholder="Ex: 5">
+        <button onclick="calculate1RM()">Calcular 1RM Estimado</button>
+        <p id="rm-result" style="font-size: 1.5em; text-align: center; margin-top: 15px;"></p>
+    </div>
+
+    <div class="interactive-feature">
+        <h3>✅ Gerador de Percentuais de Treino</h3>
+        <p>Insira seu 1RM para gerar as cargas de treino para diferentes zonas de intensidade.</p>
+        <label for="one-rep-max">Seu 1RM (kg):</label>
+        <input type="number" id="one-rep-max" placeholder="Ex: 120">
+        <button onclick="generatePercentages()">Gerar Cargas</button>
+        <table id="percentage-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Percentual</th>
+                    <th>Carga (kg)</th>
+                    <th>Foco do Treino</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <div class="interactive-feature">
+        <h3>✅ Tracker de Recordes Pessoais (PRs)</h3>
+        <p>Mantenha um registro claro dos seus melhores levantamentos. Acompanhar o progresso é a melhor forma de motivação.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Exercício</th>
+                    <th>Recorde (1RM)</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Agachamento</td>
+                    <td><input type="text" placeholder="-- kg"></td>
+                    <td><input type="date"></td>
+                </tr>
+                <tr>
+                    <td>Supino</td>
+                    <td><input type="text" placeholder="-- kg"></td>
+                    <td><input type="date"></td>
+                </tr>
+                <tr>
+                    <td>Levantamento Terra</td>
+                    <td><input type="text" placeholder="-- kg"></td>
+                    <td><input type="date"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="interactive-feature">
+        <h3>✅ Teste de Força Relativa</h3>
+        <p>Sua força relativa é o quão forte você é em proporção ao seu peso corporal. É um ótimo indicador de eficiência neuromuscular.</p>
+        <label for="relative-1rm">Seu 1RM (kg):</label>
+        <input type="number" id="relative-1rm" placeholder="Ex: 150">
+        <label for="body-weight">Seu Peso Corporal (kg):</label>
+        <input type="number" id="body-weight" placeholder="Ex: 80">
+        <button onclick="calculateRelativeStrength()">Calcular Força Relativa</button>
+        <p id="relative-result" style="font-size: 1.2em; margin-top: 15px;"></p>
+    </div>
+    
+    <h2>Exemplo Prático: Uma Semana do Programa Força Máxima</h2>
+    <p>Este é um exemplo de como sua semana pode ser estruturada. Lembre-se que os exercícios de assistência devem ser escolhidos para atacar seus pontos fracos.</p>
+
+    <h3>Dia 1: Esforço Máximo - Inferiores</h3>
+    <ul>
+        <li><strong>Exercício Principal:</strong> Agachamento Pausado (3 segundos no fundo) - Trabalhar até 1 série pesada de 1 repetição (1RM do dia).</li>
+        <li><strong>Exercício Suplementar:</strong> Bom Dia - 3 séries de 6-8 repetições.</li>
+        <li><strong>Assistência 1:</strong> Cadeira Extensora - 4 séries de 10-12 repetições.</li>
+        <li><strong>Assistência 2:</strong> Mesa Flexora - 4 séries de 10-12 repetições.</li>
+        <li><strong>Core:</strong> Prancha com peso - 3 séries até a falha.</li>
+    </ul>
+
+    <h3>Dia 2: Esforço Máximo - Superiores</h3>
+    <ul>
+        <li><strong>Exercício Principal:</strong> Supino com Pinos (Pin Press) - Trabalhar até 1 série pesada de 1 repetição (1RM do dia).</li>
+        <li><strong>Exercício Suplementar:</strong> Supino Inclinado com Halteres - 3 séries de 6-8 repetições.</li>
+        <li><strong>Assistência 1:</strong> Remada Curvada - 4 séries de 8-10 repetições.</li>
+        <li><strong>Assistência 2:</strong> Elevação Lateral - 3 séries de 12-15 repetições.</li>
+        <li><strong>Assistência 3:</strong> Tríceps Pulley - 3 séries de 10-12 repetições.</li>
+    </ul>
+
+    <h3>Dia 4: Esforço Dinâmico - Inferiores</h3>
+    <ul>
+        <li><strong>Exercício Principal:</strong> Agachamento em Caixa (Box Squat) - 8 séries de 2 repetições com 50-60% do seu 1RM, focando em máxima velocidade na subida. Descanso de 60s.</li>
+        <li><strong>Exercício Secundário:</strong> Levantamento Terra Sumô - 6 séries de 1 repetição com 60-70% do 1RM, focando em velocidade.</li>
+        <li><strong>Assistência 1:</strong> Afundo Búlgaro - 3 séries de 10 repetições por perna.</li>
+        <li><strong>Assistência 2:</strong> Elevação Pélvica - 3 séries de 12 repetições.</li>
+        <li><strong>Core:</strong> Abdominal na polia - 4 séries de 15 repetições.</li>
+    </ul>
+
+    <h3>Dia 5: Esforço Dinâmico - Superiores</h3>
+    <ul>
+        <li><strong>Exercício Principal:</strong> Supino Reto - 9 séries de 3 repetições com 50% do seu 1RM, focando em máxima velocidade. Descanso de 60s.</li>
+        <li><strong>Exercício Suplementar:</strong> Desenvolvimento Militar em pé - 3 séries de 8 repetições.</li>
+        <li><strong>Assistência 1:</strong> Puxada na Polia Alta (Pulldown) - 4 séries de 10-12 repetições.</li>
+        <li><strong>Assistência 2:</strong> Rosca Direta - 3 séries de 10 repetições.</li>
+        <li><strong>Assistência 3:</strong> Face Pull - 3 séries de 15 repetições.</li>
+    </ul>
+    
+    <h2>Conclusão: A Jornada da Força é uma Maratona</h2>
+    <p>Saber <strong>como ganhar força máxima</strong> vai além de apenas mover pesos. Exige inteligência, consistência e uma dedicação incansável à técnica. Este <strong>programa de força</strong> é um mapa, mas você é o piloto. Ouça seu corpo, não tenha medo de ajustar as variáveis e, acima de tudo, seja paciente.</p>
+    <p>A força não é construída da noite para o dia. Ela é forjada no ferro, repetição por repetição, treino após treino. Use este guia, comprometa-se com o processo e prepare-se para se tornar a versão mais forte de si mesmo.</p>
+
+    <div style="text-align:center;">
+        <a href="#contato" class="cta-button">COMECE SUA TRANSFORMAÇÃO DE FORÇA HOJE</a>
+    </div>
+
+</div>
+
+<script>
+    function calculate1RM() {
+        const weight = parseFloat(document.getElementById('weight-lifted').value);
+        const reps = parseInt(document.getElementById('reps-done').value);
+        const resultElement = document.getElementById('rm-result');
+
+        if (isNaN(weight) || isNaN(reps) || weight <= 0 || reps <= 0) {
+            resultElement.innerText = "Por favor, insira valores válidos.";
+            return;
+        }
+        if (reps === 1) {
+            resultElement.innerText = `Seu 1RM é ${weight.toFixed(2)} kg.`;
+            return;
+        }
+
+        const estimated1RM = weight * (1 + (reps / 30));
+        resultElement.innerText = `Seu 1RM estimado é: ${estimated1RM.toFixed(2)} kg`;
+    }
+
+    function generatePercentages() {
+        const oneRepMax = parseFloat(document.getElementById('one-rep-max').value);
+        const table = document.getElementById('percentage-table');
+        const tbody = table.querySelector('tbody');
+
+        if (isNaN(oneRepMax) || oneRepMax <= 0) {
+            alert("Por favor, insira um 1RM válido.");
+            return;
+        }
+
+        tbody.innerHTML = ''; // Limpa a tabela
+        const percentages = [
+            { p: 90, focus: 'Força Máxima' },
+            { p: 80, focus: 'Força/Hipertrofia' },
+            { p: 70, focus: 'Hipertrofia/Resistência' },
+            { p: 60, focus: 'Velocidade/Técnica' },
+            { p: 50, focus: 'Esforço Dinâmico/Aquecimento' }
+        ];
+
+        percentages.forEach(item => {
+            const load = (oneRepMax * (item.p / 100)).toFixed(2);
+            const row = `<tr>
+                <td>${item.p}%</td>
+                <td>${load} kg</td>
+                <td>${item.focus}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+
+        table.style.display = 'table';
+    }
+
+    function calculateRelativeStrength() {
+        const oneRepMax = parseFloat(document.getElementById('relative-1rm').value);
+        const bodyWeight = parseFloat(document.getElementById('body-weight').value);
+        const resultElement = document.getElementById('relative-result');
+
+        if (isNaN(oneRepMax) || isNaN(bodyWeight) || oneRepMax <= 0 || bodyWeight <= 0) {
+            resultElement.innerText = "Por favor, insira valores válidos.";
+            return;
+        }
+
+        const ratio = oneRepMax / bodyWeight;
+        let classification = "Iniciante";
+        if (ratio >= 1.5 && ratio < 2.0) classification = "Intermediário";
+        if (ratio >= 2.0 && ratio < 2.5) classification = "Avançado";
+        if (ratio >= 2.5) classification = "Elite";
+
+        resultElement.innerHTML = `Sua força relativa é <strong>${ratio.toFixed(2)}x</strong> seu peso corporal.<br>Classificação (estimada): <strong>${classification}</strong>`;
+    }
+</script>
+
+</body>
+</html>

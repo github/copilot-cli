@@ -1,0 +1,495 @@
+{
+  "version": "1.0",
+  "title": "Ebook Gratuito - Lead Magnet",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 100,
+          "right": 20,
+          "bottom": 100,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='display: inline-block; background: #0EA5E9; color: #FFFFFF; padding: 10px 30px; border-radius: 25px; font-family: Oswald; font-size: 14px; margin: 0 auto; text-align: center;'>100% GRATUITO</div>"
+              }
+            },
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "OS 7 ERROS FATAIS QUE ESTÃO SABOTANDO SEU FÍSICO",
+                "header_size": "h1",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-subheading",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 22px; color: #0EA5E9; text-align: center; margin: 30px 0;'>E como corrigi-los em menos de 30 dias usando o Método Militar TD</p>"
+              }
+            },
+            {
+              "id": "ebook-mockup",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {
+                  "url": "/assets/ebook-mockup.png"
+                },
+                "alt": "Ebook 7 Erros Fatais",
+                "align": "center",
+                "width": {
+                  "unit": "px",
+                  "size": 400
+                }
+              }
+            },
+            {
+              "id": "hero-benefits",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='max-width: 600px; margin: 40px auto;'><ul style='font-family: Inter; font-size: 18px; color: #FFFFFF; line-height: 2; text-align: left;'><li>✓ Descubra por que sua dieta não funciona (e nunca funcionará)</li><li>✓ O erro #1 que impede ganho de massa muscular</li><li>✓ Por que você treina mas não emagrece (Spoiler: não é o que come)</li><li>✓ A verdade sobre suplementos que ninguém te conta</li><li>✓ Como treinar apenas 3x/semana e ter resultados melhores</li><li>✓ BÔNUS: Plano de ação de 30 dias passo-a-passo</li></ul></div>"
+              }
+            },
+            {
+              "id": "cta-arrow",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 24px; color: #0EA5E9; text-align: center; margin: 30px 0;'>↓ BAIXE AGORA GRATUITAMENTE ↓</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "form-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 60,
+          "right": 20,
+          "bottom": 60,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "form-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%",
+            "max-width": "600px",
+            "margin": "0 auto"
+          },
+          "elements": [
+            {
+              "id": "form-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Preencha para receber seu Ebook",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 32
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "form-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 16px; color: #0B1220; text-align: center; margin: 15px 0;'>Enviaremos o PDF diretamente no seu email em menos de 2 minutos.</p>"
+              }
+            },
+            {
+              "id": "contact-form",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_fields": [
+                  {
+                    "field_type": "text",
+                    "field_label": "Seu Nome",
+                    "required": true,
+                    "placeholder": "Como você gostaria de ser chamado?"
+                  },
+                  {
+                    "field_type": "email",
+                    "field_label": "Seu Melhor Email",
+                    "required": true,
+                    "placeholder": "Enviaremos o ebook aqui"
+                  },
+                  {
+                    "field_type": "tel",
+                    "field_label": "WhatsApp (opcional)",
+                    "required": false,
+                    "placeholder": "Para enviar dicas extras"
+                  }
+                ],
+                "button_text": "BAIXAR EBOOK GRÁTIS →",
+                "button_size": "lg",
+                "submit_actions": ["email", "redirect"],
+                "email_to": "contato@treinadordavid.com",
+                "email_subject": "Novo Lead - Ebook 7 Erros Fatais",
+                "redirect_to": "/download-ebook",
+                "button_typography_font_family": "Oswald",
+                "button_typography_font_size": {
+                  "unit": "px",
+                  "size": 20
+                },
+                "button_background_color": "#0EA5E9",
+                "button_text_color": "#FFFFFF",
+                "button_padding": {
+                  "unit": "px",
+                  "top": 20,
+                  "right": 50,
+                  "bottom": 20,
+                  "left": 50
+                }
+              }
+            },
+            {
+              "id": "privacy-note",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 12px; color: #666; text-align: center; margin-top: 20px;'>🔒 Seus dados estão seguros. Não compartilhamos com terceiros. Você pode cancelar os emails a qualquer momento.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "proof-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#F8F9FA",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "proof-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "proof-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "MAIS DE 10.000 DOWNLOADS",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "proof-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 20px; color: #0EA5E9; text-align: center; margin: 20px 0;'>Veja o que quem já baixou está dizendo:</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "testimonials-grid",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "testimonial-1",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "testimonial-1-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='background: #FFFFFF; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'><p style='font-family: Inter; font-size: 14px; color: #0B1220; margin-bottom: 15px;'>⭐⭐⭐⭐⭐</p><p style='font-family: Inter; font-size: 15px; color: #0B1220; font-style: italic; margin-bottom: 15px;'>\"Identifiquei 4 dos 7 erros que eu estava cometendo. Corrigi e em 2 semanas já vi diferença na balança!\"</p><p style='font-family: Oswald; font-size: 14px; color: #0EA5E9;'>— Marina S.</p></div>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "testimonial-2",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "testimonial-2-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='background: #FFFFFF; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'><p style='font-family: Inter; font-size: 14px; color: #0B1220; margin-bottom: 15px;'>⭐⭐⭐⭐⭐</p><p style='font-family: Inter; font-size: 15px; color: #0B1220; font-style: italic; margin-bottom: 15px;'>\"Conteúdo direto, sem enrolação. Típico do TD. Melhor que muito curso pago por aí.\"</p><p style='font-family: Oswald; font-size: 14px; color: #0EA5E9;'>— Ricardo P.</p></div>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "testimonial-3",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "testimonial-3-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='background: #FFFFFF; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'><p style='font-family: Inter; font-size: 14px; color: #0B1220; margin-bottom: 15px;'>⭐⭐⭐⭐⭐</p><p style='font-family: Inter; font-size: 15px; color: #0B1220; font-style: italic; margin-bottom: 15px;'>\"O erro #3 sobre suplementos me fez economizar R$500/mês. Valeu só por isso!\"</p><p style='font-family: Oswald; font-size: 14px; color: #0EA5E9;'>— Thiago M.</p></div>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "author-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "author-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "author-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "QUEM É O TREINADOR DAVID?",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "author-image",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {
+                  "url": "/assets/treinador-david.jpg"
+                },
+                "alt": "Treinador David",
+                "align": "center",
+                "width": {
+                  "unit": "px",
+                  "size": 200
+                },
+                "border_radius": {
+                  "unit": "%",
+                  "size": 50
+                }
+              }
+            },
+            {
+              "id": "author-bio",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='max-width: 700px; margin: 30px auto; font-family: Inter; font-size: 18px; color: #0B1220; line-height: 1.8; text-align: center;'><p>Ex-Marines (USMC) com <strong>30 anos de experiência</strong> em fitness e treinamento físico.</p><p style='margin-top: 20px;'>Ajudou mais de <strong>2.500 pessoas</strong> a transformarem seus corpos usando disciplina militar adaptada para civis.</p><p style='margin-top: 20px;'>Criador do <strong>Método Militar TD</strong>, que combina eficiência do treino militar com ciência moderna do exercício.</p><p style='margin-top: 20px; font-family: Oswald; font-size: 20px; color: #0EA5E9;'>\"Sem frescura. Sem desculpa. Só resultados.\"</p></div>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "final-cta-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 60,
+          "right": 20,
+          "bottom": 60,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "final-cta-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "final-cta-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "BAIXE SEU EBOOK AGORA",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "final-cta-button",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "SIM, QUERO O EBOOK GRATUITO →",
+                "link": {
+                  "url": "#form-section"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 22
+                },
+                "background_color": "#0EA5E9",
+                "color": "#FFFFFF",
+                "padding": {
+                  "unit": "px",
+                  "top": 25,
+                  "right": 60,
+                  "bottom": 25,
+                  "left": 60
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "final-catchphrase",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 20px; color: #0EA5E9; text-align: center; margin-top: 30px;'>DEPENDE! De você baixar e aplicar o conteúdo.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#000000",
+        "padding": {
+          "unit": "px",
+          "top": 40,
+          "right": 20,
+          "bottom": 40,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "footer-signature",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 24px; color: #0EA5E9; text-align: center;'>Semper Fidelis<br>— Treinador David</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

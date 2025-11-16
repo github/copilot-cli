@@ -1,0 +1,470 @@
+{
+  "version": "1.0",
+  "title": "Personal Training Individual - TD Fitness",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_background": "video",
+        "background_video_link": "https://cdn.example.com/hero-workout.mp4",
+        "background_video_fallback": {
+          "url": "https://via.placeholder.com/1920x1080/0B1220/0EA5E9"
+        },
+        "background_overlay_background": "gradient",
+        "background_overlay_color": "#0B1220",
+        "background_overlay_color_stop": {
+          "unit": "%",
+          "size": 0
+        },
+        "background_overlay_color_b": "#0EA5E9",
+        "background_overlay_color_b_stop": {
+          "unit": "%",
+          "size": 100
+        },
+        "background_overlay_opacity": {
+          "unit": "px",
+          "size": 0.9
+        },
+        "min_height": {
+          "unit": "vh",
+          "size": 100
+        },
+        "content_position": "middle",
+        "padding": {
+          "unit": "px",
+          "top": "100",
+          "right": "20",
+          "bottom": "100",
+          "left": "20"
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "width": "100",
+            "width_tablet": "100",
+            "width_mobile": "100"
+          },
+          "elements": [
+            {
+              "id": "hero-headline",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "PERSONAL TRAINING INDIVIDUAL<br><span style='color: #0EA5E9;'>RESULTADOS REAIS. SEM ENROLAÇÃO.</span>",
+                "header_size": "h1",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Oswald",
+                "typography_font_weight": "700",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 64,
+                  "sizes": []
+                },
+                "typography_font_size_tablet": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "typography_font_size_mobile": {
+                  "unit": "px",
+                  "size": 32
+                },
+                "text_color": "#FFFFFF"
+              }
+            },
+            {
+              "id": "hero-subheadline",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='text-align: center; font-size: 24px; color: #FFFFFF; margin-top: 20px;'>Treinamento 1 a 1 com ex-Marine Corps. Treinos personalizados que transformam seu corpo e mente.</p>",
+                "typography_typography": "custom",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "400"
+              }
+            },
+            {
+              "id": "hero-cta-buttons",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "QUERO COMEÇAR AGORA",
+                "link": {
+                  "url": "#formulario",
+                  "is_external": false
+                },
+                "align": "center",
+                "size": "lg",
+                "typography_typography": "custom",
+                "typography_font_family": "Oswald",
+                "typography_font_weight": "700",
+                "typography_text_transform": "uppercase",
+                "button_background_color": "#0EA5E9",
+                "button_text_color": "#FFFFFF",
+                "border_radius": {
+                  "unit": "px",
+                  "size": 8
+                },
+                "button_box_shadow_box_shadow_type": "yes",
+                "button_box_shadow_box_shadow": {
+                  "horizontal": 0,
+                  "vertical": 4,
+                  "blur": 12,
+                  "spread": 0,
+                  "color": "rgba(14, 165, 233, 0.3)"
+                },
+                "hover_animation": "grow"
+              }
+            },
+            {
+              "id": "countdown-timer",
+              "elType": "widget",
+              "widgetType": "countdown",
+              "settings": {
+                "due_date": "2024-12-31 23:59",
+                "label_display": "block",
+                "show_days": "yes",
+                "show_hours": "yes",
+                "show_minutes": "yes",
+                "show_seconds": "yes",
+                "label_days": "Dias",
+                "label_hours": "Horas",
+                "label_minutes": "Min",
+                "label_seconds": "Seg",
+                "digit_background_color": "#0B1220",
+                "digit_text_color": "#0EA5E9",
+                "label_text_color": "#FFFFFF",
+                "container_padding": {
+                  "unit": "px",
+                  "top": "40",
+                  "bottom": "0"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pain-points-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_background": "classic",
+        "background_color": "#F8FAFC",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "bottom": "80"
+        }
+      },
+      "elements": [
+        {
+          "id": "pain-points-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "VOCÊ ESTÁ CANSADO DE...",
+            "header_size": "h2",
+            "align": "center",
+            "typography_font_family": "Oswald",
+            "typography_font_weight": "700",
+            "text_color": "#0B1220"
+          }
+        },
+        {
+          "id": "pain-points-grid",
+          "elType": "section",
+          "settings": {
+            "structure": "20"
+          },
+          "elements": [
+            {
+              "id": "pain-point-1",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "icon": {
+                  "value": "fas fa-times-circle",
+                  "library": "fa-solid"
+                },
+                "icon_color": "#0EA5E9",
+                "title_text": "Treinar Sozinho Sem Resultados",
+                "description_text": "Você vai na academia, faz exercícios aleatórios e não vê mudança nenhuma no espelho. Frustração total.",
+                "title_color": "#0B1220",
+                "description_color": "#64748B"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "solution-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "bottom": "80"
+        }
+      },
+      "elements": [
+        {
+          "id": "solution-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "A SOLUÇÃO: PERSONAL TRAINING INDIVIDUAL TD",
+            "header_size": "h2",
+            "align": "center",
+            "text_color": "#FFFFFF",
+            "typography_font_family": "Oswald"
+          }
+        }
+      ]
+    },
+    {
+      "id": "benefits-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "bottom": "80"
+        },
+        "structure": "33"
+      },
+      "elements": [
+        {
+          "id": "benefit-1",
+          "elType": "widget",
+          "widgetType": "icon-box",
+          "settings": {
+            "icon": {
+              "value": "💪",
+              "library": "emoji"
+            },
+            "title_text": "Corpo Forte e Funcional",
+            "description_text": "Músculos que servem para USAR, não só para foto. Força real para a vida real.",
+            "position": "top",
+            "title_color": "#0B1220",
+            "description_color": "#64748B"
+          }
+        }
+      ]
+    },
+    {
+      "id": "testimonials-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_background": "classic",
+        "background_color": "#F8FAFC",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "bottom": "80"
+        }
+      },
+      "elements": [
+        {
+          "id": "testimonials-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "O QUE DIZEM OS ALUNOS",
+            "header_size": "h2",
+            "align": "center",
+            "text_color": "#0B1220"
+          }
+        },
+        {
+          "id": "testimonials-carousel",
+          "elType": "widget",
+          "widgetType": "testimonial-carousel",
+          "settings": {
+            "slides": [
+              {
+                "content": "Em 3 meses perdi 15kg e ganhei músculos que nunca imaginei ter. O Treinador David não aceita desculpas, e é isso que eu precisava. Melhor investimento da minha vida.",
+                "name": "Ricardo Costa",
+                "title": "Empresário, 42 anos",
+                "image": {
+                  "url": ""
+                }
+              }
+            ],
+            "slides_to_show": "3",
+            "slides_to_show_tablet": "2",
+            "slides_to_show_mobile": "1",
+            "autoplay": "yes"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pricing-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_background": "gradient",
+        "background_color": "#0EA5E9",
+        "background_color_b": "#0284C7",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "bottom": "80"
+        }
+      },
+      "elements": [
+        {
+          "id": "pricing-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "INVESTIMENTO EM VOCÊ",
+            "header_size": "h2",
+            "align": "center",
+            "text_color": "#FFFFFF"
+          }
+        },
+        {
+          "id": "pricing-table",
+          "elType": "widget",
+          "widgetType": "price-table",
+          "settings": {
+            "heading": "TRANSFORMATION",
+            "sub_heading": "6 meses • 3x/semana",
+            "price": "1.497",
+            "currency_symbol": "R$",
+            "period": "/mês",
+            "features_list": [
+              {
+                "item_text": "3 sessões/semana (60min)",
+                "item_icon": {
+                  "value": "fas fa-check",
+                  "library": "fa-solid"
+                }
+              }
+            ],
+            "button_text": "COMEÇAR AGORA",
+            "link": {
+              "url": "#formulario"
+            },
+            "heading_color": "#0B1220",
+            "price_color": "#0EA5E9",
+            "button_background_color": "#0EA5E9",
+            "ribbon_title": "MAIS POPULAR"
+          }
+        }
+      ]
+    },
+    {
+      "id": "form-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": "80",
+          "bottom": "80"
+        }
+      },
+      "elements": [
+        {
+          "id": "form-heading",
+          "elType": "widget",
+          "widgetType": "heading",
+          "settings": {
+            "title": "COMECE SUA TRANSFORMAÇÃO AGORA",
+            "header_size": "h2",
+            "align": "center",
+            "text_color": "#FFFFFF"
+          }
+        },
+        {
+          "id": "contact-form",
+          "elType": "widget",
+          "widgetType": "form",
+          "settings": {
+            "form_name": "Personal Training Individual Lead",
+            "form_fields": [
+              {
+                "field_type": "text",
+                "field_label": "Nome Completo",
+                "required": "yes",
+                "placeholder": "Seu nome",
+                "field_value": "",
+                "width": "100"
+              },
+              {
+                "field_type": "email",
+                "field_label": "Email",
+                "required": "yes",
+                "placeholder": "seu@email.com",
+                "width": "100"
+              },
+              {
+                "field_type": "tel",
+                "field_label": "WhatsApp",
+                "required": "yes",
+                "placeholder": "(11) 99999-9999",
+                "width": "100"
+              },
+              {
+                "field_type": "select",
+                "field_label": "Objetivo Principal",
+                "required": "yes",
+                "field_options": "Emagrecimento\nGanhar Massa Muscular\nAumentar Força\nMelhorar Condicionamento\nSaúde e Qualidade de Vida\nReabilitação/Lesão",
+                "width": "100"
+              },
+              {
+                "field_type": "textarea",
+                "field_label": "Conte-me sobre você (opcional)",
+                "placeholder": "Objetivos, limitações, expectativas...",
+                "rows": "4",
+                "width": "100"
+              }
+            ],
+            "button_text": "QUERO RECEBER PROPOSTA PERSONALIZADA",
+            "button_size": "lg",
+            "button_background_color": "#0EA5E9",
+            "success_message": "✓ INSCRITO COM SUCESSO! Verifique seu email para próximos passos.",
+            "form_metadata": [
+              {
+                "id": "page_url",
+                "value": "Page URL"
+              },
+              {
+                "id": "user_agent",
+                "value": "User Agent"
+              },
+              {
+                "id": "remote_ip",
+                "value": "Remote IP"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "page_settings": {
+    "hide_title": "yes",
+    "page_template": "elementor_canvas"
+  }
+}
