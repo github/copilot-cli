@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{SUBJECT}}</title>
+
+  <style type="text/css">
+    /* Client-specific Styles */
+    body { margin: 0; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    table { border-collapse: collapse !important; }
+
+    /* TD Email Styles */
+    .email-container { max-width: 600px; margin: 0 auto; background-color: #FFFFFF; }
+    .email-header { background-color: #0B1220; padding: 20px; text-align: center; }
+    .email-body { padding: 30px 20px; color: #1F2937; font-family: 'Inter', Arial, sans-serif; font-size: 16px; line-height: 1.6; }
+    .email-footer { background-color: #F3F4F6; padding: 20px; text-align: center; font-size: 12px; color: #6B7280; }
+
+    .td-logo { max-width: 200px; height: auto; }
+    .td-badge { background-color: #0EA5E9; color: #FFFFFF; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .td-heading { font-family: 'Oswald', Arial, sans-serif; font-size: 28px; font-weight: 700; color: #0B1220; margin: 20px 0; text-transform: uppercase; letter-spacing: 0.05em; }
+    .td-subheading { font-size: 20px; font-weight: 600; color: #0EA5E9; margin: 15px 0; }
+
+    .td-button { display: inline-block; padding: 16px 32px; background-color: #0EA5E9; color: #FFFFFF !important; text-decoration: none; border-radius: 4px; font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0; }
+    .td-button:hover { background-color: #0284c7; }
+
+    .td-highlight { background-color: #FEF3C7; padding: 20px; border-left: 4px solid #F59E0B; margin: 20px 0; }
+    .td-testimonial { background-color: #F3F4F6; padding: 20px; border-left: 4px solid: #0EA5E9; margin: 20px 0; font-style: italic; }
+
+    .td-ps { margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB; font-style: italic; color: #6B7280; }
+    .td-signature { margin-top: 20px; font-weight: 600; }
+    .td-signature-title { color: #6B7280; font-size: 14px; }
+
+    .td-social-links { margin: 15px 0; }
+    .td-social-links a { margin: 0 10px; text-decoration: none; }
+
+    /* Mobile Styles */
+    @media only screen and (max-width: 600px) {
+      .email-body { padding: 20px 15px !important; }
+      .td-heading { font-size: 24px !important; }
+      .td-subheading { font-size: 18px !important; }
+      .td-button { padding: 14px 24px !important; font-size: 14px !important; }
+    }
+  </style>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #F3F4F6;">
+
+  <!-- Preview Text (hidden in email body) -->
+  <div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
+    {{PREVIEW_TEXT}}
+  </div>
+
+  <!-- Email Container -->
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F3F4F6; padding: 20px 0;">
+    <tr>
+      <td align="center">
+
+        <!-- Main Email Table -->
+        <table class="email-container" border="0" cellpadding="0" cellspacing="0" width="600">
+
+          <!-- Header -->
+          <tr>
+            <td class="email-header">
+              <img src="https://treinadordavid.pt/images/email-logo.png" alt="Treinador David" class="td-logo" />
+              <br><br>
+              <span class="td-badge">🎖️ USMC Veteran | 30 Anos Experiência</span>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td class="email-body">
+
+              <!-- Personalized Greeting -->
+              <p style="margin-top: 0;">Olá <strong>{{FIRST_NAME}}</strong>,</p>
+
+              <!-- MAIN CONTENT STARTS HERE -->
+              {{CONTENT}}
+              <!-- MAIN CONTENT ENDS HERE -->
+
+              <!-- CTA Button -->
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{{CTA_URL}}?utm_source=email&utm_medium={{EMAIL_TYPE}}&utm_campaign={{CAMPAIGN_NAME}}" class="td-button">
+                  {{CTA_TEXT}}
+                </a>
+              </div>
+
+              <!-- P.S. Section -->
+              <div class="td-ps">
+                <strong>P.S.</strong> {{PS_TEXT}}
+              </div>
+
+              <!-- Signature -->
+              <div class="td-signature">
+                <strong>Semper Fidelis,</strong><br>
+                <strong>Treinador David</strong><br>
+                <span class="td-signature-title">Ex-Marine USMC | Personal Trainer | 30 Anos Experiência</span>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="email-footer">
+
+              <!-- Social Links -->
+              <div class="td-social-links">
+                <a href="https://instagram.com/treinadordavid" style="color: #0EA5E9;">Instagram</a> |
+                <a href="https://facebook.com/treinadordavid" style="color: #0EA5E9;">Facebook</a> |
+                <a href="https://youtube.com/treinadordavid" style="color: #0EA5E9;">YouTube</a>
+              </div>
+
+              <!-- Contact Info -->
+              <p style="margin: 10px 0;">
+                📧 <a href="mailto:contato@treinadordavid.pt" style="color: #0EA5E9;">contato@treinadordavid.pt</a><br>
+                📱 WhatsApp: +351 912 345 678
+              </p>
+
+              <!-- Legal & Unsubscribe -->
+              <p style="margin: 10px 0; font-size: 11px; color: #9CA3AF;">
+                Você está recebendo este email porque se inscreveu em treinadordavid.pt<br>
+                <a href="{{UNSUBSCRIBE_URL}}" style="color: #6B7280;">Cancelar inscrição</a> |
+                <a href="{{UPDATE_PREFERENCES_URL}}" style="color: #6B7280;">Atualizar preferências</a>
+              </p>
+
+              <p style="margin: 10px 0; font-size: 11px; color: #9CA3AF;">
+                Treinador David - Personal Training<br>
+                Lisboa, Portugal
+              </p>
+
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+  <!-- Tracking Pixel -->
+  <img src="{{TRACKING_PIXEL_URL}}" width="1" height="1" alt="" />
+
+</body>
+</html>
