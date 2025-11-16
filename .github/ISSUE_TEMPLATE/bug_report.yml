@@ -2,8 +2,7 @@ name: 🐞 Bug Report
 description: Report a bug or unexpected behavior in the GitHub Copilot CLI.
 type: Bug
 labels:
-  - bug
-  - "needs triage"
+  - "triage"
 body:
   - type: markdown
     attributes:

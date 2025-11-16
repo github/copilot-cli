@@ -2,8 +2,7 @@ name: ⭐️ Feature Request
 description: Suggest a new feature or improvement for the GitHub Copilot CLI.
 type: Feature
 labels:
-  - enhancement
-  - "needs triage"
+  - "triage"
 body:
   - type: markdown
     attributes:
