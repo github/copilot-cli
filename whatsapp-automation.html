@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Automation - Sistema de Coaching Automático</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #075E54, #128C7E); color: white; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding: 40px; border-radius: 15px; }
+        h1 { color: #25D366; text-align: center; font-size: 3em; margin-bottom: 20px; }
+        .flow-section { background: rgba(255,255,255,0.1); padding: 30px; margin: 25px 0; border-radius: 10px; border-left: 5px solid #25D366; }
+        .message-card { background: rgba(0,0,0,0.3); padding: 20px; margin: 15px 0; border-radius: 15px; }
+        .message-bubble { background: #DCF8C6; color: #000; padding: 15px; border-radius: 10px; margin: 10px 0; position: relative; max-width: 80%; }
+        .message-bubble.bot { background: white; }
+        .message-bubble::after { content: ''; position: absolute; bottom: 0; width: 0; height: 0; border: 10px solid transparent; }
+        .message-bubble.user::after { right: -10px; border-left-color: #DCF8C6; }
+        .message-bubble.bot::after { left: -10px; border-right-color: white; }
+        .trigger { background: #FFA500; color: white; padding: 8px 20px; border-radius: 20px; display: inline-block; margin: 10px 0; font-weight: bold; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-box { background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-number { font-size: 2.5em; color: #25D366; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💬 WHATSAPP AUTOMATION SYSTEM</h1>
+        <p style="text-align: center; font-size: 1.3em; margin-bottom: 40px;">
+            Sistema Completo de Automação para Coaching via WhatsApp
+        </p>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number">92%</div>
+                <div>Taxa de Abertura</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">78%</div>
+                <div>Taxa de Resposta</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">24/7</div>
+                <div>Disponibilidade</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">15+</div>
+                <div>Fluxos Automáticos</div>
+            </div>
+        </div>
+
+        <!-- FLUXO DE BOAS-VINDAS -->
+        <div class="flow-section">
+            <h2 style="color: #25D366; font-size: 2em; margin-bottom: 20px;">🎯 FLUXO 1: Boas-Vindas Automáticas</h2>
+            <div class="trigger">GATILHO: Primeiro contato do lead</div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM 1 - IMEDIATA:</strong></p>
+                <div class="message-bubble bot">
+                    Olá! 👋 Seja muito bem-vindo(a)!
+
+Eu sou o assistente virtual do Coach [NOME].
+
+Antes de te conectar com ele, deixa eu te fazer algumas perguntas rápidas para personalizar seu atendimento:
+
+*Qual é seu nome?* 🤔
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM 2 - Após resposta do nome:</strong></p>
+                <div class="message-bubble bot">
+                    Prazer em te conhecer, {NOME}! 😊
+
+*Qual é seu principal objetivo?*
+
+Digite o número:
+1️⃣ Perder peso/emagrecer
+2️⃣ Ganhar massa muscular
+3️⃣ Melhorar performance
+4️⃣ Ter mais saúde e disposição
+5️⃣ Outro objetivo
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM 3 - Após escolha do objetivo:</strong></p>
+                <div class="message-bubble bot">
+                    Perfeito! Então você quer *{OBJETIVO}*.
+
+Últimas perguntas:
+
+*Quanto tempo você tem disponível para treinar por semana?*
+
+1️⃣ 2-3x por semana (busy mode)
+2️⃣ 4-5x por semana (dedicado)
+3️⃣ 6-7x por semana (beast mode)
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM 4 - Qualificação e Oferta:</strong></p>
+                <div class="message-bubble bot">
+                    Excelente, {NOME}! 🎯
+
+Baseado no que você me contou, eu tenho a solução PERFEITA para você.
+
+O Coach [NOME] criou o programa *[PROGRAMA RECOMENDADO]* especificamente para pessoas com seu perfil e objetivo.
+
+*Quer que eu te envie mais informações sobre o programa?*
+
+Digite SIM para receber detalhes 📲
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM 5 - Envio de Materiais:</strong></p>
+                <div class="message-bubble bot">
+                    Perfeito! Vou te enviar 3 coisas agora:
+
+1️⃣ Vídeo de 5 minutos explicando o programa
+2️⃣ PDF com casos de sucesso de alunos
+3️⃣ Condições especiais (válidas por 48h)
+
+*[ENVIA ARQUIVO 1]*
+*[ENVIA ARQUIVO 2]*
+*[ENVIA ARQUIVO 3]*
+
+Assistiu o vídeo? Ficou alguma dúvida? 🤔
+
+Ou quer já garantir sua vaga com desconto?
+
+Digite DÚVIDA ou VAGA
+                </div>
+            </div>
+        </div>
+
+        <!-- FLUXO DE ACOMPANHAMENTO DE ALUNOS -->
+        <div class="flow-section">
+            <h2 style="color: #25D366; font-size: 2em; margin-bottom: 20px;">💪 FLUXO 2: Acompanhamento Diário de Alunos</h2>
+            <div class="trigger">GATILHO: Aluno ativo no programa</div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM MATINAL (8h00):</strong></p>
+                <div class="message-bubble bot">
+                    Bom dia, {NOME}! ☀️
+
+Hoje é *DIA DE TREINO*! 💪
+
+Seu treino de hoje:
+📋 *{NOME_DO_TREINO}*
+⏱️ Duração estimada: {TEMPO} minutos
+
+Link do treino em vídeo: {LINK}
+
+Após treinar, me avisa aqui que eu marco como concluído! ✅
+
+Força e foco, soldado! 🔥
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM CHECK-IN (20h00 - se não respondeu):</strong></p>
+                <div class="message-bubble bot">
+                    Opa, {NOME}! 👀
+
+Vi que você ainda não marcou o treino de hoje como concluído.
+
+*Conseguiu treinar?*
+
+Digite:
+✅ SIM - Treinei
+❌ NÃO - Não consegui
+⏰ AGORA - Vou treinar agora
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM SE NÃO TREINOU:</strong></p>
+                <div class="message-bubble bot">
+                    Entendo, {NOME}! Imprevistos acontecem. 😊
+
+*Mas lembra:* Consistência é a chave para resultados.
+
+Que tal treinar amanhã cedo antes do trabalho?
+
+Ou posso ajustar seu cronograma de treino?
+
+Digite AJUSTAR se quer mudar os horários
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM SEMANAL DE PROGRESSO (Domingo 19h):</strong></p>
+                <div class="message-bubble bot">
+                    📊 *RELATÓRIO SEMANAL* - Semana {NÚMERO}
+
+Olá {NOME}! Vamos analisar sua semana:
+
+✅ Treinos realizados: {X}/4
+📸 Fotos de progresso: {SIM/NÃO}
+📏 Peso atual: {PESO}kg ({+/-}kg)
+
+🎯 *Meta da próxima semana:*
+- {META_1}
+- {META_2}
+- {META_3}
+
+Continue assim! Você está evoluindo 🔥
+
+Alguma dúvida para a próxima semana?
+                </div>
+            </div>
+        </div>
+
+        <!-- FLUXO DE NUTRIÇÃO -->
+        <div class="flow-section">
+            <h2 style="color: #25D366; font-size: 2em; margin-bottom: 20px;">🍽️ FLUXO 3: Acompanhamento Nutricional</h2>
+            <div class="trigger">GATILHO: Horário das refeições</div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>PRÉ-TREINO (30 min antes do treino):</strong></p>
+                <div class="message-bubble bot">
+                    ⏰ ALERTA PRÉ-TREINO! 🏋️
+
+Não esqueça de fazer sua refeição pré-treino:
+
+🍌 *Opção 1:*
+- 1 banana
+- 1 scoop whey
+- 1 café preto
+
+🍞 *Opção 2:*
+- 2 fatias pão integral
+- 2 ovos mexidos
+- Café
+
+Bom treino, {NOME}! 💪
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>PÓS-TREINO (imediatamente após check treino):</strong></p>
+                <div class="message-bubble bot">
+                    Treino finalizado! Parabéns 🎉
+
+Agora é hora da refeição PÓS-TREINO (janela anabólica):
+
+🥤 *Imediato (agora):*
+- 1 scoop whey protein
+- 1 fruta (banana ou maçã)
+
+🍗 *Refeição completa (até 1h):*
+- 200g frango/peixe
+- 150g batata doce
+- Salada à vontade
+
+Marque quando comer: ✅
+                </div>
+            </div>
+        </div>
+
+        <!-- FLUXO DE RETENÇÃO -->
+        <div class="flow-section">
+            <h2 style="color: #25D366; font-size: 2em; margin-bottom: 20px;">🔄 FLUXO 4: Retenção e Upsell</h2>
+            <div class="trigger">GATILHO: 25 dias no programa mensal</div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM DE RENOVAÇÃO:</strong></p>
+                <div class="message-bubble bot">
+                    {NOME}, você está ARRASANDO! 🔥
+
+Estamos chegando ao final do primeiro mês e seus resultados têm sido INCRÍVEIS:
+
+✅ {X}kg eliminados
+✅ {Y}cm de cintura perdidos
+✅ {Z}% de gordura reduzidos
+
+*MAS... estamos só no começo!* 💪
+
+Os próximos 60 dias são onde acontece a TRANSFORMAÇÃO REAL.
+
+Que tal renovar com condição especial?
+
+🎁 *OFERTA EXCLUSIVA:*
+De R$ {PREÇO} por R$ {PREÇO_DESCONTO}
+Válida apenas para renovação antecipada
+
+Quer continuar sua transformação?
+Digite SIM e garanta o desconto! 🚀
+                </div>
+            </div>
+        </div>
+
+        <!-- FLUXO DE ABANDONO -->
+        <div class="flow-section">
+            <h2 style="color: #25D366; font-size: 2em; margin-bottom: 20px;">⚠️ FLUXO 5: Recuperação de Abandono</h2>
+            <div class="trigger">GATILHO: 3 dias sem interação</div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM DIA 3:</strong></p>
+                <div class="message-bubble bot">
+                    {NOME}, tudo bem com você? 😊
+
+Notei que você não interage há 3 dias...
+
+*Está tudo ok?*
+*Surgiu alguma dificuldade?*
+
+Estou aqui para ajudar! Me conta o que aconteceu 💬
+                </div>
+            </div>
+
+            <div class="message-card">
+                <p style="margin-bottom: 10px;"><strong>MENSAGEM DIA 7:</strong></p>
+                <div class="message-bubble bot">
+                    {NOME}, eu REALMENTE não quero que você desista! 💪
+
+Lembra por que você começou?
+Lembra do seu objetivo?
+
+*{OBJETIVO_ORIGINAL}*
+
+Você está tão perto de conseguir!
+
+Me responde: o que posso fazer para te ajudar a voltar aos trilhos?
+
+Podemos ajustar:
+📅 Cronograma de treino
+🍽️ Dieta
+⏰ Horários
+
+Você escolhe! Estou aqui para te apoiar 🤝
+                </div>
+            </div>
+        </div>
+
+        <!-- CONFIGURAÇÕES TÉCNICAS -->
+        <div class="flow-section">
+            <h2 style="color: #25D366; font-size: 2em; margin-bottom: 20px;">⚙️ CONFIGURAÇÃO TÉCNICA</h2>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px;">
+                <h3 style="color: #25D366; margin-bottom: 15px;">🔧 FERRAMENTAS NECESSÁRIAS:</h3>
+                <ul style="line-height: 2;">
+                    <li>✅ WhatsApp Business API (oficial)</li>
+                    <li>✅ Plataforma de automação: ManyChat, Chatfuel ou TypeBot</li>
+                    <li>✅ Integração com CRM (RD Station, HubSpot ou Pipedrive)</li>
+                    <li>✅ Zapier/Make para integrações avançadas</li>
+                    <li>✅ Google Sheets para banco de dados</li>
+                </ul>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h3 style="color: #25D366; margin-bottom: 15px;">📋 VARIÁVEIS PERSONALIZADAS:</h3>
+                <ul style="line-height: 2;">
+                    <li>{NOME} - Nome do lead/cliente</li>
+                    <li>{OBJETIVO} - Objetivo principal</li>
+                    <li>{PROGRAMA} - Programa matriculado</li>
+                    <li>{PESO} - Peso atual</li>
+                    <li>{TREINO} - Nome do treino do dia</li>
+                    <li>{DIAS_PROGRAMA} - Dias no programa</li>
+                    <li>{TREINOS_REALIZADOS} - Treinos completados</li>
+                </ul>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h3 style="color: #25D366; margin-bottom: 15px;">📊 MÉTRICAS PARA ACOMPANHAR:</h3>
+                <ul style="line-height: 2;">
+                    <li>Taxa de resposta aos fluxos</li>
+                    <li>Taxa de conversão lead → cliente</li>
+                    <li>Taxa de engajamento diário</li>
+                    <li>Taxa de retenção mensal</li>
+                    <li>NPS (Net Promoter Score)</li>
+                    <li>Taxa de renovação</li>
+                    <li>Taxa de upsell</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- EXEMPLOS DE BOTÕES RÁPIDOS -->
+        <div class="flow-section">
+            <h2 style="color: #25D366; font-size: 2em; margin-bottom: 20px;">⚡ BOTÕES DE RESPOSTA RÁPIDA</h2>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px;">
+                <p style="margin-bottom: 15px;"><strong>Botões comuns para facilitar interação:</strong></p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <span style="background: white; color: #075E54; padding: 10px 20px; border-radius: 20px; display: inline-block;">✅ Treinei Hoje</span>
+                    <span style="background: white; color: #075E54; padding: 10px 20px; border-radius: 20px; display: inline-block;">📸 Enviar Progresso</span>
+                    <span style="background: white; color: #075E54; padding: 10px 20px; border-radius: 20px; display: inline-block;">❓ Dúvida</span>
+                    <span style="background: white; color: #075E54; padding: 10px 20px; border-radius: 20px; display: inline-block;">📅 Ajustar Cronograma</span>
+                    <span style="background: white; color: #075E54; padding: 10px 20px; border-radius: 20px; display: inline-block;">🍽️ Receitas</span>
+                    <span style="background: white; color: #075E54; padding: 10px 20px; border-radius: 20px; display: inline-block;">👤 Falar com Coach</span>
+                    <span style="background: white; color: #075E54; padding: 10px 20px; border-radius: 20px; display: inline-block;">💰 Fazer Upgrade</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

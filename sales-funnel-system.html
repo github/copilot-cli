@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Funil de Vendas Completo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0B1220; color: #F8FAFC; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; background: #1E293B; padding: 40px; border-radius: 15px; }
+        h1 { color: #0EA5E9; text-align: center; font-size: 3em; margin-bottom: 20px; text-transform: uppercase; }
+        .funnel-stage { background: #334155; padding: 30px; margin: 25px 0; border-radius: 10px; border-left: 5px solid; }
+        .stage-topo { border-left-color: #10B981; }
+        .stage-meio { border-left-color: #F59E0B; }
+        .stage-fundo { border-left-color: #DC2626; }
+        .stage-header { font-size: 2em; color: #0EA5E9; margin-bottom: 20px; }
+        .offer-card { background: #1E293B; padding: 25px; margin: 15px 0; border-radius: 8px; border: 2px solid #475569; }
+        .price { font-size: 2em; color: #FBBF24; font-weight: bold; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .metric-box { background: #475569; padding: 20px; border-radius: 8px; text-align: center; }
+        .metric-number { font-size: 2em; color: #0EA5E9; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 SISTEMA DE FUNIL DE VENDAS COMPLETO</h1>
+        <p style="text-align: center; font-size: 1.3em; color: #94A3B8; margin-bottom: 40px;">
+            Do Lead Frio ao Cliente VIP - Funil de Monetização Máxima
+        </p>
+
+        <div class="metrics">
+            <div class="metric-box">
+                <div class="metric-number">R$ 47</div>
+                <div>Ticket Mínimo</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-number">R$ 35.964</div>
+                <div>LTV Máximo</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-number">8</div>
+                <div>Níveis de Upsell</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-number">38%</div>
+                <div>Taxa de Conversão</div>
+            </div>
+        </div>
+
+        <!-- TOPO DO FUNIL -->
+        <div class="funnel-stage stage-topo">
+            <h2 class="stage-header">🎯 TOPO DO FUNIL - Aquisição de Leads</h2>
+            <p style="margin-bottom: 20px; font-size: 1.1em;">Objetivo: Capturar leads frios com iscas digitais de baixo custo</p>
+
+            <div class="offer-card">
+                <h3 style="color: #10B981; font-size: 1.6em; margin-bottom: 15px;">📥 ISCA DIGITAL #1: E-book Grátis</h3>
+                <p><strong>Produto:</strong> "10 Receitas Fitness Para Emagrecer Comendo Gostoso"</p>
+                <p><strong>Preço:</strong> GRÁTIS (em troca de email)</p>
+                <p><strong>Objetivo:</strong> Capturar email e construir lista</p>
+                <p><strong>Upsell Imediato:</strong> Oferecer E-book completo por R$ 47</p>
+                <p><strong>Taxa de Conversão:</strong> 3-5% de visitantes viram leads</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #10B981; font-size: 1.6em; margin-bottom: 15px;">📹 ISCA DIGITAL #2: Masterclass Gratuita</h3>
+                <p><strong>Produto:</strong> "Masterclass: Como Perder 5kg em 15 Dias"</p>
+                <p><strong>Preço:</strong> GRÁTIS (webinar ao vivo ou gravado)</p>
+                <p><strong>Duração:</strong> 60 minutos</p>
+                <p><strong>Pitch no Final:</strong> Programa de 30 dias por R$ 197</p>
+                <p><strong>Taxa de Conversão:</strong> 8-12% dos participantes compram</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #10B981; font-size: 1.6em; margin-bottom: 15px;">🎁 ISCA DIGITAL #3: Quiz Interativo</h3>
+                <p><strong>Produto:</strong> "Qual Dieta é Ideal Para Você? Descubra em 2 Minutos"</p>
+                <p><strong>Preço:</strong> GRÁTIS</p>
+                <p><strong>Resultado:</strong> PDF personalizado enviado por email</p>
+                <p><strong>Upsell:</strong> Consultoria nutricional por R$ 297</p>
+                <p><strong>Taxa de Conversão:</strong> 15-20% fazem o quiz</p>
+            </div>
+        </div>
+
+        <!-- MEIO DO FUNIL -->
+        <div class="funnel-stage stage-meio">
+            <h2 class="stage-header">📈 MEIO DO FUNIL - Produtos Tripwire e Ascensão</h2>
+            <p style="margin-bottom: 20px; font-size: 1.1em;">Objetivo: Transformar leads em clientes com produtos de entrada (R$ 47 - R$ 497)</p>
+
+            <div class="offer-card">
+                <h3 style="color: #F59E0B; font-size: 1.6em; margin-bottom: 15px;">💎 TRIPWIRE #1: E-book 200 Receitas</h3>
+                <div class="price">R$ 47</div>
+                <p><strong>Produto:</strong> E-book completo com 200 receitas fitness</p>
+                <p><strong>Margem:</strong> 95% (produto digital)</p>
+                <p><strong>Upsell Imediato:</strong> Desafio 30 Dias por R$ 97 (upgrade de R$ 50)</p>
+                <p><strong>Taxa de Upsell:</strong> 35-40%</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #F59E0B; font-size: 1.6em; margin-bottom: 15px;">🔥 OFERTA #2: Desafio 30 Dias</h3>
+                <div class="price">R$ 97</div>
+                <p><strong>Produto:</strong> Programa de 30 dias com treinos e dieta</p>
+                <p><strong>Entrega:</strong> Acesso imediato a plataforma</p>
+                <p><strong>Upsell:</strong> Programa 90 dias por R$ 197 (upgrade de R$ 100)</p>
+                <p><strong>Cross-sell:</strong> Grupo VIP +R$ 47/mês</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #F59E0B; font-size: 1.6em; margin-bottom: 15px;">💪 OFERTA #3: Programa 90 Dias</h3>
+                <div class="price">R$ 297</div>
+                <p><strong>Produto:</strong> Transformação completa em 90 dias</p>
+                <p><strong>Incluído:</strong> Treinos + Dieta + Grupo + Suporte</p>
+                <p><strong>Upsell:</strong> Coaching Mensal por R$ 397/mês</p>
+                <p><strong>Downsell:</strong> Se recusar, oferecer 3x R$ 99</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #F59E0B; font-size: 1.6em; margin-bottom: 15px;">🏋️ OFERTA #4: Programa Específico</h3>
+                <div class="price">R$ 397</div>
+                <p><strong>Opções:</strong> Hipertrofia / Emagrecimento / Força</p>
+                <p><strong>Duração:</strong> 12 semanas</p>
+                <p><strong>Incluído:</strong> Planilhas periodizadas + Vídeos + E-books</p>
+                <p><strong>Upsell:</strong> Consultoria personalizada +R$ 300</p>
+            </div>
+        </div>
+
+        <!-- FUNDO DO FUNIL -->
+        <div class="funnel-stage stage-fundo">
+            <h2 class="stage-header">👑 FUNDO DO FUNIL - Clientes Premium e Recorrência</h2>
+            <p style="margin-bottom: 20px; font-size: 1.1em;">Objetivo: Maximizar LTV com coaching recorrente e produtos premium</p>
+
+            <div class="offer-card">
+                <h3 style="color: #DC2626; font-size: 1.6em; margin-bottom: 15px;">🥉 COACHING BRONZE</h3>
+                <div class="price">R$ 397/mês</div>
+                <p><strong>Recorrência:</strong> Mensal (cancelável)</p>
+                <p><strong>Incluído:</strong> Treino semanal + Dieta + Suporte horário comercial</p>
+                <p><strong>LTV Médio:</strong> R$ 1.985 (5 meses de retenção)</p>
+                <p><strong>Upsell:</strong> Upgrade para Prata (desconto primeiro mês)</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #DC2626; font-size: 1.6em; margin-bottom: 15px;">🥈 COACHING PRATA ⭐ MAIS POPULAR</h3>
+                <div class="price">R$ 697/mês</div>
+                <p><strong>Recorrência:</strong> Mensal com fidelidade 3 meses</p>
+                <p><strong>Incluído:</strong> TUDO do Bronze + Suporte 24/7 + Calls + Grupo VIP</p>
+                <p><strong>LTV Médio:</strong> R$ 4.873 (7 meses de retenção)</p>
+                <p><strong>Upsell:</strong> Upgrade para Ouro com desconto</p>
+                <p><strong>Bônus de Fidelidade:</strong> 6 meses = 1 mês grátis</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #DC2626; font-size: 1.6em; margin-bottom: 15px;">🥇 COACHING OURO 💎 ELITE</h3>
+                <div class="price">R$ 1.497/mês</div>
+                <p><strong>Recorrência:</strong> Mensal com fidelidade 6 meses</p>
+                <p><strong>Incluído:</strong> TUDO + Calls semanais + Análise de exames + Prioridade</p>
+                <p><strong>LTV Médio:</strong> R$ 13.473 (9 meses de retenção)</p>
+                <p><strong>Upsell:</strong> Assessoria Elite</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #DC2626; font-size: 1.6em; margin-bottom: 15px;">👑 ASSESSORIA COMPLETA ELITE</h3>
+                <div class="price">R$ 2.997/mês</div>
+                <p><strong>Recorrência:</strong> Anual (R$ 32.967 à vista com desconto)</p>
+                <p><strong>Incluído:</strong> Transformação total - Corpo, mente, nutrição, suplementação</p>
+                <p><strong>LTV Médio:</strong> R$ 35.964 (12 meses de retenção)</p>
+                <p><strong>Cross-sell:</strong> Produtos e suplementos parceiros (comissão)</p>
+                <p><strong>Exclusividade:</strong> Máximo 15 alunos por vez</p>
+            </div>
+        </div>
+
+        <!-- MAXIMIZAÇÃO DE RECEITA -->
+        <div class="funnel-stage" style="border-left-color: #8B5CF6;">
+            <h2 class="stage-header">💸 MAXIMIZAÇÃO DE RECEITA - Cross-sells e Reativação</h2>
+
+            <div class="offer-card">
+                <h3 style="color: #8B5CF6; font-size: 1.6em; margin-bottom: 15px;">📚 PRODUTOS COMPLEMENTARES</h3>
+                <ul style="line-height: 2; margin-left: 20px;">
+                    <li>Planilhas de Treino Avançadas - R$ 97</li>
+                    <li>E-books Especializados - R$ 47 cada</li>
+                    <li>Masterclasses Gravadas - R$ 147</li>
+                    <li>Pacote Completo de Cursos - R$ 497</li>
+                    <li>Aplicativo Premium (assinatura) - R$ 29,90/mês</li>
+                </ul>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #8B5CF6; font-size: 1.6em; margin-bottom: 15px;">🔄 PROGRAMA DE REATIVAÇÃO</h3>
+                <p><strong>Para clientes inativos há 30+ dias:</strong></p>
+                <ul style="line-height: 2; margin-left: 20px;">
+                    <li>Email 1: "Sentimos sua falta" + Oferta especial 30% OFF</li>
+                    <li>Email 2: Case de sucesso + Testemunho</li>
+                    <li>Email 3: Última chance - 50% OFF por 48h</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>Taxa de Reativação:</strong> 12-18%</p>
+            </div>
+
+            <div class="offer-card">
+                <h3 style="color: #8B5CF6; font-size: 1.6em; margin-bottom: 15px;">🎁 PROGRAMA DE AFILIADOS</h3>
+                <p><strong>Transforme clientes satisfeitos em vendedores:</strong></p>
+                <ul style="line-height: 2; margin-left: 20px;">
+                    <li>Comissão: 20% de todas as vendas indicadas</li>
+                    <li>Comissão recorrente em coachings mensais</li>
+                    <li>Material de divulgação pronto</li>
+                    <li>Dashboard de acompanhamento</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>Potencial:</strong> 30-50% dos clientes viram afiliados ativos</p>
+            </div>
+        </div>
+
+        <!-- MÉTRICAS E KPIs -->
+        <div class="funnel-stage" style="border-left-color: #0EA5E9;">
+            <h2 class="stage-header">📊 MÉTRICAS E KPIs DO FUNIL</h2>
+
+            <div class="metrics">
+                <div class="metric-box">
+                    <div class="metric-number">4.2%</div>
+                    <div>Conversão Lead → Cliente</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number">35%</div>
+                    <div>Taxa de Upsell</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number">R$ 284</div>
+                    <div>Ticket Médio</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number">R$ 1.847</div>
+                    <div>LTV Médio</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number">6.5x</div>
+                    <div>ROI Médio</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number">7.2</div>
+                    <div>Meses Retenção Média</div>
+                </div>
+            </div>
+
+            <div style="background: #0B1220; padding: 25px; border-radius: 10px; margin-top: 20px;">
+                <h3 style="color: #0EA5E9; margin-bottom: 15px;">💡 EXEMPLO PRÁTICO DE FLUXO DE CAIXA:</h3>
+                <p style="line-height: 2;">
+                    <strong>1000 Visitantes no Funil:</strong><br>
+                    → 42 viram clientes (4.2% conversão)<br>
+                    → Ticket médio: R$ 284<br>
+                    → Receita inicial: R$ 11.928<br>
+                    → 15 fazem upsell (+R$ 100 médio) = +R$ 1.500<br>
+                    → 8 entram em recorrência (R$ 497/mês) = R$ 3.976/mês<br>
+                    → LTV total em 7 meses: R$ 77.574<br>
+                    <br>
+                    <strong style="color: #10B981;">📈 Custo de Aquisição: R$ 50/cliente</strong><br>
+                    <strong style="color: #10B981;">💰 Investimento Total: R$ 2.100</strong><br>
+                    <strong style="color: #10B981;">🎯 Receita Total: R$ 77.574</strong><br>
+                    <strong style="color: #FBBF24; font-size: 1.3em;">🔥 ROI: 36.9x</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
