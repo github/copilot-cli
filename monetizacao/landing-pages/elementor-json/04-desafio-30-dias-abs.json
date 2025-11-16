@@ -1,0 +1,679 @@
+{
+  "version": "1.0",
+  "title": "Desafio 30 Dias ABS",
+  "type": "page",
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_image": {
+          "url": "/assets/abs-background.jpg"
+        },
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(11, 18, 32, 0.85)",
+        "padding": {
+          "unit": "px",
+          "top": 120,
+          "right": 20,
+          "bottom": 120,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "urgency-badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='display: inline-block; background: #FF0000; color: #FFFFFF; padding: 12px 35px; border-radius: 5px; font-family: Oswald; font-size: 16px; font-weight: 700; margin: 0 auto; text-align: center; animation: pulse 2s infinite;'>⚡ TURMA FECHANDO EM 48H</div>"
+              }
+            },
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "DESAFIO 30 DIAS ABS: ABDÔMEN DEFINIDO OU SEU DINHEIRO DE VOLTA",
+                "header_size": "h1",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 54
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "hero-subheading",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 24px; color: #0EA5E9; text-align: center; margin: 30px 0; font-weight: 600;'>Programa intensivo de 30 dias para queimar gordura abdominal<br>e revelar seus abdominais usando o Método Militar TD</p>"
+              }
+            },
+            {
+              "id": "hero-price-box",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='background: rgba(14, 165, 233, 0.2); border: 3px solid #0EA5E9; padding: 30px; max-width: 500px; margin: 40px auto; border-radius: 10px;'><p style='font-family: Inter; font-size: 18px; color: #FFFFFF; text-align: center; text-decoration: line-through; margin-bottom: 10px;'>De R$ 297</p><p style='font-family: Oswald; font-size: 72px; color: #0EA5E9; text-align: center; line-height: 1; margin-bottom: 10px;'>R$ 197</p><p style='font-family: Inter; font-size: 16px; color: #FFFFFF; text-align: center;'>Pagamento único • Acesso vitalício</p></div>"
+              }
+            },
+            {
+              "id": "hero-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "ACEITAR O DESAFIO AGORA →",
+                "link": {
+                  "url": "#checkout"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 24
+                },
+                "background_color": "#0EA5E9",
+                "color": "#FFFFFF",
+                "padding": {
+                  "unit": "px",
+                  "top": 30,
+                  "right": 70,
+                  "bottom": 30,
+                  "left": 70
+                },
+                "align": "center",
+                "animation": "pulse"
+              }
+            },
+            {
+              "id": "hero-guarantee",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 16px; color: #0EA5E9; text-align: center; margin-top: 25px;'>🛡️ Garantia Total: Não ficou satisfeito? 100% do dinheiro de volta até o último dia</p>"
+              }
+            },
+            {
+              "id": "hero-social-proof",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 14px; color: #FFFFFF; text-align: center; margin-top: 30px; opacity: 0.8;'>👥 Mais de 850 pessoas já completaram o desafio</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "results-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "results-heading",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "results-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "RESULTADOS REAIS EM 30 DIAS",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "results-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 20px; color: #0EA5E9; text-align: center; margin: 20px 0;'>Fotos antes/depois de quem completou o desafio:</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "results-grid",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "result-1",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "result-1-image",
+                  "elType": "widget",
+                  "widgetType": "image",
+                  "settings": {
+                    "image": {
+                      "url": "/assets/before-after-1.jpg"
+                    },
+                    "alt": "Transformação 30 dias",
+                    "border_radius": {
+                      "unit": "px",
+                      "size": 8
+                    }
+                  }
+                },
+                {
+                  "id": "result-1-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='font-family: Inter; font-size: 14px; color: #0B1220; text-align: center; margin-top: 15px;'><strong>Paulo, 38 anos</strong><br>-7kg • -6cm cintura</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "result-2",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "result-2-image",
+                  "elType": "widget",
+                  "widgetType": "image",
+                  "settings": {
+                    "image": {
+                      "url": "/assets/before-after-2.jpg"
+                    },
+                    "alt": "Transformação 30 dias",
+                    "border_radius": {
+                      "unit": "px",
+                      "size": 8
+                    }
+                  }
+                },
+                {
+                  "id": "result-2-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='font-family: Inter; font-size: 14px; color: #0B1220; text-align: center; margin-top: 15px;'><strong>Amanda, 32 anos</strong><br>-5kg • Abdômen definido</p>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "result-3",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "result-3-image",
+                  "elType": "widget",
+                  "widgetType": "image",
+                  "settings": {
+                    "image": {
+                      "url": "/assets/before-after-3.jpg"
+                    },
+                    "alt": "Transformação 30 dias",
+                    "border_radius": {
+                      "unit": "px",
+                      "size": 8
+                    }
+                  }
+                },
+                {
+                  "id": "result-3-text",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style='font-family: Inter; font-size: 14px; color: #0B1220; text-align: center; margin-top: 15px;'><strong>Rodrigo, 45 anos</strong><br>-9kg • -8cm cintura</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "included-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#F8F9FA",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "included-heading",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "included-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "O QUE VOCÊ RECEBE NO DESAFIO",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "included-list",
+          "elType": "column",
+          "settings": {
+            "width": "100%",
+            "max-width": "900px",
+            "margin": "0 auto"
+          },
+          "elements": [
+            {
+              "id": "included-items",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='background: #FFFFFF; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);'><div style='border-left: 4px solid #0EA5E9; padding-left: 25px; margin-bottom: 30px;'><h3 style='font-family: Oswald; font-size: 24px; color: #0B1220; margin-bottom: 10px;'>📅 30 Treinos Diários Progressivos</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Cada dia um treino diferente, com progressão calculada. 20-30 minutos por dia. Pode fazer em casa ou academia.</p><p style='font-family: Inter; font-size: 14px; color: #0EA5E9; margin-top: 10px;'><strong>Valor: R$ 147</strong></p></div><div style='border-left: 4px solid #0EA5E9; padding-left: 25px; margin-bottom: 30px;'><h3 style='font-family: Oswald; font-size: 24px; color: #0B1220; margin-bottom: 10px;'>🍽️ Plano Nutricional 30 Dias</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Cardápio completo focado em queimar gordura abdominal. Lista de compras semanal inclusa.</p><p style='font-family: Inter; font-size: 14px; color: #0EA5E9; margin-top: 10px;'><strong>Valor: R$ 97</strong></p></div><div style='border-left: 4px solid #0EA5E9; padding-left: 25px; margin-bottom: 30px;'><h3 style='font-family: Oswald; font-size: 24px; color: #0B1220; margin-bottom: 10px;'>🎥 Vídeos Demonstrativos</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Todos os exercícios explicados em vídeo. Aprenda a técnica correta para maximizar resultados.</p><p style='font-family: Inter; font-size: 14px; color: #0EA5E9; margin-top: 10px;'><strong>Valor: R$ 67</strong></p></div><div style='border-left: 4px solid #0EA5E9; padding-left: 25px; margin-bottom: 30px;'><h3 style='font-family: Oswald; font-size: 24px; color: #0B1220; margin-bottom: 10px;'>📱 App de Acompanhamento</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Check diário, contador de dias, motivação, antes/depois. Gamificação para manter disciplina.</p><p style='font-family: Inter; font-size: 14px; color: #0EA5E9; margin-top: 10px;'><strong>Valor: R$ 47</strong></p></div><div style='border-left: 4px solid #0EA5E9; padding-left: 25px; margin-bottom: 30px;'><h3 style='font-family: Oswald; font-size: 24px; color: #0B1220; margin-bottom: 10px;'>👥 Grupo VIP WhatsApp</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Comunidade exclusiva do desafio. Motivação diária, dicas, suporte mútuo.</p><p style='font-family: Inter; font-size: 14px; color: #0EA5E9; margin-top: 10px;'><strong>Valor: Inestimável</strong></p></div><div style='background: #0B1220; padding: 25px; border-radius: 8px; text-align: center; margin-top: 40px;'><p style='font-family: Oswald; font-size: 20px; color: #FFFFFF; margin-bottom: 10px;'>VALOR TOTAL:</p><p style='font-family: Oswald; font-size: 48px; color: #FFFFFF; text-decoration: line-through; margin-bottom: 10px;'>R$ 358</p><p style='font-family: Oswald; font-size: 20px; color: #FFFFFF; margin-bottom: 10px;'>VOCÊ PAGA HOJE:</p><p style='font-family: Oswald; font-size: 72px; color: #0EA5E9; line-height: 1;'>R$ 197</p><p style='font-family: Inter; font-size: 18px; color: #0EA5E9; margin-top: 15px;'>Economia de R$ 161 (45% OFF)</p></div></div>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "how-it-works-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "how-heading",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "how-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "COMO FUNCIONA O DESAFIO",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "steps-grid",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "step-1",
+              "elType": "column",
+              "settings": {
+                "width": "25%"
+              },
+              "elements": [
+                {
+                  "id": "step-1-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='text-align: center;'><div style='width: 80px; height: 80px; background: #0EA5E9; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;'><span style='font-family: Oswald; font-size: 36px; color: #FFFFFF; font-weight: 700;'>1</span></div><h3 style='font-family: Oswald; font-size: 22px; color: #0B1220; margin-bottom: 15px;'>INSCREVA-SE</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Garanta sua vaga e receba acesso imediato ao material completo</p></div>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "step-2",
+              "elType": "column",
+              "settings": {
+                "width": "25%"
+              },
+              "elements": [
+                {
+                  "id": "step-2-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='text-align: center;'><div style='width: 80px; height: 80px; background: #0EA5E9; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;'><span style='font-family: Oswald; font-size: 36px; color: #FFFFFF; font-weight: 700;'>2</span></div><h3 style='font-family: Oswald; font-size: 22px; color: #0B1220; margin-bottom: 15px;'>PREPARE-SE</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Tire foto antes, medidas, e entre no grupo. Começamos juntos!</p></div>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "step-3",
+              "elType": "column",
+              "settings": {
+                "width": "25%"
+              },
+              "elements": [
+                {
+                  "id": "step-3-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='text-align: center;'><div style='width: 80px; height: 80px; background: #0EA5E9; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;'><span style='font-family: Oswald; font-size: 36px; color: #FFFFFF; font-weight: 700;'>3</span></div><h3 style='font-family: Oswald; font-size: 22px; color: #0B1220; margin-bottom: 15px;'>EXECUTE</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Siga o treino e dieta por 30 dias. Marque check no app diário</p></div>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "step-4",
+              "elType": "column",
+              "settings": {
+                "width": "25%"
+              },
+              "elements": [
+                {
+                  "id": "step-4-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='text-align: center;'><div style='width: 80px; height: 80px; background: #0EA5E9; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;'><span style='font-family: Oswald; font-size: 36px; color: #FFFFFF; font-weight: 700;'>4</span></div><h3 style='font-family: Oswald; font-size: 22px; color: #0B1220; margin-bottom: 15px;'>COMEMORE</h3><p style='font-family: Inter; font-size: 16px; color: #0B1220;'>Tire foto depois, compare, compartilhe. Receba certificado!</p></div>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faq-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#F8F9FA",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "faq-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%",
+            "max-width": "800px",
+            "margin": "0 auto"
+          },
+          "elements": [
+            {
+              "id": "faq-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "PERGUNTAS FREQUENTES",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "faq-accordion",
+              "elType": "widget",
+              "widgetType": "accordion",
+              "settings": {
+                "items": [
+                  {
+                    "title": "Consigo fazer em casa sem equipamento?",
+                    "content": "SIM. O programa tem versões para casa (peso corporal) e academia (com equipamento). Você escolhe."
+                  },
+                  {
+                    "title": "Preciso fazer dieta restritiva?",
+                    "content": "NEGATIVO. O plano nutricional é sustentável, com comidas normais. Nada de passar fome ou comer só frango e brócolis."
+                  },
+                  {
+                    "title": "Quanto tempo por dia?",
+                    "content": "20-30 minutos de treino + tempo para fazer as refeições. É intenso mas curto. Eficiência militar."
+                  },
+                  {
+                    "title": "E se eu perder um dia?",
+                    "content": "Acontece. Retome no dia seguinte. O importante é completar os 30 treinos, mesmo que leve 35 dias."
+                  },
+                  {
+                    "title": "Funciona para mulheres também?",
+                    "content": "AFIRMATIVO. Temos versões adaptadas. Mais de 60% dos participantes são mulheres."
+                  },
+                  {
+                    "title": "Qual a garantia?",
+                    "content": "Total e incondicional. Complete os 30 dias, tire foto antes/depois. Se não estiver satisfeito, devolvo 100% até o último dia do desafio."
+                  },
+                  {
+                    "title": "Vou realmente ver abdômen em 30 dias?",
+                    "content": "DEPENDE! Do seu percentual de gordura atual. Se já está abaixo de 15% (homens) ou 22% (mulheres), sim. Se não, verá definição significativa e continuará progredindo."
+                  }
+                ],
+                "title_typography_font_family": "Oswald",
+                "content_typography_font_family": "Inter"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "checkout-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        },
+        "anchor": "checkout"
+      },
+      "elements": [
+        {
+          "id": "checkout-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%",
+            "max-width": "700px",
+            "margin": "0 auto"
+          },
+          "elements": [
+            {
+              "id": "checkout-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "ACEITAR O DESAFIO 30 DIAS ABS",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "countdown",
+              "elType": "widget",
+              "widgetType": "countdown",
+              "settings": {
+                "due_date": "+48 hours",
+                "show_days": true,
+                "show_hours": true,
+                "show_minutes": true,
+                "show_seconds": true,
+                "label_days": "Dias",
+                "label_hours": "Horas",
+                "label_minutes": "Min",
+                "label_seconds": "Seg",
+                "digit_color": "#0EA5E9",
+                "label_color": "#FFFFFF"
+              }
+            },
+            {
+              "id": "checkout-price",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='background: rgba(14, 165, 233, 0.2); border: 3px solid #0EA5E9; padding: 40px; border-radius: 10px; text-align: center; margin: 40px 0;'><p style='font-family: Inter; font-size: 20px; color: #FFFFFF; text-decoration: line-through; margin-bottom: 10px;'>R$ 297</p><p style='font-family: Oswald; font-size: 72px; color: #0EA5E9; line-height: 1; margin-bottom: 15px;'>R$ 197</p><p style='font-family: Inter; font-size: 18px; color: #FFFFFF;'>Pagamento único • Acesso vitalício ao material</p><p style='font-family: Inter; font-size: 16px; color: #0EA5E9; margin-top: 20px;'>💳 Cartão de crédito em até 12x de R$ 19,48</p><p style='font-family: Inter; font-size: 16px; color: #0EA5E9;'>🔐 Pix com desconto: R$ 177 à vista</p></div>"
+              }
+            },
+            {
+              "id": "checkout-button",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "GARANTIR MINHA VAGA AGORA →",
+                "link": {
+                  "url": "https://pay.hotmart.com/XXXXXXXX"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 24
+                },
+                "background_color": "#0EA5E9",
+                "color": "#FFFFFF",
+                "padding": {
+                  "unit": "px",
+                  "top": 30,
+                  "right": 70,
+                  "bottom": 30,
+                  "left": 70
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "security-badges",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='text-align: center; margin-top: 30px;'><p style='font-family: Inter; font-size: 14px; color: #FFFFFF; margin-bottom: 15px;'>🔒 Compra 100% Segura e Criptografada</p><p style='font-family: Inter; font-size: 14px; color: #0EA5E9;'>🛡️ Garantia incondicional de 30 dias<br>✓ Suporte via email e WhatsApp<br>✓ Acesso imediato após pagamento</p></div>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#000000",
+        "padding": {
+          "unit": "px",
+          "top": 40,
+          "right": 20,
+          "bottom": 40,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "footer-signature",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 24px; color: #0EA5E9; text-align: center;'>Semper Fidelis<br>— Treinador David</p><p style='font-family: Inter; font-size: 14px; color: #FFFFFF; text-align: center; margin-top: 20px;'>© 2026 Treinador David. Todos os direitos reservados.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
