@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --td-blue-display: #0EA5E9;
+    --td-blue-text: #0369A1;
+    --td-blue-dark: #0B1220;
+    --td-text-primary: #0F172A;
+    --td-text-secondary: #475569;
+    --td-bg-white: #FFFFFF;
+    --td-bg-secondary: #F8FAFC;
+    --td-cta-orange: #C2410C;
+    --td-success-green: #15803D;
+    --td-error-red: #B91C1C;
+  }
+
+  * {
+    @apply border-gray-200;
+  }
+
+  body {
+    @apply bg-td-bg-white text-td-text-primary font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headings;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
