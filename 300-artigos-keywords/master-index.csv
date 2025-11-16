@@ -1,0 +1,301 @@
+ID,Artigo,Categoria,Tipo,Keywords,Status,Data_Publicacao,Semana,Palavra-chave_Principal,URL_Slug
+1,Hipertrofia - Artigo 01,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-01,1,[KEYWORD_1],hipertrofia-01
+2,Hipertrofia - Artigo 02,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-02,1,[KEYWORD_2],hipertrofia-02
+3,Hipertrofia - Artigo 03,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-03,1,[KEYWORD_3],hipertrofia-03
+4,Hipertrofia - Artigo 04,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-04,1,[KEYWORD_4],hipertrofia-04
+5,Hipertrofia - Artigo 05,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-05,1,[KEYWORD_5],hipertrofia-05
+6,Hipertrofia - Artigo 06,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-06,1,[KEYWORD_6],hipertrofia-06
+7,Hipertrofia - Artigo 07,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-07,2,[KEYWORD_7],hipertrofia-07
+8,Hipertrofia - Artigo 08,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-08,2,[KEYWORD_8],hipertrofia-08
+9,Hipertrofia - Artigo 09,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-09,2,[KEYWORD_9],hipertrofia-09
+10,Hipertrofia - Artigo 10,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-10,2,[KEYWORD_10],hipertrofia-10
+11,Hipertrofia - Artigo 11,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-11,2,[KEYWORD_11],hipertrofia-11
+12,Hipertrofia - Artigo 12,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-12,2,[KEYWORD_12],hipertrofia-12
+13,Hipertrofia - Artigo 13,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-13,3,[KEYWORD_13],hipertrofia-13
+14,Hipertrofia - Artigo 14,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-14,3,[KEYWORD_14],hipertrofia-14
+15,Hipertrofia - Artigo 15,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-15,3,[KEYWORD_15],hipertrofia-15
+16,Hipertrofia - Artigo 16,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-16,3,[KEYWORD_16],hipertrofia-16
+17,Hipertrofia - Artigo 17,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-17,3,[KEYWORD_17],hipertrofia-17
+18,Hipertrofia - Artigo 18,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-18,3,[KEYWORD_18],hipertrofia-18
+19,Hipertrofia - Artigo 19,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-19,4,[KEYWORD_19],hipertrofia-19
+20,Hipertrofia - Artigo 20,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-20,4,[KEYWORD_20],hipertrofia-20
+21,Hipertrofia - Artigo 21,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-21,4,[KEYWORD_21],hipertrofia-21
+22,Hipertrofia - Artigo 22,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-22,4,[KEYWORD_22],hipertrofia-22
+23,Hipertrofia - Artigo 23,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-23,4,[KEYWORD_23],hipertrofia-23
+24,Hipertrofia - Artigo 24,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-24,4,[KEYWORD_24],hipertrofia-24
+25,Hipertrofia - Artigo 25,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-25,5,[KEYWORD_25],hipertrofia-25
+26,Hipertrofia - Artigo 26,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-26,5,[KEYWORD_26],hipertrofia-26
+27,Hipertrofia - Artigo 27,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-27,5,[KEYWORD_27],hipertrofia-27
+28,Hipertrofia - Artigo 28,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-28,5,[KEYWORD_28],hipertrofia-28
+29,Hipertrofia - Artigo 29,Hipertrofia e Ganho de Massa,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-29,5,[KEYWORD_29],hipertrofia-29
+30,Hipertrofia - Artigo 30,Hipertrofia e Ganho de Massa,Sem Ciência,[KEYWORDS_PENDING],Pendente,2025-12-30,5,[KEYWORD_30],hipertrofia-30
+31,Emagrecimento - Artigo 01,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2025-12-31,6,[KEYWORD_31],emagrecimento-01
+32,Emagrecimento - Artigo 02,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-01,6,[KEYWORD_32],emagrecimento-02
+33,Emagrecimento - Artigo 03,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-02,6,[KEYWORD_33],emagrecimento-03
+34,Emagrecimento - Artigo 04,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-03,6,[KEYWORD_34],emagrecimento-04
+35,Emagrecimento - Artigo 05,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-04,6,[KEYWORD_35],emagrecimento-05
+36,Emagrecimento - Artigo 06,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-05,6,[KEYWORD_36],emagrecimento-06
+37,Emagrecimento - Artigo 07,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-06,7,[KEYWORD_37],emagrecimento-07
+38,Emagrecimento - Artigo 08,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-07,7,[KEYWORD_38],emagrecimento-08
+39,Emagrecimento - Artigo 09,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-08,7,[KEYWORD_39],emagrecimento-09
+40,Emagrecimento - Artigo 10,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-09,7,[KEYWORD_40],emagrecimento-10
+41,Emagrecimento - Artigo 11,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-10,7,[KEYWORD_41],emagrecimento-11
+42,Emagrecimento - Artigo 12,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-11,7,[KEYWORD_42],emagrecimento-12
+43,Emagrecimento - Artigo 13,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-12,8,[KEYWORD_43],emagrecimento-13
+44,Emagrecimento - Artigo 14,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-13,8,[KEYWORD_44],emagrecimento-14
+45,Emagrecimento - Artigo 15,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-14,8,[KEYWORD_45],emagrecimento-15
+46,Emagrecimento - Artigo 16,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-15,8,[KEYWORD_46],emagrecimento-16
+47,Emagrecimento - Artigo 17,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-16,8,[KEYWORD_47],emagrecimento-17
+48,Emagrecimento - Artigo 18,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-17,8,[KEYWORD_48],emagrecimento-18
+49,Emagrecimento - Artigo 19,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-18,9,[KEYWORD_49],emagrecimento-19
+50,Emagrecimento - Artigo 20,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-19,9,[KEYWORD_50],emagrecimento-20
+51,Emagrecimento - Artigo 21,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-20,9,[KEYWORD_51],emagrecimento-21
+52,Emagrecimento - Artigo 22,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-21,9,[KEYWORD_52],emagrecimento-22
+53,Emagrecimento - Artigo 23,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-22,9,[KEYWORD_53],emagrecimento-23
+54,Emagrecimento - Artigo 24,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-23,9,[KEYWORD_54],emagrecimento-24
+55,Emagrecimento - Artigo 25,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-24,10,[KEYWORD_55],emagrecimento-25
+56,Emagrecimento - Artigo 26,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-25,10,[KEYWORD_56],emagrecimento-26
+57,Emagrecimento - Artigo 27,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-26,10,[KEYWORD_57],emagrecimento-27
+58,Emagrecimento - Artigo 28,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-27,10,[KEYWORD_58],emagrecimento-28
+59,Emagrecimento - Artigo 29,Emagrecimento e Perda de Gordura,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-28,10,[KEYWORD_59],emagrecimento-29
+60,Emagrecimento - Artigo 30,Emagrecimento e Perda de Gordura,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-29,10,[KEYWORD_60],emagrecimento-30
+61,Força - Artigo 01,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-01-30,11,[KEYWORD_61],forca-01
+62,Força - Artigo 02,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-01-31,11,[KEYWORD_62],forca-02
+63,Força - Artigo 03,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-01,11,[KEYWORD_63],forca-03
+64,Força - Artigo 04,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-02,11,[KEYWORD_64],forca-04
+65,Força - Artigo 05,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-03,11,[KEYWORD_65],forca-05
+66,Força - Artigo 06,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-04,11,[KEYWORD_66],forca-06
+67,Força - Artigo 07,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-05,12,[KEYWORD_67],forca-07
+68,Força - Artigo 08,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-06,12,[KEYWORD_68],forca-08
+69,Força - Artigo 09,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-07,12,[KEYWORD_69],forca-09
+70,Força - Artigo 10,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-08,12,[KEYWORD_70],forca-10
+71,Força - Artigo 11,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-09,12,[KEYWORD_71],forca-11
+72,Força - Artigo 12,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-10,12,[KEYWORD_72],forca-12
+73,Força - Artigo 13,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-11,13,[KEYWORD_73],forca-13
+74,Força - Artigo 14,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-12,13,[KEYWORD_74],forca-14
+75,Força - Artigo 15,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-13,13,[KEYWORD_75],forca-15
+76,Força - Artigo 16,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-14,13,[KEYWORD_76],forca-16
+77,Força - Artigo 17,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-15,13,[KEYWORD_77],forca-17
+78,Força - Artigo 18,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-16,13,[KEYWORD_78],forca-18
+79,Força - Artigo 19,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-17,14,[KEYWORD_79],forca-19
+80,Força - Artigo 20,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-18,14,[KEYWORD_80],forca-20
+81,Força - Artigo 21,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-19,14,[KEYWORD_81],forca-21
+82,Força - Artigo 22,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-20,14,[KEYWORD_82],forca-22
+83,Força - Artigo 23,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-21,14,[KEYWORD_83],forca-23
+84,Força - Artigo 24,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-22,14,[KEYWORD_84],forca-24
+85,Força - Artigo 25,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-23,15,[KEYWORD_85],forca-25
+86,Força - Artigo 26,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-24,15,[KEYWORD_86],forca-26
+87,Força - Artigo 27,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-25,15,[KEYWORD_87],forca-27
+88,Força - Artigo 28,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-26,15,[KEYWORD_88],forca-28
+89,Força - Artigo 29,Treino de Força e Powerlifting,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-02-27,15,[KEYWORD_89],forca-29
+90,Força - Artigo 30,Treino de Força e Powerlifting,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-02-28,15,[KEYWORD_90],forca-30
+91,Funcional - Artigo 01,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-01,16,[KEYWORD_91],funcional-01
+92,Funcional - Artigo 02,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-02,16,[KEYWORD_92],funcional-02
+93,Funcional - Artigo 03,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-03,16,[KEYWORD_93],funcional-03
+94,Funcional - Artigo 04,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-04,16,[KEYWORD_94],funcional-04
+95,Funcional - Artigo 05,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-05,16,[KEYWORD_95],funcional-05
+96,Funcional - Artigo 06,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-06,16,[KEYWORD_96],funcional-06
+97,Funcional - Artigo 07,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-07,17,[KEYWORD_97],funcional-07
+98,Funcional - Artigo 08,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-08,17,[KEYWORD_98],funcional-08
+99,Funcional - Artigo 09,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-09,17,[KEYWORD_99],funcional-09
+100,Funcional - Artigo 10,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-10,17,[KEYWORD_100],funcional-10
+101,Funcional - Artigo 11,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-11,17,[KEYWORD_101],funcional-11
+102,Funcional - Artigo 12,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-12,17,[KEYWORD_102],funcional-12
+103,Funcional - Artigo 13,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-13,18,[KEYWORD_103],funcional-13
+104,Funcional - Artigo 14,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-14,18,[KEYWORD_104],funcional-14
+105,Funcional - Artigo 15,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-15,18,[KEYWORD_105],funcional-15
+106,Funcional - Artigo 16,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-16,18,[KEYWORD_106],funcional-16
+107,Funcional - Artigo 17,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-17,18,[KEYWORD_107],funcional-17
+108,Funcional - Artigo 18,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-18,18,[KEYWORD_108],funcional-18
+109,Funcional - Artigo 19,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-19,19,[KEYWORD_109],funcional-19
+110,Funcional - Artigo 20,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-20,19,[KEYWORD_110],funcional-20
+111,Funcional - Artigo 21,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-21,19,[KEYWORD_111],funcional-21
+112,Funcional - Artigo 22,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-22,19,[KEYWORD_112],funcional-22
+113,Funcional - Artigo 23,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-23,19,[KEYWORD_113],funcional-23
+114,Funcional - Artigo 24,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-24,19,[KEYWORD_114],funcional-24
+115,Funcional - Artigo 25,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-25,20,[KEYWORD_115],funcional-25
+116,Funcional - Artigo 26,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-26,20,[KEYWORD_116],funcional-26
+117,Funcional - Artigo 27,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-27,20,[KEYWORD_117],funcional-27
+118,Funcional - Artigo 28,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-28,20,[KEYWORD_118],funcional-28
+119,Funcional - Artigo 29,Treino Funcional e Mobilidade,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-29,20,[KEYWORD_119],funcional-29
+120,Funcional - Artigo 30,Treino Funcional e Mobilidade,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-03-30,20,[KEYWORD_120],funcional-30
+121,Periodização - Artigo 01,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-03-31,21,[KEYWORD_121],periodizacao-01
+122,Periodização - Artigo 02,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-01,21,[KEYWORD_122],periodizacao-02
+123,Periodização - Artigo 03,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-02,21,[KEYWORD_123],periodizacao-03
+124,Periodização - Artigo 04,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-03,21,[KEYWORD_124],periodizacao-04
+125,Periodização - Artigo 05,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-04,21,[KEYWORD_125],periodizacao-05
+126,Periodização - Artigo 06,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-05,21,[KEYWORD_126],periodizacao-06
+127,Periodização - Artigo 07,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-06,22,[KEYWORD_127],periodizacao-07
+128,Periodização - Artigo 08,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-07,22,[KEYWORD_128],periodizacao-08
+129,Periodização - Artigo 09,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-08,22,[KEYWORD_129],periodizacao-09
+130,Periodização - Artigo 10,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-09,22,[KEYWORD_130],periodizacao-10
+131,Periodização - Artigo 11,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-10,22,[KEYWORD_131],periodizacao-11
+132,Periodização - Artigo 12,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-11,22,[KEYWORD_132],periodizacao-12
+133,Periodização - Artigo 13,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-12,23,[KEYWORD_133],periodizacao-13
+134,Periodização - Artigo 14,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-13,23,[KEYWORD_134],periodizacao-14
+135,Periodização - Artigo 15,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-14,23,[KEYWORD_135],periodizacao-15
+136,Periodização - Artigo 16,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-15,23,[KEYWORD_136],periodizacao-16
+137,Periodização - Artigo 17,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-16,23,[KEYWORD_137],periodizacao-17
+138,Periodização - Artigo 18,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-17,23,[KEYWORD_138],periodizacao-18
+139,Periodização - Artigo 19,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-18,24,[KEYWORD_139],periodizacao-19
+140,Periodização - Artigo 20,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-19,24,[KEYWORD_140],periodizacao-20
+141,Periodização - Artigo 21,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-20,24,[KEYWORD_141],periodizacao-21
+142,Periodização - Artigo 22,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-21,24,[KEYWORD_142],periodizacao-22
+143,Periodização - Artigo 23,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-22,24,[KEYWORD_143],periodizacao-23
+144,Periodização - Artigo 24,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-23,24,[KEYWORD_144],periodizacao-24
+145,Periodização - Artigo 25,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-24,25,[KEYWORD_145],periodizacao-25
+146,Periodização - Artigo 26,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-25,25,[KEYWORD_146],periodizacao-26
+147,Periodização - Artigo 27,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-26,25,[KEYWORD_147],periodizacao-27
+148,Periodização - Artigo 28,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-27,25,[KEYWORD_148],periodizacao-28
+149,Periodização - Artigo 29,Periodização e Programação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-28,25,[KEYWORD_149],periodizacao-29
+150,Periodização - Artigo 30,Periodização e Programação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-04-29,25,[KEYWORD_150],periodizacao-30
+151,Psicologia - Artigo 01,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-04-30,26,[KEYWORD_151],psicologia-01
+152,Psicologia - Artigo 02,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-01,26,[KEYWORD_152],psicologia-02
+153,Psicologia - Artigo 03,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-02,26,[KEYWORD_153],psicologia-03
+154,Psicologia - Artigo 04,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-03,26,[KEYWORD_154],psicologia-04
+155,Psicologia - Artigo 05,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-04,26,[KEYWORD_155],psicologia-05
+156,Psicologia - Artigo 06,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-05,26,[KEYWORD_156],psicologia-06
+157,Psicologia - Artigo 07,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-06,27,[KEYWORD_157],psicologia-07
+158,Psicologia - Artigo 08,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-07,27,[KEYWORD_158],psicologia-08
+159,Psicologia - Artigo 09,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-08,27,[KEYWORD_159],psicologia-09
+160,Psicologia - Artigo 10,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-09,27,[KEYWORD_160],psicologia-10
+161,Psicologia - Artigo 11,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-10,27,[KEYWORD_161],psicologia-11
+162,Psicologia - Artigo 12,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-11,27,[KEYWORD_162],psicologia-12
+163,Psicologia - Artigo 13,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-12,28,[KEYWORD_163],psicologia-13
+164,Psicologia - Artigo 14,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-13,28,[KEYWORD_164],psicologia-14
+165,Psicologia - Artigo 15,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-14,28,[KEYWORD_165],psicologia-15
+166,Psicologia - Artigo 16,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-15,28,[KEYWORD_166],psicologia-16
+167,Psicologia - Artigo 17,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-16,28,[KEYWORD_167],psicologia-17
+168,Psicologia - Artigo 18,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-17,28,[KEYWORD_168],psicologia-18
+169,Psicologia - Artigo 19,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-18,29,[KEYWORD_169],psicologia-19
+170,Psicologia - Artigo 20,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-19,29,[KEYWORD_170],psicologia-20
+171,Psicologia - Artigo 21,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-20,29,[KEYWORD_171],psicologia-21
+172,Psicologia - Artigo 22,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-21,29,[KEYWORD_172],psicologia-22
+173,Psicologia - Artigo 23,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-22,29,[KEYWORD_173],psicologia-23
+174,Psicologia - Artigo 24,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-23,29,[KEYWORD_174],psicologia-24
+175,Psicologia - Artigo 25,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-24,30,[KEYWORD_175],psicologia-25
+176,Psicologia - Artigo 26,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-25,30,[KEYWORD_176],psicologia-26
+177,Psicologia - Artigo 27,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-26,30,[KEYWORD_177],psicologia-27
+178,Psicologia - Artigo 28,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-27,30,[KEYWORD_178],psicologia-28
+179,Psicologia - Artigo 29,Psicologia e Mindset,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-28,30,[KEYWORD_179],psicologia-29
+180,Psicologia - Artigo 30,Psicologia e Mindset,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-29,30,[KEYWORD_180],psicologia-30
+181,Calistenia - Artigo 01,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-05-30,31,[KEYWORD_181],calistenia-01
+182,Calistenia - Artigo 02,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-05-31,31,[KEYWORD_182],calistenia-02
+183,Calistenia - Artigo 03,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-01,31,[KEYWORD_183],calistenia-03
+184,Calistenia - Artigo 04,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-02,31,[KEYWORD_184],calistenia-04
+185,Calistenia - Artigo 05,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-03,31,[KEYWORD_185],calistenia-05
+186,Calistenia - Artigo 06,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-04,31,[KEYWORD_186],calistenia-06
+187,Calistenia - Artigo 07,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-05,32,[KEYWORD_187],calistenia-07
+188,Calistenia - Artigo 08,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-06,32,[KEYWORD_188],calistenia-08
+189,Calistenia - Artigo 09,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-07,32,[KEYWORD_189],calistenia-09
+190,Calistenia - Artigo 10,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-08,32,[KEYWORD_190],calistenia-10
+191,Calistenia - Artigo 11,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-09,32,[KEYWORD_191],calistenia-11
+192,Calistenia - Artigo 12,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-10,32,[KEYWORD_192],calistenia-12
+193,Calistenia - Artigo 13,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-11,33,[KEYWORD_193],calistenia-13
+194,Calistenia - Artigo 14,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-12,33,[KEYWORD_194],calistenia-14
+195,Calistenia - Artigo 15,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-13,33,[KEYWORD_195],calistenia-15
+196,Calistenia - Artigo 16,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-14,33,[KEYWORD_196],calistenia-16
+197,Calistenia - Artigo 17,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-15,33,[KEYWORD_197],calistenia-17
+198,Calistenia - Artigo 18,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-16,33,[KEYWORD_198],calistenia-18
+199,Calistenia - Artigo 19,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-17,34,[KEYWORD_199],calistenia-19
+200,Calistenia - Artigo 20,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-18,34,[KEYWORD_200],calistenia-20
+201,Calistenia - Artigo 21,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-19,34,[KEYWORD_201],calistenia-21
+202,Calistenia - Artigo 22,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-20,34,[KEYWORD_202],calistenia-22
+203,Calistenia - Artigo 23,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-21,34,[KEYWORD_203],calistenia-23
+204,Calistenia - Artigo 24,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-22,34,[KEYWORD_204],calistenia-24
+205,Calistenia - Artigo 25,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-23,35,[KEYWORD_205],calistenia-25
+206,Calistenia - Artigo 26,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-24,35,[KEYWORD_206],calistenia-26
+207,Calistenia - Artigo 27,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-25,35,[KEYWORD_207],calistenia-27
+208,Calistenia - Artigo 28,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-26,35,[KEYWORD_208],calistenia-28
+209,Calistenia - Artigo 29,Treino em Casa e Calistenia,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-27,35,[KEYWORD_209],calistenia-29
+210,Calistenia - Artigo 30,Treino em Casa e Calistenia,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-28,35,[KEYWORD_210],calistenia-30
+211,Público Específico - Artigo 01,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-06-29,36,[KEYWORD_211],publico-especifico-01
+212,Público Específico - Artigo 02,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-06-30,36,[KEYWORD_212],publico-especifico-02
+213,Público Específico - Artigo 03,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-01,36,[KEYWORD_213],publico-especifico-03
+214,Público Específico - Artigo 04,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-02,36,[KEYWORD_214],publico-especifico-04
+215,Público Específico - Artigo 05,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-03,36,[KEYWORD_215],publico-especifico-05
+216,Público Específico - Artigo 06,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-04,36,[KEYWORD_216],publico-especifico-06
+217,Público Específico - Artigo 07,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-05,37,[KEYWORD_217],publico-especifico-07
+218,Público Específico - Artigo 08,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-06,37,[KEYWORD_218],publico-especifico-08
+219,Público Específico - Artigo 09,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-07,37,[KEYWORD_219],publico-especifico-09
+220,Público Específico - Artigo 10,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-08,37,[KEYWORD_220],publico-especifico-10
+221,Público Específico - Artigo 11,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-09,37,[KEYWORD_221],publico-especifico-11
+222,Público Específico - Artigo 12,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-10,37,[KEYWORD_222],publico-especifico-12
+223,Público Específico - Artigo 13,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-11,38,[KEYWORD_223],publico-especifico-13
+224,Público Específico - Artigo 14,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-12,38,[KEYWORD_224],publico-especifico-14
+225,Público Específico - Artigo 15,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-13,38,[KEYWORD_225],publico-especifico-15
+226,Público Específico - Artigo 16,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-14,38,[KEYWORD_226],publico-especifico-16
+227,Público Específico - Artigo 17,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-15,38,[KEYWORD_227],publico-especifico-17
+228,Público Específico - Artigo 18,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-16,38,[KEYWORD_228],publico-especifico-18
+229,Público Específico - Artigo 19,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-17,39,[KEYWORD_229],publico-especifico-19
+230,Público Específico - Artigo 20,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-18,39,[KEYWORD_230],publico-especifico-20
+231,Público Específico - Artigo 21,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-19,39,[KEYWORD_231],publico-especifico-21
+232,Público Específico - Artigo 22,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-20,39,[KEYWORD_232],publico-especifico-22
+233,Público Específico - Artigo 23,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-21,39,[KEYWORD_233],publico-especifico-23
+234,Público Específico - Artigo 24,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-22,39,[KEYWORD_234],publico-especifico-24
+235,Público Específico - Artigo 25,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-23,40,[KEYWORD_235],publico-especifico-25
+236,Público Específico - Artigo 26,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-24,40,[KEYWORD_236],publico-especifico-26
+237,Público Específico - Artigo 27,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-25,40,[KEYWORD_237],publico-especifico-27
+238,Público Específico - Artigo 28,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-26,40,[KEYWORD_238],publico-especifico-28
+239,Público Específico - Artigo 29,Público Específico,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-27,40,[KEYWORD_239],publico-especifico-29
+240,Público Específico - Artigo 30,Público Específico,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-28,40,[KEYWORD_240],publico-especifico-30
+241,Lesões e Recuperação - Artigo 01,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-29,41,[KEYWORD_241],lesoes-recuperacao-01
+242,Lesões e Recuperação - Artigo 02,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-07-30,41,[KEYWORD_242],lesoes-recuperacao-02
+243,Lesões e Recuperação - Artigo 03,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-07-31,41,[KEYWORD_243],lesoes-recuperacao-03
+244,Lesões e Recuperação - Artigo 04,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-01,41,[KEYWORD_244],lesoes-recuperacao-04
+245,Lesões e Recuperação - Artigo 05,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-02,41,[KEYWORD_245],lesoes-recuperacao-05
+246,Lesões e Recuperação - Artigo 06,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-03,41,[KEYWORD_246],lesoes-recuperacao-06
+247,Lesões e Recuperação - Artigo 07,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-04,42,[KEYWORD_247],lesoes-recuperacao-07
+248,Lesões e Recuperação - Artigo 08,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-05,42,[KEYWORD_248],lesoes-recuperacao-08
+249,Lesões e Recuperação - Artigo 09,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-06,42,[KEYWORD_249],lesoes-recuperacao-09
+250,Lesões e Recuperação - Artigo 10,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-07,42,[KEYWORD_250],lesoes-recuperacao-10
+251,Lesões e Recuperação - Artigo 11,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-08,42,[KEYWORD_251],lesoes-recuperacao-11
+252,Lesões e Recuperação - Artigo 12,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-09,42,[KEYWORD_252],lesoes-recuperacao-12
+253,Lesões e Recuperação - Artigo 13,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-10,43,[KEYWORD_253],lesoes-recuperacao-13
+254,Lesões e Recuperação - Artigo 14,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-11,43,[KEYWORD_254],lesoes-recuperacao-14
+255,Lesões e Recuperação - Artigo 15,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-12,43,[KEYWORD_255],lesoes-recuperacao-15
+256,Lesões e Recuperação - Artigo 16,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-13,43,[KEYWORD_256],lesoes-recuperacao-16
+257,Lesões e Recuperação - Artigo 17,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-14,43,[KEYWORD_257],lesoes-recuperacao-17
+258,Lesões e Recuperação - Artigo 18,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-15,43,[KEYWORD_258],lesoes-recuperacao-18
+259,Lesões e Recuperação - Artigo 19,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-16,44,[KEYWORD_259],lesoes-recuperacao-19
+260,Lesões e Recuperação - Artigo 20,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-17,44,[KEYWORD_260],lesoes-recuperacao-20
+261,Lesões e Recuperação - Artigo 21,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-18,44,[KEYWORD_261],lesoes-recuperacao-21
+262,Lesões e Recuperação - Artigo 22,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-19,44,[KEYWORD_262],lesoes-recuperacao-22
+263,Lesões e Recuperação - Artigo 23,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-20,44,[KEYWORD_263],lesoes-recuperacao-23
+264,Lesões e Recuperação - Artigo 24,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-21,44,[KEYWORD_264],lesoes-recuperacao-24
+265,Lesões e Recuperação - Artigo 25,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-22,45,[KEYWORD_265],lesoes-recuperacao-25
+266,Lesões e Recuperação - Artigo 26,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-23,45,[KEYWORD_266],lesoes-recuperacao-26
+267,Lesões e Recuperação - Artigo 27,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-24,45,[KEYWORD_267],lesoes-recuperacao-27
+268,Lesões e Recuperação - Artigo 28,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-25,45,[KEYWORD_268],lesoes-recuperacao-28
+269,Lesões e Recuperação - Artigo 29,Prevenção de Lesões e Recuperação,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-26,45,[KEYWORD_269],lesoes-recuperacao-29
+270,Lesões e Recuperação - Artigo 30,Prevenção de Lesões e Recuperação,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-27,45,[KEYWORD_270],lesoes-recuperacao-30
+271,Performance - Artigo 01,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-28,46,[KEYWORD_271],performance-01
+272,Performance - Artigo 02,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-29,46,[KEYWORD_272],performance-02
+273,Performance - Artigo 03,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-08-30,46,[KEYWORD_273],performance-03
+274,Performance - Artigo 04,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-08-31,46,[KEYWORD_274],performance-04
+275,Performance - Artigo 05,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-01,46,[KEYWORD_275],performance-05
+276,Performance - Artigo 06,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-02,46,[KEYWORD_276],performance-06
+277,Performance - Artigo 07,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-03,47,[KEYWORD_277],performance-07
+278,Performance - Artigo 08,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-04,47,[KEYWORD_278],performance-08
+279,Performance - Artigo 09,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-05,47,[KEYWORD_279],performance-09
+280,Performance - Artigo 10,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-06,47,[KEYWORD_280],performance-10
+281,Performance - Artigo 11,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-07,47,[KEYWORD_281],performance-11
+282,Performance - Artigo 12,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-08,47,[KEYWORD_282],performance-12
+283,Performance - Artigo 13,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-09,48,[KEYWORD_283],performance-13
+284,Performance - Artigo 14,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-10,48,[KEYWORD_284],performance-14
+285,Performance - Artigo 15,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-11,48,[KEYWORD_285],performance-15
+286,Performance - Artigo 16,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-12,48,[KEYWORD_286],performance-16
+287,Performance - Artigo 17,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-13,48,[KEYWORD_287],performance-17
+288,Performance - Artigo 18,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-14,48,[KEYWORD_288],performance-18
+289,Performance - Artigo 19,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-15,49,[KEYWORD_289],performance-19
+290,Performance - Artigo 20,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-16,49,[KEYWORD_290],performance-20
+291,Performance - Artigo 21,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-17,49,[KEYWORD_291],performance-21
+292,Performance - Artigo 22,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-18,49,[KEYWORD_292],performance-22
+293,Performance - Artigo 23,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-19,49,[KEYWORD_293],performance-23
+294,Performance - Artigo 24,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-20,49,[KEYWORD_294],performance-24
+295,Performance - Artigo 25,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-21,50,[KEYWORD_295],performance-25
+296,Performance - Artigo 26,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-22,50,[KEYWORD_296],performance-26
+297,Performance - Artigo 27,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-23,50,[KEYWORD_297],performance-27
+298,Performance - Artigo 28,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-24,50,[KEYWORD_298],performance-28
+299,Performance - Artigo 29,Performance e Atletas,Com Ciência,[KEYWORDS_PENDING],Pendente,2026-09-25,50,[KEYWORD_299],performance-29
+300,Performance - Artigo 30,Performance e Atletas,Sem Ciência,[KEYWORDS_PENDING],Pendente,2026-09-26,50,[KEYWORD_300],performance-30
