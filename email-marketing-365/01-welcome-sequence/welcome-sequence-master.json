@@ -1,0 +1,259 @@
+{
+  "sequence_name": "Welcome Sequence - Batalhão TD",
+  "description": "Sequência de boas-vindas de 14 dias para novos leads",
+  "total_emails": 14,
+  "objective": "Construir relacionamento, educar e converter para consulta gratuita",
+  "conversion_goal": "12-15% agendamento de consultoria",
+  "emails": [
+    {
+      "day": 1,
+      "send_delay": "immediate",
+      "file": "day-01-bem-vindo.md",
+      "subject_lines": [
+        "Bem-vindo ao Batalhão TD, {{FIRST_NAME}} 🎖️",
+        "{{FIRST_NAME}}, você entrou no Batalhão TD",
+        "Primeira missão: leia isto agora 👊"
+      ],
+      "preview_text": "Sua jornada de transformação começa AGORA. Primeira missão dentro...",
+      "best_send_time": "Immediate upon signup",
+      "segment": "All new subscribers",
+      "cta": "Conheça o Método TD",
+      "cta_url": "https://treinadordavid.pt/metodo-td",
+      "notes": "Estabelecer tom, expectativas e primeira conexão"
+    },
+    {
+      "day": 2,
+      "send_delay": "+24 hours",
+      "file": "day-02-minha-historia.md",
+      "subject_lines": [
+        "De Marine a Personal Trainer: minha história",
+        "Por que um ex-Marine virou personal trainer?",
+        "A história que mudou minha vida (e pode mudar a sua)"
+      ],
+      "preview_text": "8 anos no USMC me ensinaram mais sobre fitness do que qualquer certificado...",
+      "best_send_time": "9:00 AM local time",
+      "segment": "Opened Day 1",
+      "cta": "Ler História Completa",
+      "cta_url": "https://treinadordavid.pt/sobre",
+      "notes": "Construir autoridade e conexão emocional"
+    },
+    {
+      "day": 3,
+      "send_delay": "+48 hours",
+      "file": "day-03-por-que-depende.md",
+      "subject_lines": [
+        "Por que eu sempre digo 'DEPENDE!' (e por que você deveria também)",
+        "DEPENDE! = Honestidade brutal",
+        "A palavra que a indústria fitness ODEIA"
+      ],
+      "preview_text": "Não existe fórmula mágica. Existe honestidade. E eu vou te dar exatamente isso.",
+      "best_send_time": "9:00 AM local time",
+      "segment": "All (important message)",
+      "cta": "Entender o DEPENDE!",
+      "cta_url": "https://treinadordavid.pt/blog/por-que-depende",
+      "notes": "Estabelecer filosofia única TD"
+    },
+    {
+      "day": 4,
+      "send_delay": "+72 hours",
+      "file": "day-04-case-study-1.md",
+      "subject_lines": [
+        "João, 45 anos: -22kg em 120 dias",
+        "Case Study: De sedentário a atleta aos 45",
+        "Transformação real: João perdeu 22kg (veja como)"
+      ],
+      "preview_text": "'Achei que era tarde demais. O TD me provou o contrário.' - João Silva, 45 anos",
+      "best_send_time": "7:00 PM local time",
+      "segment": "All",
+      "cta": "Ver Mais Transformações",
+      "cta_url": "https://treinadordavid.pt/transformacoes",
+      "notes": "Prova social forte, relatable"
+    },
+    {
+      "day": 5,
+      "send_delay": "+96 hours",
+      "file": "day-05-3-pilares.md",
+      "subject_lines": [
+        "Os 3 Pilares do Método TD (memorize isto)",
+        "Treino + Nutrição + Mindset = Transformação",
+        "A tríade que transforma corpos"
+      ],
+      "preview_text": "Sem um destes 3 pilares, você não vai ter resultados duradouros. Simples assim.",
+      "best_send_time": "9:00 AM local time",
+      "segment": "All",
+      "cta": "Conhecer os 3 Pilares",
+      "cta_url": "https://treinadordavid.pt/3-pilares",
+      "notes": "Educacional, fundamento do método"
+    },
+    {
+      "day": 6,
+      "send_delay": "+120 hours",
+      "file": "day-06-erro-1.md",
+      "subject_lines": [
+        "Erro #1: Treinar sem progressão (95% fazem isso)",
+        "Por que você não está ganhando músculo",
+        "O erro que MATA seus ganhos"
+      ],
+      "preview_text": "Fazer o mesmo treino por meses e esperar resultados diferentes = insanidade.",
+      "best_send_time": "9:00 AM local time",
+      "segment": "All",
+      "cta": "Evitar Este Erro",
+      "cta_url": "https://treinadordavid.pt/blog/progressao-treino",
+      "notes": "Identificar problema comum"
+    },
+    {
+      "day": 7,
+      "send_delay": "+144 hours",
+      "file": "day-07-ebook-gratuito.md",
+      "subject_lines": [
+        "📚 GRÁTIS: 7 Erros que Matam Resultados (eBook)",
+        "Baixa isto antes que eu mude de ideia",
+        "eBook gratuito: os 7 erros fatais do treino"
+      ],
+      "preview_text": "Download imediato. Zero custo. Valor incalculável. 7 erros + como corrigi-los.",
+      "best_send_time": "2:00 PM local time",
+      "segment": "Not downloaded ebook yet",
+      "cta": "Baixar eBook Grátis",
+      "cta_url": "https://treinadordavid.pt/ebook",
+      "notes": "Lead magnet, aumento de engagement"
+    },
+    {
+      "day": 8,
+      "send_delay": "+168 hours",
+      "file": "day-08-prova-social.md",
+      "subject_lines": [
+        "5.000+ pessoas já transformaram com o Método TD",
+        "O que dizem sobre o Treinador David",
+        "Depoimentos reais de transformações reais"
+      ],
+      "preview_text": "Não acredite em mim. Acredite em quem já fez a jornada antes de você.",
+      "best_send_time": "7:00 PM local time",
+      "segment": "All",
+      "cta": "Ler Todos os Depoimentos",
+      "cta_url": "https://treinadordavid.pt/depoimentos",
+      "notes": "Prova social massiva"
+    },
+    {
+      "day": 9,
+      "send_delay": "+192 hours",
+      "file": "day-09-mindset-militar.md",
+      "subject_lines": [
+        "Mentalidade Militar: o segredo que ninguém conta",
+        "Motivação é passageira. Disciplina é eterna.",
+        "O que os Marines me ensinaram sobre fitness"
+      ],
+      "preview_text": "Motivação te leva até quinta-feira. Disciplina te leva até o objetivo.",
+      "best_send_time": "9:00 AM local time",
+      "segment": "High engagement",
+      "cta": "Desenvolver Mentalidade de Elite",
+      "cta_url": "https://treinadordavid.pt/mindset",
+      "notes": "Diferenciador TD, aspecto único"
+    },
+    {
+      "day": 10,
+      "send_delay": "+216 hours",
+      "file": "day-10-erro-2.md",
+      "subject_lines": [
+        "Erro #2: Ignorar a recuperação (te deixa MAIS FRACO)",
+        "Overtraining: o assassino silencioso",
+        "Por que mais treino ≠ mais resultados"
+      ],
+      "preview_text": "Crescimento acontece NO DESCANSO, não no treino. A maioria ignora isto.",
+      "best_send_time": "9:00 AM local time",
+      "segment": "All",
+      "cta": "Otimizar Recuperação",
+      "cta_url": "https://treinadordavid.pt/blog/recuperacao",
+      "notes": "Educacional, contra-intuitivo"
+    },
+    {
+      "day": 11,
+      "send_delay": "+240 hours",
+      "file": "day-11-case-study-2.md",
+      "subject_lines": [
+        "Maria, 38: de 0 a 5km em 60 dias",
+        "Case Study: Superando lesões aos 38 anos",
+        "Transformação: quando o impossível vira rotina"
+      ],
+      "preview_text": "2 lesões. 38 anos. Zero experiência. Resultado: 5km corridos e 12kg perdidos.",
+      "best_send_time": "7:00 PM local time",
+      "segment": "All",
+      "cta": "Ver História da Maria",
+      "cta_url": "https://treinadordavid.pt/case-maria",
+      "notes": "Prova social feminina, superação"
+    },
+    {
+      "day": 12,
+      "send_delay": "+264 hours",
+      "file": "day-12-convite-consultoria.md",
+      "subject_lines": [
+        "{{FIRST_NAME}}, vamos conversar? (consulta gratuita)",
+        "30 minutos comigo. Sem custo. Sem compromisso.",
+        "Pronto para dar o próximo passo?"
+      ],
+      "preview_text": "Consulta gratuita de 30min. Plano personalizado. Zero pressão de venda.",
+      "best_send_time": "10:00 AM local time",
+      "segment": "Not scheduled yet",
+      "cta": "Agendar Consulta Grátis",
+      "cta_url": "https://treinadordavid.pt/consultoria/agendar",
+      "notes": "PRIMEIRO convite para consultoria"
+    },
+    {
+      "day": 13,
+      "send_delay": "+288 hours",
+      "file": "day-13-urgencia.md",
+      "subject_lines": [
+        "⏰ Apenas 2 vagas restantes este mês",
+        "{{FIRST_NAME}}, não deixe para depois",
+        "Vagas de consultoria acabando (URGENTE)"
+      ],
+      "preview_text": "Limite de 10 consultas/mês. 8 já preenchidas. Garanta sua vaga AGORA.",
+      "best_send_time": "3:00 PM local time",
+      "segment": "Not scheduled yet + high engagement",
+      "cta": "Garantir Minha Vaga",
+      "cta_url": "https://treinadordavid.pt/consultoria/agendar",
+      "notes": "Urgência real, scarcity"
+    },
+    {
+      "day": 14,
+      "send_delay": "+312 hours",
+      "file": "day-14-ultima-chamada.md",
+      "subject_lines": [
+        "Última chamada: Oferta especial expira em 24h",
+        "{{FIRST_NAME}}, isto é a última vez que vou oferecer isso",
+        "24 horas. Depois, preço normal."
+      ],
+      "preview_text": "Desconto de 50% na primeira consulta. Válido APENAS por 24h. Depois, nunca mais.",
+      "best_send_time": "10:00 AM local time",
+      "segment": "Not scheduled yet",
+      "cta": "Aproveitar Oferta Especial",
+      "cta_url": "https://treinadordavid.pt/consultoria/oferta-especial",
+      "notes": "Última chance, desconto especial"
+    }
+  ],
+  "automation_notes": {
+    "platform": "ActiveCampaign, MailChimp, or ConvertKit",
+    "triggers": [
+      "Entry: Form submission (newsletter signup)",
+      "Entry: Lead magnet download",
+      "Entry: Quiz completion"
+    ],
+    "exit_conditions": [
+      "Scheduled consultation",
+      "Purchased product",
+      "Unsubscribed",
+      "Marked as spam"
+    ],
+    "branching_logic": {
+      "if_scheduled_consultation": "Move to Post-Purchase sequence",
+      "if_downloaded_ebook": "Skip Day 7",
+      "if_no_opens_5_days": "Send re-engagement email",
+      "if_clicked_cta_3x": "Tag as 'Hot Lead'"
+    }
+  },
+  "performance_benchmarks": {
+    "average_open_rate": "25-35%",
+    "average_click_rate": "5-10%",
+    "conversion_to_consultation": "12-15%",
+    "unsubscribe_rate": "<2%"
+  }
+}

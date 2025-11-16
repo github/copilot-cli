@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Automação de Conteúdo - Fitness Militar</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0B1220 0%, #1E293B 100%);
+            color: #F8FAFC;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #1E293B;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #0EA5E9;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #94A3B8;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        .section {
+            background: #334155;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 5px solid #0EA5E9;
+        }
+        h2 {
+            color: #0EA5E9;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-transform: uppercase;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            color: #94A3B8;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #475569;
+            border-radius: 5px;
+            background: #1E293B;
+            color: #F8FAFC;
+            font-size: 1em;
+        }
+        button {
+            background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(14, 165, 233, 0.4);
+        }
+        #output {
+            background: #0B1220;
+            padding: 25px;
+            border-radius: 8px;
+            min-height: 200px;
+            margin-top: 20px;
+            border: 2px solid #0EA5E9;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+        .template-card {
+            background: #475569;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .template-card:hover {
+            background: #64748B;
+            transform: translateX(5px);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-box {
+            background: #475569;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            color: #0EA5E9;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #94A3B8;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ SISTEMA DE AUTOMAÇÃO DE CONTEÚDO ⚡</h1>
+        <p class="subtitle">Gerador Militar de Artigos de Fitness - Máquina de Conversão</p>
+
+        <div class="section">
+            <h2>📊 Painel de Controle</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="articlesGenerated">0</div>
+                    <div class="stat-label">Artigos Gerados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="wordsGenerated">0</div>
+                    <div class="stat-label">Palavras Totais</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="conversionScore">98%</div>
+                    <div class="stat-label">Taxa de Conversão</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="seoScore">95%</div>
+                    <div class="stat-label">Score SEO</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Gerador de Artigos</h2>
+
+            <label>Tipo de Artigo:</label>
+            <select id="articleType">
+                <option value="treino">Treino Militar</option>
+                <option value="nutricao">Nutrição Tática</option>
+                <option value="emagrecimento">Emagrecimento Rápido</option>
+                <option value="hipertrofia">Hipertrofia Explosiva</option>
+                <option value="motivacao">Motivação de Guerra</option>
+                <option value="suplementos">Suplementação Estratégica</option>
+                <option value="cardio">Cardio de Elite</option>
+                <option value="força">Força Máxima</option>
+            </select>
+
+            <label>Palavra-chave Principal (SEO):</label>
+            <input type="text" id="keyword" placeholder="Ex: treino funcional, dieta para emagrecer...">
+
+            <label>Público-Alvo:</label>
+            <select id="audience">
+                <option value="iniciante">Recruta (Iniciante)</option>
+                <option value="intermediario">Soldado (Intermediário)</option>
+                <option value="avancado">Comandante (Avançado)</option>
+                <option value="elite">Força Especial (Elite)</option>
+            </select>
+
+            <label>Tom do Artigo:</label>
+            <select id="tone">
+                <option value="militar">Militar Intenso</option>
+                <option value="motivacional">Motivacional Extremo</option>
+                <option value="cientifico">Científico Tático</option>
+                <option value="vendas">Foco em Vendas</option>
+            </select>
+
+            <label>Incluir DEPENDE! (Nossa Marca):</label>
+            <select id="depende">
+                <option value="sim">Sim - Incluir 3-5x</option>
+                <option value="nao">Não</option>
+            </select>
+
+            <button onclick="generateArticle()">🚀 GERAR ARTIGO AGORA</button>
+        </div>
+
+        <div class="section">
+            <h2>📝 Templates Prontos (Clique para Usar)</h2>
+            <div class="template-card" onclick="loadTemplate('guerreiro')">
+                <strong>Template Guerreiro:</strong> "Como Treinar Como Um Soldado de Elite"
+            </div>
+            <div class="template-card" onclick="loadTemplate('transformacao')">
+                <strong>Template Transformação:</strong> "De Foca a Seal em 90 Dias"
+            </div>
+            <div class="template-card" onclick="loadTemplate('nutricao')">
+                <strong>Template Nutrição:</strong> "Dieta Tática para Performance Máxima"
+            </div>
+            <div class="template-card" onclick="loadTemplate('vendas')">
+                <strong>Template Vendas:</strong> "Por Que Você PRECISA de um Coach Agora"
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>✅ Artigo Gerado</h2>
+            <div id="output">Seu artigo aparecerá aqui...</div>
+            <button onclick="copyToClipboard()">📋 COPIAR ARTIGO</button>
+            <button onclick="downloadArticle()">💾 BAIXAR HTML</button>
+        </div>
+    </div>
+
+    <script>
+        let articlesCount = 0;
+        let totalWords = 0;
+
+        const articleTemplates = {
+            treino: {
+                intro: "Soldado, chegou a hora de DESTRUIR seus limites! Este não é mais um treino qualquer - é um PROTOCOLO DE GUERRA desenvolvido para transformar civis em máquinas de combate.",
+                topics: [
+                    "Aquecimento Tático (15 minutos de preparação mental e física)",
+                    "Exercícios Compostos de Alta Intensidade (Squat, Deadlift, Press)",
+                    "Treino Metabólico de Combate (Burpees, Mountain Climbers, Sprints)",
+                    "Core de Aço (Pranchas, Russian Twists, Leg Raises)",
+                    "Cooldown e Recuperação Estratégica"
+                ],
+                depende: "DEPENDE! Seu sucesso depende 100% da sua disciplina e execução impecável. Não existe mágica, existe TRABALHO DURO.",
+                cta: "Pronto para se transformar? CLIQUE AQUI e garanta sua vaga no Programa de Transformação Militar! Vagas limitadas."
+            },
+            nutricao: {
+                intro: "ATENÇÃO RECRUTA! Você pode treinar 10 horas por dia, mas se sua nutrição está uma DESGRAÇA, você NUNCA vai ver resultados. É hora de dominar a ciência da alimentação tática.",
+                topics: [
+                    "Protocolo de Macronutrientes (Proteína, Carboidrato, Gordura)",
+                    "Timing Nutricional para Performance Máxima",
+                    "Suplementação Estratégica (O Que Funciona VS Lixo Marketing)",
+                    "Dieta Flexível: Como Comer Pizza e Ainda Ter Abs",
+                    "Hidratação e Eletrólitos para Operações Longas"
+                ],
+                depende: "DEPENDE! Cada corpo é único. O que funciona para o cara do Instagram pode te DESTRUIR. Você precisa de um plano personalizado.",
+                cta: "Quer uma dieta personalizada feita por especialista militar? ENTRE EM CONTATO AGORA via WhatsApp!"
+            },
+            emagrecimento: {
+                intro: "Está GORDO? Sem energia? Sem confiança? ACABOU! Hoje você declara GUERRA contra a gordura corporal. Este é o protocolo mais agressivo e eficiente para queimar gordura.",
+                topics: [
+                    "Déficit Calórico Estratégico (Sem Morrer de Fome)",
+                    "HIIT de Alta Intensidade (Queime Gordura em 20 Minutos)",
+                    "Jejum Intermitente Tático (16/8, OMAD, Warrior)",
+                    "Termogênicos e Suplementos Que Funcionam",
+                    "Estratégias Anti-Rebote (Mantenha o Peso Perdido)"
+                ],
+                depende: "DEPENDE! Perder peso não é sobre dieta da moda. É sobre criar um SISTEMA que funciona para SUA vida.",
+                cta: "CHEGA DE ENROLAÇÃO! Clique aqui e comece sua transformação com orientação profissional HOJE!"
+            },
+            hipertrofia: {
+                intro: "Quer ficar GRANDE? Quer construir músculos que INTIMIDAM? Então prepare-se para o protocolo de hipertrofia mais brutal que você já viu.",
+                topics: [
+                    "Volume de Treino Otimizado (Séries, Repetições, Frequência)",
+                    "Sobrecarga Progressiva: A Lei Inviolável do Crescimento",
+                    "Exercícios de Massa (Os 10 Movimentos Essenciais)",
+                    "Nutrição Hipercalórica Inteligente (Bulk Sem Ficar Gordo)",
+                    "Descanso e Recuperação (Onde o Músculo CRESCE)"
+                ],
+                depende: "DEPENDE! Ganhar massa muscular limpa requer precisão cirúrgica na dieta e treino. Sem estratégia = SEM RESULTADOS.",
+                cta: "Quer um programa de hipertrofia personalizado? FALE COM NOSSO TIME AGORA!"
+            },
+            motivacao: {
+                intro: "Está FRACO mentalmente? Desistindo antes de tentar? DESPERTE O GUERREIRO que existe dentro de você! Motivação não é sentimento - é DISCIPLINA em ação.",
+                topics: [
+                    "Mindset de Guerreiro: Como Pensar Como um Vencedor",
+                    "Disciplina > Motivação: O Segredo dos Campeões",
+                    "Sistema de Metas Militares (Objetivos SMART de Guerra)",
+                    "Superar Obstáculos: Transforme Dor em Combustível",
+                    "Rotina Matinal de Elite (Domine Suas Manhãs, Domine Sua Vida)"
+                ],
+                depende: "DEPENDE! Seu sucesso depende 100% de VOCÊ. Nenhum coach, nenhum programa faz o trabalho por você. MAS podemos te guiar.",
+                cta: "Precisa de accountability e um sistema testado? JUNTE-SE À NOSSA TROPA DE ELITE!"
+            },
+            suplementos: {
+                intro: "PARE DE JOGAR DINHEIRO FORA! 90% dos suplementos no mercado são LIXO puro. Vou te mostrar o que realmente funciona baseado em CIÊNCIA, não marketing.",
+                topics: [
+                    "Creatina: O Rei Dos Suplementos (Como Usar Corretamente)",
+                    "Whey Protein: Vale a Pena? DEPENDE!",
+                    "Pré-Treinos: Energia Real VS Placebo Caro",
+                    "BCAAs, Glutamina e Outros: Verdade ou Mentira?",
+                    "Stack de Suplementos Essenciais (Custo-Benefício Máximo)"
+                ],
+                depende: "DEPENDE! Suplemento sem treino e dieta é DINHEIRO NO LIXO. Primeiro otimize o básico, depois suplementos potencializam.",
+                cta: "Quer uma consultoria de suplementação personalizada? CLIQUE AQUI e fale com nosso especialista!"
+            },
+            cardio: {
+                intro: "CARDIO MATA GANHOS? DEPENDE! Vou te mostrar como fazer cardio que POTENCIALIZA seus resultados ao invés de sabotar. Prepare-se para protocolos de elite.",
+                topics: [
+                    "LISS vs HIIT vs MISS: Qual é o Melhor? DEPENDE!",
+                    "Cardio em Jejum: Ciência Por Trás da Queima de Gordura",
+                    "Frequência Cardíaca Ideal para Seus Objetivos",
+                    "Protocolos de Condicionamento Militar (Tabata, EMOM, AMRAP)",
+                    "Integrar Cardio e Musculação (Sem Interferir na Hipertrofia)"
+                ],
+                depende: "DEPENDE! O tipo de cardio certo para você depende dos seus objetivos, condicionamento atual e disponibilidade de tempo.",
+                cta: "Precisa de um plano de condicionamento personalizado? FALE COM A GENTE AGORA!"
+            },
+            força: {
+                intro: "Força não é sobre ego - é sobre DOMÍNIO TOTAL. Aprenda os segredos dos powerlifters e strongmen para construir força BRUTAL e funcional.",
+                topics: [
+                    "Os 3 Grandes: Squat, Bench, Deadlift (Técnica Perfeita)",
+                    "Periodização para Força Máxima (Linear, Ondulatória, Conjugada)",
+                    "Exercícios Acessórios Essenciais (Construa Pontos Fracos)",
+                    "Nutrição para Força: Superávit Estratégico",
+                    "Recuperação e Gerenciamento de Fadiga (CNS)"
+                ],
+                depende: "DEPENDE! Ganhar força requer inteligência, não só levantar pesado estupidamente. Técnica + Progressão = FORÇA REAL.",
+                cta: "Quer um programa de força periodizado e personalizado? ENTRE EM CONTATO AGORA!"
+            }
+        };
+
+        function generateArticle() {
+            const type = document.getElementById('articleType').value;
+            const keyword = document.getElementById('keyword').value || 'fitness';
+            const audience = document.getElementById('audience').value;
+            const tone = document.getElementById('tone').value;
+            const includeDdepende = document.getElementById('depende').value;
+
+            const template = articleTemplates[type];
+
+            let article = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${keyword.toUpperCase()} - Guia Completo de Fitness Militar</title>
+    <meta name="description" content="Descubra o método militar para ${keyword}. Transforme seu corpo com disciplina e estratégia. Resultados garantidos!">
+    <meta name="keywords" content="${keyword}, treino militar, fitness, transformação, coaching">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.8; color: #F8FAFC; background: #0B1220; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #1E293B; padding: 40px; border-radius: 10px; }
+        h1 { color: #0EA5E9; font-size: 2.5em; text-align: center; text-transform: uppercase; }
+        h2 { color: #0EA5E9; font-size: 1.8em; margin-top: 30px; border-left: 5px solid #0EA5E9; padding-left: 15px; }
+        p { margin: 15px 0; font-size: 1.1em; }
+        .depende { background: #DC2626; padding: 20px; border-radius: 8px; font-weight: bold; font-size: 1.2em; margin: 20px 0; }
+        .cta { background: linear-gradient(135deg, #0EA5E9, #0284C7); color: white; padding: 20px 40px; text-align: center; border-radius: 50px; font-size: 1.3em; font-weight: bold; margin: 30px 0; cursor: pointer; text-decoration: none; display: block; }
+        .cta:hover { transform: scale(1.05); }
+        ul { margin: 20px 0; padding-left: 30px; }
+        li { margin: 10px 0; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 ${keyword.toUpperCase()} 🔥</h1>
+        <h2>GUIA MILITAR COMPLETO</h2>
+
+        <p><strong>NÍVEL: ${audience.toUpperCase()}</strong></p>
+
+        <p>${template.intro}</p>
+
+        <h2>📋 PROTOCOLO DE EXECUÇÃO</h2>
+        <ul>`;
+
+            template.topics.forEach(topic => {
+                article += `\n            <li>${topic}</li>`;
+            });
+
+            article += `\n        </ul>`;
+
+            if (includeDepende === 'sim') {
+                article += `\n\n        <div class="depende">
+            ⚠️ ${template.depende}
+        </div>`;
+            }
+
+            article += `\n\n        <h2>🎯 PRÓXIMOS PASSOS</h2>
+        <p>Agora você tem o conhecimento. Mas conhecimento sem AÇÃO é INÚTIL. É hora de colocar em prática e ver os resultados que você MERECE.</p>
+
+        <p><strong>Lembre-se:</strong> Disciplina é fazer o que precisa ser feito, mesmo quando você não quer. Isso separa os fracos dos FORTES.</p>
+
+        <a href="#contato" class="cta">
+            ${template.cta}
+        </a>
+
+        <h2>💬 FALE CONOSCO</h2>
+        <p style="text-align: center; font-size: 1.2em;">
+            📱 WhatsApp: <strong>(11) 99999-9999</strong><br>
+            📧 Email: <strong>contato@fitnessmilitar.com</strong><br>
+            📍 Instagram: <strong>@treinadormilitar</strong>
+        </p>
+
+        <p style="text-align: center; margin-top: 40px; color: #94A3B8;">
+            © 2026 Fitness Militar - Todos os direitos reservados<br>
+            Transformando civis em guerreiros desde 2020
+        </p>
+    </div>
+</body>
+</html>`;
+
+            document.getElementById('output').textContent = article;
+
+            // Update stats
+            articlesCount++;
+            const wordCount = article.split(' ').length;
+            totalWords += wordCount;
+            document.getElementById('articlesGenerated').textContent = articlesCount;
+            document.getElementById('wordsGenerated').textContent = totalWords.toLocaleString();
+        }
+
+        function loadTemplate(templateName) {
+            const templates = {
+                guerreiro: { type: 'treino', keyword: 'treino militar de elite', audience: 'avancado', tone: 'militar' },
+                transformacao: { type: 'emagrecimento', keyword: 'transformação corporal', audience: 'iniciante', tone: 'motivacional' },
+                nutricao: { type: 'nutricao', keyword: 'dieta para ganhar massa', audience: 'intermediario', tone: 'cientifico' },
+                vendas: { type: 'motivacao', keyword: 'coaching fitness', audience: 'iniciante', tone: 'vendas' }
+            };
+
+            const t = templates[templateName];
+            document.getElementById('articleType').value = t.type;
+            document.getElementById('keyword').value = t.keyword;
+            document.getElementById('audience').value = t.audience;
+            document.getElementById('tone').value = t.tone;
+            document.getElementById('depende').value = 'sim';
+
+            alert(`Template "${templateName}" carregado! Clique em GERAR ARTIGO.`);
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                alert('✅ Artigo copiado para a área de transferência!');
+            });
+        }
+
+        function downloadArticle() {
+            const output = document.getElementById('output').textContent;
+            const blob = new Blob([output], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'artigo-fitness-' + Date.now() + '.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('✅ Artigo baixado com sucesso!');
+        }
+    </script>
+</body>
+</html>

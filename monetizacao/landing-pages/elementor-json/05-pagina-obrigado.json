@@ -1,0 +1,545 @@
+{
+  "version": "1.0",
+  "title": "Página Obrigado + Upsell",
+  "type": "page",
+  "content": [
+    {
+      "id": "thank-you-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "gradient",
+        "background_color": "#0B1220",
+        "background_color_b": "#0EA5E9",
+        "background_gradient_angle": {
+          "unit": "deg",
+          "size": 135
+        },
+        "padding": {
+          "unit": "px",
+          "top": 100,
+          "right": 20,
+          "bottom": 100,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "thank-you-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "checkmark-icon",
+              "elType": "widget",
+              "widgetType": "icon",
+              "settings": {
+                "icon": "fas fa-check-circle",
+                "icon_color": "#FFFFFF",
+                "icon_size": {
+                  "unit": "px",
+                  "size": 120
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "thank-you-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "MISSÃO ACEITA, RECRUTA!",
+                "header_size": "h1",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 56
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "thank-you-message",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 22px; color: #FFFFFF; text-align: center; margin: 30px 0; max-width: 700px; margin-left: auto; margin-right: auto;'>Sua solicitação foi recebida com sucesso.<br>Dentro de 24h você receberá um email com os próximos passos.</p>"
+              }
+            },
+            {
+              "id": "next-steps",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='background: rgba(255,255,255,0.1); border-radius: 10px; padding: 40px; max-width: 600px; margin: 40px auto;'><h3 style='font-family: Oswald; font-size: 28px; color: #FFFFFF; text-align: center; margin-bottom: 25px;'>PRÓXIMOS PASSOS:</h3><div style='font-family: Inter; font-size: 18px; color: #FFFFFF; line-height: 2;'><p>✓ Verifique seu email (inclusive spam)</p><p>✓ Adicione contato@treinadordavid.com aos contatos</p><p>✓ Aguarde meu contato em até 24h</p><p>✓ Prepare-se para a transformação</p></div></div>"
+              }
+            },
+            {
+              "id": "social-follow",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 20px; color: #FFFFFF; text-align: center; margin-top: 40px;'>Enquanto isso, me siga nas redes:</p>"
+              }
+            },
+            {
+              "id": "social-icons",
+              "elType": "widget",
+              "widgetType": "social-icons",
+              "settings": {
+                "social_icons": [
+                  {
+                    "social": "facebook",
+                    "link": {
+                      "url": "https://facebook.com/treinadordavid"
+                    }
+                  },
+                  {
+                    "social": "instagram",
+                    "link": {
+                      "url": "https://instagram.com/treinadordavid"
+                    }
+                  },
+                  {
+                    "social": "youtube",
+                    "link": {
+                      "url": "https://youtube.com/@treinadordavid"
+                    }
+                  },
+                  {
+                    "social": "tiktok",
+                    "link": {
+                      "url": "https://tiktok.com/@treinadordavid"
+                    }
+                  }
+                ],
+                "icon_color": "#FFFFFF",
+                "icon_size": {
+                  "unit": "px",
+                  "size": 40
+                },
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "upsell-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "upsell-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "upsell-badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='display: inline-block; background: #FF0000; color: #FFFFFF; padding: 10px 30px; border-radius: 25px; font-family: Oswald; font-size: 14px; margin: 0 auto; text-align: center;'>⚡ OFERTA EXCLUSIVA DESTA PÁGINA</div>"
+              }
+            },
+            {
+              "id": "upsell-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "ESPERA! ANTES DE SAIR...",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            },
+            {
+              "id": "upsell-subtitle",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 24px; color: #0EA5E9; text-align: center; margin: 20px 0;'>Acelere seus resultados com o <strong>Desafio 30 Dias ABS</strong></p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "upsell-comparison",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "upsell-before",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "before-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='background: #F8F9FA; padding: 40px; border-radius: 10px; text-align: center;'><h3 style='font-family: Oswald; font-size: 28px; color: #0B1220; margin-bottom: 20px;'>SEM O DESAFIO</h3><ul style='font-family: Inter; font-size: 16px; color: #0B1220; text-align: left; line-height: 2;'><li>❌ Treina sem estrutura clara</li><li>❌ Não sabe se está progredindo</li><li>❌ Falta motivação para continuar</li><li>❌ Resultados em 3-6 meses</li><li>❌ Treina sozinho, sem suporte</li></ul></div>"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "upsell-after",
+              "elType": "column",
+              "settings": {
+                "width": "50%"
+              },
+              "elements": [
+                {
+                  "id": "after-box",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<div style='background: #0EA5E9; padding: 40px; border-radius: 10px; text-align: center;'><h3 style='font-family: Oswald; font-size: 28px; color: #FFFFFF; margin-bottom: 20px;'>COM O DESAFIO</h3><ul style='font-family: Inter; font-size: 16px; color: #FFFFFF; text-align: left; line-height: 2;'><li>✅ 30 treinos planejados dia a dia</li><li>✅ Acompanha evolução no app</li><li>✅ Grupo motivando diariamente</li><li>✅ Resultados visíveis em 30 dias</li><li>✅ Comunidade de apoio 24/7</li></ul></div>"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "upsell-offer",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "upsell-price-box",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='background: #0B1220; padding: 50px; border-radius: 15px; max-width: 700px; margin: 40px auto; text-align: center;'><p style='font-family: Inter; font-size: 18px; color: #FFFFFF; margin-bottom: 10px;'>Valor normal:</p><p style='font-family: Oswald; font-size: 36px; color: #FFFFFF; text-decoration: line-through; margin-bottom: 15px;'>R$ 197</p><p style='font-family: Oswald; font-size: 24px; color: #0EA5E9; margin-bottom: 10px;'>OFERTA EXCLUSIVA DESTA PÁGINA:</p><p style='font-family: Oswald; font-size: 72px; color: #0EA5E9; line-height: 1; margin-bottom: 15px;'>R$ 147</p><p style='font-family: Inter; font-size: 18px; color: #FFFFFF;'>💳 Ou 12x de R$ 14,55</p><p style='font-family: Inter; font-size: 16px; color: #0EA5E9; margin-top: 15px;'>Economia de R$ 50 (25% OFF)</p><p style='font-family: Inter; font-size: 14px; color: #FFFFFF; margin-top: 25px; opacity: 0.8;'>⚠️ Oferta válida apenas nesta página por 15 minutos</p></div>"
+              }
+            },
+            {
+              "id": "upsell-countdown",
+              "elType": "widget",
+              "widgetType": "countdown",
+              "settings": {
+                "due_date": "+15 minutes",
+                "show_days": false,
+                "show_hours": false,
+                "show_minutes": true,
+                "show_seconds": true,
+                "label_minutes": "Minutos",
+                "label_seconds": "Segundos",
+                "digit_color": "#FF0000",
+                "label_color": "#0B1220"
+              }
+            },
+            {
+              "id": "upsell-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "SIM! QUERO ACELERAR MEUS RESULTADOS →",
+                "link": {
+                  "url": "https://pay.hotmart.com/XXXXXXXX?coupon=THANKYOU50"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 22
+                },
+                "background_color": "#0EA5E9",
+                "color": "#FFFFFF",
+                "padding": {
+                  "unit": "px",
+                  "top": 30,
+                  "right": 60,
+                  "bottom": 30,
+                  "left": 60
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "upsell-no-thanks",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 14px; color: #666; text-align: center; margin-top: 20px;'><a href='/' style='color: #666; text-decoration: underline;'>Não, obrigado. Não quero acelerar meus resultados.</a></p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bonus-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#F8F9FA",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "right": 20,
+          "bottom": 80,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "bonus-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "bonus-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "E MAIS! BÔNUS EXCLUSIVOS:",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 42
+                },
+                "color": "#0B1220",
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "bonus-grid",
+          "elType": "section",
+          "settings": {
+            "layout": "row"
+          },
+          "elements": [
+            {
+              "id": "bonus-1",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "bonus-1-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-file-pdf",
+                    "title": "BÔNUS #1",
+                    "description": "Guia Completo de Suplementação (R$ 47) - Saiba exatamente o que funciona e o que é desperdício de dinheiro.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bonus-2",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "bonus-2-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-video",
+                    "title": "BÔNUS #2",
+                    "description": "Masterclass: Como Manter Resultados Após os 30 Dias (R$ 67) - Evite o efeito rebote.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bonus-3",
+              "elType": "column",
+              "settings": {
+                "width": "33.33%"
+              },
+              "elements": [
+                {
+                  "id": "bonus-3-box",
+                  "elType": "widget",
+                  "widgetType": "icon-box",
+                  "settings": {
+                    "icon": "fas fa-utensils",
+                    "title": "BÔNUS #3",
+                    "description": "50 Receitas Fitness Rápidas (R$ 37) - Comidas saudáveis em menos de 15 minutos.",
+                    "icon_color": "#0EA5E9",
+                    "title_typography_font_family": "Oswald",
+                    "description_typography_font_family": "Inter"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bonus-total",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "bonus-total-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<div style='background: #FFFFFF; border: 3px solid #0EA5E9; padding: 30px; border-radius: 10px; max-width: 600px; margin: 40px auto; text-align: center;'><p style='font-family: Oswald; font-size: 24px; color: #0B1220;'>VALOR DOS BÔNUS: <span style='color: #0EA5E9;'>R$ 151</span></p><p style='font-family: Oswald; font-size: 20px; color: #0B1220; margin-top: 15px;'>VALOR TOTAL DO PACOTE: <span style='text-decoration: line-through;'>R$ 348</span></p><p style='font-family: Oswald; font-size: 32px; color: #0EA5E9; margin-top: 15px;'>VOCÊ PAGA APENAS: R$ 147</p></div>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "final-cta-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#0B1220",
+        "padding": {
+          "unit": "px",
+          "top": 60,
+          "right": 20,
+          "bottom": 60,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "final-cta-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "final-cta-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "ÚLTIMA CHANCE: R$ 147",
+                "header_size": "h2",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 48
+                },
+                "color": "#FFFFFF",
+                "align": "center"
+              }
+            },
+            {
+              "id": "final-cta-button",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "GARANTIR ACESSO COM DESCONTO →",
+                "link": {
+                  "url": "https://pay.hotmart.com/XXXXXXXX?coupon=THANKYOU50"
+                },
+                "size": "lg",
+                "typography_font_family": "Oswald",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 24
+                },
+                "background_color": "#0EA5E9",
+                "color": "#FFFFFF",
+                "padding": {
+                  "unit": "px",
+                  "top": 30,
+                  "right": 70,
+                  "bottom": 30,
+                  "left": 70
+                },
+                "align": "center"
+              }
+            },
+            {
+              "id": "final-guarantee",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Inter; font-size: 16px; color: #0EA5E9; text-align: center; margin-top: 25px;'>🛡️ Garantia de 30 dias • 🔒 Compra 100% Segura</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-section",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#000000",
+        "padding": {
+          "unit": "px",
+          "top": 40,
+          "right": 20,
+          "bottom": 40,
+          "left": 20
+        }
+      },
+      "elements": [
+        {
+          "id": "footer-column",
+          "elType": "column",
+          "settings": {
+            "width": "100%"
+          },
+          "elements": [
+            {
+              "id": "footer-signature",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='font-family: Oswald; font-size: 24px; color: #0EA5E9; text-align: center;'>Semper Fidelis<br>— Treinador David</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

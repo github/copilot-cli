@@ -1,0 +1,36 @@
+{{SUBJECT}}
+========================================
+
+Olá {{FIRST_NAME}},
+
+{{CONTENT}}
+
+{{CTA_TEXT}}:
+{{CTA_URL}}?utm_source=email&utm_medium={{EMAIL_TYPE}}&utm_campaign={{CAMPAIGN_NAME}}
+
+----------------------------------------
+
+P.S. {{PS_TEXT}}
+
+Semper Fidelis,
+Treinador David
+Ex-Marine USMC | Personal Trainer | 30 Anos Experiência
+
+========================================
+
+SIGA-ME NAS REDES SOCIAIS:
+Instagram: https://instagram.com/treinadordavid
+Facebook: https://facebook.com/treinadordavid
+YouTube: https://youtube.com/treinadordavid
+
+CONTATO:
+📧 contato@treinadordavid.pt
+📱 WhatsApp: +351 912 345 678
+
+Você está recebendo este email porque se inscreveu em treinadordavid.pt
+
+Cancelar inscrição: {{UNSUBSCRIBE_URL}}
+Atualizar preferências: {{UPDATE_PREFERENCES_URL}}
+
+Treinador David - Personal Training
+Lisboa, Portugal

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download eBook | Treinador David</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/td-funnels.css">
+</head>
+<body>
+  <section class="td-section-xl">
+    <div class="td-container">
+      <div class="td-text-center td-mb-xl">
+        <span class="td-badge td-badge-accent td-badge-lg td-mb-md">
+          ✅ CONFIRMADO
+        </span>
+        <h1 class="td-h1">
+          SEU EBOOK ESTÁ<br>
+          <span class="td-text-primary">PRONTO!</span>
+        </h1>
+      </div>
+
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="td-card td-text-center td-mb-xl">
+          <h2 class="td-h2 td-mb-md">📥 Baixar eBook Agora</h2>
+          <p class="td-mb-lg">
+            Clique no botão abaixo para fazer download do seu eBook<br>
+            "7 Erros que Matam Seus Resultados"
+          </p>
+
+          <a href="/downloads/7-erros-fatais.pdf"
+             download
+             class="td-btn td-btn-primary td-btn-lg td-pulse"
+             onclick="TDFunnels.Tracking.trackEvent('eBook', 'Download', '7 Erros Fatais');">
+            📥 BAIXAR EBOOK (PDF)
+          </a>
+
+          <p class="td-text-secondary td-mt-md" style="font-size: var(--text-sm);">
+            ✅ Também enviamos uma cópia para seu email
+          </p>
+        </div>
+
+        <!-- Upsell Suave -->
+        <div class="td-depende-box td-mb-lg">
+          <h2 class="td-h2 td-text-white td-mb-md">
+            QUER ACELERAR<br>
+            <span class="td-text-primary">SEUS RESULTADOS?</span>
+          </h2>
+
+          <p class="td-text-white td-text-lg td-mb-md">
+            O eBook é ótimo, mas e se você pudesse ter um plano 100% personalizado?
+          </p>
+
+          <div class="td-grid td-grid-2 td-gap-md td-mb-lg">
+            <div>
+              <h3 class="td-h4 td-text-white td-mb-sm">📚 eBook (O que você tem)</h3>
+              <ul style="color: white; text-align: left;">
+                <li>✅ Informação geral</li>
+                <li>✅ Princípios básicos</li>
+                <li>✅ Dicas genéricas</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="td-h4 td-text-primary td-mb-sm">🎯 Consultoria (Próximo nível)</h3>
+              <ul style="color: white; text-align: left;">
+                <li>✅ Plano 100% personalizado</li>
+                <li>✅ Acompanhamento direto</li>
+                <li>✅ Resultados garantidos</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="td-text-center">
+            <a href="/consultoria/quiz/" class="td-btn td-btn-accent td-btn-lg">
+              QUERO UMA CONSULTA GRATUITA
+            </a>
+            <p class="td-text-white td-mt-sm" style="font-size: var(--text-sm);">
+              Apenas 5 vagas disponíveis este mês
+            </p>
+          </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="td-card">
+          <h3 class="td-h3 td-mb-md">📧 Próximos Passos</h3>
+          <p class="td-mb-md">
+            Nos próximos dias você receberá mais conteúdo exclusivo no seu email:
+          </p>
+
+          <div class="td-grid td-grid-3 td-gap-sm">
+            <div class="td-card td-bg-gray">
+              <strong>Dia 1</strong><br>
+              <span class="td-text-secondary">Guia de Nutrição</span>
+            </div>
+            <div class="td-card td-bg-gray">
+              <strong>Dia 2</strong><br>
+              <span class="td-text-secondary">Treino em Casa</span>
+            </div>
+            <div class="td-card td-bg-gray">
+              <strong>Dia 3</strong><br>
+              <span class="td-text-secondary">Mentalidade</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="../js/td-funnels.js"></script>
+  <script>
+    TDFunnels.Tracking.trackConversion('Lead', 5);
+    TDFunnels.Tracking.trackEvent('Page', 'View', 'eBook Download');
+  </script>
+</body>
+</html>

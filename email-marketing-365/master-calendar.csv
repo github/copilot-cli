@@ -1,0 +1,68 @@
+Week,Day,Date,Sequence,Email_Title,Send_Time,Segment,Priority,Notes
+1,Mon,2025-01-06,Educational,Fundamentos do Treino de Força,09:00,All,High,Semana 1 do ano
+1,Thu,2025-01-09,Engagement,Motivação: Disciplina vs Motivação,19:00,High-engagement,Medium,
+2,Mon,2025-01-13,Educational,Proteína: Quanto Quando Como,09:00,All,High,
+2,Thu,2025-01-16,Engagement,Dica: Técnica Perfeita de Agachamento,19:00,All,Medium,
+3,Mon,2025-01-20,Educational,Mindset de Guerreiro,09:00,All,High,
+3,Thu,2025-01-23,Engagement,Nutrição: Meal Prep Tático,19:00,All,Medium,
+4,Mon,2025-01-27,Educational,Recuperação: O Pilar Esquecido,09:00,All,High,
+4,Thu,2025-01-30,Engagement,História: Pedro de 120kg a 85kg,19:00,All,Medium,
+4,Sat,2025-02-01,Promotional,FEVEREIRO: Especial Carnaval - Cutting,10:00,All,Critical,Promoção mensal
+5,Mon,2025-02-03,Educational,Periodização: O Que É e Por Que Importa,09:00,All,High,
+5,Thu,2025-02-06,Engagement,Motivação: Regra dos 5 Segundos,19:00,High-engagement,Medium,
+6,Mon,2025-02-10,Educational,Técnicas Avançadas: Drop Sets,09:00,Intermediate+,High,
+6,Thu,2025-02-13,Engagement,Dica: 3 Variações de Flexão,19:00,All,Medium,
+7,Mon,2025-02-17,Educational,Nutrição Estratégica: Timing de Carbos,09:00,All,High,
+7,Thu,2025-02-20,Engagement,Nutrição: 5 Lanches Proteicos,19:00,All,Medium,
+8,Mon,2025-02-24,Educational,Progressão Linear vs Não-Linear,09:00,Intermediate+,High,
+8,Thu,2025-02-27,Engagement,História: Ana Superando Lesão,19:00,All,Medium,
+9,Sat,2025-03-01,Promotional,MARÇO: Outono = Bulking Season,10:00,All,Critical,Promoção mensal
+9,Mon,2025-03-03,Educational,Hipertrofia: Ciência dos Ganhos,09:00,All,High,
+9,Thu,2025-03-06,Engagement,Motivação: Superando Plateaus Mentais,19:00,High-engagement,Medium,
+10,Mon,2025-03-10,Educational,Volume Training: Quantas Séries?,09:00,Intermediate+,High,
+10,Thu,2025-03-13,Engagement,Dica: Como Progredir em Pull-ups,19:00,All,Medium,
+11,Mon,2025-03-17,Educational,Nutrição para Bulking,09:00,Bulking-interested,High,
+11,Thu,2025-03-20,Engagement,Nutrição: Hidratação Além da Água,19:00,All,Medium,
+12,Mon,2025-03-24,Educational,Força vs Hipertrofia: Diferenças,09:00,All,High,
+12,Thu,2025-03-27,Engagement,História: Carlos Ironman aos 50,19:00,All,Medium,
+13,Sat,2025-03-29,Seasonal,PÁSCOA: Chocolate vs Gains,10:00,All,Medium,Data especial
+13,Mon,2025-03-31,Educational,Mobilidade e Flexibilidade,09:00,All,High,Fim Q1
+14,Sat,2025-04-05,Promotional,ABRIL: Desafio 30 Dias TD,10:00,All,Critical,Promoção mensal
+14,Mon,2025-04-07,Educational,Treino em Casa: Guia Completo,09:00,Home-gym,High,
+14,Thu,2025-04-10,Engagement,Motivação: Resiliência Marines,19:00,High-engagement,Medium,
+15,Mon,2025-04-14,Educational,Técnicas de Intensificação,09:00,Advanced,High,
+15,Thu,2025-04-17,Engagement,Dica: Drop Sets Quando e Como,19:00,Intermediate+,Medium,
+...
+52,Mon,2025-12-22,Educational,Planejamento 2026: Objetivos SMART,09:00,All,High,Fim de ano
+52,Thu,2025-12-25,Seasonal,NATAL: Mantendo-se Fit nas Festas,10:00,All,High,Data especial
+52,Wed,2025-12-31,Seasonal,RÉVEILLON: Preparação 2026,18:00,All,Critical,Fim do ano
+
+LEGEND:
+- Educational: 1x/semana (segundas 09:00)
+- Engagement: 2x/semana (quintas 19:00)
+- Promotional: 1x/mês (primeiro sábado 10:00)
+- Seasonal: Datas específicas
+- Welcome: Trigger-based (novo lead)
+- Re-engagement: Inactivity-based
+- Cart Abandonment: Behavior-based
+- Post-Purchase: Purchase-based
+
+SEGMENTS:
+- All: Toda a lista
+- High-engagement: Abriu 3+ emails últimos 7 dias
+- Intermediate+: Treina há 6+ meses
+- Advanced: Treina há 2+ anos
+- [Interest]-interested: Expressou interesse no tópico
+
+PRIORITY:
+- Critical: Revenue-generating, não pular
+- High: Core content, manter consistência
+- Medium: Value-add, pode ajustar timing
+- Low: Nice-to-have, pode cancelar se necessário
+
+NOTES:
+- Ajustar datas conforme calendário real
+- Respeitar fusos horários
+- A/B test subject lines
+- Monitor performance semanal
+- Ajustar baseado em engagement

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emagrecimento Rápido - Perca 10kg em 30 Dias</title>
+    <meta name="description" content="Método Militar de Emagrecimento: Perca até 10kg em 30 dias com alimentação flexível e treinos curtos. Resultados comprovados!">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: #0B1220; color: white; }
+        .hero { background: linear-gradient(135deg, #DC2626, #B91C1C); padding: 80px 20px; text-align: center; }
+        .hero h1 { font-size: 3em; margin-bottom: 20px; }
+        .hero-badge { background: #FCD34D; color: #0B1220; padding: 10px 30px; border-radius: 50px; display: inline-block; font-weight: bold; margin-bottom: 20px; }
+        .cta { background: #FCD34D; color: #0B1220; padding: 20px 50px; font-size: 1.3em; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; margin: 20px; transition: all 0.3s; }
+        .cta:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(252, 211, 77, 0.5); }
+        .section { padding: 60px 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h2 { font-size: 2.3em; text-align: center; margin-bottom: 40px; color: #0EA5E9; }
+        .benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .benefit-box { background: #1E293B; padding: 25px; border-radius: 10px; border-top: 4px solid #DC2626; }
+        .price-box { background: linear-gradient(135deg, #DC2626, #B91C1C); padding: 40px; border-radius: 15px; text-align: center; margin: 40px 0; }
+        .price { font-size: 3.5em; font-weight: bold; }
+        .countdown { background: #FCD34D; color: #0B1220; padding: 20px; text-align: center; font-size: 1.5em; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="countdown">⏰ OFERTA EXPIRA EM: <span id="countdown">23:59:47</span></div>
+
+    <div class="hero">
+        <div class="hero-badge">✅ MÉTODO COMPROVADO</div>
+        <h1>PERCA ATÉ 10KG EM 30 DIAS</h1>
+        <p style="font-size: 1.4em; margin: 20px 0;">Sem Dietas Malucas. Sem Fome. Sem Enrolação.</p>
+        <a href="#comprar" class="cta">COMEÇAR AGORA</a>
+    </div>
+
+    <div class="section">
+        <div class="container">
+            <h2>COMO FUNCIONA O MÉTODO</h2>
+            <div class="benefits">
+                <div class="benefit-box">
+                    <h3 style="color: #0EA5E9; margin-bottom: 15px;">🎯 FASE 1: Ataque</h3>
+                    <p>Protocolo de choque para acelerar metabolismo e queimar gordura imediata. Dias 1-7.</p>
+                </div>
+                <div class="benefit-box">
+                    <h3 style="color: #0EA5E9; margin-bottom: 15px;">⚡ FASE 2: Aceleração</h3>
+                    <p>Treinos metabólicos de 20 minutos para maximizar queima. Dias 8-21.</p>
+                </div>
+                <div class="benefit-box">
+                    <h3 style="color: #0EA5E9; margin-bottom: 15px;">🔒 FASE 3: Consolidação</h3>
+                    <p>Manter os resultados e evitar efeito sanfona. Dias 22-30.</p>
+                </div>
+            </div>
+
+            <div class="price-box" id="comprar">
+                <h2 style="color: white; margin-bottom: 20px;">INVESTIMENTO</h2>
+                <p style="text-decoration: line-through; font-size: 1.2em; margin-bottom: 10px;">De R$ 997</p>
+                <div class="price">R$ 197</div>
+                <p style="font-size: 1.1em; margin: 20px 0;">Ou 12x de R$ 19,70</p>
+                <a href="https://wa.me/5511999999999?text=Quero%20o%20Programa%20de%20Emagrecimento%20Rápido!" class="cta">GARANTIR ACESSO AGORA</a>
+                <p style="margin-top: 20px; font-size: 0.9em;">🎁 BÔNUS: E-book de Receitas + Planilha de Controle</p>
+            </div>
+
+            <h2>O QUE VOCÊ RECEBE</h2>
+            <ul style="font-size: 1.1em; list-style: none;">
+                <li>✅ Plano Alimentar Completo de 30 Dias</li>
+                <li>✅ Treinos em Vídeo (20 minutos/dia)</li>
+                <li>✅ Grupo VIP no WhatsApp</li>
+                <li>✅ Suporte Durante Todo o Programa</li>
+                <li>✅ Garantia de 7 Dias (Risco Zero)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let seconds = 86387;
+        setInterval(() => {
+            seconds--;
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            document.getElementById('countdown').textContent =
+                `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }, 1000);
+    </script>
+</body>
+</html>

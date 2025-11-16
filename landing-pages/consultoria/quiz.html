@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Quiz de Avaliação Fitness - Descubra qual estratégia de treino é ideal para você">
+  <title>Quiz de Avaliação | Treinador David</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/td-funnels.css">
+</head>
+<body>
+  <section class="td-section-lg td-bg-gray">
+    <div class="td-container">
+      <div class="td-text-center td-mb-xl">
+        <span class="td-badge td-badge-primary td-badge-lg td-mb-md">
+          📋 AVALIAÇÃO GRATUITA
+        </span>
+        <h1 class="td-h1">
+          DESCUBRA SEU PERFIL<br>
+          <span class="td-text-primary">DE TREINO IDEAL</span>
+        </h1>
+        <p class="td-text-secondary">
+          Responda 6 perguntas rápidas e receba um plano personalizado
+        </p>
+      </div>
+
+      <div id="quiz-container"></div>
+    </div>
+  </section>
+
+  <script src="../js/td-funnels.js"></script>
+  <script>
+    const quizData = {
+      questions: [
+        {
+          id: 'nivel',
+          question: 'Qual seu nível atual de treino?',
+          options: [
+            { value: 'iniciante', label: 'Iniciante', description: 'Nunca treinei ou parei há mais de 1 ano' },
+            { value: 'intermediario', label: 'Intermediário', description: 'Treino há alguns meses, conheço o básico' },
+            { value: 'avancado', label: 'Avançado', description: 'Treino consistentemente há mais de 2 anos' }
+          ]
+        },
+        {
+          id: 'objetivo',
+          question: 'Qual seu objetivo principal?',
+          options: [
+            { value: 'emagrecer', label: 'Perder Peso', description: 'Reduzir gordura corporal' },
+            { value: 'musculo', label: 'Ganhar Músculo', description: 'Hipertrofia e massa muscular' },
+            { value: 'definicao', label: 'Definição', description: 'Perder gordura mantendo músculo' },
+            { value: 'performance', label: 'Performance', description: 'Melhorar desempenho atlético' }
+          ]
+        },
+        {
+          id: 'disponibilidade',
+          question: 'Quantos dias por semana pode treinar?',
+          options: [
+            { value: '2-3', label: '2-3 dias', description: 'Agenda apertada' },
+            { value: '4-5', label: '4-5 dias', description: 'Rotina regular' },
+            { value: '6+', label: '6+ dias', description: 'Total dedicação' }
+          ]
+        },
+        {
+          id: 'local',
+          question: 'Onde pretende treinar?',
+          options: [
+            { value: 'academia', label: 'Academia', description: 'Acesso a equipamento completo' },
+            { value: 'casa', label: 'Em Casa', description: 'Equipamento básico ou peso corporal' },
+            { value: 'ambos', label: 'Ambos', description: 'Flexibilidade total' }
+          ]
+        },
+        {
+          id: 'alimentacao',
+          question: 'Como está sua alimentação atual?',
+          options: [
+            { value: 'ruim', label: 'Preciso Melhorar', description: 'Como mal e sem planejamento' },
+            { value: 'media', label: 'Razoável', description: 'Tento comer bem mas sem consistência' },
+            { value: 'boa', label: 'Boa', description: 'Alimentação saudável e consistente' }
+          ]
+        },
+        {
+          id: 'compromisso',
+          question: 'Está pronto para se comprometer com mudanças?',
+          options: [
+            { value: 'sim', label: 'Totalmente', description: 'Estou 100% comprometido com resultados' },
+            { value: 'talvez', label: 'Preciso de Ajuda', description: 'Quero mas preciso de orientação' },
+            { value: 'explorar', label: 'Ainda Explorando', description: 'Querend saber mais primeiro' }
+          ]
+        }
+      ],
+      redirectUrl: '/consultoria/obrigado/'
+    };
+
+    // Initialize Quiz
+    new TDFunnels.Quiz(quizData, 'quiz-container');
+  </script>
+</body>
+</html>
