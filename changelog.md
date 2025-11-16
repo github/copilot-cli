@@ -1,3 +1,11 @@
+## 0.0.358 - 2025-11-14
+
+Recovery release to fix availability of GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini models.
+
+## 0.0.357 - 2025-11-13
+
+Recovery release to fix an issue with image resizing.
+
 ## 0.0.356 - 2025-11-13
 
 - GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini are now available in GitHub Copilot CLI. See the [GitHub Changelog](https://github.blog/changelog/2025-11-13-openais-gpt-5-1-gpt-5-1-codex-and-gpt-5-1-codex-mini-are-now-in-public-preview-for-github-copilot/) for more details
