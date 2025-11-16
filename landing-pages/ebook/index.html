@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="eBook Grátis: 7 Erros que Matam Seus Resultados no Treino">
+  <title>eBook Grátis: 7 Erros Fatais | Treinador David</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/td-funnels.css">
+</head>
+<body>
+  <section class="td-section-xl">
+    <div class="td-container">
+      <div class="td-grid td-grid-2 td-gap-xl" style="align-items: center;">
+        <!-- Left: eBook Cover -->
+        <div class="td-text-center">
+          <img src="https://placehold.co/400x600/0B1220/0EA5E9?text=7+Erros+Fatais&font=oswald"
+               alt="eBook 7 Erros Fatais"
+               style="max-width: 400px; width: 100%; box-shadow: var(--shadow-xl); border-radius: 8px;">
+        </div>
+
+        <!-- Right: Opt-in Form -->
+        <div>
+          <span class="td-badge td-badge-accent td-badge-lg td-mb-md">
+            📚 EBOOK GRATUITO
+          </span>
+
+          <h1 class="td-h1 td-mb-md">
+            7 ERROS QUE MATAM<br>
+            <span class="td-text-primary">SEUS RESULTADOS</span>
+          </h1>
+
+          <p class="td-text-lg td-mb-lg">
+            Descubra os erros mais comuns que impedem você de alcançar o corpo que deseja
+            – e como evitá-los.
+          </p>
+
+          <div class="td-card td-mb-lg">
+            <h3 class="td-h3 td-mb-md">Neste eBook você vai aprender:</h3>
+            <ul style="list-style: none; padding: 0;">
+              <li class="td-mb-sm">✅ Por que 90% das pessoas falham no treino</li>
+              <li class="td-mb-sm">✅ Os 7 erros mais comuns (e como corrigir)</li>
+              <li class="td-mb-sm">✅ Como criar um plano de treino eficaz</li>
+              <li class="td-mb-sm">✅ Nutrição: o que realmente importa</li>
+              <li class="td-mb-sm">✅ Mentalidade de sucesso no fitness</li>
+              <li class="td-mb-sm">✅ Bônus: Checklist de treino perfeito</li>
+            </ul>
+          </div>
+
+          <form id="ebook-opt-in-form"
+                action="https://treinadordavid.pt/wp-json/td/v1/ebook-optin"
+                method="POST"
+                data-form-type="eBook Opt-in"
+                data-redirect="/ebook/download/">
+
+            <div class="td-form-group">
+              <input type="text"
+                     name="name"
+                     class="td-input"
+                     required
+                     placeholder="Seu Nome">
+            </div>
+
+            <div class="td-form-group">
+              <input type="email"
+                     name="email"
+                     class="td-input"
+                     required
+                     placeholder="Seu Melhor Email">
+            </div>
+
+            <button type="submit" class="td-btn td-btn-accent td-btn-lg td-btn-full td-pulse">
+              BAIXAR EBOOK GRÁTIS
+            </button>
+
+            <p class="td-text-center td-text-secondary td-mt-sm" style="font-size: var(--text-xs);">
+              🔒 100% privado. Sem spam. Cancele quando quiser.
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof Section -->
+  <section class="td-section td-bg-gray">
+    <div class="td-container">
+      <h2 class="td-h2 td-text-center td-mb-xl">
+        MAIS DE <span class="td-text-primary">5.000 PESSOAS</span><br>
+        JÁ BAIXARAM ESTE EBOOK
+      </h2>
+
+      <div class="td-grid td-grid-3 td-gap-md">
+        <div class="td-testimonial">
+          <p class="td-testimonial-quote">
+            "Finalmente entendi onde estava errando! Este eBook mudou completamente minha abordagem ao treino."
+          </p>
+          <div class="td-testimonial-author">
+            <img src="https://i.pravatar.cc/150?img=15" alt="Carlos" class="td-testimonial-avatar">
+            <div>
+              <div class="td-testimonial-name">Carlos M.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="td-testimonial">
+          <p class="td-testimonial-quote">
+            "Conteúdo direto e sem enrolação. Exatamente o que eu precisava. Recomendo!"
+          </p>
+          <div class="td-testimonial-author">
+            <img src="https://i.pravatar.cc/150?img=25" alt="Sofia" class="td-testimonial-avatar">
+            <div>
+              <div class="td-testimonial-name">Sofia R.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="td-testimonial">
+          <p class="td-testimonial-quote">
+            "Um eBook que realmente vale a pena. Informação de qualidade, não enrolação."
+          </p>
+          <div class="td-testimonial-author">
+            <img src="https://i.pravatar.cc/150?img=35" alt="Miguel" class="td-testimonial-avatar">
+            <div>
+              <div class="td-testimonial-name">Miguel S.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="../js/td-funnels.js"></script>
+  <script>
+    new TDFunnels.FormValidator('ebook-opt-in-form');
+    TDFunnels.Tracking.trackEvent('Page', 'View', 'eBook Opt-in');
+  </script>
+</body>
+</html>

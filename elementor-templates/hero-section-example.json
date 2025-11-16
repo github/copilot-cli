@@ -1,0 +1,152 @@
+{
+  "version": "1.0",
+  "title": "TD Hero Section - Personal Training",
+  "type": "section",
+  "content": {
+    "elType": "section",
+    "settings": {
+      "layout": "boxed",
+      "content_width": {
+        "unit": "px",
+        "size": 1200
+      },
+      "gap": "default",
+      "height": "min-height",
+      "custom_height": {
+        "unit": "vh",
+        "size": 100
+      },
+      "background_background": "video",
+      "background_video_link": "https://treinadordavid.pt/videos/td-hero-bg.mp4",
+      "background_video_fallback": {
+        "url": "https://treinadordavid.pt/images/hero-fallback.jpg"
+      },
+      "background_overlay_background": "gradient",
+      "background_overlay_color": "rgba(11,18,32,0.95)",
+      "background_overlay_color_stop": {
+        "size": 0
+      },
+      "background_overlay_color_b": "rgba(14,165,233,0.8)",
+      "background_overlay_color_b_stop": {
+        "size": 100
+      },
+      "background_overlay_gradient_angle": {
+        "unit": "deg",
+        "size": 135
+      }
+    },
+    "elements": [
+      {
+        "elType": "column",
+        "settings": {
+          "_column_size": 100,
+          "content_position": "middle"
+        },
+        "elements": [
+          {
+            "elType": "widget",
+            "widgetType": "heading",
+            "settings": {
+              "title": "TRANSFORME SEU CORPO<br><span style=\"color:#0EA5E9\">MÉTODO MILITAR</span>",
+              "header_size": "h1",
+              "typography_typography": "custom",
+              "typography_font_family": "Oswald",
+              "typography_font_size": {
+                "unit": "px",
+                "size": 60
+              },
+              "typography_font_weight": "700",
+              "typography_text_transform": "uppercase",
+              "typography_letter_spacing": {
+                "unit": "em",
+                "size": 0.05
+              },
+              "align": "center",
+              "text_color": "#FFFFFF",
+              "_animation": "fadeInUp",
+              "_animation_delay": 100,
+              "_css_classes": "td-hero-title"
+            }
+          },
+          {
+            "elType": "widget",
+            "widgetType": "text-editor",
+            "settings": {
+              "editor": "<p>Personal Training de elite com ex-Marine USMC.<br>Resultados garantidos. Disciplina. Honra. Transformação.</p>",
+              "typography_typography": "custom",
+              "typography_font_family": "Inter",
+              "typography_font_size": {
+                "unit": "px",
+                "size": 20
+              },
+              "align": "center",
+              "text_color": "#FFFFFF",
+              "_animation": "fadeInUp",
+              "_animation_delay": 300
+            }
+          },
+          {
+            "elType": "widget",
+            "widgetType": "button",
+            "settings": {
+              "text": "QUERO MINHA TRANSFORMAÇÃO",
+              "link": {
+                "url": "#captura-form",
+                "is_external": false
+              },
+              "size": "lg",
+              "typography_typography": "custom",
+              "typography_font_family": "Oswald",
+              "typography_font_size": {
+                "unit": "px",
+                "size": 20
+              },
+              "typography_font_weight": "700",
+              "typography_text_transform": "uppercase",
+              "button_background_color": "#0EA5E9",
+              "button_text_color": "#FFFFFF",
+              "border_radius": {
+                "unit": "px",
+                "size": 4
+              },
+              "button_box_shadow_box_shadow": "yes",
+              "button_box_shadow_box_shadow_type": "yes",
+              "button_box_shadow_horizontal": {
+                "unit": "px",
+                "size": 0
+              },
+              "button_box_shadow_vertical": {
+                "unit": "px",
+                "size": 4
+              },
+              "button_box_shadow_blur": {
+                "unit": "px",
+                "size": 6
+              },
+              "button_box_shadow_color": "rgba(0,0,0,0.1)",
+              "hover_animation": "pulse",
+              "align": "center",
+              "_animation": "fadeInUp",
+              "_animation_delay": 500,
+              "_css_classes": "td-btn td-btn-primary td-btn-lg td-pulse"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "page_settings": [],
+  "status": "publish",
+  "metadata": {
+    "created_by": "Treinador David",
+    "created_date": "2024-11-16",
+    "version": "1.0",
+    "license": "Proprietary",
+    "description": "Hero section com vídeo de fundo estilo militar para Personal Training"
+  },
+  "instructions": {
+    "installation": "1. WordPress Admin → Templates → Import Template\n2. Upload this JSON file\n3. Edit text and links as needed",
+    "customization": "1. Change video URL in background settings\n2. Edit heading text\n3. Update button link\n4. Adjust colors if needed (use global colors)",
+    "notes": "- Video should be <10MB for performance\n- Use YouTube/Vimeo for longer videos\n- Test on mobile devices\n- Enable lazy loading"
+  }
+}

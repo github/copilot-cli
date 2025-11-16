@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obrigado | Treinador David</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/td-funnels.css">
+</head>
+<body>
+  <section class="td-hero" style="min-height: 100vh;">
+    <div class="td-hero-overlay" style="background: linear-gradient(135deg, rgba(11, 18, 32, 0.95), rgba(14, 165, 233, 0.9));"></div>
+
+    <div class="td-container">
+      <div class="td-hero-content">
+        <div class="td-mb-lg">
+          <span class="td-badge td-badge-accent td-badge-lg">
+            ✅ REGISTRO CONFIRMADO
+          </span>
+        </div>
+
+        <h1 class="td-hero-title td-fade-in">
+          OBRIGADO!<br>
+          <span class="td-text-primary">PRÓXIMO PASSO...</span>
+        </h1>
+
+        <div class="td-card" style="max-width: 800px; margin: 0 auto; text-align: left;">
+          <h2 class="td-h2 td-mb-md">Assista Este Vídeo Importante</h2>
+
+          <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-bottom: var(--spacing-lg);">
+            <iframe
+              id="welcome-video"
+              data-video-name="Welcome Video"
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+              src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+              frameborder="0"
+              allowfullscreen>
+            </iframe>
+          </div>
+
+          <div class="td-depende-box td-mb-lg">
+            <h3 class="td-h3 td-text-white td-mb-md">📧 Verifique Seu Email</h3>
+            <p class="td-text-white">
+              Nos próximos 3 dias, você receberá:
+            </p>
+            <ul style="text-align: left; margin: var(--spacing-md) 0; color: white;">
+              <li>✅ Dia 1: Guia de Nutrição Tática</li>
+              <li>✅ Dia 2: Os 5 Maiores Erros no Treino</li>
+              <li>✅ Dia 3: Como Ganhar Músculo Depois dos 40</li>
+            </ul>
+          </div>
+
+          <div class="td-text-center">
+            <a href="/consultoria/agendar/" class="td-btn td-btn-primary td-btn-lg td-pulse">
+              AGENDAR CONSULTA GRATUITA
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="../js/td-funnels.js"></script>
+  <script>
+    // Track thank you page view
+    TDFunnels.Tracking.trackConversion('Lead', 10);
+    TDFunnels.Tracking.trackEvent('Page', 'View', 'Thank You - Consultoria');
+
+    // Initialize video tracking
+    new TDFunnels.VideoPlayer('welcome-video');
+  </script>
+</body>
+</html>
