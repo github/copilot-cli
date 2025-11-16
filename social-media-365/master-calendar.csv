@@ -1,0 +1,48 @@
+Date,Day,Week,Theme,IG_Feed_Type,IG_Feed_ID,IG_Stories_AM,IG_Stories_PM,IG_Reel,FB_Post,FB_Group,LinkedIn,TikTok,Twitter_AM,Twitter_PM,Pinterest,YouTube,Content_Mix,Post_Time_BR,Engagement_Tactic
+2025-01-01,Wed,1,Motivação/Ano Novo,Carrossel,IG-001,Story-001,Story-002,,,,,,,Tweet-001,Tweet-002,,,Motivacional,09:00,Poll + Question
+2025-01-02,Thu,1,Educação/Ciência,Carrossel,IG-002,Story-003,Story-004,,FB-002,,,,,Tweet-003,Tweet-004,,,Educacional,10:00,Quiz interativo
+2025-01-03,Fri,1,Comunidade,Single,IG-003,Story-005,Story-006,,FB-003,,,TT-001,,Tweet-005,Tweet-006,Pin-001,,Entretenimento,18:00,Behind scenes
+2025-01-04,Sat,1,Lifestyle/Recuperação,Infográfico,IG-004,Story-007,Story-008,Reel-001,FB-004,,,,,Tweet-007,Tweet-008,,,Educacional,11:00,Save this
+2025-01-05,Sun,1,Inspiração/Stories,Quote,IG-005,Story-009,Story-010,,FB-005,,,,,Tweet-009,Tweet-010,,,Motivacional,19:00,Share your story
+2025-01-06,Mon,2,Motivação/Mindset,Carrossel,IG-006,Story-011,Story-012,,FB-006,,LI-001,,,Tweet-011,Tweet-012,,,Motivacional,07:00,Morning motivation
+2025-01-07,Tue,2,Treino/Exercícios,Carrossel,IG-007,Story-013,Story-014,Reel-002,FB-007,,,,,Tweet-013,Tweet-014,,,Educacional,10:00,Try this workout
+2025-01-08,Wed,2,Treino/Exercícios,Single,IG-008,Story-015,Story-016,,FB-008,,,TT-002,,Tweet-015,Tweet-016,Pin-002,,Educacional,09:00,Form check
+2025-01-09,Thu,2,Educação/Ciência,Carrossel,IG-009,Story-017,Story-018,,FB-009,,,,,Tweet-017,Tweet-018,,,Educacional,10:00,Science fact
+2025-01-10,Fri,2,Comunidade/Engagement,Quote,IG-010,Story-019,Story-020,,FB-010,Group-001,,,,Tweet-019,Tweet-020,,,Entretenimento,18:00,Tag someone
+2025-01-11,Sat,2,Lifestyle/Recuperação,Infográfico,IG-011,Story-021,Story-022,Reel-003,FB-011,,,,,Tweet-021,Tweet-022,Pin-003,,Educacional,11:00,Weekend recovery
+2025-01-12,Sun,2,Inspiração/Stories,Carrossel,IG-012,Story-023,Story-024,,FB-012,,,TT-003,YouTube-001,Tweet-023,Tweet-024,,,Motivacional,19:00,Sunday reflection
+2025-01-13,Mon,3,Motivação/Mindset,Single,IG-013,Story-025,Story-026,,FB-013,,LI-002,,,Tweet-025,Tweet-026,,,Motivacional,07:00,Monday mindset
+2025-01-14,Tue,3,Treino/Exercícios,Carrossel,IG-014,Story-027,Story-028,Reel-004,FB-014,,,,,Tweet-027,Tweet-028,,,Educacional,10:00,Progressive overload
+2025-01-15,Wed,3,Treino/Exercícios,Carrossel,IG-015,Story-029,Story-030,,FB-015,,,TT-004,,Tweet-029,Tweet-030,Pin-004,,Educacional,09:00,Exercise demo
+2025-01-16,Thu,3,Educação/Ciência,Infográfico,IG-016,Story-031,Story-032,,FB-016,,,,,Tweet-031,Tweet-032,,,Educacional,10:00,Myth busting
+2025-01-17,Fri,3,Comunidade/Engagement,Quote,IG-017,Story-033,Story-034,,FB-017,Group-002,,,,Tweet-033,Tweet-034,,,Entretenimento,18:00,Friday feels
+2025-01-18,Sat,3,Lifestyle/Recuperação,Single,IG-018,Story-035,Story-036,Reel-005,FB-018,,,,,Tweet-035,Tweet-036,Pin-005,,Educacional,11:00,Rest day wisdom
+2025-01-19,Sun,3,Inspiração/Stories,Carrossel,IG-019,Story-037,Story-038,,FB-019,,,TT-005,YouTube-002,Tweet-037,Tweet-038,,,Motivacional,19:00,Transformation story
+2025-01-20,Mon,4,Motivação/Mindset,Carrossel,IG-020,Story-039,Story-040,,FB-020,,LI-003,,,Tweet-039,Tweet-040,,,Motivacional,07:00,Mental toughness
+2025-01-21,Tue,4,Treino/Exercícios,Single,IG-021,Story-041,Story-042,Reel-006,FB-021,,,,,Tweet-041,Tweet-042,,,Educacional,10:00,Leg day
+2025-01-22,Wed,4,Treino/Exercícios,Carrossel,IG-022,Story-043,Story-044,,FB-022,,,TT-006,,Tweet-043,Tweet-044,Pin-006,,Educacional,09:00,Upper body
+2025-01-23,Thu,4,Educação/Ciência,Infográfico,IG-023,Story-045,Story-046,,FB-023,,,,,Tweet-045,Tweet-046,,,Educacional,10:00,Recovery science
+2025-01-24,Fri,4,Comunidade/Engagement,Quote,IG-024,Story-047,Story-048,,FB-024,Group-003,,,,Tweet-047,Tweet-048,,,Entretenimento,18:00,Community wins
+2025-01-25,Sat,4,Lifestyle/Recuperação,Carrossel,IG-025,Story-049,Story-050,Reel-007,FB-025,,,,,Tweet-049,Tweet-050,Pin-007,,Educacional,11:00,Sleep optimization
+2025-01-26,Sun,4,Inspiração/Stories,Single,IG-026,Story-051,Story-052,,FB-026,,,TT-007,YouTube-003,Tweet-051,Tweet-052,,,Motivacional,19:00,Sunday motivation
+2025-01-27,Mon,5,Motivação/Mindset,Carrossel,IG-027,Story-053,Story-054,,FB-027,,LI-004,,,Tweet-053,Tweet-054,,,Motivacional,07:00,Discipline over motivation
+2025-01-28,Tue,5,Treino/Exercícios,Carrossel,IG-028,Story-055,Story-056,Reel-008,FB-028,,,,,Tweet-055,Tweet-056,,,Educacional,10:00,Push day
+2025-01-29,Wed,5,Treino/Exercícios,Infográfico,IG-029,Story-057,Story-058,,FB-029,,,TT-008,,Tweet-057,Tweet-058,Pin-008,,Educacional,09:00,Pull day
+2025-01-30,Thu,5,Educação/Ciência,Carrossel,IG-030,Story-059,Story-060,,FB-030,,,,,Tweet-059,Tweet-060,,,Educacional,10:00,Muscle hypertrophy
+2025-01-31,Fri,5,Comunidade/Engagement,Quote,IG-031,Story-061,Story-062,,FB-031,Group-004,,,,Tweet-061,Tweet-062,,,Entretenimento,18:00,January recap
+2025-02-01,Sat,5,Lifestyle/Recuperação,Single,IG-032,Story-063,Story-064,Reel-009,FB-032,,,,,Tweet-063,Tweet-064,Pin-009,,Educacional,11:00,Active recovery
+2025-02-02,Sun,5,Inspiração/Stories,Carrossel,IG-033,Story-065,Story-066,,FB-033,,,TT-009,YouTube-004,Tweet-065,Tweet-066,,,Motivacional,19:00,February goals
+2025-02-03,Mon,6,Motivação/Mindset,Single,IG-034,Story-067,Story-068,,FB-034,,LI-005,,,Tweet-067,Tweet-068,,,Motivacional,07:00,Monday warrior
+2025-02-04,Tue,6,Treino/Exercícios,Carrossel,IG-035,Story-069,Story-070,Reel-010,FB-035,,,,,Tweet-069,Tweet-070,,,Educacional,10:00,Core training
+2025-02-05,Wed,6,Treino/Exercícios,Carrossel,IG-036,Story-071,Story-072,,FB-036,,,TT-010,,Tweet-071,Tweet-072,Pin-010,,Educacional,09:00,Functional fitness
+2025-02-06,Thu,6,Educação/Ciência,Infográfico,IG-037,Story-073,Story-074,,FB-037,,,,,Tweet-073,Tweet-074,,,Educacional,10:00,DEPENDE science
+2025-02-07,Fri,6,Comunidade/Engagement,Quote,IG-038,Story-075,Story-076,,FB-038,Group-005,,,,Tweet-075,Tweet-076,,,Entretenimento,18:00,Wins this week
+2025-02-08,Sat,6,Lifestyle/Recuperação,Carrossel,IG-039,Story-077,Story-078,Reel-011,FB-039,,,,,Tweet-077,Tweet-078,Pin-011,,Educacional,11:00,Mobility work
+2025-02-09,Sun,6,Inspiração/Stories,Single,IG-040,Story-079,Story-080,,FB-040,,,TT-011,YouTube-005,Tweet-079,Tweet-080,,,Motivacional,19:00,USMC mindset
+2025-02-10,Mon,7,Motivação/Mindset,Carrossel,IG-041,Story-081,Story-082,,FB-041,,LI-006,,,Tweet-081,Tweet-082,,,Motivacional,07:00,Embrace the suck
+2025-02-11,Tue,7,Treino/Exercícios,Carrossel,IG-042,Story-083,Story-084,Reel-012,FB-042,,,,,Tweet-083,Tweet-084,,,Educacional,10:00,Strength training
+2025-02-12,Wed,7,Treino/Exercícios,Infográfico,IG-043,Story-085,Story-086,,FB-043,,,TT-012,,Tweet-085,Tweet-086,Pin-012,,Educacional,09:00,Cardio variations
+2025-02-13,Thu,7,Educação/Ciência,Carrossel,IG-044,Story-087,Story-088,,FB-044,,,,,Tweet-087,Tweet-088,,,Educacional,10:00,Training frequency
+2025-02-14,Fri,7,Comunidade/Engagement,Quote,IG-045,Story-089,Story-090,,FB-045,Group-006,,,,Tweet-089,Tweet-090,,,Motivacional,18:00,Love your process
+2025-02-15,Sat,7,Lifestyle/Recuperação,Single,IG-046,Story-091,Story-092,Reel-013,FB-046,,,,,Tweet-091,Tweet-092,Pin-013,,Educacional,11:00,Stretching guide
+2025-02-16,Sun,7,Inspiração/Stories,Carrossel,IG-047,Story-093,Story-094,,FB-047,,,TT-013,YouTube-006,Tweet-093,Tweet-094,,,Motivacional,19:00,Overcome obstacles

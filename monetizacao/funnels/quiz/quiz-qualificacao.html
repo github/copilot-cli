@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Qualificação - Treinador David</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0B1220 0%, #0EA5E9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: #FFFFFF;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+            padding: 50px;
+        }
+
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 36px;
+            color: #0B1220;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #0EA5E9;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #0EA5E9;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            color: #0B1220;
+            margin-bottom: 25px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #F8F9FA;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .option:hover {
+            background: #E5E7EB;
+            border-color: #0EA5E9;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #0EA5E9;
+            border-color: #0EA5E9;
+            color: #FFFFFF;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next {
+            background: #0EA5E9;
+            color: #FFFFFF;
+            flex: 1;
+        }
+
+        .btn-next:hover {
+            background: #0284C7;
+            transform: translateY(-2px);
+        }
+
+        .btn-prev {
+            background: #E5E7EB;
+            color: #0B1220;
+            padding: 15px 25px;
+        }
+
+        .btn-prev:hover {
+            background: #D1D5DB;
+        }
+
+        .result {
+            display: none;
+            text-align: center;
+        }
+
+        .result.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .result h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 32px;
+            color: #0B1220;
+            margin-bottom: 20px;
+        }
+
+        .result p {
+            font-size: 18px;
+            color: #4B5563;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .recommendation {
+            background: #F8F9FA;
+            border-left: 4px solid #0EA5E9;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .recommendation h3 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            color: #0EA5E9;
+            margin-bottom: 15px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #0EA5E9;
+            color: #FFFFFF;
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+            padding: 20px 50px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .cta-button:hover {
+            background: #0284C7;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);
+        }
+
+        .signature {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            color: #0EA5E9;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .question h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>DESCUBRA SEU PROGRAMA IDEAL</h1>
+        <p class="subtitle">Responda 7 perguntas rápidas. Leva menos de 2 minutos.</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Question 1 -->
+        <div class="question active" data-question="1">
+            <h2>1. Qual é seu objetivo principal?</h2>
+            <div class="options">
+                <div class="option" data-value="perder-peso">🔥 Perder gordura e definir o corpo</div>
+                <div class="option" data-value="ganhar-massa">💪 Ganhar massa muscular</div>
+                <div class="option" data-value="condicionamento">⚡ Melhorar condicionamento físico</div>
+                <div class="option" data-value="reabilitacao">🩹 Reabilitação/volta ao treino</div>
+            </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question" data-question="2">
+            <h2>2. Qual seu nível de experiência com treino?</h2>
+            <div class="options">
+                <div class="option" data-value="iniciante">Iniciante (nunca treinei sério)</div>
+                <div class="option" data-value="intermediario">Intermediário (treino há menos de 2 anos)</div>
+                <div class="option" data-value="avancado">Avançado (treino há mais de 2 anos)</div>
+                <div class="option" data-value="atleta">Atleta/competidor</div>
+            </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question" data-question="3">
+            <h2>3. Quantos dias por semana você pode treinar?</h2>
+            <div class="options">
+                <div class="option" data-value="2-3">2-3 dias (horários limitados)</div>
+                <div class="option" data-value="4-5">4-5 dias (boa disponibilidade)</div>
+                <div class="option" data-value="6-7">6-7 dias (máxima dedicação)</div>
+            </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question" data-question="4">
+            <h2>4. Onde você prefere treinar?</h2>
+            <div class="options">
+                <div class="option" data-value="casa">Em casa (equipamento mínimo)</div>
+                <div class="option" data-value="academia">Academia completa</div>
+                <div class="option" data-value="flexivel">Tanto faz (me adapto)</div>
+            </div>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="question" data-question="5">
+            <h2>5. Quanto de atenção individual você precisa?</h2>
+            <div class="options">
+                <div class="option" data-value="grupo">Posso seguir programa genérico e comunidade me basta</div>
+                <div class="option" data-value="hibrido">Quero programa personalizado mas suporte em grupo tá bom</div>
+                <div class="option" data-value="individual">Preciso de atenção 100% individual e personalizada</div>
+            </div>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="question" data-question="6">
+            <h2>6. Qual sua situação financeira para investir em coaching?</h2>
+            <div class="options">
+                <div class="option" data-value="economico">Até R$ 100/mês (orçamento apertado)</div>
+                <div class="option" data-value="moderado">R$ 100-300/mês (razoável)</div>
+                <div class="option" data-value="premium">R$ 300-500/mês (posso investir no melhor)</div>
+                <div class="option" data-value="vip">Acima de R$ 500/mês (quero resultado máximo)</div>
+            </div>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="question" data-question="7">
+            <h2>7. Qual prazo você considera realista para ver resultados?</h2>
+            <div class="options">
+                <div class="option" data-value="urgente">30 dias (tenho um evento importante)</div>
+                <div class="option" data-value="rapido">3 meses (quero resultados visíveis logo)</div>
+                <div class="option" data-value="sustentavel">6-12 meses (transformação completa e duradoura)</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-prev" id="btnPrev" style="display: none;">← Anterior</button>
+            <button class="btn-next" id="btnNext" disabled>Próxima →</button>
+        </div>
+
+        <!-- Results -->
+        <div class="result" id="resultPersonal">
+            <h2>✅ RECOMENDAÇÃO: CONSULTORIA PERSONAL 1-ON-1</h2>
+            <p>Baseado nas suas respostas, você precisa de <strong>atenção individualizada e programa 100% personalizado</strong>.</p>
+
+            <div class="recommendation">
+                <h3>Por que Personal Training 1-on-1 é ideal para você:</h3>
+                <p style="margin-bottom: 15px;">✓ Treino adaptado às suas necessidades específicas<br>
+                ✓ Ajustes constantes baseados na sua evolução<br>
+                ✓ Suporte direto via WhatsApp<br>
+                ✓ 4 sessões de acompanhamento mensal<br>
+                ✓ Plano nutricional customizado</p>
+                <p style="font-family: 'Oswald', sans-serif; font-size: 20px; color: #0EA5E9; margin-top: 20px;">
+                    Investimento: R$ 497/mês
+                </p>
+            </div>
+
+            <a href="/consultoria-personal-training" class="cta-button">AGENDAR CONSULTORIA GRATUITA →</a>
+
+            <p class="signature">Semper Fidelis<br>— Treinador David</p>
+        </div>
+
+        <div class="result" id="resultGroup">
+            <h2>✅ RECOMENDAÇÃO: PROGRAMA ONLINE GROUP</h2>
+            <p>Baseado nas suas respostas, você vai <strong>se dar muito bem em comunidade com treinos estruturados</strong>.</p>
+
+            <div class="recommendation">
+                <h3>Por que Programa Group é ideal para você:</h3>
+                <p style="margin-bottom: 15px;">✓ Treinos semanais profissionais<br>
+                ✓ Comunidade motivadora<br>
+                ✓ Lives semanais para tirar dúvidas<br>
+                ✓ Custo-benefício excelente<br>
+                ✓ Flexibilidade para treinar onde quiser</p>
+                <p style="font-family: 'Oswald', sans-serif; font-size: 20px; color: #0EA5E9; margin-top: 20px;">
+                    Investimento: R$ 97/mês
+                </p>
+            </div>
+
+            <a href="/programa-online-group" class="cta-button">ENTRAR NO PELOTÃO →</a>
+
+            <p class="signature">Semper Fidelis<br>— Treinador David</p>
+        </div>
+
+        <div class="result" id="resultDesafio">
+            <h2>✅ RECOMENDAÇÃO: DESAFIO 30 DIAS ABS</h2>
+            <p>Baseado nas suas respostas, você precisa de um <strong>kickstart intenso e com prazo definido</strong>.</p>
+
+            <div class="recommendation">
+                <h3>Por que Desafio 30 Dias é ideal para você:</h3>
+                <p style="margin-bottom: 15px;">✓ Programa intensivo focado em resultados rápidos<br>
+                ✓ 30 treinos progressivos já planejados<br>
+                ✓ Plano nutricional incluso<br>
+                ✓ Comunidade de apoio exclusiva<br>
+                ✓ Investimento único (não é mensalidade)</p>
+                <p style="font-family: 'Oswald', sans-serif; font-size: 20px; color: #0EA5E9; margin-top: 20px;">
+                    Investimento: R$ 197 (pagamento único)
+                </p>
+            </div>
+
+            <a href="/desafio-30-dias-abs" class="cta-button">ACEITAR O DESAFIO →</a>
+
+            <p class="signature">Semper Fidelis<br>— Treinador David</p>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        const totalQuestions = 7;
+        const answers = {};
+
+        const progressFill = document.getElementById('progressFill');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            progressFill.style.width = progress + '%';
+        }
+
+        // Handle option selection
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const question = this.closest('.question');
+                const questionNumber = question.dataset.question;
+
+                // Remove selected from siblings
+                question.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+
+                // Add selected to clicked
+                this.classList.add('selected');
+
+                // Store answer
+                answers[questionNumber] = this.dataset.value;
+
+                // Enable next button
+                btnNext.disabled = false;
+            });
+        });
+
+        // Next button
+        btnNext.addEventListener('click', function() {
+            if (currentQuestion < totalQuestions) {
+                document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.remove('active');
+                currentQuestion++;
+                document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.add('active');
+
+                // Check if current question already has answer
+                if (answers[currentQuestion]) {
+                    btnNext.disabled = false;
+                } else {
+                    btnNext.disabled = true;
+                }
+
+                btnPrev.style.display = 'block';
+                updateProgress();
+            } else {
+                // Show results
+                showResults();
+            }
+
+            if (currentQuestion === totalQuestions) {
+                btnNext.textContent = 'Ver Resultado →';
+            }
+        });
+
+        // Previous button
+        btnPrev.addEventListener('click', function() {
+            if (currentQuestion > 1) {
+                document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.remove('active');
+                currentQuestion--;
+                document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.add('active');
+
+                btnNext.disabled = false;
+                btnNext.textContent = 'Próxima →';
+
+                if (currentQuestion === 1) {
+                    btnPrev.style.display = 'none';
+                }
+
+                updateProgress();
+            }
+        });
+
+        // Calculate and show results
+        function showResults() {
+            // Hide all questions and buttons
+            document.querySelectorAll('.question').forEach(q => q.style.display = 'none');
+            document.querySelector('.buttons').style.display = 'none';
+            document.querySelector('.progress-bar').style.display = 'none';
+            document.querySelector('h1').textContent = 'SEU RESULTADO';
+            document.querySelector('.subtitle').textContent = 'Análise completa baseada nas suas respostas:';
+
+            // Logic to determine recommendation
+            let recommendation = 'group'; // default
+
+            // If wants individual attention or high budget -> Personal
+            if (answers['5'] === 'individual' || answers['6'] === 'premium' || answers['6'] === 'vip') {
+                recommendation = 'personal';
+            }
+
+            // If urgent timeline -> Desafio
+            if (answers['7'] === 'urgente') {
+                recommendation = 'desafio';
+            }
+
+            // If low budget -> Group
+            if (answers['6'] === 'economico') {
+                recommendation = 'group';
+            }
+
+            // If advanced athlete with high budget -> Personal
+            if ((answers['2'] === 'avancado' || answers['2'] === 'atleta') && answers['6'] !== 'economico') {
+                recommendation = 'personal';
+            }
+
+            // Show appropriate result
+            if (recommendation === 'personal') {
+                document.getElementById('resultPersonal').classList.add('active');
+            } else if (recommendation === 'desafio') {
+                document.getElementById('resultDesafio').classList.add('active');
+            } else {
+                document.getElementById('resultGroup').classList.add('active');
+            }
+
+            // Send data to backend (if integrated)
+            sendQuizData(answers, recommendation);
+        }
+
+        // Send quiz data to backend
+        function sendQuizData(answers, recommendation) {
+            // This would integrate with your email marketing/CRM
+            fetch('/wp-json/td/v1/quiz-submission', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    answers: answers,
+                    recommendation: recommendation,
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(error => {
+                console.log('Quiz data:', answers, recommendation);
+            });
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

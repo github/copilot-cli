@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Tracking e Analytics de Conversão</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #0B1220, #1E293B); color: #F8FAFC; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; background: #1E293B; padding: 40px; border-radius: 15px; }
+        h1 { color: #0EA5E9; text-align: center; font-size: 3em; margin-bottom: 20px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }
+        .metric-card { background: linear-gradient(135deg, #334155, #475569); padding: 30px; border-radius: 10px; border-left: 5px solid; text-align: center; }
+        .metric-card.green { border-left-color: #10B981; }
+        .metric-card.blue { border-left-color: #0EA5E9; }
+        .metric-card.yellow { border-left-color: #FBBF24; }
+        .metric-card.red { border-left-color: #DC2626; }
+        .metric-number { font-size: 3em; font-weight: bold; margin: 15px 0; }
+        .metric-label { color: #94A3B8; font-size: 1.1em; }
+        .section { background: #334155; padding: 30px; margin: 25px 0; border-radius: 10px; }
+        .code-block { background: #0B1220; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 15px 0; }
+        .code-block code { color: #10B981; font-family: 'Courier New', monospace; }
+        .funnel-visual { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+        .funnel-stage { background: linear-gradient(90deg, #0EA5E9, #0284C7); padding: 20px; border-radius: 8px; text-align: center; position: relative; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #1E293B; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #475569; }
+        th { background: #0EA5E9; color: white; font-weight: bold; }
+        tr:hover { background: #334155; }
+        .chart-placeholder { background: #1E293B; height: 300px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94A3B8; font-size: 1.2em; margin: 20px 0; border: 2px dashed #475569; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 SISTEMA DE CONVERSION TRACKING & ANALYTICS</h1>
+        <p style="text-align: center; font-size: 1.3em; color: #94A3B8; margin-bottom: 40px;">
+            Dashboard Completo de Monitoramento de Conversões e ROI
+        </p>
+
+        <!-- DASHBOARD PRINCIPAL -->
+        <div class="dashboard">
+            <div class="metric-card green">
+                <div class="metric-label">RECEITA TOTAL</div>
+                <div class="metric-number" id="receita-total">R$ 0</div>
+                <div style="color: #10B981; font-size: 1.1em;">+24% vs mês anterior</div>
+            </div>
+
+            <div class="metric-card blue">
+                <div class="metric-label">CONVERSÕES</div>
+                <div class="metric-number" id="conversoes">0</div>
+                <div style="color: #0EA5E9;">Taxa: <span id="taxa-conversao">0%</span></div>
+            </div>
+
+            <div class="metric-card yellow">
+                <div class="metric-label">TICKET MÉDIO</div>
+                <div class="metric-number" id="ticket-medio">R$ 0</div>
+                <div style="color: #FBBF24;">LTV: R$ <span id="ltv">0</span></div>
+            </div>
+
+            <div class="metric-card red">
+                <div class="metric-label">CAC</div>
+                <div class="metric-number" id="cac">R$ 0</div>
+                <div style="color: #DC2626;">ROI: <span id="roi">0x</span></div>
+            </div>
+        </div>
+
+        <!-- FUNIL DE CONVERSÃO -->
+        <div class="section">
+            <h2 style="color: #0EA5E9; font-size: 2em; margin-bottom: 20px;">🎯 FUNIL DE CONVERSÃO EM TEMPO REAL</h2>
+
+            <div class="funnel-visual">
+                <div class="funnel-stage" style="width: 100%;">
+                    <strong>VISITANTES:</strong> <span id="visitantes">10.000</span> (100%)
+                </div>
+                <div class="funnel-stage" style="width: 90%; margin: 0 auto;">
+                    <strong>LEADS (EMAIL):</strong> <span id="leads">500</span> (5%)
+                </div>
+                <div class="funnel-stage" style="width: 80%; margin: 0 auto;">
+                    <strong>QUALIFICADOS:</strong> <span id="qualificados">200</span> (2%)
+                </div>
+                <div class="funnel-stage" style="width: 70%; margin: 0 auto;">
+                    <strong>OPORTUNIDADES:</strong> <span id="oportunidades">100</span> (1%)
+                </div>
+                <div class="funnel-stage" style="width: 60%; margin: 0 auto;">
+                    <strong>CLIENTES:</strong> <span id="clientes">42</span> (0.42%)
+                </div>
+            </div>
+
+            <div class="chart-placeholder">
+                📈 Gráfico de Conversão Temporal (Integração com Google Analytics/Charts)
+            </div>
+        </div>
+
+        <!-- MÉTRICAS POR FONTE -->
+        <div class="section">
+            <h2 style="color: #0EA5E9; font-size: 2em; margin-bottom: 20px;">📍 CONVERSÕES POR FONTE DE TRÁFEGO</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fonte</th>
+                        <th>Visitantes</th>
+                        <th>Conversões</th>
+                        <th>Taxa</th>
+                        <th>CAC</th>
+                        <th>ROI</th>
+                    </tr>
+                </thead>
+                <tbody id="fonte-tabela">
+                    <tr>
+                        <td>🔍 Google Ads</td>
+                        <td>3.500</td>
+                        <td>175</td>
+                        <td style="color: #10B981;">5%</td>
+                        <td>R$ 45</td>
+                        <td style="color: #10B981;">6.3x</td>
+                    </tr>
+                    <tr>
+                        <td>📱 Instagram</td>
+                        <td>4.200</td>
+                        <td>126</td>
+                        <td style="color: #FBBF24;">3%</td>
+                        <td>R$ 35</td>
+                        <td style="color: #10B981;">8.1x</td>
+                    </tr>
+                    <tr>
+                        <td>📘 Facebook Ads</td>
+                        <td>2.100</td>
+                        <td>84</td>
+                        <td style="color: #10B981;">4%</td>
+                        <td>R$ 50</td>
+                        <td style="color: #FBBF24;">5.7x</td>
+                    </tr>
+                    <tr>
+                        <td>🌐 Orgânico (SEO)</td>
+                        <td>1.800</td>
+                        <td>72</td>
+                        <td style="color: #10B981;">4%</td>
+                        <td>R$ 15</td>
+                        <td style="color: #10B981;">18.9x</td>
+                    </tr>
+                    <tr>
+                        <td>📧 Email Marketing</td>
+                        <td>900</td>
+                        <td>54</td>
+                        <td style="color: #10B981;">6%</td>
+                        <td>R$ 8</td>
+                        <td style="color: #10B981;">35.5x</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- EVENTOS DE CONVERSÃO -->
+        <div class="section">
+            <h2 style="color: #0EA5E9; font-size: 2em; margin-bottom: 20px;">🎯 EVENTOS RASTREADOS</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Evento</th>
+                        <th>Descrição</th>
+                        <th>Quantidade (30d)</th>
+                        <th>Taxa Conversão</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>page_view</td>
+                        <td>Visualização de página</td>
+                        <td>10.000</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>lead_capture</td>
+                        <td>Captura de email</td>
+                        <td>500</td>
+                        <td>5%</td>
+                    </tr>
+                    <tr>
+                        <td>video_view_50</td>
+                        <td>50% do vídeo assistido</td>
+                        <td>320</td>
+                        <td>3.2%</td>
+                    </tr>
+                    <tr>
+                        <td>add_to_cart</td>
+                        <td>Adicionou ao carrinho</td>
+                        <td>150</td>
+                        <td>1.5%</td>
+                    </tr>
+                    <tr>
+                        <td>checkout_initiated</td>
+                        <td>Iniciou checkout</td>
+                        <td>95</td>
+                        <td>0.95%</td>
+                    </tr>
+                    <tr>
+                        <td>purchase</td>
+                        <td>Compra concluída</td>
+                        <td>42</td>
+                        <td>0.42%</td>
+                    </tr>
+                    <tr>
+                        <td>whatsapp_click</td>
+                        <td>Clique no WhatsApp</td>
+                        <td>380</td>
+                        <td>3.8%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CÓDIGO DE IMPLEMENTAÇÃO -->
+        <div class="section">
+            <h2 style="color: #0EA5E9; font-size: 2em; margin-bottom: 20px;">💻 CÓDIGO DE IMPLEMENTAÇÃO</h2>
+
+            <h3 style="color: #FBBF24; margin: 20px 0;">1. GOOGLE ANALYTICS 4 (GA4)</h3>
+            <div class="code-block">
+                <code>
+<!-- Google tag (gtag.js) -->
+&lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h3 style="color: #FBBF24; margin: 20px 0;">2. FACEBOOK PIXEL</h3>
+            <div class="code-block">
+                <code>
+&lt;!-- Facebook Pixel Code --&gt;
+&lt;script&gt;
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', 'YOUR_PIXEL_ID');
+fbq('track', 'PageView');
+&lt;/script&gt;
+                </code>
+            </div>
+
+            <h3 style="color: #FBBF24; margin: 20px 0;">3. EVENTOS CUSTOMIZADOS</h3>
+            <div class="code-block">
+                <code>
+// Captura de Lead
+function trackLeadCapture(email, source) {
+    // GA4
+    gtag('event', 'lead_capture', {
+        'email': email,
+        'source': source
+    });
+
+    // Facebook Pixel
+    fbq('track', 'Lead', {
+        source: source
+    });
+
+    // Custom Tracking
+    sendToBackend('lead', { email, source });
+}
+
+// Compra
+function trackPurchase(value, product) {
+    gtag('event', 'purchase', {
+        'transaction_id': generateTransactionId(),
+        'value': value,
+        'currency': 'BRL',
+        'items': [{
+            'item_name': product,
+            'price': value
+        }]
+    });
+
+    fbq('track', 'Purchase', {
+        value: value,
+        currency: 'BRL'
+    });
+}
+
+// WhatsApp Click
+function trackWhatsAppClick() {
+    gtag('event', 'whatsapp_click', {
+        'event_category': 'engagement',
+        'event_label': 'whatsapp_button'
+    });
+}
+
+// Video View
+function trackVideoView(percent) {
+    gtag('event', 'video_view', {
+        'percent': percent
+    });
+}
+                </code>
+            </div>
+
+            <h3 style="color: #FBBF24; margin: 20px 0;">4. HOTJAR (HEATMAPS E GRAVAÇÕES)</h3>
+            <div class="code-block">
+                <code>
+&lt;!-- Hotjar Tracking Code --&gt;
+&lt;script&gt;
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:YOUR_HJID,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <!-- BACKEND TRACKING -->
+        <div class="section">
+            <h2 style="color: #0EA5E9; font-size: 2em; margin-bottom: 20px;">🗄️ BACKEND TRACKING (Node.js Example)</h2>
+
+            <div class="code-block">
+                <code>
+// server.js - Sistema de Tracking Backend
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+// Banco de dados simples (use MongoDB/PostgreSQL em produção)
+const conversions = [];
+
+// Endpoint para receber eventos
+app.post('/api/track', (req, res) => {
+    const { event, data, userId, timestamp } = req.body;
+
+    const trackingData = {
+        event,
+        data,
+        userId,
+        timestamp: timestamp || new Date(),
+        source: req.headers.referer,
+        userAgent: req.headers['user-agent'],
+        ip: req.ip
+    };
+
+    conversions.push(trackingData);
+
+    // Salvar no banco de dados
+    saveToDatabase(trackingData);
+
+    // Se for uma conversão importante, enviar notificação
+    if (event === 'purchase') {
+        sendSlackNotification(`💰 Nova venda: R$ ${data.value}`);
+    }
+
+    res.json({ success: true });
+});
+
+// Endpoint para analytics dashboard
+app.get('/api/analytics', (req, res) => {
+    const stats = {
+        totalConversions: conversions.filter(c => c.event === 'purchase').length,
+        totalRevenue: conversions
+            .filter(c => c.event === 'purchase')
+            .reduce((sum, c) => sum + c.data.value, 0),
+        conversionRate: calculateConversionRate(),
+        topSources: getTopSources()
+    };
+
+    res.json(stats);
+});
+
+app.listen(3000, () => console.log('Tracking server running on port 3000'));
+                </code>
+            </div>
+        </div>
+
+        <!-- DASHBOARDS RECOMENDADOS -->
+        <div class="section">
+            <h2 style="color: #0EA5E9; font-size: 2em; margin-bottom: 20px;">📊 FERRAMENTAS RECOMENDADAS</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="background: #1E293B; padding: 20px; border-radius: 10px; border-left: 4px solid #0EA5E9;">
+                    <h3 style="color: #0EA5E9; margin-bottom: 10px;">Google Analytics 4</h3>
+                    <p>Tracking completo de visitantes, conversões e comportamento</p>
+                    <p style="color: #10B981; margin-top: 10px;">✅ Grátis</p>
+                </div>
+
+                <div style="background: #1E293B; padding: 20px; border-radius: 10px; border-left: 4px solid #0EA5E9;">
+                    <h3 style="color: #0EA5E9; margin-bottom: 10px;">Facebook Pixel</h3>
+                    <p>Otimização de campanhas e retargeting no Facebook/Instagram</p>
+                    <p style="color: #10B981; margin-top: 10px;">✅ Grátis</p>
+                </div>
+
+                <div style="background: #1E293B; padding: 20px; border-radius: 10px; border-left: 4px solid #0EA5E9;">
+                    <h3 style="color: #0EA5E9; margin-bottom: 10px;">Hotjar</h3>
+                    <p>Heatmaps, gravações de sessão e feedback de usuários</p>
+                    <p style="color: #FBBF24; margin-top: 10px;">💰 A partir de $39/mês</p>
+                </div>
+
+                <div style="background: #1E293B; padding: 20px; border-radius: 10px; border-left: 4px solid #0EA5E9;">
+                    <h3 style="color: #0EA5E9; margin-bottom: 10px;">Google Tag Manager</h3>
+                    <p>Gerenciamento centralizado de todos os pixels e tags</p>
+                    <p style="color: #10B981; margin-top: 10px;">✅ Grátis</p>
+                </div>
+
+                <div style="background: #1E293B; padding: 20px; border-radius: 10px; border-left: 4px solid #0EA5E9;">
+                    <h3 style="color: #0EA5E9; margin-bottom: 10px;">RD Station / HubSpot</h3>
+                    <p>CRM completo com automação de marketing</p>
+                    <p style="color: #FBBF24; margin-top: 10px;">💰 A partir de R$ 69/mês</p>
+                </div>
+
+                <div style="background: #1E293B; padding: 20px; border-radius: 10px; border-left: 4px solid #0EA5E9;">
+                    <h3 style="color: #0EA5E9; margin-bottom: 10px;">Google Data Studio</h3>
+                    <p>Dashboards visuais e relatórios customizados</p>
+                    <p style="color: #10B981; margin-top: 10px;">✅ Grátis</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs PRINCIPAIS -->
+        <div class="section">
+            <h2 style="color: #0EA5E9; font-size: 2em; margin-bottom: 20px;">🎯 KPIs ESSENCIAIS PARA ACOMPANHAR</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th>Fórmula</th>
+                        <th>Meta</th>
+                        <th>Atual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Taxa de Conversão</td>
+                        <td>Conversões / Visitantes × 100</td>
+                        <td>> 3%</td>
+                        <td style="color: #10B981;">4.2%</td>
+                    </tr>
+                    <tr>
+                        <td>CAC (Custo Aquisição Cliente)</td>
+                        <td>Investimento Marketing / Clientes</td>
+                        <td>< R$ 100</td>
+                        <td style="color: #10B981;">R$ 45</td>
+                    </tr>
+                    <tr>
+                        <td>LTV (Lifetime Value)</td>
+                        <td>Ticket Médio × Compras Médias × Tempo Retenção</td>
+                        <td>> R$ 1.000</td>
+                        <td style="color: #10B981;">R$ 1.847</td>
+                    </tr>
+                    <tr>
+                        <td>ROI</td>
+                        <td>LTV / CAC</td>
+                        <td>> 3x</td>
+                        <td style="color: #10B981;">6.5x</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa de Abertura Email</td>
+                        <td>Emails Abertos / Emails Enviados × 100</td>
+                        <td>> 25%</td>
+                        <td style="color: #10B981;">45%</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa de Clique Email</td>
+                        <td>Cliques / Emails Enviados × 100</td>
+                        <td>> 5%</td>
+                        <td style="color: #10B981;">12%</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa de Retenção</td>
+                        <td>Clientes Ativos / Total Clientes × 100</td>
+                        <td>> 70%</td>
+                        <td style="color: #FBBF24;">68%</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa de Cancelamento</td>
+                        <td>Cancelamentos / Clientes Ativos × 100</td>
+                        <td>< 5%</td>
+                        <td style="color: #10B981;">3.2%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Simulação de dados em tempo real
+        function updateDashboard() {
+            const receita = Math.floor(Math.random() * 50000) + 150000;
+            const conversoes = Math.floor(Math.random() * 20) + 40;
+            const ticket = Math.floor(receita / conversoes);
+            const cac = Math.floor(Math.random() * 20) + 35;
+            const ltv = ticket * 6.5;
+            const roi = (ltv / cac).toFixed(1);
+            const taxa = (conversoes / 10000 * 100).toFixed(2);
+
+            document.getElementById('receita-total').textContent = `R$ ${receita.toLocaleString()}`;
+            document.getElementById('conversoes').textContent = conversoes;
+            document.getElementById('taxa-conversao').textContent = `${taxa}%`;
+            document.getElementById('ticket-medio').textContent = `R$ ${ticket}`;
+            document.getElementById('ltv').textContent = ltv.toLocaleString();
+            document.getElementById('cac').textContent = `R$ ${cac}`;
+            document.getElementById('roi').textContent = `${roi}x`;
+        }
+
+        // Atualizar a cada 5 segundos para demo
+        setInterval(updateDashboard, 5000);
+        updateDashboard();
+
+        // Funções de tracking
+        function trackEvent(eventName, eventData) {
+            // Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, eventData);
+            }
+
+            // Facebook Pixel
+            if (typeof fbq !== 'undefined') {
+                fbq('track', eventName, eventData);
+            }
+
+            // Backend
+            fetch('/api/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    event: eventName,
+                    data: eventData,
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            console.log(`✅ Event tracked: ${eventName}`, eventData);
+        }
+
+        // Exemplos de uso
+        // trackEvent('page_view', { page: window.location.pathname });
+        // trackEvent('lead_capture', { email: 'user@example.com', source: 'landing-page' });
+        // trackEvent('purchase', { value: 497, product: 'Coaching Mensal' });
+    </script>
+</body>
+</html>

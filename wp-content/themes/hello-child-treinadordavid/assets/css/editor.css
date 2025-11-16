@@ -1,0 +1,11 @@
+@import url('td-blocks.css');
+
+.editor-styles-wrapper .wp-block {
+  max-width: 72ch;
+}
+.editor-styles-wrapper .wp-block[data-align="wide"] {
+  max-width: min(1100px, 92vw);
+}
+.editor-styles-wrapper .wp-block[data-align="full"] {
+  max-width: 100%;
+}

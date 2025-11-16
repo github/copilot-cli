@@ -1,0 +1,598 @@
+<?php
+
+/* Plugin Name: Treinador David Core – v1.5.0
+Dem DOMDocument e Cache), Shortcodes (Quick Answer, Science+CTA, Q&A+CTA, Speakable, Signature, Card, Audio, Video), identidade visual, layout científico, Dark Mode e otimizações.
+Version: 1.5.0scription: WCAG 2.2 AAA, TOC (H2–H4 co
+Author: Treinador David
+*/
+
+if ( ! defined('ABSPATH') ) exit;
+
+/* =========================================================
+ * 1) ?php
+/*
+Plugin NamACESSIBILIDADE, SCHEMA & CONTEÚDO PRINCIPAL
+ * =======================================================*/
+
+/**
+ * Adiciona o link "Pular para o conteúdo"
+ */
+add_action('wp_body_open', function () {
+	echo '<a href="#main-content" class="td-skip-link">Pular para o conteúdo</a>';
+});
+
+/**
+ * Adiciona o wrapper #main-content para o skip-link funcionar.
+ * Prioridade 1 para rodar antes de outros filtros.
+ */
+add_filter('the_content', function ($html) {
+    if ( is_singular('post') && is_main_query() && ! is_admin() ) {
+        // ID "main-content" é o alvo do skip-link
+        return '<main id="main-content" role="main">' . $html . '</main>';
+    }
+    return $html;
+}, 1);
+
+
+/**
+ * Adiciona Schema.org de Artigo (e Speakable se o shortcode existir)
+ */
+add_action('wp_head', function () {
+	if ( ! is_singular('post') ) return;
+
+	$post_id = get_queried_object_id();
+	$schema = array(
+		'@context'  => 'https://schema.org',
+		'@type'     => 'Article',
+		'headline'  => wp_strip_all_tags(get_the_title($post_id)),
+		'url'       => esc_url(get_permalink($post_id)),
+		'author'    => array('@type'=>'Person','name'=>'Treinador David'),
+		'publisher' => array(
+			'@type'=>'Organization','name'=>'Treinador David',
+			'logo'=>array('@type'=>'ImageObject','url'=>'https://treinadordavid.com/wp-content/uploads/2025/09/treinadord-david-icon.png')
+		),
+	);
+
+	global $post;
+	if ( $post && has_shortcode($post->post_content, 'td_speakable') ) {
+		$schema['speakable'] = array(
+			'@type'=>'SpeakableSpecification',
+			'cssSelector'=>array('.td-speakable'),
+		);
+	}
+
+	echo '<script type="application/ld+json">'. wp_json_encode($schema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) .'</script>';
+}, 5);
+
+
+/* =========================================================
+ * 2) ESTILOS GERAIS (AAA, Dark Mode, Responsivo)
+ * =======================================================*/
+
+add_action('wp_enqueue_scripts', function () {
+	// ATUALIZADO para v1.5.0
+	wp_register_style('td-core-inline', false, array(), '1.5.0', 'all');
+	wp_enqueue_style('td-core-inline');
+
+	$css = "
+:root{
+  --td-blue:#0EA5E9;--td-blue-aa:#0369A1;--td-blue-dark:#0B1220;
+  --td-text:#0F172A;--td-text-2:#475569;--td-bg:#FFFFFF;--td-bg-2:#F8FAFC;
+  --td-cta:#C2410C;--td-ok:#15803D;--td-err:#B91C1C;
+
+  /* Sistema de Espaçamento Responsivo (v1.5) */
+  --space-xs: clamp(0.5rem, 0.5vw + 0.375rem, 0.75rem);
+  --space-sm: clamp(0.75rem, 0.5vw + 0.625rem, 1rem);
+  --space-md: clamp(1rem, 1vw + 0.75rem, 1.5rem);
+  --space-lg: clamp(1.5rem, 2vw + 1rem, 2.5rem);
+  --space-xl: clamp(2rem, 4vw + 1rem, 4rem);
+
+  /* Sistema de Tipografia Responsivo (v1.5) */
+  --font-sm: clamp(0.9rem, 0.17vw + 0.86rem, 1rem);
+  --font-base: clamp(1rem, 0.34vw + 0.91rem, 1.125rem);
+  --font-lg: clamp(1.125rem, 0.61vw + 0.98rem, 1.3rem);
+  --font-xl: clamp(1.266rem, 1vw + 1.01rem, 1.5rem);
+  --font-2xl: clamp(1.424rem, 1.56vw + 1.04rem, 1.8rem);
+  --font-3xl: clamp(1.602rem, 2.38vw + 1.01rem, 2.2rem);
+  --font-4xl: clamp(1.802rem, 3.54vw + 0.91rem, 2.8rem);
+}
+
+html{font-size:var(--font-base);scroll-behavior:smooth}
+body{background:var(--td-bg);color:var(--td-text);line-height:1.7;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;margin:0;overflow-x:hidden}
+h1,h2,h3,h4,h5,h6,.hero-title,.td-qa-q,.td-signature-text strong{font-family:'Oswald',Impact,'Arial Black',sans-serif;line-height:1.3}
+h1, .hero-title {font-size:var(--font-4xl);}
+h2 {font-size:var(--font-3xl);}
+h3 {font-size:var(--font-2xl);}
+h4 {font-size:var(--font-xl);}
+h5 {font-size:var(--font-lg);}
+h6 {font-size:var(--font-sm);}
+
+img,table,video{max-width:100%;height:auto}
+:focus-visible{outline:3px solid var(--td-blue);outline-offset:3px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Acessibilidade: Skip Link */
+.td-skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:-999;background:var(--td-blue);color:#fff;padding:8px 16px;border-radius:4px;text-decoration:none}
+.td-skip-link:focus, .td-skip-link:active {left:10px;top:10px;width:auto;height:auto;overflow:visible;z-index:99999;}
+
+/* Container e conteúdo */
+.post-wrapper{max-width:1200px;margin:0 auto;padding:0 20px;box-sizing:border-box}
+.article-content h2{font-size:var(--font-3xl);color:var(--td-blue-aa);margin-top:var(--space-lg);border-left:6px solid var(--td-blue);padding-left:var(--space-sm)}
+.article-content h3{font-size:var(--font-2xl);color:var(--td-blue-dark);margin-top:var(--space-md)}
+.article-content p{font-size:var(--font-base);line-height:1.8;color:var(--td-text);margin-bottom:var(--space-md)}
+.article-content ul{margin:0 0 var(--space-md) 24px}
+.article-content li{margin-bottom:var(--space-xs);color:var(--td-text-2)}
+.article-content a{color:var(--td-blue-aa);text-decoration:underline;transition: color .2s ease}
+.article-content a:hover{color:var(--td-blue-dark)}
+h2[id],h3[id],h4[id]{scroll-margin-top:120px} /* Espaço para header fixo */
+
+/* Hero + separador */
+.hero-title{text-align:center;text-transform:uppercase;color:var(--td-blue-aa);margin:var(--space-md) 0 var(--space-lg)}
+.td-hero-placeholder img{width:100%;border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.1);object-fit:cover}
+
+/* Separador (v1.5: agora hr.td-sep) */
+hr.td-sep{width:100%;height:3px;background:var(--td-blue);margin:var(--space-lg) 0;border:0;border-radius:2px}
+/* Separador com Label (v1.5) */
+.td-sep-label{display:flex;align-items:center;text-align:center;margin:var(--space-lg) 0;gap:var(--space-sm)}
+.td-sep-label::before, .td-sep-label::after{content:'';flex:1;border-bottom:3px solid var(--td-blue);border-radius:2px}
+.td-sep-label span{padding:0 var(--space-sm);font-family:'Oswald',sans-serif;font-size:var(--font-lg);color:var(--td-blue-aa);text-transform:uppercase;white-space:nowrap}
+
+/* Grid com trilho direito (TOC lateral) */
+.layout-rail-right{display:grid;grid-template-columns:1fr 280px;gap:40px;align-items:start}
+@media (max-width:960px){.layout-rail-right{grid-template-columns:1fr}}
+
+/* TOC lateral */
+.rail{position:sticky;top:95px;align-self:start;background:var(--td-bg);border:3px solid var(--td-blue);border-radius:12px;padding:var(--space-md);box-shadow:0 2px 8px rgba(0,0,0,.05);max-width:280px;box-sizing:border-box}
+.rail h3{margin-top:0}
+.rail ol{margin:0;padding-left:20px}
+.rail li{margin:4px 0}
+.rail a{color:var(--td-blue-aa);text-decoration:none;transition: color .2s ease}
+.rail a:hover{text-decoration:underline;color:var(--td-blue-dark)}
+@media (max-width:960px){.rail{display:none}}
+
+/* TOC top (v1.5: Collapsible) */
+.td-toc-top{position:sticky;top:60px;z-index:10;background:var(--td-bg);border-bottom:3px solid var(--td-blue);padding:var(--space-sm) var(--space-md);margin:0 0 var(--space-md);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+@media (max-width:960px){.td-toc-top{position:relative;top:auto}}
+.td-toc-top-header{margin:0}
+.td-toc-top-header button{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;padding:0;font-family:'Oswald',sans-serif;font-size:var(--font-xl);color:var(--td-blue-aa);cursor:pointer;text-align:left}
+.td-toc-top-header button svg{width:24px;height:24px;fill:currentColor;transition:transform .2s ease}
+.td-toc-top-header button[aria-expanded='false'] svg{transform:rotate(-90deg)}
+.td-toc-top nav ol{margin-top: var(--space-sm); padding-left: 20px; }
+.td-toc-top nav ol[hidden]{display:none}
+.td-toc-top li { margin: 4px 0; }
+.td-toc-top a { color:var(--td-blue-aa); text-decoration:none; }
+.td-toc-top a:hover { text-decoration:underline; color:var(--td-blue-dark); }
+
+
+/* Quick Answer */
+.td-quick-answer{background:#F0F9FF;border-left:5px solid var(--td-blue);padding:var(--space-md);border-radius:8px;margin:var(--space-md) 0}
+.td-quick-answer h4 { margin-top: 0; }
+
+/* Speakable */
+.td-speakable{display:block;background:var(--td-bg);border-left:4px dashed var(--td-blue-aa);padding:var(--space-sm) var(--space-md);border-radius:10px;margin:var(--space-md) 0}
+
+/* Science */
+.td-science-block{background:var(--td-bg-2);border:3px solid var(--td-blue);border-radius:12px;padding:var(--space-md);margin:var(--space-lg) 0}
+.td-science-block h3{margin-top:0;color:var(--td-blue-dark)}
+.td-articles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--space-md)}
+/* td_card (v1.5) */
+.td-article-card{background:#fff;border:3px solid var(--td-blue);border-radius:12px;padding:var(--space-md);box-shadow:0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.04);transition:transform .2s ease, box-shadow .2s ease}
+.td-article-card:hover{transform:translateY(-4px);box-shadow:0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.05)}
+.td-article-card h4{margin:0 0 var(--space-xs);color:var(--td-blue-aa);font-size:var(--font-lg)}
+.td-article-meta{font-size:var(--font-sm);color:var(--td-text-2);margin:0 0 var(--space-xs)}
+.td-article-reference{font-size:var(--font-sm);font-style:italic;color:var(--td-text-2);margin:0 0 var(--space-sm)}
+.td-article-summary{font-size:var(--font-base);line-height:1.7;color:var(--td-text)}
+.td-article-list{margin:var(--space-sm) 0 0 18px}
+.td-article-list li{margin:var(--space-xs) 0; font-size: var(--font-base); }
+.td-science-cta{text-align:center;margin-top:var(--space-md)}
+.td-science-cta a{display:inline-block;padding:10px 16px;border:2px solid var(--td-blue-aa);border-radius:999px;text-decoration:none;color:var(--td-blue-aa);transition: background-color .2s ease, color .2s ease}
+.td-science-cta a:hover{background:var(--td-blue-aa);color:#fff}
+
+/* Q&A */
+.td-qa-block{background:#fff;border:3px solid var(--td-blue);border-radius:12px;padding:var(--space-md);margin:var(--space-lg) 0}
+.td-qa-block h3 { margin-top: 0; }
+.td-qa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--space-md)}
+/* td_qa_card (v1.5) */
+.td-qa-card{background:#fff;border:3px solid var(--td-blue);border-radius:12px;padding:var(--space-md);transition:transform .2s ease, box-shadow .2s ease; box-shadow:0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.04);}
+.td-qa-card:hover, .td-qa-card:focus-within{transform:translateY(-4px); box-shadow:0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.05); outline: none;}
+.td-qa-badge{display:inline-block;background:var(--td-blue);color:#fff;border-radius:999px;padding:4px 12px;font-size:.85rem;margin:0 0 var(--space-sm)}
+.td-qa-q{font-size:var(--font-lg);font-weight:700;color:var(--td-blue-aa);margin:0 0 var(--space-xs)}
+.td-qa-a{font-size:var(--font-base);line-height:1.6;color:var(--td-text)}
+.td-qa-cta{display:inline-block;padding:10px 16px;border:2px solid var(--td-blue-aa);border-radius:999px;text-decoration:none;color:var(--td-blue-aa);transition: background-color .2s ease, color .2s ease}
+.td-qa-cta:hover{background:var(--td-blue-aa);color:#fff}
+
+/* Assinatura */
+.td-signature-block{display:flex;align-items:center;gap:16px;padding:var(--space-md);background:var(--td-bg-2);border:2px solid var(--td-blue);border-radius:12px;margin:var(--space-xl) 0 var(--space-lg)}
+.td-signature-logo{width:80px;height:80px;border-radius:50%;border:3px solid var(--td-blue); flex-shrink: 0;}
+.td-signature-text strong{font-size:var(--font-xl);text-transform:uppercase;color:var(--td-blue-dark)}
+.td-signature-text span{font-size:var(--font-sm);color:var(--td-text-2)}
+
+/* Audio/Video (v1.5) */
+.td-audio-wrap{margin:var(--space-md) 0}
+.td-audio-wrap audio{width:100%}
+.td-video-wrap{margin:var(--space-md) 0}
+.td-video-responsive-embed{position:relative;padding-bottom:56.25%;/* 16:9 */height:0;overflow:hidden;border-radius:12px;background:#000;}
+.td-video-responsive-embed video{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.td-video-wrap figcaption{font-size:var(--font-sm);color:var(--td-text-2);text-align:center;margin-top:var(--space-xs)}
+";
+	wp_add_inline_style('td-core-inline', $css);
+});
+
+
+/* =========================================================
+ * 3) TOC COM DOMDocument (SEGURO, COM CACHE) — H2–H4
+ * =======================================================*/
+
+global $td_toc_headings;
+$td_toc_headings = array();
+
+/**
+ * Parseia o conteúdo, adiciona IDs aos H2-H4 e armazena em cache.
+ * Evita rodar no admin (v1.5)
+ */
+add_filter('the_content', function ($html) {
+	// (v1.5) Não rodar no editor
+	if ( is_admin() ) return $html; 
+	
+	if ( ! is_singular('post') || ! is_main_query() ) return $html;
+	if ( strpos($html, '[td_toc') === false ) return $html;
+
+	global $td_toc_headings;
+	$post_id = get_the_ID();
+	
+	// (v1.5) Implementação de Cache
+	$cache_key_html = "td_toc_html_{$post_id}";
+	$cache_key_headings = "td_toc_headings_{$post_id}";
+	$cache_group = 'td_core_toc';
+
+	$cached_html = wp_cache_get($cache_key_html, $cache_group);
+
+	if ( false !== $cached_html ) {
+		$cached_headings = wp_cache_get($cache_key_headings, $cache_group);
+		if ( false !== $cached_headings ) {
+			$td_toc_headings = $cached_headings;
+			return $cached_html;
+		}
+	}
+	
+	// Reseta headings para este parse
+	$td_toc_headings = array();
+
+	// (v1.5) Segurança: Desabilita carregador de entidade XML
+	$previous_loader_state = libxml_disable_entity_loader(true);
+	libxml_use_internal_errors(true);
+	
+	$doc = new DOMDocument('1.0', 'UTF-8');
+	$doc->loadHTML(
+		mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'),
+		LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+	);
+	$xpath = new DOMXPath($doc);
+
+	$used = array(); // IDs únicos
+
+	foreach (array(2,3,4) as $lvl) {
+		foreach ($xpath->query("//h{$lvl}") as $h) {
+			$text = trim($h->textContent);
+			if ($text === '') continue;
+
+			if ($h->hasAttribute('id')) {
+				$id = trim($h->getAttribute('id'));
+			} else {
+				$id = sanitize_title($text);
+			}
+			if ($id === '') $id = 'secao';
+
+			$base = $id;
+			$n = 2;
+			while (in_array($id, $used, true)) {
+				$id = $base . '-' . $n++;
+			}
+			$used[] = $id;
+			$h->setAttribute('id', $id);
+
+			$td_toc_headings[] = array('level'=>$lvl, 'id'=>$id, 'text'=>$text);
+		}
+	}
+
+	$out = $doc->saveHTML();
+	
+	libxml_clear_errors();
+	libxml_disable_entity_loader($previous_loader_state); // Restaura estado
+
+	// (v1.5) Salva no cache por 1 hora
+	wp_cache_set($cache_key_html, $out, $cache_group, 3600);
+	wp_cache_set($cache_key_headings, $td_toc_headings, $cache_group, 3600);
+
+	return $out;
+}, 8); // Prioridade 8 para rodar antes do wpautop (10)
+
+/**
+ * (v1.5) Limpa o cache do TOC ao salvar o post
+ */
+add_action('save_post_post', function ($post_id) {
+    if ( wp_is_post_revision($post_id) || wp_is_post_autosave($post_id) ) {
+        return;
+    }
+	$cache_group = 'td_core_toc';
+    wp_cache_delete("td_toc_html_{$post_id}", $cache_group);
+    wp_cache_delete("td_toc_headings_{$post_id}", $cache_group);
+});
+
+
+/* =========================================================
+ * 4) SHORTCODE [td_toc] — (v1.5: Collapsible)
+ * =======================================================*/
+
+add_shortcode('td_toc', function ($atts) {
+	global $td_toc_headings;
+	if (empty($td_toc_headings)) return '';
+
+	$a = shortcode_atts(array(
+		'title'     => 'Navegação Rápida',
+		'variant'   => 'lateral', // lateral|top
+		'min_level' => 2,
+		'max_level' => 4,
+	), $atts, 'td_toc');
+
+	$min = (int) $a['min_level'];
+	$max = (int) $a['max_level'];
+
+	$items = array_values(array_filter($td_toc_headings, function ($h) use ($min,$max) {
+		$l = (int)$h['level'];
+		return ($l >= $min && $l <= $max);
+	}));
+
+	if (empty($items)) return '';
+
+	$is_top = ($a['variant'] === 'top');
+	$cls    = $is_top ? 'td-toc-top' : 'rail';
+	$toc_id = 'td-toc-list-' . ($is_top ? 'top' : 'rail');
+	$base   = (int)$items[0]['level'];
+	$cur    = $base;
+	$first  = true;
+
+	$toc  = '<aside class="'. esc_attr($cls) .'" role="complementary" aria-label="Índice">';
+	
+	// (v1.5) Botão expansível para TOC 'top'
+	if ($is_top) {
+		$toc .= '<h3 class="td-toc-top-header">';
+		$toc .= '<button type="button" aria-expanded="true" aria-controls="'. esc_attr($toc_id) .'">';
+		$toc .= esc_html($a['title']);
+		$toc .= '<svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>';
+		$toc .= '</button></h3>';
+	} else {
+		$toc .= '<h3>'. esc_html($a['title']) .'</h3>';
+	}
+	
+	$toc .= '<nav aria-label="Tabela de conteúdos"><ol id="'. esc_attr($toc_id) .'">';
+
+	foreach ($items as $h) {
+		$lvl = max($min, min($max, (int)$h['level']));
+		$id  = esc_attr($h['id']);
+		$txt = esc_html($h['text']);
+
+		if ($first) {
+			$toc  .= '<li><a href="#'.$id.'">'.$txt.'</a>';
+			$first = false;
+			$cur   = $lvl;
+			continue;
+		}
+
+		if ($lvl > $cur) {
+			for ($i = $cur; $i < $lvl; $i++) $toc .= '<ol>';
+			$toc .= '<li><a href="#'.$id.'">'.$txt.'</a>';
+		} elseif ($lvl === $cur) {
+			$toc .= '</li><li><a href="#'.$id.'">'.$txt.'</a>';
+		} else {
+			$toc .= '</li>';
+			for ($i = $cur; $i > $lvl; $i--) $toc .= '</ol></li>';
+			$toc .= '<li><a href="#'.$id.'">'.$txt.'</a>';
+		}
+		$cur = $lvl;
+	}
+
+	$toc .= '</li>';
+	for ($i = $cur; $i > $base; $i--) $toc .= '</ol></li>';
+	$toc .= '</ol></nav></aside>';
+
+	return $toc;
+});
+
+
+/* =========================================================
+ * 5) OUTROS SHORTCODES (v1.5: +Card, QA_Card, Audio, Video)
+ * =======================================================*/
+
+// [td_quick_answer title="..."]...[/td_quick_answer]
+add_shortcode('td_quick_answer', function ($atts, $content = null) {
+	$a = shortcode_atts(array('title'=>''), $atts, 'td_quick_answer');
+	$out  = '<aside class="td-quick-answer" role="region" aria-label="Resposta rápida">';
+	if (!empty($a['title'])) $out .= '<h4>'. esc_html($a['title']) .'</h4>';
+	$out .= wp_kses_post(do_shortcode($content));
+	$out .= '</aside>';
+	return $out;
+});
+
+// [td_speakable]...[/td_speakable]
+add_shortcode('td_speakable', function ($atts, $content = null) {
+	return '<div class="td-speakable">'. wp_kses_post(do_shortcode($content)) .'</div>';
+});
+
+// [td_science title="Evidência Científica" cta_url="" cta_label=""]
+add_shortcode('td_science', function ($atts, $content = null) {
+	$a = shortcode_atts(array('title'=>'Evidência Científica','cta_url'=>'','cta_label'=>''), $atts, 'td_science');
+	$out  = '<aside class="td-science-block" role="region" aria-label="'. esc_attr($a['title']) .'">';
+	if (!empty($a['title'])) $out .= '<h3>'. esc_html($a['title']) .'</h3>';
+	$out .= '<div class="td-articles-grid">'. do_shortcode( wp_kses_post($content) ) .'</div>';
+	if (!empty($a['cta_url']) && !empty($a['cta_label'])) {
+		$out .= '<p class="td-science-cta"><a href="'. esc_url($a['cta_url']) .'" rel="nofollow noopener" target="_blank">'. esc_html($a['cta_label']) .'</a></p>';
+	}
+	$out .= '</aside>';
+	return $out;
+});
+
+// (v1.5) [td_card title="..." meta="..." ref="..."]...[/td_card] (para usar dentro de [td_science])
+add_shortcode('td_card', function ($atts, $content = null) {
+	$a = shortcode_atts(array(
+		'title' => '',
+		'meta'  => '', // e.g., Autor, Ano
+		'ref'   => '', // e.g., Journal Name
+	), $atts, 'td_card');
+
+	$out  = '<div class="td-article-card">';
+	if (!empty($a['title'])) $out .= '<h4>' . esc_html($a['title']) . '</h4>';
+	if (!empty($a['meta'])) $out .= '<p class="td-article-meta">' . esc_html($a['meta']) . '</p>';
+	if (!empty($a['ref'])) $out .= '<p class="td-article-reference">' . esc_html($a['ref']) . '</p>';
+	
+	$summary = trim(do_shortcode(wp_kses_post($content)));
+	if ( ! empty($summary) ) {
+		if (strpos(trim($summary), '<ul>') === 0) {
+			$summary = str_replace('<ul>', '<ul class="td-article-list">', $summary);
+			$out .= $summary;
+		} else {
+			$out .= '<p class="td-article-summary">' . $summary . '</p>';
+		}
+	}
+	$out .= '</div>';
+	return $out;
+});
+
+
+// [td_qa title="Q&A" cta_url="" cta_label=""] ... [/td_qa]
+add_shortcode('td_qa', function ($atts, $content = null) {
+	$a = shortcode_atts(array('title'=>'Q&A do Treinador','cta_url'=>'','cta_label'=>''), $atts, 'td_qa');
+	$out  = '<aside class="td-qa-block" role="region" aria-label="'. esc_attr($a['title']) .'">';
+	if (!empty($a['title'])) $out .= '<h3>'. esc_html($a['title']) .'</h3>';
+	$out .= '<div class="td-qa-grid">'. do_shortcode( wp_kses_post($content) ) .'</div>';
+	if (!empty($a['cta_url']) && !empty($a['cta_label'])) {
+		$out .= '<p style="text-align:center;margin-top:16px"><a class="td-qa-cta" href="'. esc_url($a['cta_url']) .'">'. esc_html($a['cta_label']) .'</a></p>';
+	}
+	$out .= '</aside>';
+	return $out;
+});
+
+// (v1.5) [td_qa_card q="..." badge="..."]...[/td_qa_card] (para usar dentro de [td_qa])
+add_shortcode('td_qa_card', function ($atts, $content = null) {
+	$a = shortcode_atts(array(
+		'q'     => 'Pergunta',
+		'badge' => 'Dúvida',
+	), $atts, 'td_qa_card');
+
+	// (v1.5) Adicionado tabindex="0" para acessibilidade de teclado
+	$out  = '<div class="td-qa-card" tabindex="0">';
+	if (!empty($a['badge'])) $out .= '<span class="td-qa-badge">' . esc_html($a['badge']) . '</span>';
+	$out .= '<h4 class="td-qa-q">' . esc_html($a['q']) . '</h4>';
+	$out .= '<p class="td-qa-a">' . wp_kses_post(do_shortcode($content)) . '</p>';
+	$out .= '</div>';
+	return $out;
+});
+
+
+// [td_signature]
+add_shortcode('td_signature', function () {
+	$img = 'https://treinadordavid.com/wp-content/uploads/2025/09/treinadord-david-icon.png';
+	return '<div class="td-signature-block"><img src="'. esc_url($img) .'" alt="Treinador David Logo" class="td-signature-logo" width="80" height="80" loading="lazy" /><div class="td-signature-text"><strong>Treinador David</strong><br><span>Personal Trainer | CREF 7-016401-G/DF</span></div></div>';
+});
+
+// (v1.5) [td_sep label="..."]
+add_shortcode('td_sep', function ($atts) {
+	$a = shortcode_atts(array('label' => ''), $atts, 'td_sep');
+	if (empty($a['label'])) {
+		return '<hr class="td-sep">'; // Original
+	}
+	return '<div class="td-sep-label" role="separator"><span>' . esc_html($a['label']) . '</span></div>';
+});
+
+// (v1.5) [td_audio src="..."]
+add_shortcode('td_audio', function ($atts) {
+	$a = shortcode_atts(array('src' => ''), $atts, 'td_audio');
+	if (empty($a['src'])) return '';
+	return '<figure class="td-audio-wrap">
+			  <audio controls src="' . esc_url($a['src']) . '" preload="metadata">
+				Seu navegador não suporta o elemento <code>audio</code>.
+			  </audio>
+			</figure>';
+});
+
+// (v1.5) [td_video src="..." caption="..."]
+add_shortcode('td_video', function ($atts) {
+	$a = shortcode_atts(array('src' => '', 'caption' => ''), $atts, 'td_video');
+	if (empty($a['src'])) return '';
+
+	$out  = '<figure class="td-video-wrap">';
+	$out .= '<div class="td-video-responsive-embed">';
+	$out .= '<video controls src="' . esc_url($a['src']) . '" preload="metadata" width="1600" height="900" playsinline>
+			   <source src="' . esc_url($a['src']) . '" type="video/mp4">
+			   Seu navegador não suporta o elemento <code>video</code>.
+			 </video>';
+	$out .= '</div>';
+	if (!empty($a['caption'])) {
+		$out .= '<figcaption>' . esc_html($a['caption']) . '</figcaption>';
+	}
+	$out .= '</figure>';
+	return $out;
+});
+
+
+/* =========================================================
+ * 6) OTIMIZAÇÕES (v1.5: KSES, Scripts Footer)
+ * =======================================================*/
+
+/**
+ * (v1.5) Adiciona tags seguras (audio, video, figure) ao wp_kses_post
+ */
+add_filter('wp_kses_allowed_html', function ($allowed_tags, $context) {
+	if ($context === 'post') {
+		$allowed_tags['figure'] = array('class' => array());
+		$allowed_tags['figcaption'] = array('class' => array());
+		
+		$allowed_tags['audio'] = array(
+			'src' => array(), 'controls' => array(), 'preload' => array(), 'loop' => array(), 'autoplay' => array(), 'muted' => array()
+		);
+		$allowed_tags['video'] = array(
+			'src' => array(), 'controls' => array(), 'preload' => array(), 'loop' => array(), 'autoplay' => array(), 'muted' => array(),
+			'width' => array(), 'height' => array(), 'poster' => array(), 'playsinline' => array()
+		);
+		$allowed_tags['source'] = array('src' => array(), 'type' => array());
+	}
+	return $allowed_tags;
+}, 10, 2);
+
+/**
+ * (v1.5) Adiciona JS para interatividade (TOC collapsible, QA Card com teclado)
+ */
+add_action('wp_footer', function () {
+	// Só carrega o JS se for um post singular (onde o TOC e QAs existem)
+	if ( ! is_singular('post') ) return;
+	?>
+	<script id="td-core-js-interactive">
+	document.addEventListener('DOMContentLoaded', function() {
+		// Lógica do TOC 'top' collapsible
+		var tocButton = document.querySelector('.td-toc-top-header button');
+		if (tocButton) {
+			var tocList = document.getElementById(tocButton.getAttribute('aria-controls'));
+			if (tocList) {
+				tocButton.addEventListener('click', function() {
+					var isExpanded = tocButton.getAttribute('aria-expanded') === 'true';
+					tocButton.setAttribute('aria-expanded', !isExpanded);
+					tocList.hidden = isExpanded;
+				});
+			}
+		}
+		
+		// Lógica dos Q&A Cards (acesso via teclado)
+		document.querySelectorAll('.td-qa-card[tabindex="0"]').forEach(function(card) {
+			card.addEventListener('keydown', function(e) {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					// No futuro, isso pode expandir uma resposta oculta.
+					// Por enquanto, apenas simula o foco.
+					card.focus(); 
+				}
+			});
+		});
+	});
+	</script>
+	<?php
+}, 99);

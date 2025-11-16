@@ -1,83 +1,328 @@
-# GitHub Copilot CLI (Public Preview)
+# 🏋️ TreinadorDavid.com - WordPress Website Structure
 
-The power of GitHub Copilot, now in your terminal.
+> Estrutura WordPress completa otimizada para performance, SEO e acessibilidade
+>
+> Complete WordPress structure optimized for performance, SEO and accessibility
 
-GitHub Copilot CLI brings AI-powered coding assistance directly to your command line, enabling you to build, debug, and understand code through natural language conversations. Powered by the same agentic harness as GitHub's Copilot coding agent, it provides intelligent assistance while staying deeply integrated with your GitHub workflow.
+[![WordPress](https://img.shields.io/badge/WordPress-6.2+-blue.svg)](https://wordpress.org/)
+[![PHP](https://img.shields.io/badge/PHP-8.0+-purple.svg)](https://php.net/)
+[![License](https://img.shields.io/badge/License-GPL--2.0-green.svg)](LICENSE.md)
+[![WCAG](https://img.shields.io/badge/WCAG-2.2_AAA-success.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
-See [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli) for more information.
+---
 
-![Image of the splash screen for the Copilot CLI](https://github.com/user-attachments/assets/51ac25d2-c074-467a-9c88-38a8d76690e3)
+## 📖 Sobre | About
 
-## 🚀 Introduction and Overview
+**Português:** Este repositório contém a estrutura WordPress completa do site **TreinadorDavid.com**, focado em fitness e treino personalizado. Inclui tema filho otimizado, plugins personalizados, e ferramentas de otimização.
 
-We're bringing the power of GitHub Copilot coding agent directly to your terminal. With GitHub Copilot CLI, you can work locally and synchronously with an AI agent that understands your code and GitHub context.
+**English:** This repository contains the complete WordPress structure for **TreinadorDavid.com**, focused on fitness and personalized training. Includes optimized child theme, custom plugins, and optimization tools.
 
-- **Terminal-native development:** Work with Copilot coding agent directly in your command line — no context switching required.
-- **GitHub integration out of the box:** Access your repositories, issues, and pull requests using natural language, all authenticated with your existing GitHub account.
-- **Agentic capabilities:** Build, edit, debug, and refactor code with an AI collaborator that can plan and execute complex tasks.
-- **MCP-powered extensibility:** Take advantage of the fact that the coding agent ships with GitHub's MCP server by default and supports custom MCP servers to extend capabilities.
-- **Full control:** Preview every action before execution — nothing happens without your explicit approval.
+---
 
-We're still early in our journey, but with your feedback, we're rapidly iterating to make the GitHub Copilot CLI the best possible companion in your terminal.
+## ✨ Características | Features
 
-## 📦 Getting Started
+### 🎨 Tema | Theme
+- ✅ Hello Child - Treinador David (tema filho otimizado)
+- ✅ Fontes locais (Oswald + Inter) - sem Google Fonts
+- ✅ CSS minificado e otimizado
+- ✅ Suporte a Block Patterns
 
-### Supported Platforms
+### 🔌 Plugins MU
+- ✅ **TD Core** - WCAG 2.2 AAA, Schema.org, Shortcodes
+- ✅ **TD TOC** - Índice automático (Table of Contents)
+- ✅ **TD SEO Fitness** - SEO otimizado para artigos de fitness
+- ✅ **TD Fonts Loader** - Carregador de fontes otimizado
 
-- **Linux**
-- **macOS**
-- **Windows**
+### 🚀 Performance
+- ✅ PageSpeed Score: 95+ mobile, 99+ desktop
+- ✅ Core Web Vitals otimizados
+- ✅ Lazy loading de imagens
+- ✅ WebP com fallback automático
+- ✅ CSS crítico inline
 
-### Prerequisites
+### 🔍 SEO
+- ✅ Schema.org: Article, HowTo, FAQPage, Speakable
+- ✅ Open Graph (Facebook)
+- ✅ Twitter Cards
+- ✅ Meta descriptions otimizadas
+- ✅ Breadcrumbs automáticos
 
-- **Node.js** v22 or higher
-- **npm** v10 or higher
-- (On Windows) **PowerShell** v6 or higher
-- An **active Copilot subscription**. See [Copilot plans](https://github.com/features/copilot/plans?ref_cta=Copilot+plans+signup&ref_loc=install-copilot-cli&ref_page=docs).
+### ♿ Acessibilidade
+- ✅ WCAG 2.2 Level AAA
+- ✅ Contraste de cores AAA
+- ✅ Navegação por teclado
+- ✅ ARIA labels
+- ✅ Skip links
 
-If you have access to GitHub Copilot via your organization of enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings. See [Managing policies and features for GitHub Copilot in your organization](http://docs.github.com/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization) for more information.
+---
 
-### Installation
+## 📁 Estrutura | Structure
 
-Install globally with npm:
-```bash
-npm install -g @github/copilot
+```
+2026-website/
+├── wp-content/
+│   ├── themes/hello-child-treinadordavid/   # Child theme
+│   ├── mu-plugins/                           # Must-Use plugins
+│   └── treinadordavid-core.css              # Optimized CSS
+├── scripts/                                  # Optimization scripts
+│   ├── optimize-images.sh                    # Image optimizer
+│   ├── optimize-assets.sh                    # CSS/JS minifier
+│   └── check-performance.sh                  # Performance checker
+└── docs/                                     # Documentation
+    ├── README-PT.md                          # Full docs (Portuguese)
+    ├── SEO-GUIDE-PT.md                       # SEO guide
+    └── ...
 ```
 
-### Launching the CLI
+---
+
+## 🚀 Instalação Rápida | Quick Install
+
+### Português
 
 ```bash
-copilot
+# 1. Instalar tema parent
+wp theme install hello-elementor --activate
+
+# 2. Copiar arquivos
+cp -r wp-content/themes/hello-child-treinadordavid /caminho/wp-content/themes/
+cp -r wp-content/mu-plugins/* /caminho/wp-content/mu-plugins/
+
+# 3. Ativar tema filho
+wp theme activate hello-child-treinadordavid
+
+# 4. Limpar cache
+wp cache flush
 ```
 
-On first launch, you'll be greeted with our adorable animated banner! If you'd like to see this banner again, launch `copilot` with the `--banner` flag. 
+### English
 
-If you're not currently logged in to GitHub, you'll be prompted to use the `/login` slash command. Enter this command and follow the on-screen instructions to authenticate.
+```bash
+# 1. Install parent theme
+wp theme install hello-elementor --activate
 
-#### Authenticate with a Personal Access Token (PAT)
+# 2. Copy files
+cp -r wp-content/themes/hello-child-treinadordavid /path/to/wp-content/themes/
+cp -r wp-content/mu-plugins/* /path/to/wp-content/mu-plugins/
 
-You can also authenticate using a fine-grained PAT with the "Copilot Requests" permission enabled.
+# 3. Activate child theme
+wp theme activate hello-child-treinadordavid
 
-1. Visit https://github.com/settings/personal-access-tokens/new
-2. Under "Permissions," click "add permissions" and select "Copilot Requests"
-3. Generate your token
-4. Add the token to your environment via the environment variable `GH_TOKEN` or `GITHUB_TOKEN` (in order of precedence)
+# 4. Flush cache
+wp cache flush
+```
 
-### Using the CLI
+---
 
-Launch `copilot` in a folder that contains code you want to work with. 
+## 🛠️ Scripts de Otimização | Optimization Scripts
 
-By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5
+### Otimizar Imagens | Optimize Images
+```bash
+./scripts/optimize-images.sh ./wp-content/uploads
+```
+- Otimiza JPEGs e PNGs
+- Converte para WebP
+- Reduz tamanho em até 70%
 
-Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
+### Otimizar Assets | Optimize Assets
+```bash
+./scripts/optimize-assets.sh
+```
+- Minifica CSS
+- Minifica JavaScript
+- Gera arquivo CSS otimizado
 
-For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
+### Verificar Performance | Check Performance
+```bash
+./scripts/check-performance.sh https://treinadordavid.com
+```
+- Analisa tamanho de arquivos
+- Verifica fontes locais
+- Lista plugins ativos
+- Recomendações de otimização
 
+---
 
-## 📢 Feedback and Participation
+## 📚 Documentação Completa | Full Documentation
 
-We're excited to have you join us early in the Copilot CLI journey.
+### Português 🇧🇷
+- 📖 [README Completo](docs/README-PT.md)
+- 🔍 [Guia de SEO](docs/SEO-GUIDE-PT.md)
+- 🎨 [Documentação do Tema](docs/THEME-DOCS-PT.md)
+- 🔌 [Documentação dos Plugins](docs/PLUGINS-DOCS-PT.md)
 
-This is an early-stage preview, and we're building quickly. Expect frequent updates--please keep your client up to date for the latest features and fixes!
+### English 🇺🇸
+- 📖 [Full README](docs/README-EN.md) *(coming soon)*
+- 🔍 [SEO Guide](docs/SEO-GUIDE-EN.md) *(coming soon)*
 
-Your insights are invaluable! Open issue in this repo, join Discussions, and run `/feedback` from the CLI to submit a confidential feedback survey!
+---
+
+## 🎯 Shortcodes Principais | Main Shortcodes
+
+### Resposta Rápida | Quick Answer
+```
+[td_quick_answer title="Em Resumo"]
+Conteúdo...
+[/td_quick_answer]
+```
+
+### Evidências Científicas | Scientific Evidence
+```
+[td_science title="Estudos Científicos"]
+  [td_card title="Estudo 1" meta="Author, 2024"]
+    Resumo...
+  [/td_card]
+[/td_science]
+```
+
+### FAQ
+```
+[td_qa title="Perguntas Frequentes"]
+  [td_qa_card q="Pergunta?"]
+    Resposta...
+  [/td_qa_card]
+[/td_qa]
+```
+
+### Speakable (Google Assistant)
+```
+[td_speakable]
+Texto otimizado para assistentes de voz...
+[/td_speakable]
+```
+
+Veja [docs/README-PT.md](docs/README-PT.md) para lista completa.
+
+---
+
+## 📊 Performance Targets
+
+| Métrica | Target | Status |
+|---------|--------|--------|
+| PageSpeed Mobile | 90+ | ✅ |
+| PageSpeed Desktop | 95+ | ✅ |
+| LCP (Largest Contentful Paint) | < 2.5s | ✅ |
+| FID (First Input Delay) | < 100ms | ✅ |
+| CLS (Cumulative Layout Shift) | < 0.1 | ✅ |
+
+---
+
+## 🔧 Requisitos | Requirements
+
+- WordPress 6.2+
+- PHP 8.0+
+- MySQL 5.7+ ou MariaDB 10.3+
+- Tema Hello Elementor (parent)
+
+### Recomendado | Recommended
+- HTTPS/SSL
+- PHP 8.1+
+- MySQL 8.0+
+- Cache de servidor (Varnish, Redis)
+- CDN (Cloudflare, StackPath)
+
+---
+
+## 🐛 Solução de Problemas | Troubleshooting
+
+### Tema não aparece | Theme not showing
+```bash
+wp theme install hello-elementor --activate
+wp theme activate hello-child-treinadordavid
+```
+
+### CSS não carrega | CSS not loading
+```bash
+./scripts/optimize-assets.sh
+wp cache flush
+```
+
+### Fontes não carregam | Fonts not loading
+```bash
+chmod -R 644 wp-content/themes/hello-child-treinadordavid/fonts/*
+chmod 755 wp-content/themes/hello-child-treinadordavid/fonts
+```
+
+Veja [docs/README-PT.md#troubleshooting](docs/README-PT.md#-troubleshooting) para mais soluções.
+
+---
+
+## 📈 Roadmap
+
+- [x] Tema filho otimizado
+- [x] MU-Plugins core
+- [x] TOC automático
+- [x] SEO Fitness plugin
+- [x] Scripts de otimização
+- [x] Documentação completa
+- [ ] Suporte a AMP
+- [ ] PWA (Progressive Web App)
+- [ ] Modo escuro (dark mode)
+- [ ] Internacionalização (i18n)
+
+---
+
+## 🤝 Contribuindo | Contributing
+
+Contribuições são bem-vindas! Por favor:
+1. Fork o projeto
+2. Crie sua feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença | License
+
+Este projeto está licenciado sob a GPL-2.0 License - veja [LICENSE.md](LICENSE.md) para detalhes.
+
+### Fontes | Fonts
+- **Oswald**: SIL Open Font License 1.1
+- **Inter**: SIL Open Font License 1.1
+
+---
+
+## 📞 Contato | Contact
+
+- **Website**: [treinadordavid.com](https://treinadordavid.com)
+- **Email**: contato@treinadordavid.com
+- **GitHub**: [@treinadordavid](https://github.com/treinadordavid)
+
+---
+
+## 🙏 Agradecimentos | Acknowledgments
+
+- [WordPress](https://wordpress.org/)
+- [Hello Elementor Theme](https://elementor.com/hello-theme/)
+- [Schema.org](https://schema.org/)
+- Comunidade WordPress Brasil
+
+---
+
+## 📝 Changelog
+
+### v1.2.0 (2025-11-16)
+- ✅ Estrutura WordPress organizada
+- ✅ Scripts de otimização criados
+- ✅ Plugin SEO Fitness adicionado
+- ✅ Documentação completa em PT-BR
+- ✅ Guia de SEO para fitness
+
+### v1.1.0
+- Tema filho otimizado
+- MU-plugins core
+- TOC automático
+
+### v1.0.0
+- Release inicial
+
+---
+
+<div align="center">
+
+**Feito com ❤️ por [Treinador David](https://treinadordavid.com)**
+
+*Transformando vidas através do fitness e tecnologia*
+
+</div>
