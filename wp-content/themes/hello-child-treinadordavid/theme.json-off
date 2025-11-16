@@ -1,0 +1,153 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "color": {
+      "palette": [
+        {
+          "slug": "brand-display",
+          "name": "Azul (Display)",
+          "color": "#0EA5E9"
+        },
+        {
+          "slug": "brand-text",
+          "name": "Azul (Texto/AA)",
+          "color": "#0369A1"
+        },
+        {
+          "slug": "dark",
+          "name": "Azul-Escuro (Fundo)",
+          "color": "#0B1220"
+        },
+        {
+          "slug": "text-primary",
+          "name": "Texto Principal",
+          "color": "#0F172A"
+        },
+        {
+          "slug": "text-secondary",
+          "name": "Texto Secundário",
+          "color": "#475569"
+        },
+        {
+          "slug": "white",
+          "name": "Branco",
+          "color": "#FFFFFF"
+        },
+        {
+          "slug": "light",
+          "name": "Fundo Secundário",
+          "color": "#F8FAFC"
+        },
+        {
+          "slug": "cta",
+          "name": "CTA (Laranja)",
+          "color": "#C2410C"
+        },
+        {
+          "slug": "success",
+          "name": "Sucesso (Verde)",
+          "color": "#15803D"
+        },
+        {
+          "slug": "error",
+          "name": "Erro (Vermelho)",
+          "color": "#B91C1C"
+        }
+      ]
+    },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        {
+          "slug": "oswald",
+          "name": "Oswald",
+          "fontFamily": "'Oswald', Impact, 'Arial Black', sans-serif"
+        },
+        {
+          "slug": "inter",
+          "name": "Inter",
+          "fontFamily": "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"
+        }
+      ],
+      "fontSizes": [
+        {
+          "slug": "base",
+          "name": "Base",
+          "size": "clamp(1rem, 0.5vw + 0.875rem, 1.125rem)"
+        },
+        {
+          "slug": "lg",
+          "name": "Large",
+          "size": "clamp(1.125rem, 1vw + 0.875rem, 1.5rem)"
+        },
+        {
+          "slug": "xl",
+          "name": "XL",
+          "size": "clamp(1.25rem, 1.5vw + 0.875rem, 1.875rem)"
+        },
+        {
+          "slug": "2xl",
+          "name": "2XL",
+          "size": "clamp(1.5rem, 2vw + 1rem, 2.25rem)"
+        },
+        {
+          "slug": "3xl",
+          "name": "3XL",
+          "size": "clamp(1.875rem, 3vw + 1rem, 3rem)"
+        },
+        {
+          "slug": "4xl",
+          "name": "4XL",
+          "size": "clamp(2.25rem, 4vw + 1.25rem, 3.75rem)"
+        },
+        {
+          "slug": "5xl",
+          "name": "5XL",
+          "size": "clamp(3rem, 6vw + 1.5rem, 5rem)"
+        }
+      ]
+    },
+    "spacing": {
+      "units": [
+        "px",
+        "rem",
+        "%",
+        "vw",
+        "vh"
+      ]
+    },
+    "layout": {
+      "contentSize": "1000px",
+      "wideSize": "1100px"
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "var(--wp--preset--color--white)",
+      "text": "var(--wp--preset--color--text-primary)"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--inter)",
+      "lineHeight": 1.7,
+      "fontSize": "var(--wp--preset--font-size--base)"
+    },
+    "elements": {
+      "heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--oswald)",
+          "lineHeight": 1.2
+        }
+      },
+      "link": {
+        "color": {
+          "text": "var(--wp--preset--color--brand-text)"
+        },
+        "typography": {
+          "textDecoration": "underline"
+        }
+      }
+    }
+  }
+}
