@@ -1,0 +1,13 @@
+# TD Content Generator - Dependências Python
+
+# Core
+requests>=2.31.0
+
+# Markdown processing (opcional - melhora conversão)
+markdown2>=2.4.10
+
+# Environment variables (opcional - segurança)
+python-dotenv>=1.0.0
+
+# CLI enhancements (opcional)
+colorama>=0.4.6

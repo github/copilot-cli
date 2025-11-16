@@ -1,0 +1,87 @@
+[
+  {
+    "topic_type": "treino",
+    "title": "Como Ganhar Massa Muscular Depois dos 40",
+    "custom_params": {
+      "hook_question": "Achas que é tarde demais para ganhar músculo depois dos 40?",
+      "topic_intro": "Vou te mostrar que idade é apenas um número quando tens o método certo.",
+      "cta_type": "programa_foca"
+    }
+  },
+  {
+    "topic_type": "nutricao",
+    "title": "A Verdade Sobre Proteína: Quanto Precisas Realmente",
+    "custom_params": {
+      "hook_question": "Quantas gramas de proteína por dia? A resposta vai te surpreender.",
+      "nutrition_question": "Preciso de 2g de proteína por kg de peso?",
+      "cta_type": "ebook_gratis"
+    }
+  },
+  {
+    "topic_type": "motivacao",
+    "title": "Disciplina vs Motivação: O Que Realmente Funciona",
+    "custom_params": {
+      "personal_story": "aprendi que motivação é passageira, mas disciplina é eterna",
+      "shocking_stat": "95% das pessoas falham porque dependem de motivação, não de disciplina",
+      "cta_type": "desafio_30_dias"
+    }
+  },
+  {
+    "topic_type": "ciencia",
+    "title": "Frequência de Treino: O Que a Ciência Realmente Diz",
+    "custom_params": {
+      "hook_question": "Treinar 3x por semana é suficiente? Ou precisas de 6x?",
+      "cta_type": "consultoria"
+    }
+  },
+  {
+    "topic_type": "transformacao",
+    "title": "De Sedentário a Atleta: 90 Dias de Transformação Total",
+    "custom_params": {
+      "personal_story": "estava 30kg acima do peso, sem energia, sem esperança",
+      "cta_type": "transformacao"
+    }
+  },
+  {
+    "topic_type": "treino",
+    "title": "Treino em Casa vs Academia: Qual é Melhor?",
+    "custom_params": {
+      "hook_question": "Consegues resultados sem academia?",
+      "common_myth": "precisas de uma academia cara para ganhar músculo",
+      "cta_type": "app_mobile"
+    }
+  },
+  {
+    "topic_type": "nutricao",
+    "title": "Jejum Intermitente: Funciona ou É Moda?",
+    "custom_params": {
+      "hook_question": "Jejum intermitente queima gordura ou é só hype?",
+      "nutrition_question": "Devo fazer jejum intermitente?",
+      "cta_type": "newsletter"
+    }
+  },
+  {
+    "topic_type": "motivacao",
+    "title": "Como Manter a Consistência Quando a Vida Complica",
+    "custom_params": {
+      "personal_story": "enfrentei a pior fase da minha vida e não parei de treinar",
+      "cta_type": "comunidade"
+    }
+  },
+  {
+    "topic_type": "ciencia",
+    "title": "Cardio Mata Ganhos? A Ciência Responde",
+    "custom_params": {
+      "hook_question": "Fazer cardio vai destruir teus ganhos de massa?",
+      "cta_type": "video_gratis"
+    }
+  },
+  {
+    "topic_type": "treino",
+    "title": "Drop Sets, Supersets e Rest-Pause: Quando Usar Cada Um",
+    "custom_params": {
+      "hook_question": "Técnicas avançadas funcionam ou são perda de tempo?",
+      "cta_type": "metodo_td"
+    }
+  }
+]
