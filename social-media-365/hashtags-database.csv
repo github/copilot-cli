@@ -1,0 +1,280 @@
+Category,Hashtag,Popularity,Platform_Best,Usage_Notes
+Fitness_BR,#TreinadorDavid,Brand,All,Sempre usar
+Fitness_BR,#FitnessBrasil,High,IG/TT,Amplo alcance BR
+Fitness_BR,#AcademiaBrasil,High,IG/FB,Comunidade academia
+Fitness_BR,#TreinoBR,High,IG/TT,Treinos brasileiros
+Fitness_BR,#Musculacao,High,IG/FB,Musculação BR
+Fitness_BR,#Hipertrofia,High,IG/TT,Ganho muscular
+Fitness_BR,#Personal,Medium,IG/LI,Personal trainers
+Fitness_BR,#PersonalTrainer,High,IG/LI,Profissionais
+Fitness_BR,#PersonalTrainerBR,Medium,IG/LI,BR específico
+Fitness_BR,#TreinadorPessoal,Medium,IG/FB,PT-BR termo
+Fitness_BR,#Crosstraining,Medium,IG/TT,Treino funcional
+Fitness_BR,#FuncionalBR,Medium,IG/TT,Funcional BR
+Fitness_BR,#AcademiaVirtual,Medium,IG/YT,Online training
+Fitness_BR,#TreinoOnline,High,IG/YT,Online workouts
+Fitness_BR,#FitnessOnline,High,IG/YT,Virtual fitness
+Fitness_BR,#TreinoEmCasa,High,IG/TT,Home workouts
+Fitness_BR,#HomeWorkoutBR,Medium,IG/TT,Casa treinos
+Fitness_BR,#TreinoCaseiro,Medium,IG/FB,Treino residencial
+Fitness_BR,#GymBrasil,High,IG,Academia BR
+Fitness_BR,#AcademiaSP,Medium,IG,São Paulo específico
+Fitness_BR,#AcademiaRJ,Medium,IG,Rio específico
+Fitness_BR,#FitnessSP,Medium,IG,SP fitness
+Fitness_BR,#FitnessRJ,Medium,IG,RJ fitness
+Motivação,#Motivacao,High,All,Sem acento
+Motivação,#Motivação,High,All,Com acento
+Motivação,#MotivacaoFitness,High,IG/FB,Fitness motivation
+Motivação,#Foco,High,All,Focus
+Motivação,#Disciplina,High,All,Discipline
+Motivação,#Determinacao,High,All,Determination
+Motivação,#FocoForcaFe,High,IG/FB,Triple F
+Motivação,#NaoDesista,Medium,IG/FB,Never give up
+Motivação,#VamosPraCima,Medium,IG/TT,Let's go
+Motivação,#SejaForte,Medium,IG/FB,Be strong
+Motivação,#Superacao,High,IG/FB,Overcome
+Motivação,#Resiliencia,Medium,IG/LI,Resilience
+Motivação,#GuerreiroDoDia,Medium,IG/TT,Daily warrior
+Motivação,#MindsetVencedor,Medium,IG/LI,Winner mindset
+Motivação,#MentalidadeForte,Medium,IG/FB,Strong mentality
+Motivação,#SemDesculpas,High,IG/TT,No excuses
+Motivação,#DorTemporaria,Medium,IG/FB,Temporary pain
+Motivação,#GloriaEterna,Medium,IG/FB,Eternal glory
+Treino,#Treino,High,All,Workout
+Treino,#TreinoPesado,High,IG/TT,Heavy training
+Treino,#TreinoDuro,High,IG/TT,Hard training
+Treino,#TreinoIntensivo,Medium,IG/FB,Intensive
+Treino,#TreinoDePernas,High,IG/TT,Leg day
+Treino,#LegDay,High,IG/TT,Internacional leg
+Treino,#TreinoDeCostas,High,IG,Back training
+Treino,#TreinoDePeito,High,IG,Chest day
+Treino,#TreinoDeBraço,High,IG,Arm day
+Treino,#TreinoDeOmbro,High,IG,Shoulder day
+Treino,#TreinoABC,Medium,IG/FB,ABC split
+Treino,#TreinoABCD,Medium,IG/FB,ABCD split
+Treino,#TreinoPushPull,Medium,IG,Push pull
+Treino,#TreinoFullBody,Medium,IG,Full body
+Treino,#TreinoSuperiores,Medium,IG,Upper body
+Treino,#TreinoInferiores,Medium,IG,Lower body
+Treino,#CardioTreino,Medium,IG/TT,Cardio
+Treino,#HIITBrasil,Medium,IG/TT,HIIT workouts
+Treino,#CircuitoTreino,Medium,IG/TT,Circuit training
+Treino,#TreinoFuncional,High,IG/TT,Functional
+Treino,#CrossFitBR,High,IG/TT,CrossFit BR
+Treino,#Calistenia,Medium,IG/TT,Calisthenics
+Treino,#CalisteniaBR,Medium,IG/TT,BR calisthenics
+Treino,#TreinoLivre,Medium,IG,Free weights
+Exercícios,#Exercicios,High,All,Exercises
+Exercícios,#Exercício,High,All,Exercise singular
+Exercícios,#ExercicioFisico,High,IG/FB,Physical exercise
+Exercícios,#Agachamento,High,IG/TT,Squat
+Exercícios,#Supino,High,IG/TT,Bench press
+Exercícios,#LevantamentoTerra,Medium,IG/TT,Deadlift
+Exercícios,#Deadlift,Medium,IG/TT,Internacional
+Exercícios,#Flexao,High,IG/TT,Push-ups
+Exercícios,#Barra,High,IG/TT,Pull-ups
+Exercícios,#BarraFixa,High,IG/TT,Pull-up bar
+Exercícios,#Remada,Medium,IG,Row
+Exercícios,#DesenvolvimentoOmbro,Medium,IG,Shoulder press
+Exercícios,#RoscaDireta,Medium,IG,Bicep curl
+Exercícios,#Triceps,Medium,IG,Triceps
+Exercícios,#Abdominais,High,IG/TT,Abs
+Exercícios,#AbdomenDefinido,High,IG/TT,Defined abs
+Exercícios,#Prancha,Medium,IG/TT,Plank
+Exercícios,#Burpee,Medium,IG/TT,Burpees
+Educação,#EducacaoFisica,High,IG/LI,Physical education
+Educação,#CienciaDoTreino,Medium,IG/LI,Training science
+Educação,#FisiologiaExercicio,Low,LI,Exercise physiology
+Educação,#Biomecânica,Low,LI,Biomechanics
+Educação,#TreinamentoEsportivo,Medium,IG/LI,Sports training
+Educação,#Periodização,Low,LI,Periodization
+Educação,#PeriodizacaoTreino,Low,LI,Training periodization
+Educação,#SobrecargaProgressiva,Medium,IG/LI,Progressive overload
+Educação,#TempoSobTensao,Medium,IG/FB,Time under tension
+Educação,#RangeDeMov,Medium,IG,Range of motion
+Educação,#AmplitudeMovimento,Medium,IG/FB,ROM
+Educação,#FormaTecnica,Medium,IG/FB,Form technique
+Educação,#TecnicaCorreta,High,IG/TT,Correct technique
+Educação,#ExecutaoBemFeita,Medium,IG,Proper execution
+Resultados,#Resultados,High,All,Results
+Resultados,#ResultadosReais,High,IG/FB,Real results
+Resultados,#Transformacao,High,All,Transformation
+Resultados,#TransformacaoFisica,High,IG/FB,Physical transformation
+Resultados,#AntesEDepois,High,IG/FB,Before after
+Resultados,#BeforeAndAfter,High,IG,Internacional
+Resultados,#GanhoMuscular,High,IG,Muscle gain
+Resultados,#PerdaDePeso,High,IG/FB,Weight loss
+Resultados,#Emagrecimento,High,IG/FB,Slimming
+Resultados,#Definicao,High,IG,Definition
+Resultados,#DefinicaoMuscular,High,IG,Muscle definition
+Resultados,#CorpoDefinido,High,IG,Defined body
+Resultados,#CorpoSaudavel,High,IG/FB,Healthy body
+Resultados,#FitnessResults,Medium,IG,Internacional results
+Resultados,#ProgressoFitness,Medium,IG,Fitness progress
+Resultados,#EvoluçãoFisica,Medium,IG/FB,Physical evolution
+Lifestyle,#VidaSaudavel,High,All,Healthy life
+Lifestyle,#EstiloDeVidaSaudavel,High,IG/FB,Healthy lifestyle
+Lifestyle,#VidaFitness,High,IG,Fitness life
+Lifestyle,#LifestyleFitness,Medium,IG,Fitness lifestyle
+Lifestyle,#VidaAtiva,High,IG/FB,Active life
+Lifestyle,#Wellness,Medium,All,Bem-estar
+Lifestyle,#BemestarFisico,Medium,IG/FB,Physical wellness
+Lifestyle,#SaudeEBemEstar,High,IG/FB,Health wellness
+Lifestyle,#QualidadeDeVida,High,IG/FB,Quality of life
+Lifestyle,#VidaEquilibrada,Medium,IG/FB,Balanced life
+Lifestyle,#Longevidade,Medium,IG/LI,Longevity
+Lifestyle,#EnvelhecerComSaude,Low,FB/LI,Age healthy
+Lifestyle,#SaudeIntegral,Medium,IG/FB,Integral health
+Lifestyle,#HabitosSaudaveis,High,IG/FB,Healthy habits
+Lifestyle,#RotinaSaudavel,High,IG/FB,Healthy routine
+Recuperação,#Recuperacao,Medium,IG/FB,Recovery
+Recuperação,#RecuperacaoMuscular,Medium,IG/FB,Muscle recovery
+Recuperação,#DescansoAtivo,Medium,IG,Active rest
+Recuperação,#RestDay,Medium,IG,Rest day
+Recuperação,#DiaDeFolga,Low,IG,Day off
+Recuperação,#Alongamento,High,IG/TT,Stretching
+Recuperação,#Flexibilidade,Medium,IG,Flexibility
+Recuperação,#Mobilidade,Medium,IG/TT,Mobility
+Recuperação,#MobilidadeArticular,Low,IG,Joint mobility
+Recuperação,#Sono,Medium,IG/FB,Sleep
+Recuperação,#QualidadeSono,Medium,IG/FB,Sleep quality
+Recuperação,#Descanso,Medium,IG/FB,Rest
+Recuperação,#RecuperacaoAdequada,Low,FB,Adequate recovery
+Nutrição,#NutricaoFitness,High,IG/FB,Fitness nutrition
+Nutrição,#AlimentacaoSaudavel,High,IG/FB,Healthy eating
+Nutrição,#Proteina,High,IG/FB,Protein
+Nutrição,#DietaFlexivel,Medium,IG/FB,Flexible diet
+Nutrição,#MacrosBR,Medium,IG/FB,Macros BR
+Nutrição,#Hidratacao,Medium,IG/FB,Hydration
+Nutrição,#BebaAgua,High,IG/TT,Drink water
+Mindset,#MindsetFitness,Medium,IG/LI,Fitness mindset
+Mindset,#MentalidadeFitness,Medium,IG/FB,Fitness mentality
+Mindset,#ForteMental,Medium,IG/FB,Mentally strong
+Mindset,#ResilienciaMental,Low,LI,Mental resilience
+Mindset,#AutoDisciplina,Medium,IG/LI,Self-discipline
+Mindset,#Consistencia,High,All,Consistency
+Mindset,#ConsistenciaResultados,Medium,IG/FB,Consistency results
+Mindset,#PacienciaProcesso,Medium,IG/FB,Process patience
+Mindset,#Processo,High,All,Process
+Mindset,#RespeiteSeuProcesso,Medium,IG/FB,Respect process
+Mindset,#JornadaFitness,Medium,IG,Fitness journey
+Mindset,#Dedicacao,High,All,Dedication
+Mindset,#Comprometimento,Medium,All,Commitment
+Mindset,#VoceECapaz,High,IG/FB,You're capable
+Militar,#USMC,Medium,IG/LI,Marines
+Militar,#MarineCorps,Medium,IG/LI,Marine Corps
+Militar,#MilitarFitness,Low,IG/LI,Military fitness
+Militar,#DisciplinaMilitar,Low,IG/LI,Military discipline
+Militar,#TreinoMilitar,Medium,IG/TT,Military training
+Militar,#SemperFi,Low,IG/LI,Marines motto
+Militar,#LeadershipFitness,Low,LI,Leadership
+Militar,#LiderancaFitness,Low,LI,Liderança
+Militar,#VeteranFitness,Low,LI,Veteran
+Comunidade,#ComunidadeFitness,High,IG/FB,Fitness community
+Comunidade,#FitnessFamily,Medium,IG,Fitness family
+Comunidade,#FamiliaFitness,Medium,IG/FB,BR family
+Comunidade,#TimeFitness,Medium,IG/FB,Fitness team
+Comunidade,#JuntosSomosMaisFortes,Medium,IG/FB,Together stronger
+Comunidade,#MotivaMutua,Medium,IG/FB,Mutual motivation
+Comunidade,#ApoioMutuo,Medium,FB,Mutual support
+Comunidade,#GrupoTreino,Medium,FB,Training group
+Geral,#Fitness,High,All,Universal
+Geral,#FitnessMotivation,High,IG,International
+Geral,#FitnessJourney,Medium,IG,Journey
+Geral,#FitnessGoals,High,IG,Goals
+Geral,#FitnessLife,High,IG,Life
+Geral,#Gym,High,All,Academia
+Geral,#GymLife,High,IG,Gym life
+Geral,#GymMotivation,High,IG,Gym motivation
+Geral,#GymTime,High,IG/TT,Gym time
+Geral,#WorkoutMotivation,High,IG,Workout
+Geral,#Workout,High,All,Treino
+Geral,#Training,High,All,Treinamento
+Geral,#Fit,High,All,Em forma
+Geral,#FitLife,High,IG,Fit life
+Geral,#GetFit,Medium,IG,Ficar em forma
+Geral,#StayFit,Medium,IG,Manter forma
+Geral,#HealthyLifestyle,High,IG,Estilo saudável
+Geral,#Health,High,All,Saúde
+Geral,#HealthAndFitness,High,IG/FB,Saúde fitness
+Geral,#FitnessAddict,Medium,IG,Fitness viciado
+Geral,#FitnessFreak,Medium,IG,Fitness fanático
+Geral,#GymRat,Medium,IG,Rato academia
+Geral,#Bodybuilding,High,IG,Fisiculturismo
+Geral,#Muscle,High,IG,Músculo
+Geral,#Gains,High,IG/TT,Ganhos
+Geral,#MuscleGains,High,IG,Ganhos musculares
+Geral,#Shredded,Medium,IG,Definido
+Geral,#Ripped,Medium,IG,Rasgado
+Geral,#Swole,Medium,IG,Musculoso
+Geral,#BeastMode,High,IG/TT,Modo besta
+Geral,#NoExcuses,High,All,Sem desculpas
+Geral,#JustDoIt,Medium,IG,Apenas faça
+Geral,#NeverGiveUp,Medium,IG,Nunca desista
+Geral,#PushYourself,Medium,IG,Se desafie
+Geral,#TrainHard,High,IG,Treine duro
+Geral,#WorkHardPlayHard,Medium,IG,Trabalhe jogue duro
+Geral,#FitnessGoal,High,IG,Meta fitness
+Geral,#FitnessTransformation,High,IG,Transformação
+Geral,#TransformationTuesday,Medium,IG,Terça transformação
+Geral,#MotivationMonday,High,IG/FB,Segunda motivação
+Geral,#WorkoutWednesday,Medium,IG,Quarta treino
+Geral,#FlexFriday,Medium,IG,Sexta flex
+Geral,#FitFam,High,IG,Família fit
+Geral,#Fitspiration,Medium,IG,Inspiração fit
+Geral,#Fitspo,High,IG,Inspo fit
+Geral,#InstaFit,High,IG,Insta fitness
+Geral,#InstaFitness,High,IG,Instagram fitness
+Geral,#InstaHealth,Medium,IG,Insta saúde
+Geral,#FitnessInfluencer,Low,IG/LI,Influenciador
+Geral,#PersonalTrainerLife,Low,IG/LI,Vida PT
+Geral,#PTLife,Low,IG/LI,Vida PT
+Geral,#OnlineCoach,Medium,IG/LI,Coach online
+Geral,#FitnessCoach,High,IG/LI,Coach fitness
+Geral,#StrengthTraining,High,IG,Treino força
+Geral,#WeightLifting,Medium,IG,Levantamento peso
+Geral,#PowerLifting,Medium,IG,Powerlifting
+Geral,#BodyWeight,Medium,IG,Peso corporal
+Geral,#BodyWeightTraining,Medium,IG,Treino peso corporal
+Específico_TD,#DEPENDE,Brand,All,Resposta assinatura TD
+Específico_TD,#TreinadorDavidMethod,Brand,All,Método TD
+Específico_TD,#MarineToTrainer,Brand,IG/LI,História transformação
+Específico_TD,#FitnessComCiencia,Brand,IG/FB,Science-based
+Específico_TD,#TDArmy,Brand,All,Comunidade TD
+Específico_TD,#TreinadorDavidTeam,Brand,IG/FB,Time TD
+Específico_TD,#TDTransformations,Brand,IG,Transformações clientes
+Específico_TD,#TreinadorDavidOnline,Brand,IG/YT,Programa online
+Específico_TD,#SegueoTD,Brand,All,Call to action
+Específico_TD,#TimeTD,Brand,IG/FB,Equipe TD
+YouTube,#FitnessYouTube,Medium,YT,YouTube fitness
+YouTube,#TreinoYouTube,Medium,YT,Treino YouTube
+YouTube,#YouTubeFitness,Medium,YT,YT fitness
+YouTube,#FitnessBR,High,YT,BR fitness
+YouTube,#ExerciciosYouTube,Medium,YT,Exercises YT
+TikTok,#FitnessTikTok,High,TT,TikTok fitness
+TikTok,#TikTokFitness,High,TT,Fitness TT
+TikTok,#TreinoTikTok,High,TT,Treino TT
+TikTok,#FitnessChallenge,High,TT,Desafio
+TikTok,#WorkoutChallenge,High,TT,Desafio treino
+TikTok,#FitCheck,High,TT,Verificação forma
+TikTok,#GymTok,High,TT,Gym TikTok
+LinkedIn,#FitnessProfessional,Medium,LI,Profissional fitness
+LinkedIn,#HealthCoach,Medium,LI,Coach saúde
+LinkedIn,#PersonalTrainerBusiness,Low,LI,Negócio PT
+LinkedIn,#FitnessEntrepreneur,Low,LI,Empreendedor fitness
+LinkedIn,#FitnessIndustry,Low,LI,Indústria fitness
+LinkedIn,#OnlineFitnessCoaching,Medium,LI,Coaching online
+Sazonais,#AnoNovo,Seasonal,All,Janeiro
+Sazonais,#MetasAnoNovo,Seasonal,All,Janeiro metas
+Sazonais,#NewYearNewMe,Seasonal,All,Janeiro
+Sazonais,#VeraoChegando,Seasonal,IG/FB,Outubro-Dezembro
+Sazonais,#ProjetoVerao,Seasonal,IG/FB,Setembro-Dezembro
+Sazonais,#SummerBody,Seasonal,IG,Verão
+Sazonais,#BeachBody,Seasonal,IG,Corpo praia
+Sazonais,#FitnessChallenge30Dias,Recurring,All,Desafios mensais
+Engajamento,#SalveEstePost,High,IG,Save this
+Engajamento,#CompartilheComAmigo,High,IG/FB,Share with friend
+Engajamento,#MarcaUmAmigo,High,IG/FB,Tag a friend
+Engajamento,#ComentaAqui,High,IG/FB,Comment here
+Engajamento,#DupliqueSeguir,Medium,IG,Double tap
+Engajamento,#SigaParaMais,High,All,Follow for more
