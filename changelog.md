@@ -1,34 +1,48 @@
+## 0.0.359 - 2025-11-17
+
+- Support adding images to context via drag & dropping and pasting paths to image files. Improved how image slugs are rendered in the input box
+- Add `/share` command to save session as markdown file or GitHub gist
+- Fix a bug where cached tokens were displaying as zero at the end of the session
+- Enable `USE_BUILTIN_RIPGREP` environment variable to optionally use ripgrep from PATH
+- Fix an issue where sourcing custom agents from the remote repository's default branch led to confusions about whether the local copy of the agent was being used
+- Fix custom agents configuration issues
+- Improve `Ctrl+C` performance
+- Improve tool argument parsing safety
+- Distinguish tool names from paths and improve tool success/error icons
+- `copilot -p` will no longer interactively prompt for permission requests
+- Remove unnecessary whitespace from tool descriptions
+
 ## 0.0.358 - 2025-11-14
 
-Recovery release to fix availability of GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini models.
+- Recovery release to fix availability of GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini models
 
 ## 0.0.357 - 2025-11-13
 
-Recovery release to fix an issue with image resizing.
+- Recovery release to fix an issue with image resizing
 
 ## 0.0.356 - 2025-11-13
 
-- GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini are now available in GitHub Copilot CLI. See the [GitHub Changelog](https://github.blog/changelog/2025-11-13-openais-gpt-5-1-gpt-5-1-codex-and-gpt-5-1-codex-mini-are-now-in-public-preview-for-github-copilot/) for more details
+- GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini are now available in GitHub Copilot CLI
 
 ## 0.0.355 - 2025-11-12
 
 - Enabled the CLI agent to read its own `/help` and README to answer questions about its capabilities
-- Improved parsing of VSCode-formatted custom agents with the `.agent.md` suffix
-- Sanitize tool names to fix issues like https://github.com/github/copilot-cli/issues/456
+- Improved parsing of VS Code-formatted custom agents with the `.agent.md` suffix
+- Sanitize tool names to fix issues with special characters
 - Bundled `ripgrep` and added `grep` and `glob` tools for more performant searching of codebases
-- Fixed malformed tool call handling before it reaches the UI (partially addresses https://github.com/github/copilot-cli/issues/393)
+- Fixed malformed tool call handling before it reaches the UI
 - Prevent double line wraps in markdown messages
-- Fixed a bug where the file selector was used in multi-line input that led to unexpected up/down arrow behavior (fixes https://github.com/github/copilot-cli/issues/350)
+- Fixed a bug where the file selector was used in multi-line input that led to unexpected up/down arrow behavior
 - Fixed a bug where remote MCP server configuration in custom agents was not fetched properly
 - Added more detail and improved the styling of the `/session` command's output
-- Removed the internal `NODE_ENV` variable from the shell tool's environment (fixes https://github.com/github/copilot-cli/issues/151)
+- Removed the internal `NODE_ENV` variable from the shell tool's environment
 - Fixed a memory leak when using the interactive shell tool
-- Improved line number formatting in file view output (fixes https://github.com/github/copilot-cli/issues/471)
+- Improved line number formatting in file view output
 - Lowered the default shell tool timeout and updated prompt language to not imply that timeout means failure
-- Ensured that we query the terminal background color before rendering (fixes https://github.com/github/copilot-cli/issues/36)
+- Ensured that we query the terminal background color before rendering
 - Ensured that the agent won't run `pkill` on its own PID
-- Fixed a bug where `copilot` would not quit after an abort signal (fixes https://github.com/github/copilot-cli/issues/529)
-- Ensure `!` commands on Windows use PowerShell when available (fixes https://github.com/github/copilot-cli/issues/504)
+- Fixed a bug where `copilot` would not quit after an abort signal
+- Ensure `!` commands on Windows use PowerShell when available
 - Fixed a bug in Windows Terminal where keyboard input was not accepted
 
 ## 0.0.354 - 2025-11-03
@@ -57,41 +71,17 @@ Recovery release to fix an issue with image resizing.
 ## 0.0.351 - 2025-10-24
 
 - Improved our path detection heuristic to avoid various annoying, unnecessary permissions requests:
-	- Running many standard bash/PowerShell commands that are known to be readonly (Fixes part of https://github.com/github/sweagentd/issues/7372)
-	- Commands like `npm test -- --something` in PowerShell
-	- Shell redirections like `> some_file.txt` in paths you've already granted write permissions, `> /dev/null`, and `2>&1` (Fixes https://github.com/github/copilot-cli/issues/211)
-	- Arguments to `gh api` like `gh api /repos/user/repo/ec` (Fixes https://github.com/github/copilot-cli/issues/216)
+    - Running many standard bash/PowerShell commands that are known to be readonly (Fixes part of https://github.com/github/sweagentd/issues/7372)
+    - Commands like `npm test -- --something` in PowerShell
+    - Shell redirections like `> some_file.txt` in paths you've already granted write permissions, `> /dev/null`, and `2>&1` (Fixes https://github.com/github/copilot-cli/issues/211)
+    - Arguments to `gh api` like `gh api /repos/user/repo/ec` (Fixes https://github.com/github/copilot-cli/issues/216)
 - Improved prompting for Sonnet 4.5 to reduce the number of intermediate markdown files left in the workspace
 - 👀 ...see you at [GitHub Universe](https://githubuniverse.com/)!
 
 ## 0.0.350 - 2025-10-23
 
-- To conserve context window space, we've limited the list of tools available to the default GitHub MCP server. In our tests, the model will use the [GitHub CLI, `gh`](https://github.com/cli/cli) (if installed) in lieu of missing MCP tools. We added an `--enable-all-github-mcp-tools` if you wish to turn on all available tools. 
-Default available tools are:
-	- Code & Repo navigation
-		- get_file_contents
-		- search_code
-		- search_repositories
-		- list_branches
-		- list_commits
-		- get_commit
-	- Issue Management
-		- get_issue
-		- list_issues
-		- get_issue_comments
-		- search_issues
-	- PR Management
-		- pull_request_read
-		- list_pull_requests
-		- search_pull_requests
-	- Workflow Info
-		- list_workflows
-		- list_workflow_runs
-		- get_workflow_run
-		- get_job_logs
-		- get_workflow_run_logs
-	- Misc search
-		- user_search
+- To conserve context window space, we've limited the list of tools available to the default GitHub MCP server. In our tests, the model will use the [GitHub CLI, `gh`](https://github.com/cli/cli) (if installed) in lieu of missing MCP tools. We added an `--enable-all-github-mcp-tools` if you wish to turn on all available tools.
+  Default available tools are: - Code & Repo navigation - get_file_contents - search_code - search_repositories - list_branches - list_commits - get_commit - Issue Management - get_issue - list_issues - get_issue_comments - search_issues - PR Management - pull_request_read - list_pull_requests - search_pull_requests - Workflow Info - list_workflows - list_workflow_runs - get_workflow_run - get_job_logs - get_workflow_run_logs - Misc search - user_search
 - Bundled `sharp` dependency into the CLI package -- we're one step closer to implementing https://github.com/github/copilot-cli/issues/16, and this fixes some startup blockers on Windows (fixes https://github.com/github/copilot-cli/issues/309 & https://github.com/github/copilot-cli/issues/287)
 - Fixed a bug where input tokens were not tracked properly (Fixes https://github.com/github/copilot-cli/issues/337)
 - Fixed a bug where MCP tools with arguments would fail with streaming enabled
@@ -100,7 +90,7 @@ Default available tools are:
 ## 0.0.349 - 2025-10-22
 
 - The model can now call multiple tools in parallel. Each tool must be confirmed in advance. This behavior can be disabled with the `--disable-parallel-tools-execution` flag
-- Added `/quit` as an alias of `/exit`  (fixes https://github.com/github/copilot-cli/issues/357)
+- Added `/quit` as an alias of `/exit` (fixes https://github.com/github/copilot-cli/issues/357)
 - Fixed a bug where every streamed output chunk was sent back to the model as part of the conversation (fixes https://github.com/github/copilot-cli/issues/379)
 - Ensure that environment variables are expanded before running path permission checks
 - Fixed a bug where Ctrl+K deleted to the end of the visual line in the input box rather than the logical line
@@ -141,7 +131,6 @@ Default available tools are:
 - Enforced minimum Node version requirement at launch
 - Simplified messaging for `/terminal-setup`
 
-
 ## 0.0.343 - 2025-10-16
 
 - ```
@@ -149,27 +138,26 @@ Default available tools are:
   Run slash model to equip
   Haiku 4.5.
   ```
-- Added a flag to augment MCP server configuration to temporarily add or override server configuration per session:  `--additional-mcp-config` (fixes https://github.com/github/copilot-cli/issues/288)
-	- You can pass MCP server configuration in two ways:
-		- Inline JSON: `copilot --additional-mcp-config '{"mcpServers": {"my-tool": {...}}}'`
-		- From a file (prefix with @): `copilot --additional-mcp-config @/path/to/config.json`
-	- You can also pass the flag multiple times (later values override earlier ones): `copilot --additional-mcp-config @base.json --additional-mcp-config @overrides.json`
+- Added a flag to augment MCP server configuration to temporarily add or override server configuration per session: `--additional-mcp-config` (fixes https://github.com/github/copilot-cli/issues/288)
+    - You can pass MCP server configuration in two ways:
+        - Inline JSON: `copilot --additional-mcp-config '{"mcpServers": {"my-tool": {...}}}'`
+        - From a file (prefix with @): `copilot --additional-mcp-config @/path/to/config.json`
+    - You can also pass the flag multiple times (later values override earlier ones): `copilot --additional-mcp-config @base.json --additional-mcp-config @overrides.json`
 - Improved our prompts to ensure the agent uses Windows-style paths on Windows (fixes https://github.com/github/copilot-cli/issues/261)
 - Added a prompt for users to run `/terminal-setup` if needed to enable multi-line input
 - Various visual improvements:
-	- Added a shimmer effect to the "Thinking..." indicator
-	- Removed the box around user messages in the timeline
-	- Increased the contrast of removed intraline highlights in diffs
-	- Allow cycling through slash commands (from the bottom of the list back to the top)
-	- Aligned permission/confirmation prompts to ensure all use the same visual style
-
+    - Added a shimmer effect to the "Thinking..." indicator
+    - Removed the box around user messages in the timeline
+    - Increased the contrast of removed intraline highlights in diffs
+    - Allow cycling through slash commands (from the bottom of the list back to the top)
+    - Aligned permission/confirmation prompts to ensure all use the same visual style
 
 ## 0.0.342 - 2025-10-15
 
 - Overhauled our session logging format:
-	- Introduced a new session logging format that decouples how we store sessions from how we display them in the timeline. The new format is cleaner, more concise, and scalable, and will allow us to more easily implement new features down the line.
-	- New sessions are stored in `~/.copilot/session-state`
-	- Legacy sessions are stored in `~/.copilot/history-session-state` -- these will be migrated to the new format & location as you resume them from `copilot --resume`
+    - Introduced a new session logging format that decouples how we store sessions from how we display them in the timeline. The new format is cleaner, more concise, and scalable, and will allow us to more easily implement new features down the line.
+    - New sessions are stored in `~/.copilot/session-state`
+    - Legacy sessions are stored in `~/.copilot/history-session-state` -- these will be migrated to the new format & location as you resume them from `copilot --resume`
 - Enabled the Kitty protocol by default. Multi-line input is now supported via Shift+Ctrl on terminal that support the Kitty protocol. Multi-line input is also supported in VSCode and its forks by running the `/terminal-setup` command (fixes https://github.com/github/copilot-cli/issues/14)
 - Enabled non-interactive GHE logins by respecting the `GH_HOST` environment variable for PAT and `gh` authentication modes (fixes https://github.com/github/copilot-cli/issues/296)
 - Improved debug log collection convenience by adding a persistent `log_level` option in `~/.copilot/config`. Possible values: `["none", "error", "warning", "info", "debug", "all", "default"]`
@@ -192,27 +180,27 @@ Default available tools are:
 - Fixed an issue where consecutive orphaned tool calls led to a "Each `tool_use` block must have a corresponding `tool_result` block in the next message" message (fixes https://github.com/github/copilot-cli/issues/102)
 - Added a prompt to approve new paths in `-p` mode. Also added `--allow-all-paths` argument that approves access to all paths.
 - Changed parsing of environment variables in MCP server configuration to treat the value of the `env` section as literal values (fixes https://github.com/github/copilot-cli/issues/26).
-  Customers who have configured MCP Servers for use with the CLI will need to make a slight modification to their `~/.copilot/mcp-config.json`.  For any servers they have added with an `env` section, they will need to go add a `$` to the start of the "value" pair of the key value pair of each entry in the env-block, so to have the values treated as references to environment variables.
+  Customers who have configured MCP Servers for use with the CLI will need to make a slight modification to their `~/.copilot/mcp-config.json`. For any servers they have added with an `env` section, they will need to go add a `$` to the start of the "value" pair of the key value pair of each entry in the env-block, so to have the values treated as references to environment variables.
 
-  For example: Before:
+    For example: Before:
+
     ```json
     {
         "env": {
             "GITHUB_ACCESS_TOKEN": "GITHUB_TOKEN"
-         }
+        }
     }
     ```
 
-    Before this change, the CLI would read the value of `GITHUB_TOKEN` from the environment of the CLI and set the environment varaible named `GITHUB_ACCESS_TOKEN` in the MCP process to that value.  With this change, `GITHUB_ACCESS_TOKEN` would now be set to the literal value `GITHUB_TOKEN`.  To get the old behavior, change to this:
+    Before this change, the CLI would read the value of `GITHUB_TOKEN` from the environment of the CLI and set the environment variable named `GITHUB_ACCESS_TOKEN` in the MCP process to that value. With this change, `GITHUB_ACCESS_TOKEN` would now be set to the literal value `GITHUB_TOKEN`. To get the old behavior, change to this:
 
     ```json
     {
         "env": {
             "GITHUB_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-         }
+        }
     }
     ```
-
 
 ## 0.0.339 - 2025-10-10
 
@@ -280,7 +268,7 @@ Default available tools are:
 ## 0.0.332 - 2025-10-01
 
 - Switched to using per-subscription Copilot API endpoints in accordance with [GitHub's docs](https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-access/manage-network-access) (fixes https://github.com/github/copilot-cli/issues/76)
-- Fixed a bug where `/user [list | show | swtich]` did not include users signed in from all authentication modes (fixes https://github.com/github/copilot-cli/issues/58)
+- Fixed a bug where `/user [list | show | switch]` did not include users signed in from all authentication modes (fixes https://github.com/github/copilot-cli/issues/58)
 - Fixed a bug where switching to another user with `/user switch` did not take effect in the GitHub MCP server
 - Improved the screenreader experience by disabling the scrollbar in the `@` file picker, the `--resume` session picker, and the `/` command picker
 - Improved the polish of the scrollbar container (increased the width, reduced the opacity of the gutter)
@@ -308,11 +296,11 @@ Default available tools are:
     - `/model` will open a picker to change the model
     - `/model <model>` will set the model to the parameter provided
 - Added display of currently selected model above the input text box (Addresses feedback in https://github.com/github/copilot-cli/issues/120, https://github.com/github/copilot-cli/issues/108, )
-- Improved error messages when users provide incorrect command-line arguments. (Addresses feedback of the discoverability of non-interactive mode from  https://github.com/github/copilot-cli/issues/96)
+- Improved error messages when users provide incorrect command-line arguments. (Addresses feedback of the discoverability of non-interactive mode from https://github.com/github/copilot-cli/issues/96)
 - Changed the behavior of `Ctrl+r` to expand only recent timeline items. After running `Ctrl+r`, you can use `Ctrl+e` to expand all
 - Improved word motion logic to better detect newlines: using word motion keys will now correctly move to the first word on a line
 - Improved the handling of multi-line inputs in the input box: the input text box is scrollable, limited to 10 lines. Long prompts won't take up the whole screen anymore! (This is on the way to implementing https://github.com/github/copilot-cli/issues/14)
-- Removed the left and right boarders from the input box. This makes it easier to copy text out of it!
+- Removed the left and right borders from the input box. This makes it easier to copy text out of it!
 - Added glob matching to shell rules. When using `--allow-tool` and `--deny-tool`, you can now specify things like `shell(npm run test:*)` to match any shell commands beginning with `npm run test`
 - Improved the `copilot --resume` interface with relative time display, session message count, (Fixes https://github.com/github/copilot-cli/issues/97)
 
