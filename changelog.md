@@ -1,3 +1,7 @@
+## 0.0.360 - 2025-11-18
+
+- Fix file operations timing out while waiting for user permission
+
 ## 0.0.359 - 2025-11-17
 
 - Support adding images to context via drag & dropping and pasting paths to image files. Improved how image slugs are rendered in the input box
