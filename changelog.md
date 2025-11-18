@@ -1,3 +1,7 @@
+## 0.0.361 - 2025-11-18
+
+- Gemini 3 Pro is now available in GitHub Copilot CLI
+
 ## 0.0.360 - 2025-11-18
 
 - Fix file operations timing out while waiting for user permission
