@@ -1,6 +1,9 @@
-## 0.0.361 - 2025-11-18
+## 0.0.362 - 2025-11-20
 
-- Gemini 3 Pro is now available in GitHub Copilot CLI
+- Fix issues with image drag and drop on Windows
+- Shell commands are no longer included in Bash and PowerShell history files
+- Paste image data from your clipboard directly into the CLI
+- Cleanup and update prompts and tool instructions to be more fluid
 
 ## 0.0.360 - 2025-11-18
 
