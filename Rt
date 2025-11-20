@@ -1,0 +1,29 @@
+ import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+# إعداد الرسم
+fig, ax = plt.subplots(figsize=(6,6))
+ax.axis('equal')
+ax.axis('off')  # إخفاء المحاور
+
+# نقاط القلب الأساسية
+t = np.linspace(0, 2*np.pi, 1000)
+x = 16 * np.sin(t)**3
+y = 13*np.cos(t) - 5*np.cos(2*t) - 2*np.cos(3*t) - np.cos(4*t)
+
+line, = ax.plot([], [], color='red', linewidth=2)
+
+# تحديث كل إطار
+def update(frame):
+    line.set_data(x[:frame], y[:frame])
+    return line,
+
+# إعداد الحركة
+ani = FuncAnimation(fig, update, frames=len(t), interval=5)  # interval=5ms => سريع جدًا
+
+# حفظ GIF
+ani.save("heart_fast.gif", dpi=200, writer='pillow')
+
+plt.show()
+print("تم إنشاء قلب متحرك بسرعة وحفظه باسم 'hea
