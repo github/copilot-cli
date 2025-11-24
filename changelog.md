@@ -1,3 +1,11 @@
+## 0.0.363 - 2025-11-24
+
+- Opus 4.5, GPT-4.1 and GPT-5-Mini are now available in GitHub Copilot CLI
+- Image data paste now prioritizes pasting contents of image files instead of their file icons.
+- Improved timeline rendering of shell tool names
+- Add support for GITHUB_ASKPASS environment variable for authentication
+- MCP servers work in `--prompt` mode
+
 ## 0.0.362 - 2025-11-20
 
 - Fix issues with image drag and drop on Windows
