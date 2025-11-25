@@ -1,3 +1,8 @@
+## 0.0.364 - 2025-11-25
+
+- Add syntax highlighting for diffs
+- Fix light theme markdown rendering
+
 ## 0.0.363 - 2025-11-24
 
 - Opus 4.5, GPT-4.1 and GPT-5-Mini are now available in GitHub Copilot CLI
