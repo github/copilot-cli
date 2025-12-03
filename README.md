@@ -40,6 +40,7 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 ### Installation
 
 Install globally with npm:
+
 ```bash
 npm install -g @github/copilot
 ```
@@ -50,7 +51,7 @@ npm install -g @github/copilot
 copilot
 ```
 
-On first launch, you'll be greeted with our adorable animated banner! If you'd like to see this banner again, launch `copilot` with the `--banner` flag. 
+On first launch, you'll be greeted with our adorable animated banner! If you'd like to see this banner again, launch `copilot` with the `--banner` flag.
 
 If you're not currently logged in to GitHub, you'll be prompted to use the `/login` slash command. Enter this command and follow the on-screen instructions to authenticate.
 
@@ -65,14 +66,13 @@ You can also authenticate using a fine-grained PAT with the "Copilot Requests" p
 
 ### Using the CLI
 
-Launch `copilot` in a folder that contains code you want to work with. 
+Launch `copilot` in a folder that contains code you want to work with.
 
 By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5.
 
 Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
-
 
 ## 📢 Feedback and Participation
 

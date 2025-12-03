@@ -1,3 +1,13 @@
+## 0.0.366 - 2025-12-03
+
+- Add `infer` property to control custom agent tool visibility
+- Add CLI executables to GitHub release artifacts
+- Add apply_patch toolchain for OpenAI Codex models
+
+## 0.0.365 - 2025-11-25
+
+- Add `--silent` option to suppress stats output for scripting
+
 ## 0.0.364 - 2025-11-25
 
 - Add syntax highlighting for diffs
