@@ -45,6 +45,12 @@ Install globally with npm:
 npm install -g @github/copilot
 ```
 
+Install with [WinGet](https://github.com/microsoft/winget-cli):
+
+```bash
+winget install GitHub.Copilot
+```
+
 ### Launching the CLI
 
 ```bash
