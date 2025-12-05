@@ -39,15 +39,16 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 
 ### Installation
 
-Install with [WinGet](https://github.com/microsoft/winget-cli):
-```bash
-winget install GitHub.Copilot
-```
-
-Install globally with npm:
+    Install globally with npm:
 
 ```bash
 npm install -g @github/copilot
+```
+
+Install with [WinGet](https://github.com/microsoft/winget-cli):
+
+```bash
+winget install GitHub.Copilot
 ```
 
 ### Launching the CLI
