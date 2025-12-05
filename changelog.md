@@ -1,3 +1,7 @@
+## 0.0.367 - 2025-12-04
+
+- GPT-5.1-Codex-Max is now available in GitHub Copilot CLI
+
 ## 0.0.366 - 2025-12-03
 
 - Add `infer` property to control custom agent tool visibility
