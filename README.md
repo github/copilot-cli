@@ -39,7 +39,7 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 
 ### Installation
 
-    Install globally with npm:
+Install globally with npm:
 
 ```bash
 npm install -g @github/copilot
