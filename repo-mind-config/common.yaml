@@ -1,0 +1,121 @@
+description: "common config for generic repo"
+version: 0.9
+
+input:
+  default:
+    path: ${oc.env:REPO_MIND_WORKDIR,/github/workspace}
+    repo:
+      slug: ${oc.env:GITHUB_REPOSITORY,githubnext/w3k}
+      sha: ${oc.env:GITHUB_SHA,null}
+    code:
+      include_patterns:
+        - "**/*.py"
+        - "**/*.ts"
+        - "**/*.tsx"
+        - "**/*.js"
+        - "**/*.go"
+        - "**/*.rb"
+        - "**/*.cpp"
+        - "**/*.cc"
+        - "**/*.cxx"
+        - "**/*.hpp"
+        - "**/*.h"
+        - "**/*.hh"
+        - "**/*.hxx"
+      exclude_patterns:
+        - "**/node_modules/**"
+        - "**/.git/**"
+        - "**/dist/**"
+        - "**/build/**"
+        - "**/__pycache__/**"
+        - "**/venv/**"
+        - "**/env/**"
+    code_docs:
+      include_patterns:
+        - "**/*.md"
+        - "**/*.txt"
+        - "**/*.rst"
+        - "**/Dockerfile*"
+      exclude_patterns:
+        - "LICENSE"
+        - "ACKNOWLEDGEMENTS"
+        - "CONTRIBUTING"
+        - "CODE_OF_CONDUCT"
+        - "SECURITY"
+        - "CHANGELOG"
+        - "HISTORY"
+        - "CITATION"
+        - "MANIFEST.in"
+        - "**/node_modules/**"
+        - "**/.git/**"
+        - "**/dist/**"
+        - "**/build/**"
+        - "**/__pycache__/**"
+        - "**/venv/**"
+        - "**/env/**"
+    docs:
+      issue:
+        state: closed
+        allow_bot_origin: false
+      pr:
+        state: merged
+        allow_bot_origin: false
+
+index:
+  code:
+    generate_ast: true
+    generate_code_embeddings: true
+    generate_code_summary: true
+    generate_graphrag: true
+    chunk_size: 8000
+    chunk_overlap: 200
+  code_docs:
+    generate_code_doc_embeddings: true
+    generate_graphrag: true
+    chunk_size: 1000
+    chunk_overlap: 100
+  docs:
+    generate_doc_issue_embeddings: true
+    generate_doc_pr_embeddings: true
+    generate_graphrag: true
+    chunk_size: 1000
+    chunk_overlap: 100
+  graphrag:
+    generate_summaries_at_index: false
+    max_cluster_size: 10
+    knn_doc_to_graph: 5
+
+processing:
+  generate_model_id: "next-gpt-4.1-long-context"
+  summarization_model_id: "next-gpt-4.1"
+  embedding_model_id: "next-text-embedding-3-small-2"
+  parallelism: 32
+  update_if_exists: true
+  use_content_filter: true
+
+storage:
+  kind: azure
+  namespace: "v0.2.0/dev"
+
+query:
+  generate_answer: true
+  top_k: 20
+  use_code: true
+  use_code_summary: true
+  use_code_doc: true
+  use_doc: true
+  use_graphrag: true
+  structured_response_format: true
+  rewrite_query_flag: true
+
+debug:
+  print_every: 50
+  usage_tracking: false
+  disable_index_storage: false
+  force_from_scratch_indexing: false
+
+evaluation:
+  evaluation_model_id: "next-o3"
+
+defaults:
+  - query_graphrag_zero

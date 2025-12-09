@@ -1,0 +1,10 @@
+defaults:
+  - wiki-common
+  - _self_
+
+storage:
+  kind: local
+  namespace: v0.2.0/dev
+
+debug:
+  force_from_scratch_indexing: false

@@ -1,0 +1,209 @@
+name: Repo-mind Index
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+  packages: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  update-index:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify repo-mind access secrets
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.REPO_MIND_GHCR_USERNAME }}" ]; then
+            echo "Missing required secret REPO_MIND_GHCR_USERNAME" >&2
+            exit 1
+          fi
+          if [ -z "${{ secrets.REPO_MIND_GHCR_TOKEN }}" ]; then
+            echo "Missing required secret REPO_MIND_GHCR_TOKEN" >&2
+            exit 1
+          fi
+
+      - name: Seed cache from committed index
+        run: |
+          set -euo pipefail
+          mkdir -p .cache/blobs
+          if [ -d repo-mind-index ] && [ "$(ls -A repo-mind-index)" ]; then
+            rsync -a repo-mind-index/ .cache/blobs/
+          fi
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.REPO_MIND_GHCR_USERNAME }}
+          password: ${{ secrets.REPO_MIND_GHCR_TOKEN }}
+
+      - name: Pull repo-mind image
+        run: docker pull ghcr.io/githubnext/repo-mind:latest
+
+      - name: Run repo-mind indexer
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_MIND_GHCR_TOKEN }}
+          GITHUBNEXT_MODEL_8_UKSOUTH_API_KEY: ${{ secrets.GITHUBNEXT_MODEL_8_UKSOUTH_API_KEY }}
+          GITHUBNEXT_EASTUS2_API_KEY: ${{ secrets.GITHUBNEXT_EASTUS2_API_KEY }}
+        run: |
+          set -euo pipefail
+          repo_mind_output_file="${PWD}/.repo_mind_output.json"
+          : > "${repo_mind_output_file}"
+          chmod 666 "${repo_mind_output_file}"
+          docker run --rm \
+            -v "${PWD}":/github/workspace \
+            -v "${PWD}/repo-mind-config/common.yaml":/opt/repo-mind-action/configs/common.yaml:ro \
+            -v "${repo_mind_output_file}":/github/workspace/.repo_mind_output.json \
+            -e REPO_MIND_OP=index \
+            -e GITHUB_REPOSITORY="${{ github.repository }}" \
+            -e GITHUB_SHA="${{ github.sha }}" \
+            -e REPO_MIND_MAX_INDEX_AGE_IN_DAYS=0 \
+            -e GITHUB_TOKEN \
+            -e GITHUBNEXT_MODEL_8_UKSOUTH_API_KEY \
+            -e GITHUBNEXT_EASTUS2_API_KEY \
+            -e REPO_MIND_OUTPUT_FILE=/github/workspace/.repo_mind_output.json \
+            ghcr.io/githubnext/repo-mind:latest
+
+          rm -f "${repo_mind_output_file}"
+
+      - name: Fix blob permissions
+        run: |
+          set -euo pipefail
+          if [ -d .cache/blobs ]; then
+            sudo chown -R $USER:$USER .cache/blobs || true
+            chmod -R 755 .cache/blobs || true
+          fi
+
+      - name: Sync generated index into repo
+        run: |
+          set -euo pipefail
+
+          if [ ! -d ".cache/blobs" ]; then
+            echo "repo-mind did not produce .cache/blobs" >&2
+            exit 1
+          fi
+
+          rm -rf repo-mind-index
+          mkdir -p repo-mind-index
+          rsync -a --delete .cache/blobs/ repo-mind-index/
+
+      - name: Check out repo-mind sources
+        uses: actions/checkout@v4
+        with:
+          repository: githubnext/repo-mind
+          ref: copilot/refactor-rate-limit-handling
+          path: repo-mind-src
+          token: ${{ secrets.REPO_MIND_GHCR_TOKEN }}
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Prepare repo-mind configuration for wiki
+        run: |
+          set -euo pipefail
+          cp repo-mind-config/wiki-common.yaml repo-mind-src/configs/wiki-common.yaml
+          cp repo-mind-config/wiki.yaml repo-mind-src/configs/w3k-ci.yaml
+
+      - name: Generate repo wiki content
+        env:
+          PYTHONPATH: ${{ github.workspace }}/repo-mind-src
+          REPO_MIND_WORKDIR: ${{ github.workspace }}
+          GITHUB_TOKEN: ${{ secrets.REPO_MIND_GHCR_TOKEN }}
+          GITHUBNEXT_MODEL_8_UKSOUTH_API_KEY: ${{ secrets.GITHUBNEXT_MODEL_8_UKSOUTH_API_KEY }}
+          GITHUBNEXT_EASTUS2_API_KEY: ${{ secrets.GITHUBNEXT_EASTUS2_API_KEY }}
+          REPO_MIND_LOCAL_CACHE_DIR: ${{ github.workspace }}/.cache/blobs
+        run: |
+          set -euo pipefail
+          uv run --directory repo-mind-src python repo-mind/generate_wiki.py --config-name=w3k-ci
+
+      - name: Sync generated wiki into repo
+        run: |
+          set -euo pipefail
+          org=${GITHUB_REPOSITORY%%/*}
+          repo=${GITHUB_REPOSITORY#*/}
+          wiki_source="repo-mind-src/.cache/wiki/${org}/${repo}/_edited"
+          if [ ! -d "${wiki_source}" ]; then
+            echo "repo-mind wiki output not found at ${wiki_source}" >&2
+            exit 1
+          fi
+
+          rm -rf repo-wiki
+          mkdir -p repo-wiki
+          rsync -a --delete "${wiki_source}/" repo-wiki/
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Generate templated documentation
+        env:
+          REPO_MIND_SRC: ${{ github.workspace }}/repo-mind-src
+          REPO_MIND_WORKDIR: ${{ github.workspace }}
+          PYTHONPATH: ${{ github.workspace }}/repo-mind-src
+          GITHUB_TOKEN: ${{ secrets.REPO_MIND_GHCR_TOKEN }}
+          GITHUBNEXT_MODEL_8_UKSOUTH_API_KEY: ${{ secrets.GITHUBNEXT_MODEL_8_UKSOUTH_API_KEY }}
+          GITHUBNEXT_EASTUS2_API_KEY: ${{ secrets.GITHUBNEXT_EASTUS2_API_KEY }}
+          REPO_MIND_LOCAL_CACHE_DIR: ${{ github.workspace }}/.cache/blobs
+        run: |
+          set -euo pipefail
+          if [ -f "scripts/generate-docs.ts" ]; then
+            echo "Generating documentation from templates..."
+            bun run scripts/generate-docs.ts
+          else
+            echo "No generate-docs.ts script found, skipping template generation"
+          fi
+
+      - name: Prepare git state
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Publish wiki
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_ACTOR: github-actions[bot]
+        run: |
+          set -euo pipefail
+          if [ -f "scripts/publish-wiki.ts" ]; then
+            echo "Publishing wiki content..."
+            bun run scripts/publish-wiki.ts
+          else
+            echo "No publish-wiki.ts script found, skipping wiki publish"
+          fi
+
+      - name: Create pull request with refreshed index
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/repo-mind-index-${{ github.run_id }}
+          title: 'chore: refresh repo-mind index'
+          commit-message: 'chore: refresh repo-mind index'
+          body: |
+            Automated Repo-mind indexing run triggered by `${{ github.sha }}`.
+
+            - Workflow: `${{ github.workflow }}`
+            - Run: `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+
+            Please review the generated shards and merge if they look good.
+          add-paths: |
+            repo-mind-index/**
+            repo-wiki/**
+            docs/repo-wiki/**
+          delete-branch: true
