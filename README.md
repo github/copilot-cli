@@ -51,6 +51,12 @@ Install with [WinGet](https://github.com/microsoft/winget-cli):
 winget install GitHub.Copilot
 ```
 
+Install with [Homebrew](https://brew.sh/):
+
+```bash
+brew install copilot-cli
+```
+
 ### Launching the CLI
 
 ```bash
