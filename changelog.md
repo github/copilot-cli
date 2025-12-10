@@ -1,3 +1,10 @@
+## 0.0.368 - 2025-12-10
+
+- PRU usage rates now displayed correctly
+- Fix checkmark and x icon rendering
+- Add grep tool Codex models
+- Numpad keys work in prompts with Kitty keyboard protocol
+
 ## 0.0.367 - 2025-12-04
 
 - GPT-5.1-Codex-Max is now available in GitHub Copilot CLI

@@ -45,16 +45,16 @@ Install globally with npm:
 npm install -g @github/copilot
 ```
 
+Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli):
+
+```bash
+brew install copilot-cli
+```
+
 Install with [WinGet](https://github.com/microsoft/winget-cli):
 
 ```bash
 winget install GitHub.Copilot
-```
-
-Install with [Homebrew](https://brew.sh/):
-
-```bash
-brew install copilot-cli
 ```
 
 ### Launching the CLI
