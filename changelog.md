@@ -1,3 +1,7 @@
+## 0.0.369 - 2025-12-11
+
+- Add support for GPT-5.2
+
 ## 0.0.368 - 2025-12-10
 
 - PRU usage rates now displayed correctly
