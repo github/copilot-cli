@@ -41,9 +41,9 @@ if [ "$(id -u 2>/dev/null || echo 1)" -eq 0 ]; then
   PREFIX="${PREFIX:-/usr/local}"
 else
   PREFIX="${PREFIX:-$HOME/.local}"
-  mkdir -p "$INSTALL_DIR/bin"
 fi
 INSTALL_DIR="$PREFIX/bin"
+mkdir -p "$INSTALL_DIR"
 
 # Install binary
 if [ -f "copilot" ]; then
