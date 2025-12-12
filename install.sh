@@ -4,8 +4,9 @@ set -e
 # GitHub Copilot CLI Installation Script
 # Usage: curl -fsSL https://gh.io/copilot-install | bash
 #    or: wget -qO- https://gh.io/copilot-install | bash
-# Set PREFIX to install to $PREFIX/bin/ directory (default: /usr/local for root,
-# $HOME/.local for non-root)
+# Export PREFIX to install to $PREFIX/bin/ directory (default: /usr/local for
+# root, $HOME/.local for non-root), e.g., export PREFIX=$HOME/custom to install
+# to $HOME/custom/bin
 
 echo "Installing GitHub Copilot CLI..."
 
