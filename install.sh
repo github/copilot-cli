@@ -28,11 +28,10 @@ DOWNLOAD_DIR="${HOME}/.copilot"
 mkdir -p "$DOWNLOAD_DIR"
 
 # Download and extract
-cd "$DOWNLOAD_DIR"
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$DOWNLOAD_URL" | tar -xz
+  curl -fsSL "$DOWNLOAD_URL" | tar -xz -C "$DOWNLOAD_DIR"
 elif command -v wget >/dev/null 2>&1; then
-  wget -qO- "$DOWNLOAD_URL" | tar -xz
+  wget -qO- "$DOWNLOAD_URL" | tar -xz -C "$DOWNLOAD_DIR"
 else
   echo "Error: Neither curl nor wget found. Please install one of them."
   exit 1
