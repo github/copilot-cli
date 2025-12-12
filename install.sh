@@ -55,6 +55,7 @@ if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
   exit 1
 fi
 
+# Check if running as root, fallback to non-root
 if [ "$(id -u 2>/dev/null || echo 1)" -eq 0 ]; then
   PREFIX="${PREFIX:-/usr/local}"
 else
