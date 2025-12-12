@@ -34,7 +34,17 @@ case "$(uname -m)" in
   *) echo "Error: Unsupported architecture $(uname -m)" >&2 ; exit 1 ;;
 esac
 
-DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
+# Determine download URL based on VERSION
+if [ -n "$VERSION" ]; then
+  # Prefix version with 'v' if not already present
+  case "$VERSION" in
+    v*) ;;
+    *) VERSION="v$VERSION" ;;
+  esac
+  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/copilot-${PLATFORM}-${ARCH}.tar.gz"
+else
+  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
+fi
 echo "Downloading from: $DOWNLOAD_URL"
 
 # Download and extract with error handling

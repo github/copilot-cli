@@ -74,6 +74,8 @@ Use `| sudo bash` to run as root and install to `/usr/local/bin`.
 Set `PREFIX` to install to `$PREFIX/bin/` directory. Defaults to `/usr/local`
 when run as root or `$HOME/.local` when run as a non-root user.
 
+Set `VERSION` to install a specific version. Defaults to the latest version.
+
 ### Launching the CLI
 
 ```bash
