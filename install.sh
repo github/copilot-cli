@@ -24,7 +24,7 @@ esac
 DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
 echo "Downloading from: $DOWNLOAD_URL"
 
-DOWNLOAD_DIR="${HOME}/.copilot/"
+DOWNLOAD_DIR="${HOME}/.copilot"
 mkdir -p "$DOWNLOAD_DIR"
 
 # Download and extract
