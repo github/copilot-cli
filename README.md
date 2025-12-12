@@ -39,29 +39,19 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 
 ### Installation
 
-#### Any platform with npm
-
-```bash
-npm install -g @github/copilot
-```
-
-#### Windows
-
-Install with [WinGet](https://github.com/microsoft/winget-cli):
+Install with [WinGet](https://github.com/microsoft/winget-cli) (Windows):
 
 ```bash
 winget install GitHub.Copilot
 ```
 
-#### macOS
-
-Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli):
+Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
 
 ```bash
 brew install copilot-cli
 ```
 
-#### macOS and Linux
+Install with the install script (macOS and Linux):
 
 ```bash
 curl -fsSL https://gh.io/copilot-install | bash
@@ -71,6 +61,12 @@ Or
 
 ```bash
 wget -qO- https://gh.io/copilot-install | bash
+```
+
+Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
+
+```bash
+npm install -g @github/copilot
 ```
 
 Use `| sudo bash` to run as root and install to `/usr/local/bin`.
