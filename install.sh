@@ -56,12 +56,15 @@ else
 fi
 
 # Check if install directory is in PATH
-if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
-  echo ""
-  echo "Warning: $INSTALL_DIR is not in your PATH"
-  echo "Add it to your PATH by adding this line to your shell profile:"
-  echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
-fi
+case ":$PATH:" in
+  *":$INSTALL_DIR:"*) ;;
+  *)
+    echo ""
+    echo "Warning: $INSTALL_DIR is not in your PATH"
+    echo "Add it to your PATH by adding this line to your shell profile:"
+    echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
+    ;;
+esac
 
 echo ""
 echo "Installation complete! Run 'copilot help' to get started."
