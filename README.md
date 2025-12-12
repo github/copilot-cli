@@ -45,6 +45,22 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 npm install -g @github/copilot
 ```
 
+#### Windows
+
+Install with [WinGet](https://github.com/microsoft/winget-cli):
+
+```bash
+winget install GitHub.Copilot
+```
+
+#### macOS
+
+Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli):
+
+```bash
+brew install copilot-cli
+```
+
 #### macOS and Linux
 
 ```bash
@@ -59,22 +75,6 @@ wget -qO- https://gh.io/copilot-install | bash
 
 Set `PREFIX` to install to `$PREFIX/bin/` directory. Defaults to `/usr/local`
 when run as root or `$HOME/.local` when run as a non-root user.
-
-#### macOS
-
-Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli):
-
-```bash
-brew install copilot-cli
-```
-
-#### Windows
-
-Install with [WinGet](https://github.com/microsoft/winget-cli):
-
-```bash
-winget install GitHub.Copilot
-```
 
 ### Launching the CLI
 
