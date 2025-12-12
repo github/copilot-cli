@@ -64,6 +64,9 @@ fi
 
 # Install binary
 if [ -f "$DOWNLOAD_DIR/copilot" ]; then
+  if [ -f "$INSTALL_DIR/copilot" ]; then
+    echo "Notice: Replacing copilot binary found at $INSTALL_DIR/copilot."
+  fi
   mv -f "$DOWNLOAD_DIR/copilot" "$INSTALL_DIR/copilot"
   chmod +x "$INSTALL_DIR/copilot"
   echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
