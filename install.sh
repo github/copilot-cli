@@ -27,9 +27,6 @@ esac
 DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
 echo "Downloading from: $DOWNLOAD_URL"
 
-DOWNLOAD_DIR="${HOME}/.copilot"
-mkdir -p "$DOWNLOAD_DIR"
-
 # Download and extract with error handling
 TMP_TARBALL="$(mktemp)"
 if command -v curl >/dev/null 2>&1; then
@@ -48,8 +45,6 @@ if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
   exit 1
 fi
 
-tar -xz -C "$DOWNLOAD_DIR" -f "$TMP_TARBALL"
-rm -f "$TMP_TARBALL"
 if [ "$(id -u 2>/dev/null || echo 1)" -eq 0 ]; then
   PREFIX="${PREFIX:-/usr/local}"
 else
@@ -63,17 +58,13 @@ if ! mkdir -p "$INSTALL_DIR"; then
 fi
 
 # Install binary
-if [ -f "$DOWNLOAD_DIR/copilot" ]; then
-  if [ -f "$INSTALL_DIR/copilot" ]; then
-    echo "Notice: Replacing copilot binary found at $INSTALL_DIR/copilot."
-  fi
-  mv -f "$DOWNLOAD_DIR/copilot" "$INSTALL_DIR/copilot"
-  chmod +x "$INSTALL_DIR/copilot"
-  echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
-else
-  echo "Error: copilot binary not found in tarball" >&2
-  exit 1
+if [ -f "$INSTALL_DIR/copilot" ]; then
+  echo "Notice: Replacing copilot binary found at $INSTALL_DIR/copilot."
 fi
+tar -xz -C "$INSTALL_DIR" -f "$TMP_TARBALL"
+chmod +x "$INSTALL_DIR/copilot"
+echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
+rm -f "$TMP_TARBALL"
 
 # Check if install directory is in PATH
 case ":$PATH:" in
