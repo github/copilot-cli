@@ -39,17 +39,33 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 
 ### Installation
 
-Install globally with npm:
+#### Any platform with npm
 
 ```bash
 npm install -g @github/copilot
 ```
+
+#### macOS and Linux
+
+```bash
+curl -fsSL https://gh.io/copilot-install | bash
+```
+
+Or
+
+```bash
+wget -qO- https://gh.io/copilot-install | bash
+```
+
+#### macOS
 
 Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli):
 
 ```bash
 brew install copilot-cli
 ```
+
+#### Windows
 
 Install with [WinGet](https://github.com/microsoft/winget-cli):
 
