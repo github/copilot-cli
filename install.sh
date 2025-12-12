@@ -11,7 +11,7 @@ echo "Installing GitHub Copilot CLI..."
 case "$(uname -s)" in
   Darwin*) PLATFORM="darwin" ;;
   Linux*) PLATFORM="linux" ;;
-  *) echo "Error: Unsupported platform $(uname -s). For Windows, recommend using: winget install GitHub.Copilot" >&2 ; exit 1 ;;
+  *) echo "Error: Unsupported platform $(uname -s). For Windows, we recommend using: winget install GitHub.Copilot" >&2 ; exit 1 ;;
 esac
 
 # Detect architecture
