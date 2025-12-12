@@ -55,7 +55,11 @@ else
   PREFIX="${PREFIX:-$HOME/.local}"
 fi
 INSTALL_DIR="$PREFIX/bin"
-mkdir -p "$INSTALL_DIR"
+if ! mkdir -p "$INSTALL_DIR"; then
+  echo "Error: Could not create directory $INSTALL_DIR. You may not have write permissions." >&2
+  echo "Try running this script with sudo or set PREFIX to a directory you own (e.g., export PREFIX=\$HOME/.local)." >&2
+  exit 1
+fi
 
 # Install binary
 if [ -f "$DOWNLOAD_DIR/copilot" ]; then
