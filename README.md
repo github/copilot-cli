@@ -76,6 +76,12 @@ when run as root or `$HOME/.local` when run as a non-root user.
 
 Set `VERSION` to install a specific version. Defaults to the latest version.
 
+For example, to install version `v0.0.369` to a custom directory:
+
+```bash
+curl -fsSL https://gh.io/copilot-install | VERSION="v0.0.369" PREFIX="$HOME/custom" bash
+```
+
 ### Launching the CLI
 
 ```bash
