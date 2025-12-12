@@ -29,16 +29,26 @@ echo "Downloading from: $DOWNLOAD_URL"
 DOWNLOAD_DIR="${HOME}/.copilot"
 mkdir -p "$DOWNLOAD_DIR"
 
-# Download and extract
+# Download and extract with error handling
+TMP_TARBALL="$(mktemp)"
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$DOWNLOAD_URL" | tar -xz -C "$DOWNLOAD_DIR"
+  curl -fsSL "$DOWNLOAD_URL" -o "$TMP_TARBALL"
 elif command -v wget >/dev/null 2>&1; then
-  wget -qO- "$DOWNLOAD_URL" | tar -xz -C "$DOWNLOAD_DIR"
+  wget -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
 else
-  echo "Error: Neither curl nor wget found. Please install one of them." >&2
+  echo "Error: Neither curl nor wget found. Please install one of them."
   exit 1
 fi
 
+# Check that the file is a valid tarball
+if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
+  echo "Error: Downloaded file is not a valid tarball or is corrupted."
+  rm -f "$TMP_TARBALL"
+  exit 1
+fi
+
+tar -xz -C "$DOWNLOAD_DIR" -f "$TMP_TARBALL"
+rm -f "$TMP_TARBALL"
 if [ "$(id -u 2>/dev/null || echo 1)" -eq 0 ]; then
   PREFIX="${PREFIX:-/usr/local}"
 else
