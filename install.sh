@@ -5,8 +5,6 @@ set -e
 # Usage: curl -fsSL https://gh.io/copilot-install | bash
 #    or: wget -qO- https://gh.io/copilot-install | bash
 
-INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
-
 echo "Installing GitHub Copilot CLI..."
 
 # Detect platform
