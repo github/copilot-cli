@@ -47,7 +47,7 @@ mkdir -p "$INSTALL_DIR"
 
 # Install binary
 if [ -f "$DOWNLOAD_DIR/copilot" ]; then
-  mv "$DOWNLOAD_DIR/copilot" "$INSTALL_DIR/copilot"
+  mv -f "$DOWNLOAD_DIR/copilot" "$INSTALL_DIR/copilot"
   chmod +x "$INSTALL_DIR/copilot"
   echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
 else
