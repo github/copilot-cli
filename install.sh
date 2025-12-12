@@ -35,7 +35,7 @@ if command -v curl >/dev/null 2>&1; then
 elif command -v wget >/dev/null 2>&1; then
   wget -qO- "$DOWNLOAD_URL" | tar -xz -C "$DOWNLOAD_DIR"
 else
-  echo "Error: Neither curl nor wget found. Please install one of them."
+  echo "Error: Neither curl nor wget found. Please install one of them." >&2
   exit 1
 fi
 
