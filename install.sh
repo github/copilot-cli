@@ -12,10 +12,19 @@ set -e
 echo "Installing GitHub Copilot CLI..."
 
 # Detect platform
-case "$(uname -s)" in
+case "$(uname -s || echo "")" in
   Darwin*) PLATFORM="darwin" ;;
   Linux*) PLATFORM="linux" ;;
-  *) echo "Error: Unsupported platform $(uname -s). For Windows, we recommend using: winget install GitHub.Copilot" >&2 ; exit 1 ;;
+  *)
+    if command -v winget >/dev/null 2>&1; then
+      echo "Windows detected. Installing via winget..."
+      winget install GitHub.Copilot
+      exit $?
+    else
+      echo "Error: Windows detected but winget not found. Please see https://gh.io/install-copilot-readme" >&2
+      exit 1
+    fi
+    ;;
 esac
 
 # Detect architecture
