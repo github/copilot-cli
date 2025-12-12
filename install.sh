@@ -43,7 +43,7 @@ fi
 
 # Check that the file is a valid tarball
 if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
-  echo "Error: Downloaded file is not a valid tarball or is corrupted."
+  echo "Error: Downloaded file is not a valid tarball or is corrupted." >&2
   rm -f "$TMP_TARBALL"
   exit 1
 fi
