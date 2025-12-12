@@ -39,23 +39,40 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 
 ### Installation
 
-Install globally with npm:
+Install with [WinGet](https://github.com/microsoft/winget-cli) (Windows):
 
 ```bash
-npm install -g @github/copilot
+winget install GitHub.Copilot
 ```
 
-Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli):
+Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
 
 ```bash
 brew install copilot-cli
 ```
 
-Install with [WinGet](https://github.com/microsoft/winget-cli):
+Install with the install script (macOS and Linux):
 
 ```bash
-winget install GitHub.Copilot
+curl -fsSL https://gh.io/copilot-install | bash
 ```
+
+Or
+
+```bash
+wget -qO- https://gh.io/copilot-install | bash
+```
+
+Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
+
+```bash
+npm install -g @github/copilot
+```
+
+Use `| sudo bash` to run as root and install to `/usr/local/bin`.
+
+Set `PREFIX` to install to `$PREFIX/bin/` directory. Defaults to `/usr/local`
+when run as root or `$HOME/.local` when run as a non-root user.
 
 ### Launching the CLI
 
