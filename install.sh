@@ -71,7 +71,7 @@ if [ -f "$DOWNLOAD_DIR/copilot" ]; then
   chmod +x "$INSTALL_DIR/copilot"
   echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
 else
-  echo "Error: copilot binary not found in tarball"
+  echo "Error: copilot binary not found in tarball" >&2
   exit 1
 fi
 
