@@ -45,10 +45,28 @@ Install with [WinGet](https://github.com/microsoft/winget-cli) (Windows):
 winget install GitHub.Copilot
 ```
 
+```bash
+winget install GitHub.Copilot.Prerelease
+```
+
 Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
 
 ```bash
 brew install copilot-cli
+```
+
+```bash
+brew install copilot-cli@prerelease
+```
+
+Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
+
+```bash
+npm install -g @github/copilot
+```
+
+```bash
+npm install -g @github/copilot@prerelease
 ```
 
 Install with the install script (macOS and Linux):
@@ -61,12 +79,6 @@ Or
 
 ```bash
 wget -qO- https://gh.io/copilot-install | bash
-```
-
-Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
-
-```bash
-npm install -g @github/copilot
 ```
 
 Use `| sudo bash` to run as root and install to `/usr/local/bin`.
