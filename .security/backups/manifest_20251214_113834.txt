@@ -1,0 +1,44 @@
+=== CRYPTOGRAPHIC HASH MANIFEST ===
+Generated: 2025-12-14T11:38:34+00:00
+Backup ID: 20251214_113834
+
+FILE: Phoenix_Protocol_Super_Agent_Architecture.ipynb
+  SHA256: e8b23fb589ddd02ec94d54567f549438e483778977e70932aaed5ab6809d2c62
+  Size:   File: "Phoenix_Protocol_Super_Agent_Architecture.ipynb"
+    ID: 0        Namelen: 256     Type: v9fs
+Block size: 4096       Fundamental block size: 4096
+Blocks: Total: 7696873    Free: 7695538    Available: 7691442
+Inodes: Total: 1966080    Free: 1965898
+1496869 bytes
+  Timestamp: 2025-12-14T11:31:43+00:00
+
+FILE: .security/EVIDENCE_REPORT.md
+  SHA256: 42c0871080616d65e075a57a4d95d7c96158009f43645e2c33c1663a948be07b
+  Size:   File: ".security/EVIDENCE_REPORT.md"
+    ID: 0        Namelen: 256     Type: v9fs
+Block size: 4096       Fundamental block size: 4096
+Blocks: Total: 7696873    Free: 7695538    Available: 7691442
+Inodes: Total: 1966080    Free: 1965898
+2356 bytes
+  Timestamp: 2025-12-14T11:36:57+00:00
+
+FILE: .security/ip_manifest.json
+  SHA256: 2574985de620282fb67ed88c374286658e57a8b6104703d6f1736cdbf0db73ae
+  Size:   File: ".security/ip_manifest.json"
+    ID: 0        Namelen: 256     Type: v9fs
+Block size: 4096       Fundamental block size: 4096
+Blocks: Total: 7696873    Free: 7695538    Available: 7691442
+Inodes: Total: 1966080    Free: 1965898
+1711 bytes
+  Timestamp: 2025-12-14T11:37:54+00:00
+
+FILE: README.md
+  SHA256: 58e48121c0b7a827547e4827d6cfcf4a9e6ca8ffe5324743a2d822b5b8fd240b
+  Size:   File: "README.md"
+    ID: 0        Namelen: 256     Type: v9fs
+Block size: 4096       Fundamental block size: 4096
+Blocks: Total: 7696873    Free: 7695538    Available: 7691442
+Inodes: Total: 1966080    Free: 1965898
+4730 bytes
+  Timestamp: 2025-12-14T11:31:43+00:00
+

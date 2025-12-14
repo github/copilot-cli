@@ -1,0 +1,4 @@
+=== BACKUP INDEX ===
+Updated: 2025-12-14T11:38:34+00:00
+
+/home/user/copilot-cli/.security/backups/ip_backup_20251214_113834.tar.gz.gpg 242K Dec 14 11:38
