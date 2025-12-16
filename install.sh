@@ -70,27 +70,24 @@ elif command -v wget >/dev/null 2>&1; then
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
-  TARBALL_NAME="copilot-${PLATFORM}-${ARCH}.tar.gz"
-  EXPECTED_CHECKSUM=$(grep "$TARBALL_NAME" "$TMP_CHECKSUMS" | awk '{print $1}')
-  if [ -n "$EXPECTED_CHECKSUM" ]; then
-    if command -v sha256sum >/dev/null 2>&1; then
-      ACTUAL_CHECKSUM=$(sha256sum "$TMP_TARBALL" | awk '{print $1}')
-    elif command -v shasum >/dev/null 2>&1; then
-      ACTUAL_CHECKSUM=$(shasum -a 256 "$TMP_TARBALL" | awk '{print $1}')
-    else
-      echo "Warning: No sha256sum or shasum found, skipping checksum validation."
-      ACTUAL_CHECKSUM=""
-    fi
-    if [ -n "$ACTUAL_CHECKSUM" ]; then
-      if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
-        echo "Error: Checksum validation failed." >&2
-        echo "Expected: $EXPECTED_CHECKSUM" >&2
-        echo "Actual:   $ACTUAL_CHECKSUM" >&2
-        rm -f "$TMP_TARBALL" "$TMP_CHECKSUMS"
-        exit 1
-      fi
+  if command -v sha256sum >/dev/null 2>&1; then
+    if (cd "$(dirname "$TMP_TARBALL")" && sha256sum -c --ignore-missing "$TMP_CHECKSUMS" 2>/dev/null | grep -q "$(basename "$TMP_TARBALL")"); then
       echo "✓ Checksum validated"
+    else
+      echo "Error: Checksum validation failed." >&2
+      rm -f "$TMP_TARBALL" "$TMP_CHECKSUMS"
+      exit 1
     fi
+  elif command -v shasum >/dev/null 2>&1; then
+    if (cd "$(dirname "$TMP_TARBALL")" && shasum -a 256 -c --ignore-missing "$TMP_CHECKSUMS" 2>/dev/null | grep -q "$(basename "$TMP_TARBALL")"); then
+      echo "✓ Checksum validated"
+    else
+      echo "Error: Checksum validation failed." >&2
+      rm -f "$TMP_TARBALL" "$TMP_CHECKSUMS"
+      exit 1
+    fi
+  else
+    echo "Warning: No sha256sum or shasum found, skipping checksum validation."
   fi
 fi
 rm -f "$TMP_CHECKSUMS"
