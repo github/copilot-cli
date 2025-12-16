@@ -42,8 +42,10 @@ if [ -n "$VERSION" ]; then
     *) VERSION="v$VERSION" ;;
   esac
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/copilot-${PLATFORM}-${ARCH}.tar.gz"
+  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/SHA256SUMS.txt"
 else
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
+  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/latest/download/SHA256SUMS.txt"
 fi
 echo "Downloading from: $DOWNLOAD_URL"
 
@@ -57,6 +59,41 @@ else
   echo "Error: Neither curl nor wget found. Please install one of them."
   exit 1
 fi
+
+# Attempt to download checksums file and validate
+TMP_CHECKSUMS="$(mktemp)"
+CHECKSUMS_AVAILABLE=false
+if command -v curl >/dev/null 2>&1; then
+  curl -fsSL "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
+elif command -v wget >/dev/null 2>&1; then
+  wget -qO "$TMP_CHECKSUMS" "$CHECKSUMS_URL" 2>/dev/null && CHECKSUMS_AVAILABLE=true
+fi
+
+if [ "$CHECKSUMS_AVAILABLE" = true ]; then
+  TARBALL_NAME="copilot-${PLATFORM}-${ARCH}.tar.gz"
+  EXPECTED_CHECKSUM=$(grep "$TARBALL_NAME" "$TMP_CHECKSUMS" | awk '{print $1}')
+  if [ -n "$EXPECTED_CHECKSUM" ]; then
+    if command -v sha256sum >/dev/null 2>&1; then
+      ACTUAL_CHECKSUM=$(sha256sum "$TMP_TARBALL" | awk '{print $1}')
+    elif command -v shasum >/dev/null 2>&1; then
+      ACTUAL_CHECKSUM=$(shasum -a 256 "$TMP_TARBALL" | awk '{print $1}')
+    else
+      echo "Warning: No sha256sum or shasum found, skipping checksum validation."
+      ACTUAL_CHECKSUM=""
+    fi
+    if [ -n "$ACTUAL_CHECKSUM" ]; then
+      if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
+        echo "Error: Checksum validation failed." >&2
+        echo "Expected: $EXPECTED_CHECKSUM" >&2
+        echo "Actual:   $ACTUAL_CHECKSUM" >&2
+        rm -f "$TMP_TARBALL" "$TMP_CHECKSUMS"
+        exit 1
+      fi
+      echo "✓ Checksum validated"
+    fi
+  fi
+fi
+rm -f "$TMP_CHECKSUMS"
 
 # Check that the file is a valid tarball
 if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
