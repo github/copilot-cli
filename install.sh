@@ -50,18 +50,20 @@ fi
 echo "Downloading from: $DOWNLOAD_URL"
 
 # Download and extract with error handling
-TMP_TARBALL="$(mktemp)"
+TMP_DIR="$(mktemp -d)"
+TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
 if command -v curl >/dev/null 2>&1; then
   curl -fsSL "$DOWNLOAD_URL" -o "$TMP_TARBALL"
 elif command -v wget >/dev/null 2>&1; then
   wget -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
 else
   echo "Error: Neither curl nor wget found. Please install one of them."
+  rm -rf "$TMP_DIR"
   exit 1
 fi
 
 # Attempt to download checksums file and validate
-TMP_CHECKSUMS="$(mktemp)"
+TMP_CHECKSUMS="$TMP_DIR/SHA256SUMS.txt"
 CHECKSUMS_AVAILABLE=false
 if command -v curl >/dev/null 2>&1; then
   curl -fsSL "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
@@ -71,31 +73,30 @@ fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
   if command -v sha256sum >/dev/null 2>&1; then
-    if (cd "$(dirname "$TMP_TARBALL")" && sha256sum -c --ignore-missing "$TMP_CHECKSUMS" 2>/dev/null | grep -q "$(basename "$TMP_TARBALL")"); then
+    if (cd "$TMP_DIR" && sha256sum -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
-      rm -f "$TMP_TARBALL" "$TMP_CHECKSUMS"
+      rm -rf "$TMP_DIR"
       exit 1
     fi
   elif command -v shasum >/dev/null 2>&1; then
-    if (cd "$(dirname "$TMP_TARBALL")" && shasum -a 256 -c --ignore-missing "$TMP_CHECKSUMS" 2>/dev/null | grep -q "$(basename "$TMP_TARBALL")"); then
+    if (cd "$TMP_DIR" && shasum -a 256 -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
-      rm -f "$TMP_TARBALL" "$TMP_CHECKSUMS"
+      rm -rf "$TMP_DIR"
       exit 1
     fi
   else
     echo "Warning: No sha256sum or shasum found, skipping checksum validation."
   fi
 fi
-rm -f "$TMP_CHECKSUMS"
 
 # Check that the file is a valid tarball
 if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
   echo "Error: Downloaded file is not a valid tarball or is corrupted." >&2
-  rm -f "$TMP_TARBALL"
+  rm -rf "$TMP_DIR"
   exit 1
 fi
 
@@ -119,7 +120,7 @@ fi
 tar -xz -C "$INSTALL_DIR" -f "$TMP_TARBALL"
 chmod +x "$INSTALL_DIR/copilot"
 echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
-rm -f "$TMP_TARBALL"
+rm -rf "$TMP_DIR"
 
 # Check if install directory is in PATH
 case ":$PATH:" in
