@@ -15,18 +15,14 @@ jobs:
 
     # winget-create is only supported on Windows
     runs-on: windows-latest
+      
+    # winget-create will read the following environment variable to access the GitHub token needed for submitting a PR
+    # See https://aka.ms/winget-create-token
+    env:
+      WINGET_CREATE_GITHUB_TOKEN: ${{ secrets.WINGET_CREATE_GITHUB_TOKEN }}
 
     steps:
-      - name: Generate release app access token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.COPILOT_CLI_RELEASE_APP_ID }}
-          private-key: ${{ secrets.COPILOT_CLI_RELEASE_APP_PRIVATE_KEY }}
-
       - name: Submit package using wingetcreate
-        env:
-          WINGET_CREATE_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           # Set the package ID based on the release info
           $packageId = if (${{ !github.event.release.prerelease }}) { "GitHub.Copilot" } else { "GitHub.Copilot.Prerelease" }
