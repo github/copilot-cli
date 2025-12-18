@@ -1,3 +1,8 @@
+## 0.0.371 - 2025-12-18
+
+- Normal text respects terminal's default foreground color
+- Update skills help text to reference correct ~/.copilot/skills/ directory
+
 ## 0.0.370 - 2025-12-18
 
 - Disabled MCP servers are now properly ignored when using --disable-mcp-server
