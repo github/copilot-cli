@@ -25,7 +25,7 @@ jobs:
       - name: Submit package using wingetcreate
         run: |
           # Set the package ID based on the release info
-          $packageId = if (${{ !github.event.release.prerelease }}) { "GitHub.Copilot" } else { "GitHub.Copilot.Prerelease" }
+          $packageId = if ('${{ !github.event.release.prerelease }}' -eq 'true') { 'GitHub.Copilot' } else { 'GitHub.Copilot.Prerelease' }
           
           # Get installer info from release event
           $assets = '${{ toJSON(github.event.release.assets) }}' | ConvertFrom-Json
