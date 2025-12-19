@@ -1,3 +1,11 @@
+## 0.0.372 - 2025-12-19
+
+- Enable disabled models directly in CLI when selecting or specifying them
+- Add `/context` command to visualize token usage
+- Add `--resume` flag to continue remote sessions locally
+- Add URL permission controls which affect common shell commands which access the web
+- Long commands no longer show duplicate intention headers when wrapping
+
 ## 0.0.371 - 2025-12-18
 
 - Normal text respects terminal's default foreground color
