@@ -1,3 +1,57 @@
+## 0.0.372 - 2025-12-19
+
+- Enable disabled models directly in CLI when selecting or specifying them
+- Add `/context` command to visualize token usage
+- Add `--resume` flag to continue remote sessions locally
+- Add URL permission controls which affect common shell commands which access the web
+- Long commands no longer show duplicate intention headers when wrapping
+
+## 0.0.371 - 2025-12-18
+
+- Normal text respects terminal's default foreground color
+- Update skills help text to reference correct ~/.copilot/skills/ directory
+
+## 0.0.370 - 2025-12-18
+
+- Disabled MCP servers are now properly ignored when using --disable-mcp-server
+- Shared sessions correctly render nested markdown codeblocks
+- Log levels now output all messages of that level and higher severity
+- Load CA certificates from system and environment variables
+- Improve `/model` error messages to show available and unavailable models
+- Model picker uses two-column layout with aligned multipliers and clearer visual indicators
+- Add STDIO type as synonymous for Local for MCP servers in CLI configuration UI
+- Diff display uses your configured git pager (delta, diff-so-fancy)
+- Use platform-specific executable from npm install when available
+- Publish SHA256 checksums for CLI executables in releases
+- Add --available-tools and --excluded-tools to filter which tools the model can use
+- Ensure animated or non-animated banner is displayed based on banner and screen reader preferences
+- Fix truncation logic for codex models
+
+## 0.0.369 - 2025-12-11
+
+- Add support for GPT-5.2
+
+## 0.0.368 - 2025-12-10
+
+- PRU usage rates now displayed correctly
+- Fix checkmark and x icon rendering
+- Add grep tool Codex models
+- Numpad keys work in prompts with Kitty keyboard protocol
+
+## 0.0.367 - 2025-12-04
+
+- GPT-5.1-Codex-Max is now available in GitHub Copilot CLI
+
+## 0.0.366 - 2025-12-03
+
+- Add `infer` property to control custom agent tool visibility
+- Add CLI executables to GitHub release artifacts
+- Add apply_patch toolchain for OpenAI Codex models
+
+## 0.0.365 - 2025-11-25
+
+- Add `--silent` option to suppress stats output for scripting
+
 ## 0.0.364 - 2025-11-25
 
 - Add syntax highlighting for diffs
