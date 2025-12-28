@@ -5,7 +5,7 @@
     "ghcr.io/devcontainers/features/git:1": {}
   },
   "customizations": {
-    "vscode":  {
+    "vscode": {
       "extensions": [
         "GitHub.copilot",
         "GitHub.copilot-chat"
