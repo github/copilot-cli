@@ -12,5 +12,5 @@
       ]
     }
   },
-  "postCreateCommand": "echo 'Development environment ready! '"
+  "postCreateCommand": "echo 'Development environment ready!'"
 }
