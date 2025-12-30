@@ -1,3 +1,11 @@
+## 0.0.373 - 2025-12-30
+
+- Tab completion for path arguments in slash commands like `/cwd` and `/add-dir`
+- Enable Copilot Spaces tools in GitHub MCP Server
+- GitHub URL resolves correctly for GHE
+- Kill command filtering now allows commands when 'kill' appears as an argument
+- Device code authorization polling begins immediately instead of waiting for clipboard and browser
+
 ## 0.0.372 - 2025-12-19
 
 - Enable disabled models directly in CLI when selecting or specifying them
