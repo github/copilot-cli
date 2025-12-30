@@ -1,0 +1,28 @@
+{
+  "name": "copilot-cli",
+  "version": "1.0.0",
+  "description": "Copilot CLI with Azure Webpack configuration",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development",
+    "watch": "webpack --watch"
+  },
+  "keywords": [
+    "azure",
+    "storage",
+    "webpack",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/storage-blob": "^12.17.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
