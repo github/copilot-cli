@@ -1,3 +1,11 @@
+## 0.0.374 - 2026-01-02
+
+- MCP server type help text displays correct options
+- Model picker shows clearer message with settings link when models are unavailable
+- Add auto-compaction at 95% token limit and `/compact` command
+- Built-in subagents for exploring and managing tasks
+- Built in `web_fetch` tool for fetching web content
+
 ## 0.0.373 - 2025-12-30
 
 - Tab completion for path arguments in slash commands like `/cwd` and `/add-dir`
