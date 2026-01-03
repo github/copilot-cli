@@ -1,0 +1,4 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+loadstring(game:HttpGet("https://gist.githubusercontent.com/plutoguy/9d33fa2d37897f99fbc2172661a10ab5/raw/sab.lua"))()
