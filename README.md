@@ -1,6 +1,6 @@
-# GitHub Copilot CLI (Public Preview)
+GitHub Copilot CLI (Public Preview)
 
-The power of GitHub Copilot, now in your terminal.
+The power on GitHub Copilot, now in your terminal.
 
 GitHub Copilot CLI brings AI-powered coding assistance directly to your command line, enabling you to build, debug, and understand code through natural language conversations. Powered by the same agentic harness as GitHub's Copilot coding agent, it provides intelligent assistance while staying deeply integrated with your GitHub workflow.
 
@@ -16,28 +16,28 @@ We're bringing the power of GitHub Copilot coding agent directly to your termina
 - **GitHub integration out of the box:** Access your repositories, issues, and pull requests using natural language, all authenticated with your existing GitHub account.
 - **Agentic capabilities:** Build, edit, debug, and refactor code with an AI collaborator that can plan and execute complex tasks.
 - **MCP-powered extensibility:** Take advantage of the fact that the coding agent ships with GitHub's MCP server by default and supports custom MCP servers to extend capabilities.
-- **Full control:** Preview every action before execution — nothing happens without your explicit approval.
+-Full control Preview every action before execution — nothing happens without your explicit approval.
 
 We're still early in our journey, but with your feedback, we're rapidly iterating to make the GitHub Copilot CLI the best possible companion in your terminal.
 
-## 📦 Getting Started
+Getting Started
 
-### Supported Platforms
+Supported Platforms
 
-- **Linux**
-- **macOS**
-- **Windows**
+-Linux
+-macOS
+-Windows
 
-### Prerequisites
+Prerequisites
 
-- (On Windows) **PowerShell** v6 or higher
-- An **active Copilot subscription**. See [Copilot plans](https://github.com/features/copilot/plans?ref_cta=Copilot+plans+signup&ref_loc=install-copilot-cli&ref_page=docs).
+-On WindowsPowershell v6 or higher
+- An active Copilot subscription See Copilot plans https://github.com/features/copilot/plans ref_cta Copilot+plans+signup&ref_loc install-copilot-cli&ref page doct
 
-If you have access to GitHub Copilot via your organization or enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings. See [Managing policies and features for GitHub Copilot in your organization](http://docs.github.com/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization) for more information.
+If you have access to GitHub Copilot via your organization or enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings. See Managing policies and features for GitHub Copilot in your organization http://docs.github.com/copiot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization for more information.
 
-### Installation
+Installation
 
-Install with [WinGet](https://github.com/microsoft/winget-cli) (Windows):
+Install with WinGet https://github.com/microsoft/winget-cli Windows
 
 ```bash
 winget install GitHub.Copilot
@@ -89,20 +89,17 @@ Set `VERSION` to install a specific version. Defaults to the latest version.
 For example, to install version `v0.0.369` to a custom directory:
 
 ```bash
-curl -fsSL https://gh.io/copilot-install | VERSION="v0.0.369" PREFIX="$HOME/custom" bash
-```
+curl -fsSL https://gh.io/copilot-install | VERSION="v0.0.369" Prefix HOME/custom bash
 
-### Launching the CLI
-
-```bash
+Launching the CLI
+bash
 copilot
-```
 
-On first launch, you'll be greeted with our adorable animated banner! If you'd like to see this banner again, launch `copilot` with the `--banner` flag.
+On first launch, you'll be greeted with our adorable animated banner! If you'd like to see this banner again launch copilot with the banner flag.
 
-If you're not currently logged in to GitHub, you'll be prompted to use the `/login` slash command. Enter this command and follow the on-screen instructions to authenticate.
+If you're not currently logged in to GitHub, you'll be prompted to use the login slash command. Enter this command and follow the on-screen instructions to authenticate.
 
-#### Authenticate with a Personal Access Token (PAT)
+Authenticate with a Personal Access Token PAT
 
 You can also authenticate using a fine-grained PAT with the "Copilot Requests" permission enabled.
 
