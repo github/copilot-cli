@@ -30,8 +30,6 @@ We're still early in our journey, but with your feedback, we're rapidly iteratin
 
 ### Prerequisites
 
-- **Node.js** v22 or higher
-- **npm** v10 or higher
 - (On Windows) **PowerShell** v6 or higher
 - An **active Copilot subscription**. See [Copilot plans](https://github.com/features/copilot/plans?ref_cta=Copilot+plans+signup&ref_loc=install-copilot-cli&ref_page=docs).
 
