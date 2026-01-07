@@ -81,3 +81,4 @@ We're excited to have you join us early in the Copilot CLI journey.
 This is an early-stage preview, and we're building quickly. Expect frequent updates--please keep your client up to date for the latest features and fixes!
 
 Your insights are invaluable! Open issue in this repo, join Discussions, and run `/feedback` from the CLI to submit a confidential feedback survey!
+npm.

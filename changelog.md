@@ -1,6 +1,6 @@
 ## 0.0.356 - 2025-11-13
 
-- GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini are now available in GitHub Copilot CLI. See the [GitHub Changelog](https://github.blog/changelog/2025-11-13-openais-gpt-5-1-gpt-5-1-codex-and-gpt-5-1-codex-mini-are-now-in-public-preview-for-github-copilot/) for more details
+- GPT-5.1, GPT-5.1-Codex, and GPT-5.1-Codex-Mini are now available in GitHu b Copilot CLI. See the [GitHub Changelog](https://github.blog/changelog/2025-11-13-openais-gpt-5-1-gpt-5-1-codex-and-gpt-5-1-codex-mini-are-now-in-public-preview-for-github-copilot/) for more details
 
 ## 0.0.355 - 2025-11-12
 
