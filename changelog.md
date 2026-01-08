@@ -1,3 +1,10 @@
+## 0.0.376 - 2026-01-08
+
+- Loading remote sessions using GraphQL ID or session picker
+- Task tool subagents can now process images
+- Downgrading CLI version no longer requires manually clearing downloaded packages
+- Large tool outputs are written to disk and models are encouraged to use efficient search tools
+
 ## 0.0.375 - 2026-01-07
 
 - Add Ctrl+T to toggle reasoning summaries for supported models
