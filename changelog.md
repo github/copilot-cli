@@ -1,3 +1,7 @@
+## 0.0.377 - 2026-01-08
+
+- Large file messages now encourage incremental reading with view_range instead of discouraging all reading
+
 ## 0.0.376 - 2026-01-08
 
 - Loading remote sessions using GraphQL ID or session picker
