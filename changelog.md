@@ -1,3 +1,10 @@
+## 0.0.381 - 2026-01-13
+
+- Add --allow-all and --yolo flags to enable all permissions at once
+- Ghost text and tab completion show correct alias when typing slash commands like '/q' for '/quit'
+- Add `/new` as an alias for `/clear` command
+- Shell mode history navigation now filters by prefix - typing `!git` and pressing up arrow cycles only through previous git commands
+
 ## 0.0.380 - 2026-01-13
 
 - Retrieving models handles network errors from firewalled routes gracefully, raises errors appropriately
