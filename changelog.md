@@ -1,3 +1,8 @@
+## 0.0.382 - 2026-01-14
+
+- Add support for GPT-5.2-Codex model
+- Add `--config-dir` flag to override default configuration directory location
+
 ## 0.0.381 - 2026-01-13
 
 - Add --allow-all and --yolo flags to enable all permissions at once
