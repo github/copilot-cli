@@ -14,7 +14,42 @@ echo "Installing GitHub Copilot CLI..."
 # Detect platform
 case "$(uname -s || echo "")" in
   Darwin*) PLATFORM="darwin" ;;
-  Linux*) PLATFORM="linux" ;;
+  Linux*)
+    PLATFORM="linux"
+    # Check if apt is available and offer to use it on Debian/Ubuntu systems
+    if [ "$USE_APT" = "true" ] || { [ -z "$USE_APT" ] && command -v apt-get >/dev/null 2>&1 && [ -f /etc/debian_version ]; }; then
+      if [ "$USE_APT" = "true" ] || [ -t 0 ]; then
+        # Only prompt if USE_APT is set or running interactively
+        if [ "$USE_APT" != "true" ] && [ -t 0 ]; then
+          echo "Debian/Ubuntu system detected. Would you like to install via apt? [y/N]"
+          read -r USE_APT_RESPONSE
+          case "$USE_APT_RESPONSE" in
+            [yY][eE][sS]|[yY]) USE_APT="true" ;;
+            *) USE_APT="false" ;;
+          esac
+        fi
+        if [ "$USE_APT" = "true" ]; then
+          echo "Installing via apt..."
+          # Add GitHub's official apt repository
+          if ! command -v gpg >/dev/null 2>&1; then
+            echo "Installing gnupg..."
+            sudo apt-get update && sudo apt-get install -y gnupg
+          fi
+          # Download and add GitHub GPG key
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/github-copilot-archive-keyring.gpg 2>/dev/null || true
+          # Add the repository
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/github-copilot-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-copilot.list > /dev/null
+          # Update and install
+          sudo apt-get update
+          sudo apt-get install -y copilot-cli
+          echo "✓ GitHub Copilot CLI installed via apt"
+          echo ""
+          echo "Installation complete! Run 'copilot help' to get started."
+          exit 0
+        fi
+      fi
+    fi
+    ;;
   *)
     if command -v winget >/dev/null 2>&1; then
       echo "Windows detected. Installing via winget..."

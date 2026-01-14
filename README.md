@@ -57,6 +57,25 @@ brew install copilot-cli
 brew install copilot-cli@prerelease
 ```
 
+Install with apt (Ubuntu/Debian):
+
+```bash
+curl -fsSL https://gh.io/copilot-install | USE_APT=true sudo bash
+```
+
+Or manually:
+
+```bash
+# Add GitHub GPG key
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/github-copilot-archive-keyring.gpg
+
+# Add the repository
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/github-copilot-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-copilot.list > /dev/null
+
+# Update and install
+sudo apt update && sudo apt install -y copilot-cli
+```
+
 Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
 
 ```bash
