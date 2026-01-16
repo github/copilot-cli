@@ -1,3 +1,28 @@
+## 0.0.384 - 2026-01-16
+
+- Add `&` prefix shortcut for delegating prompts to run in background (equivalent to `/delegate`)
+- Tab completion cycles correctly based on typed prefix, not completed text
+- Allow users to configure the reasoning effort for gpt models
+- MCP servers now start correctly for custom agents
+- Shell commands now display error output when they fail
+- Fixed bug causing model call failures after compaction in some scenarios
+
+## 0.0.383 - 2026-01-15
+
+- Login flow respects OAuth slow_down interval and includes debug logging
+- Custom agent discovery now follows symbolic links to agent definition files
+- Add additional prompting for custom agent delegation
+- Add `/cd` as an alias for `/cwd` command
+- Files created by the CLI are available for @-mention
+- Enable extended thinking for Anthropic Claude models
+- Screen reader mode shows static text instead of animated spinners during login
+- Selecting 'approve for session' now auto-approves pending parallel permission requests of the same type
+- Reasoning view setting persists across sessions
+- Provide clearer error messages when repository is not found or access is denied
+- Inject repo memories in the prompt and add memory storage tool to remember facts across sessions
+- Show delay time when Copilot reads shell output with a delay
+- Support proxy URLs without scheme (e.g., localhost:9999)
+
 ## 0.0.382 - 2026-01-14
 
 - Add support for GPT-5.2-Codex model
