@@ -1,3 +1,7 @@
+## 0.0.385 - TBD
+
+- Fixed Esc key behavior in interactive prompts: pressing Esc while editing "No, and tell Copilot what to do differently" message now returns to option picker instead of auto-selecting "No"
+
 ## 0.0.384 - 2026-01-16
 
 - Add `&` prefix shortcut for delegating prompts to run in background (equivalent to `/delegate`)
