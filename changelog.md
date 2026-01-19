@@ -1,3 +1,8 @@
+## 0.0.386 - 2026-01-19
+
+- Background compaction preserves tool call sequences correctly
+- Add `/resume` command to switch sessions
+
 ## 0.0.385 - 2026-01-19
 
 - The store_memory tool is only included when memory is enabled for the user
