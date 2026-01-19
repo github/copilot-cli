@@ -1,3 +1,17 @@
+## 0.0.385 - 2026-01-19
+
+- The store_memory tool is only included when memory is enabled for the user
+- Input placeholder now says "Type" instead of "Enter" to avoid confusion with Enter key
+- Cursor now correctly positioned at end of line when navigating history with down arrow
+- The new memory feature gracefully handles Copilot running without a repository
+- Control-C message now displays for 5 seconds instead of 1 second
+- Display current intent in terminal tab title
+- Combine all custom instruction files instead of using priority-based fallbacks
+- Enable infinite sessions with automatic long-running context management through compaction checkpoints
+- MCP server management when swapping between custom agents with /agent
+- Press Escape to cancel manual `/compact` command
+- Model switching from Codex to Opus preserves conversation history correctly
+
 ## 0.0.384 - 2026-01-16
 
 - Add `&` prefix shortcut for delegating prompts to run in background (equivalent to `/delegate`)
@@ -6,9 +20,6 @@
 - MCP servers now start correctly for custom agents
 - Shell commands now display error output when they fail
 - Fixed bug causing model call failures after compaction in some scenarios
-
-## 0.0.383 - 2026-01-15
-
 - Login flow respects OAuth slow_down interval and includes debug logging
 - Custom agent discovery now follows symbolic links to agent definition files
 - Add additional prompting for custom agent delegation
@@ -50,6 +61,7 @@
 - Allow reading files >10MB when using view_range parameter
 - Sessions with large conversation history load faster on startup
 - Send messages while Copilot is thinking to steer or queue
+- Keyboard shortcuts: Ctrl+O now expands recent timeline, Ctrl+E expands all timeline (Ctrl+R unbound for future use)
 
 ## 0.0.377 - 2026-01-08
 
