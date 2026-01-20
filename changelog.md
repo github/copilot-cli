@@ -1,3 +1,9 @@
+## 0.0.387 - 2026-01-20
+
+- Skill tool handles large directories without exceeding context limits
+- Add ask_user tool for interactive clarification questions
+- Add plan mode with dedicated panel for viewing implementation plans
+
 ## 0.0.386 - 2026-01-19
 
 - Background compaction preserves tool call sequences correctly
