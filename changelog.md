@@ -1,3 +1,13 @@
+## 0.0.388 - 2026-01-20
+
+- Add `/review` command to analyze code changes
+- Make session event messages more concise and visually clean
+- Clean up old package versions during auto-update check to free disk space
+- `--enable-all-github-mcp-tools` flag now enables read-write GitHub MCP tools
+- `/share gist` shows helpful error on GitHub Enterprise Cloud with data residency
+- Remove commit hash from CLI header
+- Redesign CLI header with branded mascot and streamlined welcome message
+
 ## 0.0.387 - 2026-01-20
 
 - Skill tool handles large directories without exceeding context limits
