@@ -126,29 +126,28 @@ rm -rf "$TMP_DIR"
 if ! command -v copilot >/dev/null 2>&1; then
   echo ""
   echo "Notice: $INSTALL_DIR is not in your PATH"
-  export PATH="$PATH:$INSTALL_DIR"
-  echo "✓ Added $INSTALL_DIR to PATH for this session"
 
   # Detect shell rc file
   case "$(basename "${SHELL:-/bin/sh}")" in
     zsh)  RC_FILE="$HOME/.zshrc" ;;
-    bash)
-      if [ -f "$HOME/.bash_profile" ]; then
-        RC_FILE="$HOME/.bash_profile"
-      else
-        RC_FILE="$HOME/.bashrc"
-      fi
-      ;;
+    bash) RC_FILE="$HOME/.bashrc" ;;
     *)    RC_FILE="$HOME/.profile" ;;
   esac
 
-  # Prompt user to add to shell rc file
-  echo ""
-  printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
-  read -r REPLY </dev/tty
-  if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
-    echo "export PATH=\"\$PATH:$INSTALL_DIR\"" >> "$RC_FILE"
-    echo "✓ Added PATH export to $RC_FILE"
+  # Prompt user to add to shell rc file (only if interactive)
+  if [ -t 0 ] || [ -e /dev/tty ]; then
+    echo ""
+    printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
+    if read -r REPLY </dev/tty 2>/dev/null; then
+      if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
+        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC_FILE"
+        echo "✓ Added PATH export to $RC_FILE"
+      fi
+    fi
+  else
+    echo ""
+    echo "To add $INSTALL_DIR to your PATH permanently, add this to $RC_FILE:"
+    echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
   fi
 fi
 
