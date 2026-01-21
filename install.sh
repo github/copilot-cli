@@ -122,16 +122,13 @@ chmod +x "$INSTALL_DIR/copilot"
 echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
 rm -rf "$TMP_DIR"
 
-# Check if install directory is in PATH
-case ":$PATH:" in
-  *":$INSTALL_DIR:"*) ;;
-  *)
-    echo ""
-    echo "Warning: $INSTALL_DIR is not in your PATH"
-    echo "Add it to your PATH by adding this line to your shell profile:"
-    echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
-    ;;
-esac
+# Check if installed binary is accessible
+if ! command -v copilot >/dev/null 2>&1; then
+  echo ""
+  echo "Warning: $INSTALL_DIR is not in your PATH"
+  echo "Add it to your PATH by adding this line to your shell profile:"
+  echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
+fi
 
 echo ""
 echo "Installation complete! Run 'copilot help' to get started."
