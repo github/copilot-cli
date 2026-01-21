@@ -1,3 +1,118 @@
+## 0.0.388 - 2026-01-20
+
+- Add `/review` command to analyze code changes
+- Make session event messages more concise and visually clean
+- Clean up old package versions during auto-update check to free disk space
+- `--enable-all-github-mcp-tools` flag now enables read-write GitHub MCP tools
+- `/share gist` shows helpful error on GitHub Enterprise Cloud with data residency
+- Remove commit hash from CLI header
+- Redesign CLI header with branded mascot and streamlined welcome message
+
+## 0.0.387 - 2026-01-20
+
+- Skill tool handles large directories without exceeding context limits
+- Add ask_user tool for interactive clarification questions
+- Add plan mode with dedicated panel for viewing implementation plans
+
+## 0.0.386 - 2026-01-19
+
+- Background compaction preserves tool call sequences correctly
+- Add `/resume` command to switch sessions
+
+## 0.0.385 - 2026-01-19
+
+- The store_memory tool is only included when memory is enabled for the user
+- Input placeholder now says "Type" instead of "Enter" to avoid confusion with Enter key
+- Cursor now correctly positioned at end of line when navigating history with down arrow
+- The new memory feature gracefully handles Copilot running without a repository
+- Control-C message now displays for 5 seconds instead of 1 second
+- Display current intent in terminal tab title
+- Combine all custom instruction files instead of using priority-based fallbacks
+- Enable infinite sessions with automatic long-running context management through compaction checkpoints
+- MCP server management when swapping between custom agents with /agent
+- Press Escape to cancel manual `/compact` command
+- Model switching from Codex to Opus preserves conversation history correctly
+
+## 0.0.384 - 2026-01-16
+
+- Add `&` prefix shortcut for delegating prompts to run in background (equivalent to `/delegate`)
+- Tab completion cycles correctly based on typed prefix, not completed text
+- Allow users to configure the reasoning effort for gpt models
+- MCP servers now start correctly for custom agents
+- Shell commands now display error output when they fail
+- Fixed bug causing model call failures after compaction in some scenarios
+- Login flow respects OAuth slow_down interval and includes debug logging
+- Custom agent discovery now follows symbolic links to agent definition files
+- Add additional prompting for custom agent delegation
+- Add `/cd` as an alias for `/cwd` command
+- Files created by the CLI are available for @-mention
+- Enable extended thinking for Anthropic Claude models
+- Screen reader mode shows static text instead of animated spinners during login
+- Selecting 'approve for session' now auto-approves pending parallel permission requests of the same type
+- Reasoning view setting persists across sessions
+- Provide clearer error messages when repository is not found or access is denied
+- Inject repo memories in the prompt and add memory storage tool to remember facts across sessions
+- Show delay time when Copilot reads shell output with a delay
+- Support proxy URLs without scheme (e.g., localhost:9999)
+
+## 0.0.382 - 2026-01-14
+
+- Add support for GPT-5.2-Codex model
+- Add `--config-dir` flag to override default configuration directory location
+
+## 0.0.381 - 2026-01-13
+
+- Add --allow-all and --yolo flags to enable all permissions at once
+- Ghost text and tab completion show correct alias when typing slash commands like '/q' for '/quit'
+- Add `/new` as an alias for `/clear` command
+- Shell mode history navigation now filters by prefix - typing `!git` and pressing up arrow cycles only through previous git commands
+
+## 0.0.380 - 2026-01-13
+
+- Retrieving models handles network errors from firewalled routes gracefully, raises errors appropriately
+- Bash command text aligns with output in timeline events
+- Large output hints now suggest appropriate tools for different content types including JSON
+- The `--agent` flag now works in interactive mode
+- Provide inline feedback when rejecting tool permission requests so agents don't have to stop due to denying permissions
+- web-fetch tool now rejects file:// URLs and suggests using view tool instead
+- Terminal escape sequences no longer appear as text input
+- Auto-compaction runs in background without blocking the conversation.
+- Abort signals now propagate to sub-agents, allowing task cancellation to stop all nested agent work
+- Custom agent tool aliasing for the task tool
+- Allow reading files >10MB when using view_range parameter
+- Sessions with large conversation history load faster on startup
+- Send messages while Copilot is thinking to steer or queue
+- Keyboard shortcuts: Ctrl+O now expands recent timeline, Ctrl+E expands all timeline (Ctrl+R unbound for future use)
+
+## 0.0.377 - 2026-01-08
+
+- Large file messages now encourage incremental reading with view_range instead of discouraging all reading
+
+## 0.0.376 - 2026-01-08
+
+- Loading remote sessions using GraphQL ID or session picker
+- Task tool subagents can now process images
+- Downgrading CLI version no longer requires manually clearing downloaded packages
+- Large tool outputs are written to disk and models are encouraged to use efficient search tools
+
+## 0.0.375 - 2026-01-07
+
+- Add Ctrl+T to toggle reasoning summaries for supported models
+- Add --share and --share-gist flags for session sharing in non-interactive mode
+- File edits no longer hang when approving multiple concurrent edits
+- Responses with reasoning no longer cause duplicate assistant messages
+- Shutdown MCP servers after subagent execution completes
+- SVG files are now treated as text files instead of binary images
+- Fix 'Connection Error' issues due to subscription-based route used in chat completions
+
+## 0.0.374 - 2026-01-02
+
+- MCP server type help text displays correct options
+- Model picker shows clearer message with settings link when models are unavailable
+- Add auto-compaction at 95% token limit and `/compact` command
+- Built-in subagents for exploring and managing tasks
+- Built in `web_fetch` tool for fetching web content
+
 ## 0.0.373 - 2025-12-30
 
 - Tab completion for path arguments in slash commands like `/cwd` and `/add-dir`
