@@ -35,7 +35,24 @@ case "$(uname -m)" in
 esac
 
 # Determine download URL based on VERSION
-if [ -n "$VERSION" ]; then
+if [ "${VERSION}" = "latest" ] || [ -z "$VERSION" ]; then
+  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
+  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/latest/download/SHA256SUMS.txt"
+elif [ "${VERSION}" = "prerelease" ]; then
+  # Get the latest prerelease tag
+  if ! command -v git >/dev/null 2>&1; then
+    echo "Error: git is required to install prerelease versions" >&2
+    exit 1
+  fi
+  VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | tail -1 | awk -F/ '{print $NF}')"
+  if [ -z "$VERSION" ]; then
+    echo "Error: Could not determine prerelease version" >&2
+    exit 1
+  fi
+  echo "Latest prerelease version: $VERSION"
+  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/copilot-${PLATFORM}-${ARCH}.tar.gz"
+  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/SHA256SUMS.txt"
+else
   # Prefix version with 'v' if not already present
   case "$VERSION" in
     v*) ;;
@@ -43,9 +60,6 @@ if [ -n "$VERSION" ]; then
   esac
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/copilot-${PLATFORM}-${ARCH}.tar.gz"
   CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/SHA256SUMS.txt"
-else
-  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
-  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/latest/download/SHA256SUMS.txt"
 fi
 echo "Downloading from: $DOWNLOAD_URL"
 
