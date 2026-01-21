@@ -125,9 +125,31 @@ rm -rf "$TMP_DIR"
 # Check if installed binary is accessible
 if ! command -v copilot >/dev/null 2>&1; then
   echo ""
-  echo "Warning: $INSTALL_DIR is not in your PATH"
-  echo "Add it to your PATH by adding this line to your shell profile:"
-  echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
+  echo "Notice: $INSTALL_DIR is not in your PATH"
+  export PATH="$PATH:$INSTALL_DIR"
+  echo "✓ Added $INSTALL_DIR to PATH for this session"
+
+  # Detect shell rc file
+  case "$(basename "${SHELL:-/bin/sh}")" in
+    zsh)  RC_FILE="$HOME/.zshrc" ;;
+    bash)
+      if [ -f "$HOME/.bash_profile" ]; then
+        RC_FILE="$HOME/.bash_profile"
+      else
+        RC_FILE="$HOME/.bashrc"
+      fi
+      ;;
+    *)    RC_FILE="$HOME/.profile" ;;
+  esac
+
+  # Prompt user to add to shell rc file
+  echo ""
+  printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
+  read -r REPLY </dev/tty
+  if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
+    echo "export PATH=\"\$PATH:$INSTALL_DIR\"" >> "$RC_FILE"
+    echo "✓ Added PATH export to $RC_FILE"
+  fi
 fi
 
 echo ""
