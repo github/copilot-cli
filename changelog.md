@@ -1,3 +1,9 @@
+## 0.0.390 - 2026-01-22
+
+- Preserve extended thinking after compaction
+- Custom agents with MCP servers avoid unnecessary restarts
+- Enable steering during plan mode
+
 ## 0.0.389 - 2026-01-22
 
 - Improve `/session` command visual hierarchy and colors
