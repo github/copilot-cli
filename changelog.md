@@ -1,3 +1,25 @@
+## 0.0.389 - 2026-01-22
+
+- Improve `/session` command visual hierarchy and colors
+- Subagents receive correct tools when using different models
+- grep and glob tools now find hidden files and dotfiles
+- Add MSI installer for Windows
+- Remove Node version requirement from npm package
+- MCP servers can now authenticate using OAuth 2.0 with automatic token management and refresh
+- Display progress messages from MCP tools in timeline
+- Plugins can bundle MCP servers that load automatically when installed
+- Invoke skills using slash commands like /skill-name
+- Add `/diff` command to review changes made during the current session
+- Show warning when repository memory fails to load
+- Add `/plugin` command to install skills from plugin marketplaces
+- Subagents no longer hang on user input requests
+- Rate limit errors now show retry timing in user-friendly messages
+- Messages sent during `/compact` are automatically queued
+- Add `/models` as alias for `/model` command
+- Change license to MIT License
+- Reduce padding in welcome header
+- Shell commands (!) can run in parallel while agent is working
+
 ## 0.0.388 - 2026-01-20
 
 - Add `/review` command to analyze code changes
