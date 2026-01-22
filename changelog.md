@@ -11,7 +11,6 @@
 - Invoke skills using slash commands like /skill-name
 - Add `/diff` command to review changes made during the current session
 - Show warning when repository memory fails to load
-- Add `/plugin` command to install skills from plugin marketplaces
 - Subagents no longer hang on user input requests
 - Rate limit errors now show retry timing in user-friendly messages
 - Messages sent during `/compact` are automatically queued
