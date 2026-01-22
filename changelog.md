@@ -1,3 +1,10 @@
+## 0.0.392 - 2026-01-22
+
+- Add `/plugin` command for plugin marketplace management
+- Add /rename command as alias for /session rename
+- Add /plugin update command to update installed plugins
+- Edit tool now displays diffs when expanded in timeline
+
 ## 0.0.390 - 2026-01-22
 
 - Preserve extended thinking after compaction
