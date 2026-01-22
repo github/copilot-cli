@@ -6,7 +6,7 @@ GitHub Copilot CLI brings AI-powered coding assistance directly to your command 
 
 See [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli) for more information.
 
-![Image of the splash screen for the Copilot CLI](https://github.com/user-attachments/assets/51ac25d2-c074-467a-9c88-38a8d76690e3)
+![Image of the splash screen for the Copilot CLI](https://github.com/user-attachments/assets/aba8d4a4-9919-48de-98a3-66c9897025fa)
 
 ## 🚀 Introduction and Overview
 
