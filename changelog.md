@@ -1,3 +1,12 @@
+## 0.0.393 - 2026-01-23
+
+- Show conversation compaction status as timeline messages instead of header indicator
+- Memory loading no longer warns when outside a Git repository
+- Add support for GHE Cloud (\*.ghe.com) remote custom agents
+- Plugin uninstall now works correctly
+- Expose MCP server and tool names in tool.execution_start events for better error handling
+- Add Esc-Esc to undo file changes to any previous snapshot
+
 ## 0.0.392 - 2026-01-22
 
 - Add `/plugin` command for plugin marketplace management
