@@ -119,6 +119,7 @@
   <script>
     // State
     let currentMode = 'passive';
+    let gridType = 'coarse'; // 'coarse' or 'fine'
     let dots = [];
     const canvas = document.getElementById('dot-canvas');
     const ctx = canvas.getContext('2d');
@@ -130,24 +131,57 @@
     canvas.height = window.innerHeight;
 
     /**
-     * Generate coarse grid of dots
+     * Generate coarse grid of dots (100px spacing)
      */
     function generateCoarseGrid() {
-      const spacing = 100; // 100px spacing for coarse grid
+      const spacing = 100;
       const dots = [];
       
       for (let x = spacing; x < window.innerWidth; x += spacing) {
         for (let y = spacing; y < window.innerHeight; y += spacing) {
+          const col = Math.floor(x / spacing);
+          const row = Math.floor(y / spacing);
           dots.push({
             id: `dot-${x}-${y}`,
             x,
             y,
-            label: `${String.fromCharCode(65 + Math.floor(x / spacing) % 26)}${Math.floor(y / spacing)}`
+            label: `${String.fromCharCode(65 + col % 26)}${row}`
           });
         }
       }
       
       return dots;
+    }
+
+    /**
+     * Generate fine grid of dots (50px spacing)
+     */
+    function generateFineGrid() {
+      const spacing = 50;
+      const dots = [];
+      
+      for (let x = spacing; x < window.innerWidth; x += spacing) {
+        for (let y = spacing; y < window.innerHeight; y += spacing) {
+          const col = Math.floor(x / spacing);
+          const row = Math.floor(y / spacing);
+          // Use different labeling for fine grid
+          dots.push({
+            id: `dot-${x}-${y}`,
+            x,
+            y,
+            label: `${String.fromCharCode(65 + (col % 26))}${row}${col > 25 ? '+' : ''}`
+          });
+        }
+      }
+      
+      return dots;
+    }
+
+    /**
+     * Generate dots based on current grid type
+     */
+    function generateDots() {
+      return gridType === 'fine' ? generateFineGrid() : generateCoarseGrid();
     }
 
     /**
@@ -232,7 +266,7 @@
     // Initialize
     window.electronAPI.getState().then(state => {
       currentMode = state.overlayMode;
-      dots = generateCoarseGrid();
+      dots = generateDots();
       updateModeDisplay();
     });
 
@@ -240,9 +274,12 @@
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      dots = generateCoarseGrid();
+      dots = generateDots();
       renderDots();
     });
+
+    // Listen for grid type changes (future enhancement)
+    // Could be triggered via IPC message from chat window
   </script>
 </body>
 </html>
