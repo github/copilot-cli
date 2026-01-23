@@ -4,9 +4,7 @@
   "description": "GitHub Copilot CLI with headless agent + ultra-thin overlay architecture",
   "main": "src/main/index.js",
   "scripts": {
-    "start": "electron .",
-    "build": "webpack --config webpack.config.js",
-    "dev": "webpack --config webpack.config.js --watch"
+    "start": "electron ."
   },
   "keywords": [
     "copilot",
@@ -18,12 +16,5 @@
   "license": "MIT",
   "dependencies": {
     "electron": "^35.7.5"
-  },
-  "devDependencies": {
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4",
-    "html-webpack-plugin": "^5.5.3",
-    "css-loader": "^6.8.1",
-    "style-loader": "^3.3.3"
   }
 }

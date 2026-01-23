@@ -131,6 +131,19 @@
     canvas.height = window.innerHeight;
 
     /**
+     * Generate label for a dot based on grid position
+     */
+    function generateDotLabel(col, row, isFineGrid) {
+      if (isFineGrid) {
+        // Fine grid uses extended labeling with '+' for columns > 26
+        return `${String.fromCharCode(65 + (col % 26))}${row}${col > 25 ? '+' : ''}`;
+      } else {
+        // Coarse grid uses simple A-Z + row number
+        return `${String.fromCharCode(65 + col % 26)}${row}`;
+      }
+    }
+
+    /**
      * Generate coarse grid of dots (100px spacing)
      */
     function generateCoarseGrid() {
@@ -145,7 +158,7 @@
             id: `dot-${x}-${y}`,
             x,
             y,
-            label: `${String.fromCharCode(65 + col % 26)}${row}`
+            label: generateDotLabel(col, row, false)
           });
         }
       }
@@ -164,12 +177,11 @@
         for (let y = spacing; y < window.innerHeight; y += spacing) {
           const col = Math.floor(x / spacing);
           const row = Math.floor(y / spacing);
-          // Use different labeling for fine grid
           dots.push({
             id: `dot-${x}-${y}`,
             x,
             y,
-            label: `${String.fromCharCode(65 + (col % 26))}${row}${col > 25 ? '+' : ''}`
+            label: generateDotLabel(col, row, true)
           });
         }
       }

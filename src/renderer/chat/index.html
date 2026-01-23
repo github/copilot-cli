@@ -349,9 +349,11 @@
     window.electronAPI.onDotSelected((data) => {
       addMessage(`Selected dot: ${data.label} at (${data.x}, ${data.y})`, 'system');
       
-      // Automatically switch back to passive mode after selection
-      currentMode = 'passive';
-      updateModeDisplay();
+      // Mode will be changed by main process, just update display
+      window.electronAPI.getState().then(state => {
+        currentMode = state.overlayMode;
+        updateModeDisplay();
+      });
     });
 
     // Listen for agent responses

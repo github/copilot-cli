@@ -111,16 +111,20 @@ function createChatWindow() {
  * Create system tray icon with menu
  */
 function createTray() {
-  // Create a simple 16x16 icon (we'll use a placeholder for now)
-  // In production, use a proper icon file
+  // Create tray icon with proper error handling
   const trayIconPath = path.join(__dirname, '../assets/tray-icon.png');
+  const fs = require('fs');
   
-  // For now, we'll create the tray without icon and handle it gracefully
-  try {
-    tray = new Tray(trayIconPath);
-  } catch (error) {
-    // If icon doesn't exist, create tray with empty string (will use default)
-    console.log('Tray icon not found, using system default');
+  // Check if icon file exists
+  if (fs.existsSync(trayIconPath)) {
+    try {
+      tray = new Tray(trayIconPath);
+    } catch (error) {
+      console.error('Failed to load tray icon:', error);
+      tray = new Tray(require('electron').nativeImage.createEmpty());
+    }
+  } else {
+    console.warn('Tray icon not found at:', trayIconPath);
     tray = new Tray(require('electron').nativeImage.createEmpty());
   }
 
