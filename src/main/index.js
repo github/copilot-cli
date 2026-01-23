@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, screen } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 // Keep references to windows to prevent garbage collection
 let overlayWindow = null;
@@ -113,7 +114,6 @@ function createChatWindow() {
 function createTray() {
   // Create tray icon with proper error handling
   const trayIconPath = path.join(__dirname, '../assets/tray-icon.png');
-  const fs = require('fs');
   
   // Check if icon file exists
   if (fs.existsSync(trayIconPath)) {

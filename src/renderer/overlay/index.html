@@ -135,11 +135,14 @@
      */
     function generateDotLabel(col, row, isFineGrid) {
       if (isFineGrid) {
-        // Fine grid uses extended labeling with '+' for columns > 26
-        return `${String.fromCharCode(65 + (col % 26))}${row}${col > 25 ? '+' : ''}`;
+        // Fine grid uses extended labeling with '+' for columns beyond Z
+        // Columns 0-25 = A-Z, 26-51 = A+-Z+, etc.
+        const letter = String.fromCharCode(65 + (col % 26));
+        const suffix = col >= 26 ? '+' : '';
+        return `${letter}${row}${suffix}`;
       } else {
-        // Coarse grid uses simple A-Z + row number
-        return `${String.fromCharCode(65 + col % 26)}${row}`;
+        // Coarse grid uses simple A-Z + row number (wrapping after Z)
+        return `${String.fromCharCode(65 + (col % 26))}${row}`;
       }
     }
 
@@ -150,10 +153,12 @@
       const spacing = 100;
       const dots = [];
       
+      // Start at spacing pixels from edge (first dot at x=spacing, y=spacing)
       for (let x = spacing; x < window.innerWidth; x += spacing) {
         for (let y = spacing; y < window.innerHeight; y += spacing) {
-          const col = Math.floor(x / spacing);
-          const row = Math.floor(y / spacing);
+          // Column index starts at 0 for first dot
+          const col = Math.floor((x - spacing) / spacing);
+          const row = Math.floor((y - spacing) / spacing);
           dots.push({
             id: `dot-${x}-${y}`,
             x,
@@ -173,10 +178,12 @@
       const spacing = 50;
       const dots = [];
       
+      // Start at spacing pixels from edge (first dot at x=spacing, y=spacing)
       for (let x = spacing; x < window.innerWidth; x += spacing) {
         for (let y = spacing; y < window.innerHeight; y += spacing) {
-          const col = Math.floor(x / spacing);
-          const row = Math.floor(y / spacing);
+          // Column index starts at 0 for first dot
+          const col = Math.floor((x - spacing) / spacing);
+          const row = Math.floor((y - spacing) / spacing);
           dots.push({
             id: `dot-${x}-${y}`,
             x,
