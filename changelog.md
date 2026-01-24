@@ -1,3 +1,23 @@
+## 0.0.394 - 2026-01-24
+
+- Deduplicate identical model instruction files to save context
+- Exit summary displays accurate usage metrics instead of zeros
+- Getting git branch works in repositories with no commits
+- Add support for GitHub Enterprise Cloud (\*.ghe.com) in /delegate command
+- Directory path uses consistent muted text color with git branch and model display
+- Plugin skills work in agent responses
+- Timeline hides startup messages to reduce noise
+- Fixed timeline entry regression where read_agent and other tools showed incorrect content
+- Git status updates on-demand instead of polling every 15 seconds
+- SDK supports infinite sessions with automatic context compaction
+- Memory loading errors are handled gracefully without user warnings
+- `/delegate` command accepts optional prompt, uses conversation context
+- Auto-update no longer removes old CLI package versions
+- Improve task completion with clearer detached process guidance
+- Simplified bottom bar by hiding some keyboard hints
+- Queue slash commands alongside messages using Ctrl+D
+- Press `/` to search sessions in `/resume`
+
 ## 0.0.393 - 2026-01-23
 
 - Show conversation compaction status as timeline messages instead of header indicator
