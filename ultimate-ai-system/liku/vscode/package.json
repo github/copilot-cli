@@ -1,0 +1,24 @@
+{
+  "name": "ultimate-ai-architect",
+  "displayName": "Ultimate AI Architect",
+  "version": "0.1.0",
+  "publisher": "liku-systems",
+  "engines": { "vscode": "^1.80.0" },
+  "activationEvents": ["workspaceContains:.ai/manifest.json"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "liku.refactor", "title": "Liku: Refactor" },
+      { "command": "liku.checkpoint", "title": "Liku: Create Checkpoint" },
+      { "command": "liku.status", "title": "Liku: Show Status" }
+    ]
+  },
+  "scripts": { "build": "tsc", "clean": "rimraf dist" },
+  "dependencies": { "@liku/core": "workspace:*" },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
+  }
+}

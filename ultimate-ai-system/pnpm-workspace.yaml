@@ -1,0 +1,4 @@
+packages:
+  - "liku/*"
+  - "!packages/**"
+  - "!src/**"

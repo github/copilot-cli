@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.turbo/
+*.log
+.env
+.DS_Store
+*.vsix
+.ai/logs/*.csv
+!.ai/logs/.gitkeep
+.ai/context/*.xml
+!.ai/context/.gitkeep

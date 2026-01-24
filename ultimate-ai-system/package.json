@@ -1,0 +1,24 @@
+{
+  "name": "ultimate-ai-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Liku AI System - Defensive AI coding architecture",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0",
+    "rimraf": "^5.0.5"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

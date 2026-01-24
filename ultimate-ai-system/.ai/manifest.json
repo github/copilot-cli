@@ -1,0 +1,28 @@
+{
+  "version": "3.1.0",
+  "project_root": ".",
+  "system_rules": {
+    "filesystem_security": {
+      "immutable_paths": ["liku/**", ".ai/manifest.json"],
+      "writable_paths": ["src/**", "tests/**", "packages/**"],
+      "rule_description": "Use 'liku/' for system logic ONLY."
+    }
+  },
+  "agent_profile": {
+    "default": "defensive",
+    "token_limit_soft_cap": 32000,
+    "context_strategy": "checkpoint_handover"
+  },
+  "verification": {
+    "strategies": {
+      "typescript": {
+        "tier1_fast": "pnpm test --filter ${package} -- --related ${files}",
+        "tier2_preflight": "pnpm run build && pnpm test"
+      }
+    }
+  },
+  "memory": {
+    "checkpoint_file": ".ai/context/checkpoint.xml",
+    "provenance_log": ".ai/logs/provenance.csv"
+  }
+}
