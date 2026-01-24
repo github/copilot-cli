@@ -1,0 +1,20 @@
+{
+  "name": "copilot-liku-cli",
+  "version": "0.0.1",
+  "description": "GitHub Copilot CLI with headless agent + ultra-thin overlay architecture",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "copilot",
+    "electron",
+    "overlay",
+    "agent"
+  ],
+  "author": "GitHub",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^35.7.5"
+  }
+}
