@@ -9,6 +9,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Listen for mode changes
   onModeChanged: (callback) => ipcRenderer.on('mode-changed', (event, mode) => callback(mode)),
   
+  // Listen for overlay commands (keyboard shortcuts routed via main process)
+  onOverlayCommand: (callback) => ipcRenderer.on('overlay-command', (event, data) => callback(data)),
+  
   // Get current state
   getState: () => ipcRenderer.invoke('get-state')
 });

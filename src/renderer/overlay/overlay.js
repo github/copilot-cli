@@ -472,6 +472,42 @@ window.electronAPI.onModeChanged((mode) => {
   updateModeDisplay();
 });
 
+// ===== OVERLAY COMMAND HANDLER (from main process globalShortcut) =====
+window.electronAPI.onOverlayCommand && window.electronAPI.onOverlayCommand((data) => {
+  console.log('Received overlay command:', data);
+  
+  if (currentMode !== 'selection') {
+    console.log('Ignoring command - not in selection mode');
+    return;
+  }
+  
+  switch (data.action) {
+    case 'toggle-fine':
+      const newLevel = zoomLevel > 1 ? 1 : 2;
+      setZoomLevel(newLevel);
+      showKeyFeedback(newLevel > 1 ? 'Fine Grid ON' : 'Fine Grid OFF');
+      break;
+    case 'show-all':
+      setZoomLevel(3);
+      showKeyFeedback('All Grids Visible');
+      break;
+    case 'zoom-in':
+      setZoomLevel(zoomLevel + 1);
+      showKeyFeedback('Zoom In: ' + Math.min(zoomLevel + 1, 3) + 'x');
+      break;
+    case 'zoom-out':
+      setZoomLevel(zoomLevel - 1);
+      showKeyFeedback('Zoom Out: ' + Math.max(zoomLevel - 1, 1) + 'x');
+      break;
+    case 'cancel':
+      window.electronAPI.selectDot({ cancelled: true });
+      showKeyFeedback('Cancelled');
+      break;
+    default:
+      console.log('Unknown command:', data.action);
+  }
+});
+
 // ===== INITIALIZATION =====
 coarseDots = generateCoarseGrid();
 fineDots = generateFineGrid();
@@ -483,4 +519,4 @@ window.electronAPI.getState().then(state => {
 });
 
 console.log('Overlay initialized with adaptive grid system');
-console.log('Key bindings: F/Space = toggle fine grid, G = show all, +/- = zoom, Esc = cancel');
+console.log('Global shortcuts: F = toggle fine grid, G = show all, +/- = zoom, Esc = cancel');
