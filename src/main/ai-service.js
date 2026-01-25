@@ -1,14 +1,23 @@
 /**
  * AI Service Module
- * Handles integration with AI backends (OpenAI, Claude, local models)
+ * Handles integration with AI backends (GitHub Copilot, OpenAI, Claude, local models)
  * Supports visual context for AI awareness of screen content
  */
 
 const https = require('https');
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { shell } = require('electron');
 
 // ===== CONFIGURATION =====
 const AI_PROVIDERS = {
+  copilot: {
+    baseUrl: 'api.githubcopilot.com',
+    path: '/chat/completions',
+    model: 'gpt-4o',
+    visionModel: 'gpt-4o'
+  },
   openai: {
     baseUrl: 'api.openai.com',
     path: '/v1/chat/completions',
@@ -30,12 +39,25 @@ const AI_PROVIDERS = {
   }
 };
 
+// GitHub Copilot OAuth Configuration
+const COPILOT_CLIENT_ID = 'Iv1.b507a08c87ecfe98';
+const GITHUB_DEVICE_CODE_URL = 'https://github.com/login/device/code';
+const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
+
 // Current configuration
-let currentProvider = 'ollama'; // Default to local for privacy
+let currentProvider = 'copilot'; // Default to GitHub Copilot
 let apiKeys = {
+  copilot: process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '',
   openai: process.env.OPENAI_API_KEY || '',
   anthropic: process.env.ANTHROPIC_API_KEY || ''
 };
+
+// Token persistence path
+const TOKEN_FILE = path.join(process.env.APPDATA || process.env.HOME || '.', 'copilot-agent', 'copilot-token.json');
+
+// OAuth state
+let oauthInProgress = false;
+let oauthCallback = null;
 
 // Conversation history for context
 let conversationHistory = [];
@@ -185,6 +207,246 @@ function buildMessages(userMessage, includeVisual = false) {
   }
 
   return messages;
+}
+
+// ===== GITHUB COPILOT OAUTH =====
+
+/**
+ * Load saved Copilot token from disk
+ */
+function loadCopilotToken() {
+  try {
+    if (fs.existsSync(TOKEN_FILE)) {
+      const data = JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8'));
+      if (data.access_token) {
+        apiKeys.copilot = data.access_token;
+        console.log('[COPILOT] Loaded saved token');
+        return true;
+      }
+    }
+  } catch (e) {
+    console.error('[COPILOT] Failed to load token:', e.message);
+  }
+  return false;
+}
+
+/**
+ * Save Copilot token to disk
+ */
+function saveCopilotToken(token) {
+  try {
+    const dir = path.dirname(TOKEN_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(TOKEN_FILE, JSON.stringify({ 
+      access_token: token, 
+      saved_at: new Date().toISOString() 
+    }));
+    console.log('[COPILOT] Token saved');
+  } catch (e) {
+    console.error('[COPILOT] Failed to save token:', e.message);
+  }
+}
+
+/**
+ * Start GitHub Copilot OAuth device code flow
+ * Returns { user_code, verification_uri } for user to complete auth
+ */
+function startCopilotOAuth() {
+  return new Promise((resolve, reject) => {
+    if (oauthInProgress) {
+      return reject(new Error('OAuth already in progress'));
+    }
+    
+    const data = JSON.stringify({
+      client_id: COPILOT_CLIENT_ID,
+      scope: 'copilot'
+    });
+
+    const req = https.request({
+      hostname: 'github.com',
+      path: '/login/device/code',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const result = JSON.parse(body);
+          if (result.device_code && result.user_code) {
+            console.log('[COPILOT] OAuth started. User code:', result.user_code);
+            oauthInProgress = true;
+            
+            // Open browser for user to authorize
+            shell.openExternal(result.verification_uri_complete || result.verification_uri);
+            
+            // Start polling for token
+            pollForToken(result.device_code, result.interval || 5);
+            
+            resolve({
+              user_code: result.user_code,
+              verification_uri: result.verification_uri,
+              expires_in: result.expires_in
+            });
+          } else {
+            reject(new Error(result.error_description || 'Failed to get device code'));
+          }
+        } catch (e) {
+          reject(new Error('Invalid response from GitHub'));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
+}
+
+/**
+ * Poll GitHub for access token after user authorizes
+ */
+function pollForToken(deviceCode, interval) {
+  const poll = () => {
+    const data = JSON.stringify({
+      client_id: COPILOT_CLIENT_ID,
+      device_code: deviceCode,
+      grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
+    });
+
+    const req = https.request({
+      hostname: 'github.com',
+      path: '/login/oauth/access_token',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const result = JSON.parse(body);
+          
+          if (result.access_token) {
+            // Success!
+            console.log('[COPILOT] OAuth successful!');
+            apiKeys.copilot = result.access_token;
+            saveCopilotToken(result.access_token);
+            oauthInProgress = false;
+            
+            if (oauthCallback) {
+              oauthCallback({ success: true, message: 'GitHub Copilot authenticated!' });
+              oauthCallback = null;
+            }
+          } else if (result.error === 'authorization_pending') {
+            // User hasn't authorized yet, keep polling
+            setTimeout(poll, interval * 1000);
+          } else if (result.error === 'slow_down') {
+            // Rate limited, slow down
+            setTimeout(poll, (interval + 5) * 1000);
+          } else if (result.error === 'expired_token') {
+            oauthInProgress = false;
+            if (oauthCallback) {
+              oauthCallback({ success: false, message: 'Authorization expired. Try /login again.' });
+              oauthCallback = null;
+            }
+          } else {
+            oauthInProgress = false;
+            if (oauthCallback) {
+              oauthCallback({ success: false, message: result.error_description || 'OAuth failed' });
+              oauthCallback = null;
+            }
+          }
+        } catch (e) {
+          // Parse error, retry
+          setTimeout(poll, interval * 1000);
+        }
+      });
+    });
+
+    req.on('error', () => setTimeout(poll, interval * 1000));
+    req.write(data);
+    req.end();
+  };
+
+  setTimeout(poll, interval * 1000);
+}
+
+/**
+ * Call GitHub Copilot API
+ */
+function callCopilot(messages) {
+  return new Promise((resolve, reject) => {
+    if (!apiKeys.copilot) {
+      // Try to load saved token
+      if (!loadCopilotToken()) {
+        return reject(new Error('Not authenticated. Use /login to authenticate with GitHub Copilot.'));
+      }
+    }
+
+    const config = AI_PROVIDERS.copilot;
+    const hasVision = messages.some(m => Array.isArray(m.content));
+    
+    const data = JSON.stringify({
+      model: hasVision ? config.visionModel : config.model,
+      messages: messages,
+      max_tokens: 2048,
+      temperature: 0.7,
+      stream: false
+    });
+
+    const options = {
+      hostname: config.baseUrl,
+      path: config.path,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKeys.copilot}`,
+        'Editor-Version': 'vscode/1.85.0',
+        'Editor-Plugin-Version': 'copilot/1.0.0',
+        'Copilot-Integration-Id': 'copilot-agent-overlay',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 401) {
+            // Token expired or invalid
+            apiKeys.copilot = '';
+            return reject(new Error('Token expired. Use /login to re-authenticate.'));
+          }
+          
+          const result = JSON.parse(body);
+          if (result.choices && result.choices[0]) {
+            resolve(result.choices[0].message.content);
+          } else if (result.error) {
+            reject(new Error(result.error.message || 'Copilot API error'));
+          } else {
+            reject(new Error('Invalid response from Copilot'));
+          }
+        } catch (e) {
+          reject(new Error(`Parse error: ${e.message}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
 }
 
 /**
@@ -373,6 +635,17 @@ async function sendMessage(userMessage, options = {}) {
     let response;
     
     switch (currentProvider) {
+      case 'copilot':
+        // GitHub Copilot - uses OAuth token or env var
+        if (!apiKeys.copilot) {
+          // Try loading saved token
+          if (!loadCopilotToken()) {
+            throw new Error('Not authenticated with GitHub Copilot.\n\nTo authenticate:\n1. Type /login and authorize in browser\n2. Or set GH_TOKEN or GITHUB_TOKEN environment variable');
+          }
+        }
+        response = await callCopilot(messages);
+        break;
+        
       case 'openai':
         if (!apiKeys.openai) {
           throw new Error('OpenAI API key not set. Use /setkey openai <key> or set OPENAI_API_KEY environment variable.');
@@ -458,12 +731,41 @@ function handleCommand(command) {
       }
       return { type: 'info', message: `Visual context buffer: ${visualContextBuffer.length} image(s)` };
 
+    case '/login':
+      // Start GitHub Copilot OAuth device code flow
+      return startCopilotOAuth()
+        .then(result => ({
+          type: 'login',
+          message: `GitHub Copilot authentication started!\n\nYour code: ${result.user_code}\n\nA browser window has opened. Enter the code to authorize.\nWaiting for authentication...`
+        }))
+        .catch(err => ({
+          type: 'error',
+          message: `Login failed: ${err.message}`
+        }));
+
+    case '/logout':
+      apiKeys.copilot = '';
+      try {
+        if (fs.existsSync(TOKEN_FILE)) fs.unlinkSync(TOKEN_FILE);
+      } catch (e) {}
+      return { type: 'system', message: 'Logged out from GitHub Copilot.' };
+
+    case '/status':
+      const status = getStatus();
+      return {
+        type: 'info',
+        message: `Provider: ${status.provider}\nCopilot: ${status.hasCopilotKey ? 'Authenticated' : 'Not authenticated'}\nOpenAI: ${status.hasOpenAIKey ? 'Key set' : 'No key'}\nAnthropic: ${status.hasAnthropicKey ? 'Key set' : 'No key'}\nHistory: ${status.historyLength} messages\nVisual: ${status.visualContextCount} captures`
+      };
+
     case '/help':
       return {
         type: 'info',
         message: `Available commands:
-/provider [name] - Get/set AI provider (openai, anthropic, ollama)
+/login - Authenticate with GitHub Copilot (recommended)
+/logout - Remove GitHub Copilot authentication
+/provider [name] - Get/set AI provider (copilot, openai, anthropic, ollama)
 /setkey <provider> <key> - Set API key
+/status - Show authentication status
 /clear - Clear conversation history
 /vision [on|off] - Manage visual context
 /capture - Capture screen for AI analysis
@@ -478,9 +780,20 @@ function handleCommand(command) {
 /**
  * Get current status
  */
+/**
+ * Set callback for OAuth completion
+ */
+function setOAuthCallback(callback) {
+  oauthCallback = callback;
+}
+
+/**
+ * Get current status
+ */
 function getStatus() {
   return {
     provider: currentProvider,
+    hasCopilotKey: !!apiKeys.copilot,
     hasOpenAIKey: !!apiKeys.openai,
     hasAnthropicKey: !!apiKeys.anthropic,
     historyLength: conversationHistory.length,
@@ -498,5 +811,8 @@ module.exports = {
   sendMessage,
   handleCommand,
   getStatus,
+  startCopilotOAuth,
+  setOAuthCallback,
+  loadCopilotToken,
   AI_PROVIDERS
 };

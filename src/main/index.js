@@ -566,7 +566,13 @@ function setupIPC() {
     
     // Check for slash commands first
     if (message.startsWith('/')) {
-      const commandResult = aiService.handleCommand(message);
+      let commandResult = aiService.handleCommand(message);
+      
+      // Handle async commands (like /login)
+      if (commandResult && typeof commandResult.then === 'function') {
+        commandResult = await commandResult;
+      }
+      
       if (commandResult) {
         if (chatWindow) {
           chatWindow.webContents.send('agent-response', {
@@ -864,6 +870,20 @@ app.whenReady().then(() => {
   createTray();
   registerShortcuts();
   setupIPC();
+  
+  // Set up Copilot OAuth callback to notify chat on auth completion
+  aiService.setOAuthCallback((result) => {
+    if (chatWindow && !chatWindow.isDestroyed()) {
+      chatWindow.webContents.send('agent-response', {
+        text: result.success ? result.message : `Authentication failed: ${result.message}`,
+        type: result.success ? 'system' : 'error',
+        timestamp: Date.now()
+      });
+    }
+  });
+  
+  // Try to load saved Copilot token
+  aiService.loadCopilotToken();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
