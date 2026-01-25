@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
   <title>Overlay</title>
   <style>
     * {
@@ -17,11 +18,15 @@
       overflow: hidden;
       background: transparent;
       cursor: default;
+      -webkit-user-select: none;
       user-select: none;
       -webkit-app-region: no-drag;
     }
 
-    /* By default, make everything click-through */
+    /* Container must have pointer-events: none for click-through to work.
+       Individual dots have pointer-events: auto to still receive clicks.
+       This is required because we use setIgnoreMouseEvents(true, { forward: true })
+       so mouse events pass through transparent areas to background apps. */
     #overlay-container {
       width: 100%;
       height: 100%;
@@ -29,54 +34,240 @@
       pointer-events: none;
     }
 
-    /* Canvas for drawing dots */
+    /* Dots container also needs pointer-events: none so clicks pass through gaps */
+    #dots-container {
+      pointer-events: none;
+    }
+
+    /* ===== ACTIVE OVERLAY BORDER ===== */
+    #overlay-border {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
+    }
+
+    #overlay-border.active {
+      opacity: 1;
+    }
+
+    #overlay-border::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border: 2px solid rgba(0, 122, 255, 0.6);
+      border-radius: 8px;
+      animation: border-pulse 2s ease-in-out infinite;
+    }
+
+    #overlay-border::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      border: 1px dashed rgba(0, 122, 255, 0.3);
+      border-radius: 6px;
+    }
+
+    @keyframes border-pulse {
+      0%, 100% { 
+        border-color: rgba(0, 122, 255, 0.6);
+        box-shadow: 0 0 10px rgba(0, 122, 255, 0.2), inset 0 0 10px rgba(0, 122, 255, 0.1);
+      }
+      50% { 
+        border-color: rgba(0, 200, 255, 0.8);
+        box-shadow: 0 0 20px rgba(0, 200, 255, 0.3), inset 0 0 20px rgba(0, 200, 255, 0.1);
+      }
+    }
+
+    /* ===== CORNER INDICATORS ===== */
+    .corner-indicator {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .corner-indicator.active {
+      opacity: 1;
+    }
+
+    .corner-indicator::before,
+    .corner-indicator::after {
+      content: '';
+      position: absolute;
+      background: rgba(0, 122, 255, 0.8);
+    }
+
+    .corner-indicator::before {
+      width: 20px;
+      height: 3px;
+    }
+
+    .corner-indicator::after {
+      width: 3px;
+      height: 20px;
+    }
+
+    #corner-tl { top: 8px; left: 8px; }
+    #corner-tl::before { top: 0; left: 0; }
+    #corner-tl::after { top: 0; left: 0; }
+
+    #corner-tr { top: 8px; right: 8px; }
+    #corner-tr::before { top: 0; right: 0; }
+    #corner-tr::after { top: 0; right: 0; }
+
+    #corner-bl { bottom: 8px; left: 8px; }
+    #corner-bl::before { bottom: 0; left: 0; }
+    #corner-bl::after { bottom: 0; left: 0; }
+
+    #corner-br { bottom: 8px; right: 8px; }
+    #corner-br::before { bottom: 0; right: 0; }
+    #corner-br::after { bottom: 0; right: 0; }
+
+    /* Canvas for drawing dots - pointer-events: none for click-through */
     #dot-canvas {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: auto;
+      pointer-events: none;
     }
 
-    /* Dots will be interactive when in selection mode */
+    /* ===== COARSE GRID DOTS (always visible) ===== */
+    /* CRITICAL: dots must have pointer-events: auto to be clickable
+       while the rest of the overlay is click-through */
     .dot {
       position: absolute;
-      width: 8px;
-      height: 8px;
-      background: rgba(0, 122, 255, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      width: 12px;
+      height: 12px;
+      background: rgba(0, 122, 255, 0.85);
+      border: 2px solid rgba(255, 255, 255, 0.95);
       border-radius: 50%;
       cursor: pointer;
-      pointer-events: auto;
-      transition: all 0.2s;
+      pointer-events: auto !important;
+      transition: all 0.15s ease;
       transform: translate(-50%, -50%);
+      box-shadow: 0 0 8px rgba(0, 122, 255, 0.5);
+      z-index: 100;
     }
 
     .dot:hover {
-      background: rgba(0, 122, 255, 0.9);
-      width: 12px;
-      height: 12px;
+      background: rgba(0, 180, 255, 1);
+      width: 16px;
+      height: 16px;
       border: 2px solid rgba(255, 255, 255, 1);
+      box-shadow: 0 0 12px rgba(0, 180, 255, 0.6);
+      z-index: 100;
     }
 
     .dot.selected {
       background: rgba(255, 45, 85, 0.9);
-      border: 2px solid rgba(255, 255, 255, 1);
+      border: 3px solid rgba(255, 255, 255, 1);
+      box-shadow: 0 0 15px rgba(255, 45, 85, 0.6);
+      animation: dot-selected 0.3s ease;
+    }
+
+    @keyframes dot-selected {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.5); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* ===== FINE GRID DOTS (appear on zoom/interaction) ===== */
+    .dot.fine {
+      width: 6px;
+      height: 6px;
+      background: rgba(100, 180, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, width 0.15s ease, height 0.15s ease;
+      box-shadow: 0 0 4px rgba(100, 180, 255, 0.3);
+    }
+
+    .dot.fine.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .dot.fine:hover {
+      width: 10px;
+      height: 10px;
+      background: rgba(100, 200, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 1);
+    }
+
+    /* ===== ZOOM INDICATOR ===== */
+    #zoom-indicator {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #zoom-indicator.visible {
+      opacity: 1;
+    }
+
+    #zoom-indicator .zoom-level {
+      font-weight: 600;
+      color: #00bfff;
     }
 
     /* Label for dots */
     .dot-label {
       position: absolute;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.85);
       color: white;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 10px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+      font-weight: 500;
       pointer-events: none;
-      transform: translate(-50%, -120%);
+      transform: translate(-50%, -130%);
       white-space: nowrap;
+      border: 1px solid rgba(0, 122, 255, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .dot-label.fine-label {
+      font-size: 9px;
+      padding: 2px 5px;
+      background: rgba(0, 0, 0, 0.75);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .dot-label.fine-label.visible {
+      opacity: 1;
     }
 
     /* Mode indicator */
@@ -84,18 +275,52 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.85);
       color: white;
-      padding: 8px 16px;
-      border-radius: 6px;
+      padding: 10px 20px;
+      border-radius: 8px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 12px;
+      font-size: 13px;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.3s ease;
+      border: 1px solid rgba(0, 122, 255, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      z-index: 10000;
     }
 
     #mode-indicator.visible {
+      opacity: 1;
+    }
+
+    #mode-indicator .mode-icon {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+      background: #00ff88;
+      animation: mode-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes mode-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ===== INTERACTION REGION HIGHLIGHT ===== */
+    #interaction-region {
+      position: fixed;
+      pointer-events: none;
+      border: 2px solid rgba(0, 255, 136, 0.6);
+      background: rgba(0, 255, 136, 0.05);
+      border-radius: 4px;
+      opacity: 0;
+      transition: opacity 0.2s ease, all 0.15s ease;
+      z-index: 9998;
+    }
+
+    #interaction-region.visible {
       opacity: 1;
     }
 
@@ -107,198 +332,86 @@
       pointer-events: none;
       border-radius: 4px;
     }
+
+    /* ===== STATUS BAR ===== */
+    #status-bar {
+      position: fixed;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #888;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #status-bar.visible {
+      opacity: 1;
+    }
+
+    #status-bar .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #status-bar .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00ff88;
+    }
+
+    #status-bar .status-dot.recording {
+      background: #ff4444;
+      animation: recording-pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes recording-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
   </style>
 </head>
 <body>
   <div id="overlay-container">
+    <!-- Active overlay border -->
+    <div id="overlay-border"></div>
+    
+    <!-- Corner indicators -->
+    <div id="corner-tl" class="corner-indicator"></div>
+    <div id="corner-tr" class="corner-indicator"></div>
+    <div id="corner-bl" class="corner-indicator"></div>
+    <div id="corner-br" class="corner-indicator"></div>
+    
+    <!-- Main canvas and dots -->
     <canvas id="dot-canvas"></canvas>
     <div id="dots-container"></div>
-    <div id="mode-indicator">Selection Mode</div>
+    
+    <!-- Interaction region highlight -->
+    <div id="interaction-region"></div>
+    
+    <!-- Status indicators -->
+    <div id="status-bar">
+      <span class="status-item"><span class="status-dot"></span> Active</span>
+      <span class="status-item" id="grid-status">Grid: Coarse</span>
+      <span class="status-item" id="coords-status">---, ---</span>
+    </div>
+    
+    <div id="mode-indicator"><span class="mode-icon"></span>Selection Mode</div>
+    <div id="zoom-indicator">Zoom: <span class="zoom-level">1x</span> | Scroll to adjust</div>
   </div>
 
-  <script>
-    // State
-    let currentMode = 'passive';
-    let gridType = 'coarse'; // 'coarse' or 'fine'
-    let dots = [];
-    const canvas = document.getElementById('dot-canvas');
-    const ctx = canvas.getContext('2d');
-    const dotsContainer = document.getElementById('dots-container');
-    const modeIndicator = document.getElementById('mode-indicator');
-
-    // Set canvas size
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    /**
-     * Generate label for a dot based on grid position
-     */
-    function generateDotLabel(col, row, isFineGrid) {
-      if (isFineGrid) {
-        // Fine grid uses extended labeling with '+' for columns beyond Z
-        // Columns 0-25 = A-Z, 26-51 = A+-Z+, etc.
-        const letter = String.fromCharCode(65 + (col % 26));
-        const suffix = col >= 26 ? '+' : '';
-        return `${letter}${row}${suffix}`;
-      } else {
-        // Coarse grid uses simple A-Z + row number (wrapping after Z)
-        return `${String.fromCharCode(65 + (col % 26))}${row}`;
-      }
-    }
-
-    /**
-     * Generate coarse grid of dots (100px spacing)
-     */
-    function generateCoarseGrid() {
-      const spacing = 100;
-      const dots = [];
-      
-      // Start at spacing pixels from edge (first dot at x=spacing, y=spacing)
-      for (let x = spacing; x < window.innerWidth; x += spacing) {
-        for (let y = spacing; y < window.innerHeight; y += spacing) {
-          // Column index starts at 0 for first dot
-          const col = Math.floor((x - spacing) / spacing);
-          const row = Math.floor((y - spacing) / spacing);
-          dots.push({
-            id: `dot-${x}-${y}`,
-            x,
-            y,
-            label: generateDotLabel(col, row, false)
-          });
-        }
-      }
-      
-      return dots;
-    }
-
-    /**
-     * Generate fine grid of dots (50px spacing)
-     */
-    function generateFineGrid() {
-      const spacing = 50;
-      const dots = [];
-      
-      // Start at spacing pixels from edge (first dot at x=spacing, y=spacing)
-      for (let x = spacing; x < window.innerWidth; x += spacing) {
-        for (let y = spacing; y < window.innerHeight; y += spacing) {
-          // Column index starts at 0 for first dot
-          const col = Math.floor((x - spacing) / spacing);
-          const row = Math.floor((y - spacing) / spacing);
-          dots.push({
-            id: `dot-${x}-${y}`,
-            x,
-            y,
-            label: generateDotLabel(col, row, true)
-          });
-        }
-      }
-      
-      return dots;
-    }
-
-    /**
-     * Generate dots based on current grid type
-     */
-    function generateDots() {
-      return gridType === 'fine' ? generateFineGrid() : generateCoarseGrid();
-    }
-
-    /**
-     * Render dots on the overlay
-     */
-    function renderDots() {
-      // Clear previous dots
-      dotsContainer.innerHTML = '';
-      
-      if (currentMode !== 'selection') {
-        return; // Only show dots in selection mode
-      }
-
-      dots.forEach(dot => {
-        const dotEl = document.createElement('div');
-        dotEl.className = 'dot';
-        dotEl.style.left = dot.x + 'px';
-        dotEl.style.top = dot.y + 'px';
-        dotEl.dataset.id = dot.id;
-        
-        // Add label
-        const labelEl = document.createElement('div');
-        labelEl.className = 'dot-label';
-        labelEl.textContent = dot.label;
-        labelEl.style.left = dot.x + 'px';
-        labelEl.style.top = dot.y + 'px';
-        
-        // Click handler
-        dotEl.addEventListener('click', () => {
-          selectDot(dot);
-        });
-
-        dotsContainer.appendChild(dotEl);
-        dotsContainer.appendChild(labelEl);
-      });
-    }
-
-    /**
-     * Handle dot selection
-     */
-    function selectDot(dot) {
-      console.log('Dot selected:', dot);
-      
-      // Visual feedback
-      const dotEl = dotsContainer.querySelector(`[data-id="${dot.id}"]`);
-      if (dotEl) {
-        dotEl.classList.add('selected');
-        setTimeout(() => dotEl.classList.remove('selected'), 500);
-      }
-
-      // Send to main process
-      window.electronAPI.selectDot({
-        id: dot.id,
-        x: dot.x,
-        y: dot.y,
-        label: dot.label,
-        timestamp: Date.now()
-      });
-    }
-
-    /**
-     * Update mode display
-     */
-    function updateModeDisplay() {
-      if (currentMode === 'selection') {
-        modeIndicator.textContent = 'Selection Mode - Click a dot';
-        modeIndicator.classList.add('visible');
-      } else {
-        modeIndicator.classList.remove('visible');
-      }
-      
-      renderDots();
-    }
-
-    // Listen for mode changes from main process
-    window.electronAPI.onModeChanged((mode) => {
-      console.log('Mode changed to:', mode);
-      currentMode = mode;
-      updateModeDisplay();
-    });
-
-    // Initialize
-    window.electronAPI.getState().then(state => {
-      currentMode = state.overlayMode;
-      dots = generateDots();
-      updateModeDisplay();
-    });
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      dots = generateDots();
-      renderDots();
-    });
-
-    // Listen for grid type changes (future enhancement)
-    // Could be triggered via IPC message from chat window
-  </script>
+  <script src="./overlay.js"></script>
 </body>
 </html>

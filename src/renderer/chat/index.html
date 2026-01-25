@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
   <title>Copilot Agent Chat</title>
   <style>
     * {
@@ -11,58 +12,194 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg-primary: #1e1e1e;
+      --bg-secondary: #252526;
+      --bg-tertiary: #2d2d30;
+      --bg-hover: #3e3e42;
+      --border-color: #3e3e42;
+      --text-primary: #cccccc;
+      --text-secondary: #858585;
+      --accent-blue: #0e639c;
+      --accent-blue-hover: #1177bb;
+      --accent-green: #14a085;
+      --accent-red: #f14c4c;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: #1e1e1e;
-      color: #d4d4d4;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* Header */
-    #header {
-      background: #252526;
-      padding: 12px 16px;
-      border-bottom: 1px solid #3e3e42;
+    /* ===== CUSTOM TITLEBAR ===== */
+    #titlebar {
+      background: var(--bg-secondary);
+      padding: 0;
+      height: 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      -webkit-app-region: drag;
+      -webkit-user-select: none;
+      user-select: none;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    #header h1 {
-      font-size: 14px;
-      font-weight: 600;
-      color: #cccccc;
-    }
-
-    /* Mode controls */
-    #mode-controls {
+    #titlebar-title {
       display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    #titlebar-title .icon {
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+      border-radius: 4px;
+    }
+
+    #titlebar-controls {
+      display: flex;
+      -webkit-app-region: no-drag;
+      height: 100%;
+    }
+
+    .titlebar-button {
+      width: 46px;
+      height: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .titlebar-button:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .titlebar-button.close:hover {
+      background: var(--accent-red);
+      color: white;
+    }
+
+    .titlebar-button svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* ===== TOOLBAR ===== */
+    #toolbar {
+      background: var(--bg-secondary);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 8px;
     }
 
+    #mode-controls {
+      display: flex;
+      gap: 4px;
+    }
+
     .mode-button {
-      background: #0e639c;
-      color: white;
-      border: none;
-      padding: 4px 12px;
-      border-radius: 3px;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 4px;
       font-size: 11px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .mode-button:hover {
-      background: #1177bb;
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
     }
 
     .mode-button.active {
-      background: #14a085;
+      background: var(--accent-blue);
+      color: white;
+      border-color: var(--accent-blue);
     }
 
-    /* Chat history */
+    .mode-button .indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.5;
+    }
+
+    .mode-button.active .indicator {
+      background: #00ff88;
+      opacity: 1;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    #action-controls {
+      display: flex;
+      gap: 4px;
+    }
+
+    .action-button {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .action-button:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .action-button.capture {
+      color: var(--accent-green);
+    }
+
+    .action-button.capture:hover {
+      background: rgba(20, 160, 133, 0.2);
+    }
+
+    .action-button svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ===== CHAT HISTORY ===== */
     #chat-history {
       flex: 1;
       overflow-y: auto;
@@ -73,299 +210,404 @@
     }
 
     #chat-history::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
     }
 
     #chat-history::-webkit-scrollbar-track {
-      background: #1e1e1e;
+      background: transparent;
     }
 
     #chat-history::-webkit-scrollbar-thumb {
-      background: #424242;
-      border-radius: 4px;
+      background: var(--bg-hover);
+      border-radius: 3px;
+    }
+
+    #chat-history::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
     }
 
     .message {
-      padding: 10px 12px;
-      border-radius: 6px;
-      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      max-width: 90%;
       word-wrap: break-word;
+      position: relative;
     }
 
     .message.user {
-      background: #0e639c;
+      background: var(--accent-blue);
       color: white;
       align-self: flex-end;
       margin-left: auto;
+      border-bottom-right-radius: 4px;
     }
 
     .message.agent {
-      background: #2d2d30;
-      color: #cccccc;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
       align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border-color);
     }
 
     .message.system {
-      background: #3e3e42;
-      color: #858585;
+      background: transparent;
+      border: 1px dashed var(--border-color);
+      color: var(--text-secondary);
       align-self: center;
-      font-size: 12px;
-      font-style: italic;
+      font-size: 11px;
       max-width: 100%;
       text-align: center;
+      padding: 8px 16px;
+    }
+
+    .message.system.capture {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
     }
 
     .message .timestamp {
-      font-size: 10px;
-      color: #858585;
-      margin-top: 4px;
+      font-size: 9px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      opacity: 0.7;
     }
 
-    /* Task list */
-    #task-list {
-      background: #252526;
-      border-top: 1px solid #3e3e42;
-      padding: 12px 16px;
-      max-height: 150px;
-      overflow-y: auto;
+    .message.user .timestamp {
+      color: rgba(255,255,255,0.6);
     }
 
-    #task-list h3 {
-      font-size: 12px;
+    /* ===== CONTEXT PANEL (collapsible) ===== */
+    #context-panel {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    #context-panel.expanded {
+      max-height: 200px;
+    }
+
+    #context-header {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    #context-header:hover {
+      background: var(--bg-hover);
+    }
+
+    #context-header h3 {
+      font-size: 11px;
       font-weight: 600;
-      color: #858585;
-      margin-bottom: 8px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .task-item {
-      font-size: 12px;
-      color: #cccccc;
-      padding: 4px 0;
+    #context-header .count {
+      background: var(--accent-blue);
+      color: white;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+    }
+
+    #context-content {
+      padding: 0 12px 12px;
+      overflow-y: auto;
+      max-height: 150px;
+    }
+
+    .context-item {
+      font-size: 11px;
+      color: var(--text-secondary);
+      padding: 6px 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      margin-bottom: 4px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .task-item::before {
-      content: '○';
-      color: #0e639c;
+    .context-item .dot-marker {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-blue);
     }
 
-    .task-item.completed::before {
-      content: '✓';
-      color: #14a085;
+    .context-item .coords {
+      color: var(--text-primary);
+      font-family: 'SF Mono', monospace;
     }
 
-    /* Input area */
+    /* ===== INPUT AREA ===== */
     #input-area {
-      background: #252526;
-      border-top: 1px solid #3e3e42;
-      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 12px;
+    }
+
+    #input-wrapper {
       display: flex;
       gap: 8px;
+      align-items: flex-end;
     }
 
     #message-input {
       flex: 1;
-      background: #3c3c3c;
-      border: 1px solid #3e3e42;
-      color: #cccccc;
-      padding: 8px 12px;
-      border-radius: 4px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: 6px;
       font-size: 13px;
       font-family: inherit;
       outline: none;
+      resize: none;
+      min-height: 40px;
+      max-height: 120px;
+      line-height: 1.4;
     }
 
     #message-input:focus {
-      border-color: #0e639c;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(14, 99, 156, 0.2);
+    }
+
+    #message-input::placeholder {
+      color: var(--text-secondary);
     }
 
     #send-button {
-      background: #0e639c;
+      background: var(--accent-blue);
       color: white;
       border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 13px;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
     }
 
     #send-button:hover {
-      background: #1177bb;
+      background: var(--accent-blue-hover);
     }
 
     #send-button:disabled {
-      background: #3e3e42;
+      background: var(--bg-hover);
       cursor: not-allowed;
     }
 
-    /* Empty state */
+    #send-button svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ===== KEYBOARD HINTS ===== */
+    #keyboard-hints {
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      font-size: 10px;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .hint kbd {
+      background: var(--bg-secondary);
+      padding: 2px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--border-color);
+      font-family: inherit;
+      margin-right: 4px;
+    }
+
+    /* ===== EMPTY STATE ===== */
     .empty-state {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100%;
-      color: #858585;
+      color: var(--text-secondary);
       text-align: center;
-      padding: 20px;
+      padding: 30px;
+    }
+
+    .empty-state .logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+      border-radius: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-state .logo svg {
+      width: 32px;
+      height: 32px;
+      fill: white;
     }
 
     .empty-state h2 {
       font-size: 16px;
       font-weight: 600;
+      color: var(--text-primary);
       margin-bottom: 8px;
     }
 
     .empty-state p {
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 12px;
+      line-height: 1.6;
+      max-width: 280px;
     }
+
+    .empty-state .shortcuts {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .empty-state .shortcut {
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .empty-state .shortcut kbd {
+      background: var(--bg-tertiary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      font-family: 'SF Mono', monospace;
+      font-size: 10px;
+    }
+
+    /* ===== RESIZE HANDLE ===== */
+    .resize-handle {
+      position: absolute;
+      background: transparent;
+    }
+
+    .resize-handle.corner {
+      width: 16px;
+      height: 16px;
+    }
+
+    .resize-handle.nw { top: 0; left: 0; cursor: nw-resize; }
+    .resize-handle.ne { top: 0; right: 0; cursor: ne-resize; }
+    .resize-handle.sw { bottom: 0; left: 0; cursor: sw-resize; }
+    .resize-handle.se { bottom: 0; right: 0; cursor: se-resize; }
   </style>
 </head>
 <body>
-  <div id="header">
-    <h1>Copilot Agent</h1>
-    <div id="mode-controls">
-      <button class="mode-button" id="passive-btn">Passive</button>
-      <button class="mode-button" id="selection-btn">Selection</button>
+  <!-- Custom titlebar -->
+  <div id="titlebar">
+    <div id="titlebar-title">
+      <div class="icon"></div>
+      <span>Copilot Agent</span>
+    </div>
+    <div id="titlebar-controls">
+      <button class="titlebar-button minimize" id="minimize-btn" title="Minimize">
+        <svg viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+      </button>
+      <button class="titlebar-button close" id="close-btn" title="Close">
+        <svg viewBox="0 0 10 10">
+          <path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        </svg>
+      </button>
     </div>
   </div>
 
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <div id="mode-controls">
+      <button class="mode-button" id="passive-btn">
+        <span class="indicator"></span>Passive
+      </button>
+      <button class="mode-button" id="selection-btn">
+        <span class="indicator"></span>Selection
+      </button>
+    </div>
+    <div id="action-controls">
+      <button class="action-button capture" id="capture-btn" title="Capture Screen Region">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+      <button class="action-button" id="settings-btn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat history -->
   <div id="chat-history">
     <div class="empty-state">
-      <h2>Welcome to Copilot Agent</h2>
-      <p>Type a command or click "Selection" to interact with screen elements.</p>
-      <p style="margin-top: 8px; font-size: 11px;">
-        Hotkeys: Ctrl+Alt+Space (toggle chat), Ctrl+Shift+O (toggle overlay)
-      </p>
+      <div class="logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h2>Copilot Agent</h2>
+      <p>Click "Selection" to interact with screen elements, or type a command below.</p>
+      <div class="shortcuts">
+        <div class="shortcut"><kbd>Ctrl+Alt+Space</kbd> Toggle chat</div>
+        <div class="shortcut"><kbd>Ctrl+Shift+O</kbd> Toggle overlay</div>
+        <div class="shortcut"><kbd>Scroll</kbd> Zoom in/out on grid</div>
+      </div>
     </div>
   </div>
 
-  <div id="task-list" style="display: none;">
-    <h3>Tasks</h3>
-    <div id="tasks-container"></div>
+  <!-- Context panel (for selected dots/captures) -->
+  <div id="context-panel">
+    <div id="context-header">
+      <h3>Context <span class="count" id="context-count">0</span></h3>
+      <span id="context-toggle">▼</span>
+    </div>
+    <div id="context-content"></div>
   </div>
 
+  <!-- Input area -->
   <div id="input-area">
-    <input type="text" id="message-input" placeholder="Type a command...">
-    <button id="send-button">Send</button>
+    <div id="input-wrapper">
+      <textarea id="message-input" placeholder="Type a command..." rows="1"></textarea>
+      <button id="send-button" title="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <script>
-    // State
-    let currentMode = 'passive';
-    let messages = [];
+  <!-- Keyboard hints -->
+  <div id="keyboard-hints">
+    <span class="hint"><kbd>Enter</kbd> Send</span>
+    <span class="hint"><kbd>Shift+Enter</kbd> New line</span>
+  </div>
 
-    // Elements
-    const chatHistory = document.getElementById('chat-history');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-    const passiveBtn = document.getElementById('passive-btn');
-    const selectionBtn = document.getElementById('selection-btn');
-
-    /**
-     * Add message to chat history
-     */
-    function addMessage(text, type = 'agent', timestamp = Date.now()) {
-      // Remove empty state if present
-      const emptyState = chatHistory.querySelector('.empty-state');
-      if (emptyState) {
-        emptyState.remove();
-      }
-
-      const messageEl = document.createElement('div');
-      messageEl.className = `message ${type}`;
-      
-      const textEl = document.createElement('div');
-      textEl.textContent = text;
-      messageEl.appendChild(textEl);
-
-      const timestampEl = document.createElement('div');
-      timestampEl.className = 'timestamp';
-      timestampEl.textContent = new Date(timestamp).toLocaleTimeString();
-      messageEl.appendChild(timestampEl);
-
-      chatHistory.appendChild(messageEl);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-
-      messages.push({ text, type, timestamp });
-    }
-
-    /**
-     * Send message
-     */
-    function sendMessage() {
-      const text = messageInput.value.trim();
-      if (!text) return;
-
-      // Add user message
-      addMessage(text, 'user');
-
-      // Send to main process
-      window.electronAPI.sendMessage(text);
-
-      // Clear input
-      messageInput.value = '';
-    }
-
-    /**
-     * Update mode display
-     */
-    function updateModeDisplay() {
-      passiveBtn.classList.toggle('active', currentMode === 'passive');
-      selectionBtn.classList.toggle('active', currentMode === 'selection');
-    }
-
-    /**
-     * Set mode
-     */
-    function setMode(mode) {
-      currentMode = mode;
-      window.electronAPI.setMode(mode);
-      updateModeDisplay();
-      
-      if (mode === 'selection') {
-        addMessage('Selection mode activated. Click dots on the overlay to select screen elements.', 'system');
-      } else {
-        addMessage('Passive mode activated. Overlay is now click-through.', 'system');
-      }
-    }
-
-    // Event listeners
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    passiveBtn.addEventListener('click', () => setMode('passive'));
-    selectionBtn.addEventListener('click', () => setMode('selection'));
-
-    // Listen for dot selections
-    window.electronAPI.onDotSelected((data) => {
-      addMessage(`Selected dot: ${data.label} at (${data.x}, ${data.y})`, 'system');
-      
-      // Mode will be changed by main process, just update display
-      window.electronAPI.getState().then(state => {
-        currentMode = state.overlayMode;
-        updateModeDisplay();
-      });
-    });
-
-    // Listen for agent responses
-    window.electronAPI.onAgentResponse((data) => {
-      addMessage(data.text, 'agent', data.timestamp);
-    });
-
-    // Initialize
-    window.electronAPI.getState().then(state => {
-      currentMode = state.overlayMode;
-      updateModeDisplay();
-    });
-  </script>
+  <script src="./chat.js"></script>
 </body>
 </html>
