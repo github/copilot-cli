@@ -1,3 +1,17 @@
+## 0.0.395 - 2026-01-26
+
+- Select escape item shows blinking cursor to indicate text input
+- `/mcp show` displays all configured MCP servers including defaults and servers from additional configuration.
+- `/mcp show` displays servers from installed plugins
+- Rewind shows clear warning in non-git repos or repos without commits
+- Cursor hides when terminal loses focus
+- Formatted text and links display correctly when wrapping
+- Load local shell configuration in agent sessions
+- Plugin skills are now usable by the agent
+- CLI handles missing tree-sitter files gracefully instead of crashing
+- Completed tool calls display in prompt mode
+- Add commenting to /diff mode for line-specific feedback
+
 ## 0.0.394 - 2026-01-24
 
 - Deduplicate identical model instruction files to save context
