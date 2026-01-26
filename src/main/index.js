@@ -463,44 +463,44 @@ function setOverlayMode(mode) {
  * which means keyboard events go to background apps, not the overlay window
  */
 function registerOverlayShortcuts() {
-  console.log('[SHORTCUTS] Registering overlay shortcuts (F, G, +, -, Esc)');
+  console.log('[SHORTCUTS] Registering overlay shortcuts (Ctrl+Alt+F/G/+/-/X)');
   
-  // F to toggle fine grid
-  globalShortcut.register('F', () => {
+  // Ctrl+Alt+F to toggle fine grid
+  globalShortcut.register('CommandOrControl+Alt+F', () => {
     if (overlayWindow && overlayMode === 'selection') {
-      console.log('[SHORTCUTS] F pressed - toggle fine grid');
+      console.log('[SHORTCUTS] Ctrl+Alt+F pressed - toggle fine grid');
       overlayWindow.webContents.send('overlay-command', { action: 'toggle-fine' });
     }
   });
   
-  // G to show all grids
-  globalShortcut.register('G', () => {
+  // Ctrl+Alt+G to show all grids
+  globalShortcut.register('CommandOrControl+Alt+G', () => {
     if (overlayWindow && overlayMode === 'selection') {
-      console.log('[SHORTCUTS] G pressed - show all grids');
+      console.log('[SHORTCUTS] Ctrl+Alt+G pressed - show all grids');
       overlayWindow.webContents.send('overlay-command', { action: 'show-all' });
     }
   });
   
-  // = (plus without shift) to zoom in
-  globalShortcut.register('=', () => {
+  // Ctrl+Alt+= to zoom in
+  globalShortcut.register('CommandOrControl+Alt+=', () => {
     if (overlayWindow && overlayMode === 'selection') {
-      console.log('[SHORTCUTS] = pressed - zoom in');
+      console.log('[SHORTCUTS] Ctrl+Alt+= pressed - zoom in');
       overlayWindow.webContents.send('overlay-command', { action: 'zoom-in' });
     }
   });
   
-  // - to zoom out
-  globalShortcut.register('-', () => {
+  // Ctrl+Alt+- to zoom out
+  globalShortcut.register('CommandOrControl+Alt+-', () => {
     if (overlayWindow && overlayMode === 'selection') {
-      console.log('[SHORTCUTS] - pressed - zoom out');
+      console.log('[SHORTCUTS] Ctrl+Alt+- pressed - zoom out');
       overlayWindow.webContents.send('overlay-command', { action: 'zoom-out' });
     }
   });
   
-  // Escape to cancel selection
-  globalShortcut.register('Escape', () => {
+  // Ctrl+Alt+X to cancel selection
+  globalShortcut.register('CommandOrControl+Alt+X', () => {
     if (overlayWindow && overlayMode === 'selection') {
-      console.log('[SHORTCUTS] Escape pressed - cancel');
+      console.log('[SHORTCUTS] Ctrl+Alt+X pressed - cancel');
       overlayWindow.webContents.send('overlay-command', { action: 'cancel' });
     }
   });
@@ -511,7 +511,13 @@ function registerOverlayShortcuts() {
  */
 function unregisterOverlayShortcuts() {
   console.log('[SHORTCUTS] Unregistering overlay shortcuts');
-  const keys = ['F', 'G', '=', '-', 'Escape'];
+  const keys = [
+    'CommandOrControl+Alt+F',
+    'CommandOrControl+Alt+G',
+    'CommandOrControl+Alt+=',
+    'CommandOrControl+Alt+-',
+    'CommandOrControl+Alt+X'
+  ];
   keys.forEach(key => {
     try {
       globalShortcut.unregister(key);

@@ -519,4 +519,4 @@ window.electronAPI.getState().then(state => {
 });
 
 console.log('Overlay initialized with adaptive grid system');
-console.log('Global shortcuts: F = toggle fine grid, G = show all, +/- = zoom, Esc = cancel');
+console.log('Overlay shortcuts: Ctrl+Alt+F = toggle fine, Ctrl+Alt+G = show all, Ctrl+Alt++/- = zoom, Ctrl+Alt+X = cancel');
