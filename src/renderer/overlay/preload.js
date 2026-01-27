@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
+const gridMath = require('../../shared/grid-math');
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -13,5 +14,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onOverlayCommand: (callback) => ipcRenderer.on('overlay-command', (event, data) => callback(data)),
   
   // Get current state
-  getState: () => ipcRenderer.invoke('get-state')
+  getState: () => ipcRenderer.invoke('get-state'),
+
+  // Grid math helpers (shared with main)
+  getGridConstants: () => gridMath.constants,
+  labelToScreenCoordinates: (label) => gridMath.labelToScreenCoordinates(label)
 });

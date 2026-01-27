@@ -1,7 +1,12 @@
 // ===== CONFIGURATION =====
-const COARSE_SPACING = 100;  // Coarse grid: 100px spacing
-const FINE_SPACING = 25;     // Fine grid: 25px spacing
-const START_OFFSET = COARSE_SPACING / 2; // 50px offset to center grid cells
+const gridConfig = window.electronAPI?.getGridConstants
+  ? window.electronAPI.getGridConstants()
+  : null;
+const COARSE_SPACING = gridConfig?.coarseSpacing || 100;  // Coarse grid: 100px spacing
+const FINE_SPACING = gridConfig?.fineSpacing || 25;       // Fine grid: 25px spacing
+const START_OFFSET = gridConfig?.startOffset || (COARSE_SPACING / 2); // 50px offset to center grid cells
+const FINE_START = gridConfig?.fineStart || (FINE_SPACING / 2);
+const LOCAL_FINE_RADIUS = gridConfig?.localFineRadius || 3;
 
 // ===== STATE MANAGEMENT =====
 let state = {
@@ -35,16 +40,17 @@ const ui = {
 
 // ===== RENDERING ENGINE =====
 let animationFrameId = null;
-let isDirty = true; // Draw only when needed
+let isDirty = false; // Draw only when needed
 
 function requestDraw() {
-  if (!isDirty) {
-    isDirty = true;
-    animationFrameId = requestAnimationFrame(draw);
-  }
+  if (animationFrameId !== null) return;
+  isDirty = true;
+  animationFrameId = requestAnimationFrame(draw);
 }
 
 function draw() {
+  animationFrameId = null;
+  if (!isDirty) return;
   isDirty = false;
   
   const { width, height, currentMode, zoomLevel } = state;
@@ -108,14 +114,13 @@ function draw() {
     // Performance: Batch all fine dots into one path
     ctx.beginPath();
     
-    const fineStart = FINE_SPACING / 2; // Offset for fine grid ~12.5px
     const fCols = Math.ceil(width / FINE_SPACING);
     const fRows = Math.ceil(height / FINE_SPACING);
     
     for (let c = 0; c < fCols; c++) {
       for (let r = 0; r < fRows; r++) {
-        const x = fineStart + c * FINE_SPACING;
-        const y = fineStart + r * FINE_SPACING;
+        const x = FINE_START + c * FINE_SPACING;
+        const y = FINE_START + r * FINE_SPACING;
         
         if (x > width || y > height) continue;
 
@@ -132,6 +137,11 @@ function draw() {
     }
     ctx.fill();
     ctx.stroke();
+  }
+
+  // 3. Draw Local Fine Grid (If Zoom Level < 2)
+  if (zoomLevel < 2) {
+    drawLocalFineGrid();
   }
 }
 
@@ -175,57 +185,84 @@ function getColLetter(colIndex) {
 // Coordinate mapping for AI (Inverse of drawing)
 // This must match generateLabel and draw loop logic exactly
 function labelToScreenCoordinates(label) {
+  if (window.electronAPI?.labelToScreenCoordinates) {
+    return window.electronAPI.labelToScreenCoordinates(label);
+  }
   if (!label) return null;
   const match = label.match(/^([A-Z]+)(\d+)(\.(\d)(\d))?$/);
   if (!match) return null;
   
   const [, letters, rowStr, , subColStr, subRowStr] = match;
   
-  // Decode Column letters (A=0, B=1... AA=26... wait. A is 0, B is 1 for my loop `c`)
-  let colIndex = 0;
-  for (let i = 0; i < letters.length; i++) {
-    colIndex = colIndex * 26 + (letters.charCodeAt(i) - 65); // A=0
-  }
-  // No, actually A=0, B=1 is base 26.
-  // Standard Excel: A=1, B=2. AA=27.
-  // My loop: c starts at 0. getColLetter(0) -> 'A'.
-  // So 'A' -> 0. 'B' -> 1.
-  // My decoding: 'A'.charCodeAt(0) - 65 = 0.
-  // 'AA': 'A' -> 0. shift -> 0. 'A' -> 0. Result 0?
-  // Excel logic is tricky. 
-  // Let's stick to simple: "AA" = index 26?
-  // getColLetter(26): 
-  //   floor(26/26)-1 = 0 -> 'A'.
-  //   26%26 = 0 -> 'A'.
-  //   Result "AA".
-  // So my decoding must handle AA -> 26.
-  if (letters.length > 1) {
-     // Single char: A=0. Z=25.
-     // Double char: AA=26.
-     // index = (first-'A'+1)*26 + (second-'A') ?
-     // Check: first A=0. (0+1)*26 + 0 = 26. Correct.
-     colIndex = (letters.charCodeAt(0) - 65 + 1) * 26 + (letters.charCodeAt(1) - 65);
+  // Decode column letters to match getColLetter()
+  // A=0..Z=25, AA=26, AB=27, etc.
+  let colIndex;
+  if (letters.length === 1) {
+    colIndex = letters.charCodeAt(0) - 65;
   } else {
-     colIndex = letters.charCodeAt(0) - 65;
+    const first = letters.charCodeAt(0) - 65 + 1;
+    const second = letters.charCodeAt(1) - 65;
+    colIndex = (first * 26) + second;
   }
   
   const rowIndex = parseInt(rowStr, 10);
   
   if (subColStr && subRowStr) {
-     // Fine grid logic
-     // NOT IMPLEMENTED FULLY in this basic patch
-     // But coarse is critical
-     return {
-         x: START_OFFSET + colIndex * COARSE_SPACING,
-         y: START_OFFSET + rowIndex * COARSE_SPACING,
-         screenX: START_OFFSET + colIndex * COARSE_SPACING,
-         screenY: START_OFFSET + rowIndex * COARSE_SPACING
-     }
+     // Fine grid logic: index into the global fine grid (25px spacing)
+     const subCol = parseInt(subColStr, 10);
+     const subRow = parseInt(subRowStr, 10);
+     const fineCol = (colIndex * 4) + subCol;
+     const fineRow = (rowIndex * 4) + subRow;
+     const fineX = FINE_START + fineCol * FINE_SPACING;
+     const fineY = FINE_START + fineRow * FINE_SPACING;
+     return { x: fineX, y: fineY, screenX: fineX, screenY: fineY };
   } else {
     // Coarse
     const x = START_OFFSET + colIndex * COARSE_SPACING;
     const y = START_OFFSET + rowIndex * COARSE_SPACING;
     return { x, y, screenX: x, screenY: y };
+  }
+}
+
+function drawLocalFineGrid() {
+  if (state.currentMode !== 'selection') return;
+  const { mouse, width, height } = state;
+  if (!mouse) return;
+
+  const baseCol = Math.round((mouse.x - FINE_START) / FINE_SPACING);
+  const baseRow = Math.round((mouse.y - FINE_START) / FINE_SPACING);
+
+  const minCol = baseCol - LOCAL_FINE_RADIUS;
+  const maxCol = baseCol + LOCAL_FINE_RADIUS;
+  const minRow = baseRow - LOCAL_FINE_RADIUS;
+  const maxRow = baseRow + LOCAL_FINE_RADIUS;
+
+  ctx.fillStyle = 'rgba(120, 200, 255, 0.7)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.lineWidth = 1;
+
+  ctx.beginPath();
+  for (let c = minCol; c <= maxCol; c++) {
+    const x = FINE_START + c * FINE_SPACING;
+    if (x < 0 || x > width) continue;
+    for (let r = minRow; r <= maxRow; r++) {
+      const y = FINE_START + r * FINE_SPACING;
+      if (y < 0 || y > height) continue;
+      ctx.moveTo(x + 2, y);
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+    }
+  }
+  ctx.fill();
+  ctx.stroke();
+
+  const centerX = FINE_START + baseCol * FINE_SPACING;
+  const centerY = FINE_START + baseRow * FINE_SPACING;
+  if (centerX >= 0 && centerX <= width && centerY >= 0 && centerY <= height) {
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0, 255, 200, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
   }
 }
 
@@ -255,10 +292,11 @@ document.addEventListener('mousemove', (e) => {
   if(ui.coordsStatus) ui.coordsStatus.textContent = `${e.clientX}, ${e.clientY}`;
   
   if (state.currentMode === 'selection') {
+    requestDraw();
     // Virtual Interaction Logic
     // Find nearest grid point
     const spacing = state.zoomLevel >= 2 ? FINE_SPACING : COARSE_SPACING;
-    const offset = state.zoomLevel >= 2 ? FINE_SPACING/2 : START_OFFSET;
+    const offset = state.zoomLevel >= 2 ? FINE_START : START_OFFSET;
     
     // Nearest index
     const c = Math.round((e.clientX - offset) / spacing);
@@ -319,7 +357,7 @@ function showPulse(x, y) {
   el.style.cssText = `position:fixed; left:${x}px; top:${y}px; width:10px; height:10px; 
     transform:translate(-50%,-50%); background:rgba(0,255,200,0.5); border-radius:50%; 
     box-shadow: 0 0 15px rgba(0,255,200,0.8); border: 2px solid #00ffcc;
-    transition:all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); pointer-events:none; z-index:9999;`;
+    transition:all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); pointer-events:none; z-index:2147483647;`;
   document.body.appendChild(el);
   requestAnimationFrame(() => {
     el.style.width = '120px';

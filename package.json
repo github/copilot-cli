@@ -4,7 +4,8 @@
   "description": "GitHub Copilot CLI with headless agent + ultra-thin overlay architecture",
   "main": "src/main/index.js",
   "scripts": {
-    "start": "node scripts/start.js"
+    "start": "node scripts/start.js",
+    "test": "node scripts/test-grid.js"
   },
   "keywords": [
     "copilot",

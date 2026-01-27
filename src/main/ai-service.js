@@ -103,6 +103,7 @@ const SYSTEM_PROMPT = `You are Liku, an intelligent AGENTIC AI assistant integra
    - **Format**: "C3" = column C (index 2), row 3 = pixel (250, 350)
    - **Formula**: x = 50 + col_index * 100, y = 50 + row_index * 100
    - A0 ≈ (50, 50), B0 ≈ (150, 50), A1 ≈ (50, 150)
+   - **Fine Grid**: Sub-labels like C3.12 refer to 25px subcells inside C3
 
 3. **SYSTEM CONTROL - AGENTIC ACTIONS**: You can execute actions on the user's computer:
    - **Click**: Click at coordinates
@@ -139,10 +140,11 @@ When the user asks you to DO something (click, type, interact), respond with a J
 - \`{"type": "screenshot"}\` - Take screenshot to verify result
 
 ### Grid to Pixel Conversion:
-- A1 → (100, 100), B1 → (200, 100), C1 → (300, 100)
-- A2 → (100, 200), B2 → (200, 200), C2 → (300, 200)
-- Formula: x = 100 + (column_number - 1) * 100, y = 100 + (row_number - 1) * 100
-- Column A=1, B=2, C=3... so C3 = x: 100 + 2*100 = 300, y: 100 + 2*100 = 300
+- A0 → (50, 50), B0 → (150, 50), C0 → (250, 50)
+- A1 → (50, 150), B1 → (150, 150), C1 → (250, 150)
+- Formula: x = 50 + col_index * 100, y = 50 + row_index * 100
+- Column A=0, B=1, C=2... so C3 = x: 50 + 2*100 = 250, y: 50 + 3*100 = 350
+ - Fine labels: C3.12 = x: 12.5 + (2*4+1)*25 = 237.5, y: 12.5 + (3*4+2)*25 = 362.5
 
 ## Response Guidelines
 
@@ -1519,7 +1521,7 @@ async function resumeAfterConfirmation(onAction = null, onScreenshot = null, opt
  * Convert grid coordinate to pixel position
  */
 function gridToPixels(coord) {
-  return systemAutomation.gridToPixels(coord, { width: 1920, height: 1080 });
+  return systemAutomation.gridToPixels(coord);
 }
 
 module.exports = {

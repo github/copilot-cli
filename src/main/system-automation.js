@@ -7,6 +7,7 @@
 
 const { exec, spawn } = require('child_process');
 const path = require('path');
+const gridMath = require('../shared/grid-math');
 
 // Action types the AI can request
 const ACTION_TYPES = {
@@ -495,32 +496,18 @@ function parseAIActions(aiResponse) {
  * @param {Object} screenSize - {width, height} of the screen
  * @param {number} coarseSpacing - Spacing of coarse grid (default 100)
  */
-function gridToPixels(coord, screenSize, coarseSpacing = 100) {
-  // Parse coordinate: letters for column, numbers for row
-  const match = coord.match(/^([A-Za-z]+)(\d+)$/);
-  if (!match) {
+function gridToPixels(coord) {
+  const coords = gridMath.labelToScreenCoordinates(coord);
+  if (!coords) {
     throw new Error(`Invalid coordinate format: ${coord}`);
   }
-  
-  const colStr = match[1].toUpperCase();
-  const row = parseInt(match[2], 10);
-  
-  // Convert column letters to number (A=0, B=1, ..., Z=25, AA=26, etc.)
-  let col = 0;
-  for (let i = 0; i < colStr.length; i++) {
-    col = col * 26 + (colStr.charCodeAt(i) - 64);
-  }
-  col--; // Make 0-indexed
-  
-  // Calculate pixel position - grid starts at startOffset (50px) to cover full screen
-  // This MUST match overlay.js: startOffset = coarseSpacing / 2
-  const startOffset = coarseSpacing / 2; // 50px for default 100px spacing
-  const x = startOffset + col * coarseSpacing;
-  const y = startOffset + row * coarseSpacing;
-  
-  console.log(`[AUTOMATION] gridToPixels: ${coord} -> col=${col}, row=${row} -> (${x}, ${y})`);
-  
-  return { x, y, col, row };
+
+  const labelInfo = coords.isFine
+    ? `fineCol=${coords.fineCol}, fineRow=${coords.fineRow}`
+    : `col=${coords.colIndex}, row=${coords.rowIndex}`;
+  console.log(`[AUTOMATION] gridToPixels: ${coord} -> ${labelInfo} -> (${coords.x}, ${coords.y})`);
+
+  return coords;
 }
 
 module.exports = {
