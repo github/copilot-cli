@@ -1,3 +1,29 @@
+## 0.0.396 - 2026-01-27
+
+- Skill names can include uppercase letters
+- Ctrl+E moves cursor to end of line when typing without expanding timeline
+- `/skills add` works with directories that contain SKILL.md directly
+- Subagent timeline entries display with bold, capitalized names
+- Timeline entries show filled circle for success status
+- Improve horizontal alignment of UI elements
+- Simplify compaction timeline entries
+- Create custom agents through interactive CLI wizard
+- Tool filtering flags now apply to subagents
+- Error messages consistently reference /login and /logout commands
+- Add `copilot version` and `copilot update` commands
+- preToolUse hooks can deny tool execution and modify arguments
+- Fix PTY leak in bash session handling
+- `/plugin install` supports GitHub repos, URLs, and local paths
+- Add `/experimental` command and `--experimental` flag to opt into experimental features
+- Add `/init` command to generate Copilot instructions
+- Reorder model picker list for better organization
+- Plugins can provide custom agents
+- Open plan files in VS Code on WSL and devcontainers
+- /diff shows changes from entire repository when run from subdirectory
+- /skills add correctly counts skills when directory path has trailing slash
+- Undo/rewind shows accurate count of affected files
+- Pre-releases on GitHub now show detailed changelog notes
+
 ## 0.0.395 - 2026-01-26
 
 - Select escape item shows blinking cursor to indicate text input
