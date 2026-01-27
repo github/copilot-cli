@@ -199,6 +199,91 @@
       height: 14px;
     }
 
+    /* ===== PROVIDER BAR ===== */
+    #provider-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+    }
+
+    #provider-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #provider-selector label {
+      color: var(--text-secondary);
+    }
+
+    #provider-select,
+    #model-select {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      padding: 3px 6px;
+      font-size: 10px;
+      cursor: pointer;
+      max-width: 100px;
+    }
+
+    #model-select {
+      max-width: 130px;
+    }
+
+    #provider-select:hover,
+    #model-select:hover {
+      border-color: var(--accent-blue);
+    }
+
+    #provider-select:focus,
+    #model-select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.2);
+    }
+
+    #provider-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-badge {
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .status-badge.connected {
+      background: rgba(20, 160, 133, 0.2);
+      color: var(--accent-green);
+    }
+
+    .status-badge.disconnected {
+      background: rgba(255, 90, 90, 0.2);
+      color: #ff5a5a;
+    }
+
+    .status-badge.pending {
+      background: rgba(255, 180, 0, 0.2);
+      color: #ffb400;
+    }
+
+    .token-badge {
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+
     /* ===== CHAT HISTORY ===== */
     #chat-history {
       flex: 1;
@@ -562,6 +647,33 @@
           <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
         </svg>
       </button>
+    </div>
+  </div>
+
+  <!-- AI Provider Bar -->
+  <div id="provider-bar">
+    <div id="provider-selector">
+      <select id="provider-select" title="AI Provider">
+        <option value="copilot">Copilot</option>
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic</option>
+        <option value="ollama">Ollama</option>
+      </select>
+      <select id="model-select" title="Model">
+        <option value="gpt-4o">GPT-4o</option>
+        <option value="gpt-4o-mini">GPT-4o Mini</option>
+        <option value="claude-sonnet-4.5">Claude Sonnet 4.5</option>
+        <option value="claude-sonnet-4">Claude Sonnet 4</option>
+        <option value="claude-opus-4.5">Claude Opus 4.5</option>
+        <option value="claude-haiku-4.5">Claude Haiku 4.5</option>
+        <option value="o1">o1</option>
+        <option value="o1-mini">o1 Mini</option>
+        <option value="o3-mini">o3 Mini</option>
+      </select>
+    </div>
+    <div id="provider-status">
+      <span id="auth-status" class="status-badge">Not Connected</span>
+      <span id="token-count" class="token-badge" title="Estimated tokens">0 tokens</span>
     </div>
   </div>
 

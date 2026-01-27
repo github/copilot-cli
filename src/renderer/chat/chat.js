@@ -1,7 +1,11 @@
 // ===== STATE =====
 let currentMode = 'passive';
+let currentProvider = 'copilot';
+let currentModel = 'gpt-4o';
+let totalTokens = 0;
 let messages = [];
 let contextItems = [];
+let pendingActions = null;
 
 // ===== ELEMENTS =====
 const chatHistory = document.getElementById('chat-history');
@@ -16,6 +20,94 @@ const contextPanel = document.getElementById('context-panel');
 const contextHeader = document.getElementById('context-header');
 const contextContent = document.getElementById('context-content');
 const contextCount = document.getElementById('context-count');
+const providerSelect = document.getElementById('provider-select');
+const modelSelect = document.getElementById('model-select');
+const authStatus = document.getElementById('auth-status');
+const tokenCount = document.getElementById('token-count');
+
+// ===== TOKEN ESTIMATION =====
+// Rough estimate: ~4 chars per token for English text
+function estimateTokens(text) {
+  return Math.ceil(text.length / 4);
+}
+
+function updateTokenCount(additionalTokens = 0) {
+  totalTokens += additionalTokens;
+  if (tokenCount) {
+    tokenCount.textContent = `${totalTokens.toLocaleString()} tokens`;
+  }
+}
+
+function resetTokenCount() {
+  totalTokens = 0;
+  updateTokenCount();
+}
+
+// ===== AUTH STATUS =====
+function updateAuthStatus(status, provider) {
+  if (!authStatus) return;
+  
+  authStatus.className = 'status-badge';
+  
+  switch (status) {
+    case 'connected':
+      authStatus.classList.add('connected');
+      authStatus.textContent = `${getProviderName(provider)} Connected`;
+      break;
+    case 'pending':
+      authStatus.classList.add('pending');
+      authStatus.textContent = 'Authenticating...';
+      break;
+    case 'error':
+      authStatus.classList.add('disconnected');
+      authStatus.textContent = 'Auth Error';
+      break;
+    default:
+      authStatus.classList.add('disconnected');
+      authStatus.textContent = 'Not Connected';
+  }
+}
+
+function getProviderName(provider) {
+  const names = {
+    copilot: 'Copilot',
+    openai: 'OpenAI',
+    anthropic: 'Anthropic',
+    ollama: 'Ollama'
+  };
+  return names[provider] || provider;
+}
+
+// ===== PROVIDER FUNCTIONS =====
+function setProvider(provider) {
+  currentProvider = provider;
+  if (window.electronAPI.setProvider) {
+    window.electronAPI.setProvider(provider);
+  }
+  // Also send as a command for backward compatibility
+  window.electronAPI.sendMessage(`/provider ${provider}`);
+  addMessage(`Switched to ${getProviderName(provider)}`, 'system');
+  
+  // Show/hide model selector based on provider
+  updateModelSelector(provider);
+  
+  // Check auth status for new provider
+  checkProviderAuth(provider);
+}
+
+// ===== MODEL FUNCTIONS =====
+function setModel(model) {
+  currentModel = model;
+  // Send model change command
+  window.electronAPI.sendMessage(`/model ${model}`);
+}
+
+function updateModelSelector(provider) {
+  if (!modelSelect) return;
+  
+  // Only show model selector for Copilot
+  modelSelect.style.display = provider === 'copilot' ? 'block' : 'none';
+}
 
 // ===== MESSAGE FUNCTIONS =====
 function addMessage(text, type = 'agent', timestamp = Date.now(), extra = {}) {
@@ -39,6 +131,11 @@ function addMessage(text, type = 'agent', timestamp = Date.now(), extra = {}) {
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
   messages.push({ text, type, timestamp, ...extra });
+  
+  // Track tokens for user and agent messages
+  if (type === 'user' || type === 'agent') {
+    updateTokenCount(estimateTokens(text));
+  }
 }
 
 function sendMessage() {
@@ -135,6 +232,30 @@ passiveBtn.addEventListener('click', () => setMode('passive'));
 selectionBtn.addEventListener('click', () => setMode('selection'));
 contextHeader.addEventListener('click', toggleContextPanel);
 
+// Provider selection
+if (providerSelect) {
+  providerSelect.addEventListener('change', (e) => {
+    setProvider(e.target.value);
+  });
+}
+
+// Model selection
+if (modelSelect) {
+  modelSelect.addEventListener('change', (e) => {
+    setModel(e.target.value);
+  });
+}
+
+// Check provider auth status
+function checkProviderAuth(provider) {
+  if (window.electronAPI.checkAuth) {
+    window.electronAPI.checkAuth(provider);
+  } else {
+    // Fallback: use /status command
+    window.electronAPI.sendMessage('/status');
+  }
+}
+
 // ===== IPC LISTENERS =====
 window.electronAPI.onDotSelected((data) => {
   if (data.cancelled) {
@@ -155,10 +276,29 @@ window.electronAPI.onDotSelected((data) => {
 window.electronAPI.onAgentResponse((data) => {
   removeTypingIndicator();
   const msgType = data.type === 'error' ? 'system' : 'agent';
-  addMessage(data.text, msgType, data.timestamp, { 
-    provider: data.provider,
-    hasVisualContext: data.hasVisualContext 
-  });
+  
+  // Check if response contains actions
+  if (data.hasActions && data.actionData && data.actionData.actions) {
+    console.log('[CHAT] Received agent response with actions:', data.actionData.actions.length);
+    
+    // Show the AI's thought/explanation first (without the JSON)
+    const cleanText = data.text.replace(/```json[\s\S]*?```/g, '').trim();
+    if (cleanText) {
+      addMessage(cleanText, msgType, data.timestamp, { 
+        provider: data.provider,
+        hasVisualContext: data.hasVisualContext 
+      });
+    }
+    
+    // Show action confirmation UI
+    showActionConfirmation(data.actionData);
+  } else {
+    // Normal response without actions
+    addMessage(data.text, msgType, data.timestamp, { 
+      provider: data.provider,
+      hasVisualContext: data.hasVisualContext 
+    });
+  }
 });
 
 if (window.electronAPI.onAgentTyping) {
@@ -184,6 +324,27 @@ if (window.electronAPI.onScreenCaptured) {
 if (window.electronAPI.onVisualContextUpdate) {
   window.electronAPI.onVisualContextUpdate((data) => {
     updateVisualContextIndicator(data.count);
+  });
+}
+
+// Auth status updates
+if (window.electronAPI.onAuthStatus) {
+  window.electronAPI.onAuthStatus((data) => {
+    updateAuthStatus(data.status, data.provider);
+    if (data.provider && providerSelect) {
+      providerSelect.value = data.provider;
+      currentProvider = data.provider;
+    }
+  });
+}
+
+// Token usage updates from API responses
+if (window.electronAPI.onTokenUsage) {
+  window.electronAPI.onTokenUsage((data) => {
+    if (data.inputTokens) {
+      totalTokens = data.totalTokens || totalTokens + data.inputTokens + (data.outputTokens || 0);
+      updateTokenCount();
+    }
   });
 }
 
@@ -225,10 +386,182 @@ function updateVisualContextIndicator(count) {
 window.electronAPI.getState().then(state => {
   currentMode = state.overlayMode;
   updateModeDisplay();
+  
+  // Load current provider
   if (state.aiProvider) {
+    currentProvider = state.aiProvider;
+    if (providerSelect) {
+      providerSelect.value = state.aiProvider;
+    }
     console.log('Current AI provider:', state.aiProvider);
+    updateModelSelector(state.aiProvider);
   }
+  
+  // Load current model
+  if (state.model && modelSelect) {
+    currentModel = state.model;
+    modelSelect.value = state.model;
+  }
+  
+  // Check auth status for current provider
+  checkProviderAuth(currentProvider);
 });
+
+// Initialize auth status display
+updateAuthStatus('disconnected', currentProvider);
+updateModelSelector(currentProvider);
+
+// ===== AGENTIC ACTION UI =====
+function showActionConfirmation(actionData) {
+  pendingActions = actionData;
+  
+  const emptyState = chatHistory.querySelector('.empty-state');
+  if (emptyState) emptyState.remove();
+  
+  const actionEl = document.createElement('div');
+  actionEl.id = 'action-confirmation';
+  actionEl.className = 'message agent action-card';
+  
+  const actionsHtml = actionData.actions.map((action, idx) => {
+    let icon = '🖱️';
+    let desc = '';
+    
+    switch (action.type) {
+      case 'click':
+        icon = '🖱️';
+        desc = `Click at (${action.x}, ${action.y})`;
+        if (action.coordinate) desc = `Click ${action.coordinate}`;
+        break;
+      case 'double_click':
+        icon = '🖱️🖱️';
+        desc = `Double-click at (${action.x}, ${action.y})`;
+        break;
+      case 'right_click':
+        icon = '🖱️';
+        desc = `Right-click at (${action.x}, ${action.y})`;
+        break;
+      case 'type':
+        icon = '⌨️';
+        desc = `Type: "${action.text.substring(0, 30)}${action.text.length > 30 ? '...' : ''}"`;
+        break;
+      case 'key':
+        icon = '⌨️';
+        desc = `Press: ${action.keys}`;
+        break;
+      case 'scroll':
+        icon = '📜';
+        desc = `Scroll ${action.direction || 'down'} ${action.amount || 3} lines`;
+        break;
+      case 'wait':
+        icon = '⏳';
+        desc = `Wait ${action.ms}ms`;
+        break;
+      case 'move_mouse':
+        icon = '➡️';
+        desc = `Move to (${action.x}, ${action.y})`;
+        break;
+      case 'drag':
+        icon = '✋';
+        desc = `Drag from (${action.fromX}, ${action.fromY}) to (${action.toX}, ${action.toY})`;
+        break;
+      default:
+        desc = JSON.stringify(action);
+    }
+    
+    return `<div class="action-item"><span class="action-icon">${icon}</span><span class="action-desc">${idx + 1}. ${desc}</span></div>`;
+  }).join('');
+  
+  actionEl.innerHTML = `
+    <div class="action-header">
+      <span class="action-title">🤖 AI wants to perform ${actionData.actions.length} action${actionData.actions.length > 1 ? 's' : ''}:</span>
+    </div>
+    ${actionData.thought ? `<div class="action-thought">${actionData.thought}</div>` : ''}
+    <div class="action-list">${actionsHtml}</div>
+    <div class="action-buttons">
+      <button id="execute-actions-btn" class="action-btn execute">▶ Execute</button>
+      <button id="cancel-actions-btn" class="action-btn cancel">✕ Cancel</button>
+    </div>
+  `;
+  
+  chatHistory.appendChild(actionEl);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+  
+  // Attach event listeners
+  document.getElementById('execute-actions-btn').addEventListener('click', executeActions);
+  document.getElementById('cancel-actions-btn').addEventListener('click', cancelActions);
+}
+
+function executeActions() {
+  if (!pendingActions) return;
+  
+  const confirmEl = document.getElementById('action-confirmation');
+  if (confirmEl) {
+    const buttons = confirmEl.querySelector('.action-buttons');
+    if (buttons) {
+      buttons.innerHTML = '<span class="executing">⏳ Executing...</span>';
+    }
+  }
+  
+  window.electronAPI.executeActions(pendingActions);
+  pendingActions = null;
+}
+
+function cancelActions() {
+  const confirmEl = document.getElementById('action-confirmation');
+  if (confirmEl) {
+    confirmEl.remove();
+  }
+  
+  window.electronAPI.cancelActions();
+  pendingActions = null;
+  addMessage('Actions cancelled', 'system');
+}
+
+function showActionProgress(data) {
+  let progressEl = document.getElementById('action-progress');
+  if (!progressEl) {
+    progressEl = document.createElement('div');
+    progressEl.id = 'action-progress';
+    progressEl.className = 'message system action-progress';
+    chatHistory.appendChild(progressEl);
+  }
+  
+  progressEl.textContent = `⏳ ${data.message || `Executing action ${data.current} of ${data.total}...`}`;
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function showActionComplete(data) {
+  const confirmEl = document.getElementById('action-confirmation');
+  if (confirmEl) confirmEl.remove();
+  
+  const progressEl = document.getElementById('action-progress');
+  if (progressEl) progressEl.remove();
+  
+  if (data.success) {
+    addMessage(`✅ ${data.actionsCount} action${data.actionsCount > 1 ? 's' : ''} completed successfully`, 'system');
+  } else {
+    addMessage(`❌ Action failed: ${data.error}`, 'system');
+  }
+}
+
+// Agentic action IPC listeners
+if (window.electronAPI.onActionExecuting) {
+  window.electronAPI.onActionExecuting((data) => {
+    showActionConfirmation(data);
+  });
+}
+
+if (window.electronAPI.onActionProgress) {
+  window.electronAPI.onActionProgress((data) => {
+    showActionProgress(data);
+  });
+}
+
+if (window.electronAPI.onActionComplete) {
+  window.electronAPI.onActionComplete((data) => {
+    showActionComplete(data);
+  });
+}
 
 // Add typing indicator styles
 const style = document.createElement('style');
@@ -253,6 +586,86 @@ style.textContent = `
   @keyframes typing-bounce {
     0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
     30% { transform: translateY(-8px); opacity: 1; }
+  }
+  
+  /* Action card styles */
+  .action-card {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid var(--accent-blue);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .action-header {
+    margin-bottom: 8px;
+  }
+  .action-title {
+    font-weight: 600;
+    color: var(--accent-blue);
+  }
+  .action-thought {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    padding: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+  }
+  .action-list {
+    margin-bottom: 12px;
+  }
+  .action-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .action-icon {
+    font-size: 16px;
+  }
+  .action-desc {
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+  }
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  .action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .action-btn.execute {
+    background: var(--accent-green);
+    color: white;
+  }
+  .action-btn.execute:hover {
+    background: #00c853;
+    transform: scale(1.02);
+  }
+  .action-btn.cancel {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-secondary);
+  }
+  .action-btn.cancel:hover {
+    background: rgba(255,100,100,0.2);
+    color: #ff6b6b;
+  }
+  .executing {
+    color: var(--accent-blue);
+    font-style: italic;
+  }
+  .action-progress {
+    background: rgba(0,150,255,0.1);
+    border-left: 3px solid var(--accent-blue);
   }
 `;
 document.head.appendChild(style);

@@ -18,8 +18,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // ===== AI SERVICE CONTROL =====
   setAIProvider: (provider) => ipcRenderer.send('set-ai-provider', provider),
+  setProvider: (provider) => ipcRenderer.send('set-ai-provider', provider), // Alias
   setApiKey: (provider, key) => ipcRenderer.send('set-api-key', { provider, key }),
   getAIStatus: () => ipcRenderer.invoke('get-ai-status'),
+  checkAuth: (provider) => ipcRenderer.send('check-auth', provider),
+  
+  // ===== AGENTIC ACTIONS =====
+  executeActions: (actionData) => ipcRenderer.send('execute-actions', actionData),
+  cancelActions: () => ipcRenderer.send('cancel-actions'),
   
   // ===== VISUAL AWARENESS =====
   getActiveWindow: () => ipcRenderer.invoke('get-active-window'),
@@ -37,6 +43,39 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onVisualContextUpdate: (callback) => ipcRenderer.on('visual-context-update', (event, data) => callback(data)),
   onProviderChanged: (callback) => ipcRenderer.on('provider-changed', (event, data) => callback(data)),
   onScreenAnalysis: (callback) => ipcRenderer.on('screen-analysis', (event, data) => callback(data)),
+  onAuthStatus: (callback) => ipcRenderer.on('auth-status', (event, data) => callback(data)),
+  onTokenUsage: (callback) => ipcRenderer.on('token-usage', (event, data) => callback(data)),
+  
+  // ===== AGENTIC ACTION EVENTS =====
+  onActionExecuting: (callback) => ipcRenderer.on('action-executing', (event, data) => callback(data)),
+  onActionProgress: (callback) => ipcRenderer.on('action-progress', (event, data) => callback(data)),
+  onActionComplete: (callback) => ipcRenderer.on('action-complete', (event, data) => callback(data)),
+  
+  // ===== SAFETY GUARDRAILS API =====
+  // Safe click with pre-analysis and confirmation for risky actions
+  safeClickAt: (params) => ipcRenderer.invoke('safe-click-at', params),
+  
+  // Label to pixel coordinate conversion
+  labelToCoordinates: (label) => ipcRenderer.invoke('label-to-coordinates', label),
+  
+  // Analyze action safety before execution
+  analyzeActionSafety: (params) => ipcRenderer.invoke('analyze-action-safety', params),
+  
+  // Pending action management (for user confirmation flow)
+  confirmPendingAction: (actionId) => ipcRenderer.invoke('confirm-pending-action', { actionId }),
+  rejectPendingAction: (actionId) => ipcRenderer.invoke('reject-pending-action', { actionId }),
+  getPendingAction: () => ipcRenderer.invoke('get-pending-action'),
+  
+  // Safety event listeners
+  onActionRequiresConfirmation: (callback) => {
+    ipcRenderer.on('action-requires-confirmation', (event, data) => callback(data));
+  },
+  onActionRejected: (callback) => {
+    ipcRenderer.on('action-rejected', (event, data) => callback(data));
+  },
+  onActionExecuted: (callback) => {
+    ipcRenderer.on('action-executed', (event, data) => callback(data));
+  },
   
   // ===== STATE =====
   getState: () => ipcRenderer.invoke('get-state')

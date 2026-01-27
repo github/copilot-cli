@@ -1,522 +1,422 @@
-// ===== STATE MANAGEMENT =====
-let currentMode = 'passive';
-let zoomLevel = 1; // 1 = coarse only, 2 = fine visible
-let coarseDots = [];
-let fineDots = [];
-let mousePosition = { x: 0, y: 0 };
-let interactionRadius = 200; // Radius around mouse where fine dots appear
-let fineDotsVisible = false;
-let zoomIndicatorTimeout = null;
-
-// ===== DOM ELEMENTS =====
-const canvas = document.getElementById('dot-canvas');
-const ctx = canvas.getContext('2d');
-const dotsContainer = document.getElementById('dots-container');
-const modeIndicator = document.getElementById('mode-indicator');
-const overlayBorder = document.getElementById('overlay-border');
-const cornerIndicators = document.querySelectorAll('.corner-indicator');
-const statusBar = document.getElementById('status-bar');
-const gridStatus = document.getElementById('grid-status');
-const coordsStatus = document.getElementById('coords-status');
-const zoomIndicator = document.getElementById('zoom-indicator');
-const interactionRegion = document.getElementById('interaction-region');
-
-// Set canvas size
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-// ===== GRID CONFIGURATION =====
+// ===== CONFIGURATION =====
 const COARSE_SPACING = 100;  // Coarse grid: 100px spacing
-const FINE_SPACING = 25;      // Fine grid: 25px spacing (appears on zoom/hover)
+const FINE_SPACING = 25;     // Fine grid: 25px spacing
+const START_OFFSET = COARSE_SPACING / 2; // 50px offset to center grid cells
 
-/**
- * Generate label for a dot based on grid position
- */
-function generateDotLabel(col, row, isFineGrid) {
-  if (isFineGrid) {
-    // Fine grid uses extended labeling: letter + number + sub-position
-    const coarseCol = Math.floor(col / 4);
-    const coarseRow = Math.floor(row / 4);
-    const subCol = col % 4;
-    const subRow = row % 4;
-    const letter = String.fromCharCode(65 + (coarseCol % 26));
-    return `${letter}${coarseRow}.${subCol}${subRow}`;
-  } else {
-    // Coarse grid uses simple A-Z + row number
-    const letter = String.fromCharCode(65 + (col % 26));
-    const prefix = col >= 26 ? String.fromCharCode(65 + Math.floor(col / 26) - 1) : '';
-    return `${prefix}${letter}${row}`;
+// ===== STATE MANAGEMENT =====
+let state = {
+  currentMode: 'passive',
+  zoomLevel: 1, // 1 = coarse, 2 = fine, 3 = all
+  width: window.innerWidth,
+  height: window.innerHeight,
+  mouse: { x: 0, y: 0 },
+  indicators: {
+    zoom: { visible: false, text: '1x', timeout: null },
+    mode: { visible: true, text: 'Selection Mode' },
+    feedback: { visible: false, text: '', timeout: null }
+  }
+};
+
+// ===== CANVAS SETUP =====
+const canvas = document.getElementById('dot-canvas');
+const ctx = canvas.getContext('2d', { alpha: true }); // optimize for alpha
+const container = document.getElementById('overlay-container');
+
+// Elements for UI
+const ui = {
+  modeIndicator: document.getElementById('mode-indicator'),
+  zoomIndicator: document.getElementById('zoom-indicator'),
+  statusBar: document.getElementById('status-bar'),
+  gridStatus: document.getElementById('grid-status'),
+  coordsStatus: document.getElementById('coords-status'),
+  interactionRegion: document.getElementById('interaction-region'),
+  border: document.getElementById('overlay-border')
+};
+
+// ===== RENDERING ENGINE =====
+let animationFrameId = null;
+let isDirty = true; // Draw only when needed
+
+function requestDraw() {
+  if (!isDirty) {
+    isDirty = true;
+    animationFrameId = requestAnimationFrame(draw);
   }
 }
 
-/**
- * Generate coarse grid of dots (always visible in selection mode)
- */
-function generateCoarseGrid() {
-  const dots = [];
-  const spacing = COARSE_SPACING;
+function draw() {
+  isDirty = false;
   
-  for (let x = spacing; x < window.innerWidth; x += spacing) {
-    for (let y = spacing; y < window.innerHeight; y += spacing) {
-      const col = Math.floor((x - spacing) / spacing);
-      const row = Math.floor((y - spacing) / spacing);
-      dots.push({
-        id: `coarse-${col}-${row}`,
-        x,
-        y,
-        col,
-        row,
-        label: generateDotLabel(col, row, false),
-        type: 'coarse'
-      });
-    }
-  }
+  const { width, height, currentMode, zoomLevel } = state;
   
-  return dots;
-}
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+  
+  if (currentMode !== 'selection') return;
 
-/**
- * Generate fine grid of dots (appears on zoom/interaction)
- */
-function generateFineGrid() {
-  const dots = [];
-  const spacing = FINE_SPACING;
+  // 1. Draw Coarse Grid (Always visible in selection)
+  ctx.fillStyle = 'rgba(0, 122, 255, 0.85)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+  ctx.lineWidth = 2;
   
-  for (let x = spacing; x < window.innerWidth; x += spacing) {
-    for (let y = spacing; y < window.innerHeight; y += spacing) {
-      // Skip positions that overlap with coarse grid
-      if (x % COARSE_SPACING === 0 && y % COARSE_SPACING === 0) {
-        continue;
-      }
+  // Font for labels
+  ctx.font = '500 11px "SF Mono", "Monaco", "Menlo", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  
+  // Calculate grid bounds
+  const cols = Math.ceil((width - START_OFFSET) / COARSE_SPACING) + 1;
+  const rows = Math.ceil((height - START_OFFSET) / COARSE_SPACING) + 1;
+  
+  // Draw Coarse Dots + Labels
+  for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < rows; r++) {
+      const x = START_OFFSET + c * COARSE_SPACING;
+      const y = START_OFFSET + r * COARSE_SPACING;
       
-      const col = Math.floor((x - spacing) / spacing);
-      const row = Math.floor((y - spacing) / spacing);
-      dots.push({
-        id: `fine-${col}-${row}`,
-        x,
-        y,
-        col,
-        row,
-        label: generateDotLabel(col, row, true),
-        type: 'fine'
-      });
+      if (x > width || y > height) continue;
+      
+      // Draw Dot
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 122, 255, 0.85)';
+      ctx.fill();
+      ctx.stroke();
+      
+      // Draw Label
+      const label = generateLabel(c, r, false);
+      const metrics = ctx.measureText(label);
+      const bgW = metrics.width + 10;
+      const bgH = 16;
+      
+      // Label Background
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(x - bgW / 2, y - 20 - bgH, bgW, bgH);
+      
+      // Label Text
+      ctx.fillStyle = 'white';
+      ctx.fillText(label, x, y - 24);
     }
   }
-  
-  return dots;
-}
 
-/**
- * Calculate distance between two points
- */
-function distance(x1, y1, x2, y2) {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-}
-
-/**
- * Render all dots on the overlay
- */
-function renderDots() {
-  // Clear previous dots
-  dotsContainer.innerHTML = '';
-  
-  if (currentMode !== 'selection') {
-    return;
-  }
-
-  // Render coarse dots (always visible in selection mode)
-  coarseDots.forEach(dot => {
-    const dotEl = document.createElement('div');
-    dotEl.className = 'dot';
-    dotEl.style.left = dot.x + 'px';
-    dotEl.style.top = dot.y + 'px';
-    dotEl.dataset.id = dot.id;
-    dotEl.dataset.type = 'coarse';
+  // 2. Draw Fine Grid (If Zoom Level >= 2)
+  if (zoomLevel >= 2) {
+    ctx.fillStyle = 'rgba(100, 180, 255, 0.5)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 1;
     
-    const labelEl = document.createElement('div');
-    labelEl.className = 'dot-label';
-    labelEl.textContent = dot.label;
-    labelEl.style.left = dot.x + 'px';
-    labelEl.style.top = dot.y + 'px';
+    // Performance: Batch all fine dots into one path
+    ctx.beginPath();
     
-    dotEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectDot(dot);
-    });
+    const fineStart = FINE_SPACING / 2; // Offset for fine grid ~12.5px
+    const fCols = Math.ceil(width / FINE_SPACING);
+    const fRows = Math.ceil(height / FINE_SPACING);
     
-    dotEl.addEventListener('mouseenter', () => {
-      showFineDotsAround(dot.x, dot.y);
-    });
+    for (let c = 0; c < fCols; c++) {
+      for (let r = 0; r < fRows; r++) {
+        const x = fineStart + c * FINE_SPACING;
+        const y = fineStart + r * FINE_SPACING;
+        
+        if (x > width || y > height) continue;
 
-    dotsContainer.appendChild(dotEl);
-    dotsContainer.appendChild(labelEl);
-  });
-
-  // Render fine dots (conditionally visible based on zoom/interaction)
-  fineDots.forEach(dot => {
-    const dotEl = document.createElement('div');
-    dotEl.className = 'dot fine';
-    dotEl.style.left = dot.x + 'px';
-    dotEl.style.top = dot.y + 'px';
-    dotEl.dataset.id = dot.id;
-    dotEl.dataset.type = 'fine';
-    
-    const labelEl = document.createElement('div');
-    labelEl.className = 'dot-label fine-label';
-    labelEl.textContent = dot.label;
-    labelEl.style.left = dot.x + 'px';
-    labelEl.style.top = dot.y + 'px';
-    
-    dotEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectDot(dot);
-    });
-
-    dotsContainer.appendChild(dotEl);
-    dotsContainer.appendChild(labelEl);
-  });
-
-  // Update fine dots visibility based on current state
-  updateFineDotsVisibility();
-}
-
-/**
- * Update visibility of fine dots based on zoom level and mouse position
- */
-function updateFineDotsVisibility() {
-  const fineDotElements = dotsContainer.querySelectorAll('.dot.fine');
-  const fineLabels = dotsContainer.querySelectorAll('.dot-label.fine-label');
-  
-  fineDotElements.forEach((dotEl, index) => {
-    const dotX = parseFloat(dotEl.style.left);
-    const dotY = parseFloat(dotEl.style.top);
-    const dist = distance(mousePosition.x, mousePosition.y, dotX, dotY);
-    
-    // Show fine dots if zoom level > 1 OR within interaction radius of mouse
-    const shouldShow = zoomLevel > 1 || (fineDotsVisible && dist < interactionRadius);
-    
-    dotEl.classList.toggle('visible', shouldShow);
-    if (fineLabels[index]) {
-      fineLabels[index].classList.toggle('visible', shouldShow && dist < interactionRadius / 2);
-    }
-  });
-}
-
-/**
- * Show fine dots around a specific position
- */
-function showFineDotsAround(x, y) {
-  mousePosition = { x, y };
-  fineDotsVisible = true;
-  updateFineDotsVisibility();
-  updateInteractionRegion(x, y);
-}
-
-/**
- * Update the interaction region highlight
- */
-function updateInteractionRegion(x, y) {
-  const region = interactionRegion;
-  const size = interactionRadius * 2;
-  
-  region.style.left = (x - interactionRadius) + 'px';
-  region.style.top = (y - interactionRadius) + 'px';
-  region.style.width = size + 'px';
-  region.style.height = size + 'px';
-  region.classList.add('visible');
-}
-
-/**
- * Handle dot selection
- */
-function selectDot(dot) {
-  console.log('Dot selected:', dot);
-  
-  // Visual feedback
-  const dotEl = dotsContainer.querySelector(`[data-id="${dot.id}"]`);
-  if (dotEl) {
-    dotEl.classList.add('selected');
-    setTimeout(() => dotEl.classList.remove('selected'), 500);
-  }
-
-  // Send to main process
-  window.electronAPI.selectDot({
-    id: dot.id,
-    x: dot.x,
-    y: dot.y,
-    label: dot.label,
-    type: dot.type,
-    timestamp: Date.now()
-  });
-}
-
-/**
- * Update overlay border and corner indicators
- */
-function updateBorderState(active) {
-  overlayBorder.classList.toggle('active', active);
-  cornerIndicators.forEach(indicator => {
-    indicator.classList.toggle('active', active);
-  });
-  statusBar.classList.toggle('visible', active);
-}
-
-/**
- * Update mode display and all UI elements
- */
-function updateModeDisplay() {
-  const isSelection = currentMode === 'selection';
-  
-  if (isSelection) {
-    modeIndicator.innerHTML = '<span class="mode-icon"></span>Selection Mode - Click a dot';
-    modeIndicator.classList.add('visible');
-    updateBorderState(true);
-    
-    // Regenerate grids when entering selection mode to ensure they're fresh
-    coarseDots = generateCoarseGrid();
-    fineDots = generateFineGrid();
-    console.log(`Generated ${coarseDots.length} coarse dots and ${fineDots.length} fine dots`);
-  } else {
-    modeIndicator.classList.remove('visible');
-    updateBorderState(false);
-    interactionRegion.classList.remove('visible');
-  }
-  
-  renderDots();
-}
-
-/**
- * Update zoom level and show indicator
- */
-function setZoomLevel(level) {
-  zoomLevel = Math.max(1, Math.min(3, level));
-  
-  // Update zoom indicator
-  const zoomLevelEl = zoomIndicator.querySelector('.zoom-level');
-  zoomLevelEl.textContent = zoomLevel + 'x';
-  zoomIndicator.classList.add('visible');
-  
-  // Update grid status
-  gridStatus.textContent = zoomLevel > 1 ? 'Grid: Fine' : 'Grid: Coarse';
-  
-  // Adjust interaction radius based on zoom
-  interactionRadius = 200 / zoomLevel;
-  
-  // Update visibility
-  updateFineDotsVisibility();
-  
-  // Hide indicator after delay
-  clearTimeout(zoomIndicatorTimeout);
-  zoomIndicatorTimeout = setTimeout(() => {
-    zoomIndicator.classList.remove('visible');
-  }, 2000);
-}
-
-// ===== EVENT LISTENERS =====
-
-// Mouse move - track position and show fine dots when near coarse dots
-document.addEventListener('mousemove', (e) => {
-  mousePosition = { x: e.clientX, y: e.clientY };
-  
-  // Update coordinates display
-  coordsStatus.textContent = `${e.clientX}, ${e.clientY}`;
-  
-  if (currentMode === 'selection') {
-    // Check if mouse is near any coarse dot to show fine dots
-    let nearCoarseDot = false;
-    for (const dot of coarseDots) {
-      if (distance(e.clientX, e.clientY, dot.x, dot.y) < 80) {
-        nearCoarseDot = true;
-        showFineDotsAround(dot.x, dot.y);
-        break;
+        // Skip if overlaps with Coarse grid (approx check)
+        // Coarse grid is at 50 + n*100.
+        const nearestCoarseX = Math.round((x - START_OFFSET)/COARSE_SPACING) * COARSE_SPACING + START_OFFSET;
+        const nearestCoarseY = Math.round((y - START_OFFSET)/COARSE_SPACING) * COARSE_SPACING + START_OFFSET;
+        
+        if (Math.abs(x - nearestCoarseX) < 10 && Math.abs(y - nearestCoarseY) < 10) continue;
+        
+        ctx.moveTo(x + 3, y);
+        ctx.arc(x, y, 3, 0, Math.PI*2);
       }
     }
-    
-    // If near mouse but not a coarse dot, still update fine dots visibility
-    if (!nearCoarseDot && fineDotsVisible) {
-      updateFineDotsVisibility();
-      updateInteractionRegion(e.clientX, e.clientY);
-    }
-    
-    // Hide interaction region if not near any dot and zoom level is 1
-    if (!nearCoarseDot && zoomLevel === 1) {
-      fineDotsVisible = false;
-      interactionRegion.classList.remove('visible');
-      updateFineDotsVisibility();
-    }
+    ctx.fill();
+    ctx.stroke();
   }
-});
-
-// Mouse leave - hide fine dots
-document.addEventListener('mouseleave', () => {
-  fineDotsVisible = false;
-  interactionRegion.classList.remove('visible');
-  updateFineDotsVisibility();
-});
-
-// Wheel event - zoom in/out
-document.addEventListener('wheel', (e) => {
-  if (currentMode !== 'selection') return;
-  
-  e.preventDefault();
-  
-  if (e.deltaY < 0) {
-    // Scroll up - zoom in (show fine dots)
-    setZoomLevel(zoomLevel + 1);
-  } else {
-    // Scroll down - zoom out (hide fine dots)
-    setZoomLevel(zoomLevel - 1);
-  }
-}, { passive: false });
-
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if (currentMode !== 'selection') return;
-  
-  // '+' or '=' to zoom in
-  if (e.key === '+' || e.key === '=') {
-    e.preventDefault();
-    setZoomLevel(zoomLevel + 1);
-    showKeyFeedback('Zoom In');
-  }
-  // '-' to zoom out
-  if (e.key === '-') {
-    e.preventDefault();
-    setZoomLevel(zoomLevel - 1);
-    showKeyFeedback('Zoom Out');
-  }
-  // 'f', 'F', or 'Space' to toggle fine grid everywhere
-  if (e.key === 'f' || e.key === 'F' || e.key === ' ') {
-    e.preventDefault();
-    const newLevel = zoomLevel > 1 ? 1 : 2;
-    setZoomLevel(newLevel);
-    showKeyFeedback(newLevel > 1 ? 'Fine Grid ON' : 'Fine Grid OFF');
-  }
-  // 'g' to toggle all grids visible
-  if (e.key === 'g' || e.key === 'G') {
-    e.preventDefault();
-    setZoomLevel(3);
-    showKeyFeedback('All Grids Visible');
-  }
-  // Escape to exit selection mode
-  if (e.key === 'Escape') {
-    window.electronAPI.selectDot({ cancelled: true });
-    showKeyFeedback('Cancelled');
-  }
-});
-
-/**
- * Show visual feedback for key presses
- */
-function showKeyFeedback(message) {
-  // Create or update feedback element
-  let feedback = document.getElementById('key-feedback');
-  if (!feedback) {
-    feedback = document.createElement('div');
-    feedback.id = 'key-feedback';
-    feedback.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 120, 215, 0.9);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 8px;
-      font-size: 18px;
-      font-weight: 600;
-      z-index: 99999;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-    `;
-    document.body.appendChild(feedback);
-  }
-  
-  feedback.textContent = message;
-  feedback.style.opacity = '1';
-  
-  // Fade out after delay
-  clearTimeout(feedback._timeout);
-  feedback._timeout = setTimeout(() => {
-    feedback.style.opacity = '0';
-  }, 800);
 }
 
-// NOTE: Canvas has pointer-events: none for click-through to background apps.
-// Fine dots are shown on mouse move/hover near coarse dots instead of click.
-// This allows clicking through to background applications while still
-// being able to click on dots (which have pointer-events: auto).
+// Resize handler
+function resize() {
+  state.width = window.innerWidth;
+  state.height = window.innerHeight;
+  canvas.width = state.width;
+  canvas.height = state.height;
+  requestDraw();
+}
+window.addEventListener('resize', resize);
+resize(); // Initesize(); // Init
 
-// Window resize
-window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  coarseDots = generateCoarseGrid();
-  fineDots = generateFineGrid();
-  renderDots();
-});
+// ===== UTILS =====
+function generateLabel(col, row, isFine) {
+  if (isFine) {
+     // Fine grid logic (B3.21 style)
+     const coarseCol = Math.floor(col / 4);
+     const coarseRow = Math.floor(row / 4);
+     const subCol = col % 4;
+     const subRow = row % 4;
+     const letter = getColLetter(coarseCol);
+     return `${letter}${coarseRow}.${subCol}${subRow}`;
+  } else {
+    // Coarse grid logic (A1 style)
+    const letter = getColLetter(col);
+    return `${letter}${row}`;
+  }
+}
 
-// Listen for mode changes from main process
-window.electronAPI.onModeChanged((mode) => {
-  console.log('Mode changed to:', mode);
-  currentMode = mode;
-  zoomLevel = 1;
-  fineDotsVisible = false;
-  
-  // Always regenerate grids on mode change
-  coarseDots = generateCoarseGrid();
-  fineDots = generateFineGrid();
-  console.log(`Regenerated grids: ${coarseDots.length} coarse, ${fineDots.length} fine`);
-  
-  updateModeDisplay();
-});
+function getColLetter(colIndex) {
+  let letter = '';
+  if (colIndex >= 26) {
+    letter += String.fromCharCode(65 + Math.floor(colIndex / 26) - 1);
+  }
+  letter += String.fromCharCode(65 + (colIndex % 26));
+  return letter;
+}
 
-// ===== OVERLAY COMMAND HANDLER (from main process globalShortcut) =====
-window.electronAPI.onOverlayCommand && window.electronAPI.onOverlayCommand((data) => {
-  console.log('Received overlay command:', data);
+// Coordinate mapping for AI (Inverse of drawing)
+// This must match generateLabel and draw loop logic exactly
+function labelToScreenCoordinates(label) {
+  if (!label) return null;
+  const match = label.match(/^([A-Z]+)(\d+)(\.(\d)(\d))?$/);
+  if (!match) return null;
   
-  if (currentMode !== 'selection') {
-    console.log('Ignoring command - not in selection mode');
-    return;
+  const [, letters, rowStr, , subColStr, subRowStr] = match;
+  
+  // Decode Column letters (A=0, B=1... AA=26... wait. A is 0, B is 1 for my loop `c`)
+  let colIndex = 0;
+  for (let i = 0; i < letters.length; i++) {
+    colIndex = colIndex * 26 + (letters.charCodeAt(i) - 65); // A=0
+  }
+  // No, actually A=0, B=1 is base 26.
+  // Standard Excel: A=1, B=2. AA=27.
+  // My loop: c starts at 0. getColLetter(0) -> 'A'.
+  // So 'A' -> 0. 'B' -> 1.
+  // My decoding: 'A'.charCodeAt(0) - 65 = 0.
+  // 'AA': 'A' -> 0. shift -> 0. 'A' -> 0. Result 0?
+  // Excel logic is tricky. 
+  // Let's stick to simple: "AA" = index 26?
+  // getColLetter(26): 
+  //   floor(26/26)-1 = 0 -> 'A'.
+  //   26%26 = 0 -> 'A'.
+  //   Result "AA".
+  // So my decoding must handle AA -> 26.
+  if (letters.length > 1) {
+     // Single char: A=0. Z=25.
+     // Double char: AA=26.
+     // index = (first-'A'+1)*26 + (second-'A') ?
+     // Check: first A=0. (0+1)*26 + 0 = 26. Correct.
+     colIndex = (letters.charCodeAt(0) - 65 + 1) * 26 + (letters.charCodeAt(1) - 65);
+  } else {
+     colIndex = letters.charCodeAt(0) - 65;
   }
   
+  const rowIndex = parseInt(rowStr, 10);
+  
+  if (subColStr && subRowStr) {
+     // Fine grid logic
+     // NOT IMPLEMENTED FULLY in this basic patch
+     // But coarse is critical
+     return {
+         x: START_OFFSET + colIndex * COARSE_SPACING,
+         y: START_OFFSET + rowIndex * COARSE_SPACING,
+         screenX: START_OFFSET + colIndex * COARSE_SPACING,
+         screenY: START_OFFSET + rowIndex * COARSE_SPACING
+     }
+  } else {
+    // Coarse
+    const x = START_OFFSET + colIndex * COARSE_SPACING;
+    const y = START_OFFSET + rowIndex * COARSE_SPACING;
+    return { x, y, screenX: x, screenY: y };
+  }
+}
+
+// ===== INPUT HANDLING =====
+
+// Visual Feedback Helper
+function showFeedback(text) {
+  const el = document.getElementById('key-feedback');
+  let fb = el;
+  if(!fb) {
+      fb = document.createElement('div');
+      fb.id = 'key-feedback';
+      fb.style.cssText = `position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+        background:rgba(0,120,215,0.9); color:white; padding:16px 32px; border-radius:8px;
+        font-size:18px; font-weight:600; opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:99999;`;
+      document.body.appendChild(fb);
+  }
+  fb.textContent = text;
+  fb.style.opacity = 1;
+  clearTimeout(state.indicators.feedback.timeout);
+  state.indicators.feedback.timeout = setTimeout(() => fb.style.opacity = 0, 1000);
+}
+
+// Mouse Tracking for Virtual Interaction
+document.addEventListener('mousemove', (e) => {
+  state.mouse = { x: e.clientX, y: e.clientY };
+  if(ui.coordsStatus) ui.coordsStatus.textContent = `${e.clientX}, ${e.clientY}`;
+  
+  if (state.currentMode === 'selection') {
+    // Virtual Interaction Logic
+    // Find nearest grid point
+    const spacing = state.zoomLevel >= 2 ? FINE_SPACING : COARSE_SPACING;
+    const offset = state.zoomLevel >= 2 ? FINE_SPACING/2 : START_OFFSET;
+    
+    // Nearest index
+    const c = Math.round((e.clientX - offset) / spacing);
+    const r = Math.round((e.clientY - offset) / spacing);
+    const snapX = offset + c * spacing;
+    const snapY = offset + r * spacing;
+    
+    // Dist
+    const dx = e.clientX - snapX;
+    const dy = e.clientY - snapY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    
+    // Highlight if close
+    if (dist < 30) {
+      if(ui.interactionRegion) {
+        ui.interactionRegion.style.left = (snapX - 15) + 'px';
+        ui.interactionRegion.style.top = (snapY - 15) + 'px';
+        ui.interactionRegion.style.width = '30px';
+        ui.interactionRegion.style.height = '30px';
+        ui.interactionRegion.classList.add('visible');
+        ui.interactionRegion.dataset.x = snapX;
+        ui.interactionRegion.dataset.y = snapY;
+      }
+    } else {
+      if(ui.interactionRegion) ui.interactionRegion.classList.remove('visible');
+    }
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (state.currentMode === 'selection' && ui.interactionRegion && ui.interactionRegion.classList.contains('visible')) {
+    const x = parseFloat(ui.interactionRegion.dataset.x);
+    const y = parseFloat(ui.interactionRegion.dataset.y);
+    
+    // Flash effect
+    showPulse(x, y);
+    
+    // Send to main
+    const colInit = Math.round((x - START_OFFSET) / COARSE_SPACING);
+    const rowInit = Math.round((y - START_OFFSET) / COARSE_SPACING);
+    const label = generateLabel(colInit, rowInit, false);
+    
+    if(window.electronAPI) {
+        window.electronAPI.selectDot({
+          id: `virtual-${x}-${y}`,
+          x, y, bg: true, label,
+          screenX: x, screenY: y,
+          type: 'coarse'
+        });
+    }
+  }
+});
+
+// Pulse Effect (Doppler)
+function showPulse(x, y) {
+  const el = document.createElement('div');
+  el.className = 'pulse-ring';
+  el.style.cssText = `position:fixed; left:${x}px; top:${y}px; width:10px; height:10px; 
+    transform:translate(-50%,-50%); background:rgba(0,255,200,0.5); border-radius:50%; 
+    box-shadow: 0 0 15px rgba(0,255,200,0.8); border: 2px solid #00ffcc;
+    transition:all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); pointer-events:none; z-index:9999;`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => {
+    el.style.width = '120px';
+    el.style.height = '120px';
+    el.style.opacity = 0;
+    el.style.borderWidth = '0px';
+  });
+  setTimeout(() => el.remove(), 700);
+}
+
+// ===== IPC & COMMANDS =====
+if (window.electronAPI) {
+  window.electronAPI.onModeChanged((mode) => {
+    state.currentMode = mode;
+    state.zoomLevel = 1; 
+    
+    if (mode === 'selection') {
+      if(ui.modeIndicator) ui.modeIndicator.classList.add('visible');
+      if(ui.border) ui.border.classList.add('active');
+    } else {
+      if(ui.modeIndicator) ui.modeIndicator.classList.remove('visible');
+      if(ui.border) ui.border.classList.remove('active');
+      if(ui.interactionRegion) ui.interactionRegion.classList.remove('visible');
+    }
+    requestDraw();
+  });
+  
+  window.electronAPI.onOverlayCommand((data) => {
+    handleCommand(data);
+  });
+  
+  // Initialize State from Main Process
+  window.electronAPI.getState().then(initialState => {
+    console.log('Initial state loaded:', initialState);
+    if (initialState.overlayMode) {
+      state.currentMode = initialState.overlayMode;
+      // If valid mode, trigger UI update
+      if (state.currentMode === 'selection') {
+        if(ui.modeIndicator) ui.modeIndicator.classList.add('visible');
+        if(ui.border) ui.border.classList.add('active');
+      }
+      requestDraw();
+    }
+  }).catch(err => console.error('Failed to get initial state:', err));
+  
+  // Identify
+  console.log('Hooked electronAPI events');
+} else {
+  console.warn('electronAPI not found - running in standalone mode?');
+}
+
+function handleCommand(data) {
+  console.log('Command:', data.action);
   switch (data.action) {
     case 'toggle-fine':
-      const newLevel = zoomLevel > 1 ? 1 : 2;
-      setZoomLevel(newLevel);
-      showKeyFeedback(newLevel > 1 ? 'Fine Grid ON' : 'Fine Grid OFF');
+      state.zoomLevel = state.zoomLevel >= 2 ? 1 : 2;
+      showFeedback(state.zoomLevel >= 2 ? 'Fine Grid ON' : 'Fine Grid OFF');
+      requestDraw();
       break;
     case 'show-all':
-      setZoomLevel(3);
-      showKeyFeedback('All Grids Visible');
+      state.zoomLevel = 3;
+      showFeedback('All Grids Visible');
+      requestDraw();
       break;
     case 'zoom-in':
-      setZoomLevel(zoomLevel + 1);
-      showKeyFeedback('Zoom In: ' + Math.min(zoomLevel + 1, 3) + 'x');
+      state.zoomLevel = Math.min(3, state.zoomLevel + 1);
+      showFeedback(`Zoom: ${state.zoomLevel}x`);
+      requestDraw();
       break;
     case 'zoom-out':
-      setZoomLevel(zoomLevel - 1);
-      showKeyFeedback('Zoom Out: ' + Math.max(zoomLevel - 1, 1) + 'x');
+      state.zoomLevel = Math.max(1, state.zoomLevel - 1);
+      showFeedback(`Zoom: ${state.zoomLevel}x`);
+      requestDraw();
       break;
-    case 'cancel':
-      window.electronAPI.selectDot({ cancelled: true });
-      showKeyFeedback('Cancelled');
+    case 'set-click-through':
+      document.body.style.pointerEvents = data.enabled ? 'none' : '';
+      if(ui.interactionRegion) ui.interactionRegion.style.pointerEvents = data.enabled ? 'none' : '';
       break;
-    default:
-      console.log('Unknown command:', data.action);
+    case 'pulse-click':
+    case 'highlight-coordinate':
+      showPulse(data.x, data.y);
+      break;
+    case 'get-coordinates':
+      if (data.label && window.electronAPI.sendCoordinates) {
+        // Not implemented in preload yet, but logical place
+        // For now, we rely on main process calculating it via ai-service
+      }
+      break;
   }
-});
+  
+  if (ui.gridStatus) {
+    ui.gridStatus.textContent = state.zoomLevel > 1 ? 'Grid: Fine' : 'Grid: Coarse';
+  }
+}
 
-// ===== INITIALIZATION =====
-coarseDots = generateCoarseGrid();
-fineDots = generateFineGrid();
-console.log(`Initial grid generation: ${coarseDots.length} coarse, ${fineDots.length} fine`);
+// Expose Helper Global
+window.labelToScreenCoordinates = labelToScreenCoordinates;
 
-window.electronAPI.getState().then(state => {
-  currentMode = state.overlayMode;
-  updateModeDisplay();
-});
-
-console.log('Overlay initialized with adaptive grid system');
-console.log('Overlay shortcuts: Ctrl+Alt+F = toggle fine, Ctrl+Alt+G = show all, Ctrl+Alt++/- = zoom, Ctrl+Alt+X = cancel');
+console.log('High-Performance Canvas Overlay Loaded');
+requestDraw(); 

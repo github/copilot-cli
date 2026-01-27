@@ -2,6 +2,7 @@
  * AI Service Module
  * Handles integration with AI backends (GitHub Copilot, OpenAI, Claude, local models)
  * Supports visual context for AI awareness of screen content
+ * Supports AGENTIC actions (mouse, keyboard, system control)
  */
 
 const https = require('https');
@@ -9,8 +10,27 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { shell } = require('electron');
+const systemAutomation = require('./system-automation');
 
 // ===== CONFIGURATION =====
+
+// Available models for GitHub Copilot (based on Copilot CLI changelog)
+const COPILOT_MODELS = {
+  'claude-sonnet-4.5': { name: 'Claude Sonnet 4.5', id: 'claude-sonnet-4.5-20250929', vision: true },
+  'claude-sonnet-4': { name: 'Claude Sonnet 4', id: 'claude-sonnet-4-20250514', vision: true },
+  'claude-opus-4.5': { name: 'Claude Opus 4.5', id: 'claude-opus-4.5', vision: true },
+  'claude-haiku-4.5': { name: 'Claude Haiku 4.5', id: 'claude-haiku-4.5', vision: true },
+  'gpt-4o': { name: 'GPT-4o', id: 'gpt-4o', vision: true },
+  'gpt-4o-mini': { name: 'GPT-4o Mini', id: 'gpt-4o-mini', vision: true },
+  'gpt-4.1': { name: 'GPT-4.1', id: 'gpt-4.1', vision: true },
+  'o1': { name: 'o1', id: 'o1', vision: false },
+  'o1-mini': { name: 'o1 Mini', id: 'o1-mini', vision: false },
+  'o3-mini': { name: 'o3 Mini', id: 'o3-mini', vision: false }
+};
+
+// Default Copilot model
+let currentCopilotModel = 'gpt-4o';
+
 const AI_PROVIDERS = {
   copilot: {
     baseUrl: 'api.githubcopilot.com',
@@ -43,11 +63,13 @@ const AI_PROVIDERS = {
 const COPILOT_CLIENT_ID = 'Iv1.b507a08c87ecfe98';
 const GITHUB_DEVICE_CODE_URL = 'https://github.com/login/device/code';
 const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
+const COPILOT_TOKEN_EXCHANGE_URL = 'https://api.github.com/copilot_internal/v2/token';
 
 // Current configuration
 let currentProvider = 'copilot'; // Default to GitHub Copilot
 let apiKeys = {
-  copilot: process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '',
+  copilot: process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '',     // OAuth token
+  copilotSession: '',  // Copilot session token (exchanged from OAuth)
   openai: process.env.OPENAI_API_KEY || '',
   anthropic: process.env.ANTHROPIC_API_KEY || ''
 };
@@ -68,27 +90,83 @@ let visualContextBuffer = [];
 const MAX_VISUAL_CONTEXT = 5;
 
 // ===== SYSTEM PROMPT =====
-const SYSTEM_PROMPT = `You are Liku, an intelligent AI assistant integrated into a desktop overlay system. You have the following capabilities:
+const SYSTEM_PROMPT = `You are Liku, an intelligent AGENTIC AI assistant integrated into a desktop overlay system with visual screen awareness AND the ability to control the user's computer.
 
-1. **Screen Awareness**: You can see screenshots of the user's screen when they share visual context with you. Analyze these images to understand what applications, UI elements, and content the user is working with.
+## Your Core Capabilities
 
-2. **Coordinate System**: The user can select specific points on their screen using a dot grid overlay. When they select coordinates, you'll receive them as (x, y) positions.
+1. **Screen Vision**: When the user captures their screen, you receive it as an image. ALWAYS analyze visible content immediately.
 
-3. **UI Interaction Guidance**: Help users navigate their applications by describing what you see and suggesting actions based on screen coordinates.
+2. **Grid Coordinate System**: The screen has a dot grid overlay:
+   - **Columns**: Letters A, B, C, D... (left to right), spacing 100px
+   - **Rows**: Numbers 0, 1, 2, 3... (top to bottom), spacing 100px
+   - **Start**: Grid is centered, so A0 is at (50, 50)
+   - **Format**: "C3" = column C (index 2), row 3 = pixel (250, 350)
+   - **Formula**: x = 50 + col_index * 100, y = 50 + row_index * 100
+   - A0 ≈ (50, 50), B0 ≈ (150, 50), A1 ≈ (50, 150)
 
-4. **Context Retention**: You maintain conversation history and visual context across messages.
+3. **SYSTEM CONTROL - AGENTIC ACTIONS**: You can execute actions on the user's computer:
+   - **Click**: Click at coordinates
+   - **Type**: Type text into focused fields
+   - **Press Keys**: Press keyboard shortcuts (ctrl+c, enter, etc.)
+   - **Scroll**: Scroll up/down
+   - **Drag**: Drag from one point to another
 
-When the user shares a screenshot:
-- Describe what you see in detail
-- Identify the application being used
-- Note any UI elements, text, or data visible
-- Suggest relevant actions or answer questions about the content
+## ACTION FORMAT - CRITICAL
 
-When the user selects coordinates:
-- Reference what's near those coordinates if visual context is available
-- Help with pixel-precise tasks like clicking specific elements
+When the user asks you to DO something (click, type, interact), respond with a JSON action block:
 
-Be concise but helpful. Use your visual understanding to provide contextually relevant assistance.`;
+\`\`\`json
+{
+  "thought": "Brief explanation of what I'm about to do",
+  "actions": [
+    {"type": "click", "x": 300, "y": 200, "reason": "Click the input field"},
+    {"type": "type", "text": "Hello world", "reason": "Type the requested text"},
+    {"type": "key", "key": "enter", "reason": "Submit the form"}
+  ],
+  "verification": "After these actions, the text field should show 'Hello world'"
+}
+\`\`\`
+
+### Action Types:
+- \`{"type": "click", "x": <number>, "y": <number>}\` - Left click at pixel coordinates
+- \`{"type": "double_click", "x": <number>, "y": <number>}\` - Double click
+- \`{"type": "right_click", "x": <number>, "y": <number>}\` - Right click
+- \`{"type": "type", "text": "<string>"}\` - Type text (types into currently focused element)
+- \`{"type": "key", "key": "<key combo>"}\` - Press key (e.g., "enter", "ctrl+c", "alt+tab", "f5")
+- \`{"type": "scroll", "direction": "up|down", "amount": <number>}\` - Scroll (amount = clicks)
+- \`{"type": "drag", "fromX": <n>, "fromY": <n>, "toX": <n>, "toY": <n>}\` - Drag
+- \`{"type": "wait", "ms": <number>}\` - Wait milliseconds
+- \`{"type": "screenshot"}\` - Take screenshot to verify result
+
+### Grid to Pixel Conversion:
+- A1 → (100, 100), B1 → (200, 100), C1 → (300, 100)
+- A2 → (100, 200), B2 → (200, 200), C2 → (300, 200)
+- Formula: x = 100 + (column_number - 1) * 100, y = 100 + (row_number - 1) * 100
+- Column A=1, B=2, C=3... so C3 = x: 100 + 2*100 = 300, y: 100 + 2*100 = 300
+
+## Response Guidelines
+
+**For OBSERVATION requests** (what's at C3, describe the screen):
+- Respond with natural language describing what you see
+- Be specific about UI elements, text, buttons
+
+**For ACTION requests** (click here, type this, open that):
+- ALWAYS respond with the JSON action block
+- Include your thought process
+- Calculate coordinates precisely
+- Add verification step to confirm success
+
+**When executing a sequence**:
+1. First action: click to focus the target element
+2. Second action: perform the main task (type, etc.)
+3. Optional: verify with screenshot
+
+**IMPORTANT**: When asked to interact with something visible in the screenshot:
+1. Identify the element's approximate position
+2. Convert to pixel coordinates
+3. Return the action JSON
+
+Be precise, efficient, and execute actions confidently based on visual information.`;
 
 /**
  * Set the AI provider
@@ -110,6 +188,36 @@ function setApiKey(provider, key) {
     return true;
   }
   return false;
+}
+
+/**
+ * Set the Copilot model
+ */
+function setCopilotModel(model) {
+  if (COPILOT_MODELS[model]) {
+    currentCopilotModel = model;
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Get available Copilot models
+ */
+function getCopilotModels() {
+  return Object.entries(COPILOT_MODELS).map(([key, value]) => ({
+    id: key,
+    name: value.name,
+    vision: value.vision,
+    current: key === currentCopilotModel
+  }));
+}
+
+/**
+ * Get current Copilot model
+ */
+function getCurrentCopilotModel() {
+  return currentCopilotModel;
 }
 
 /**
@@ -159,8 +267,9 @@ function buildMessages(userMessage, includeVisual = false) {
   // Build user message with optional visual context
   const latestVisual = includeVisual ? getLatestVisualContext() : null;
 
-  if (latestVisual && currentProvider === 'openai') {
-    // OpenAI vision format
+  if (latestVisual && (currentProvider === 'copilot' || currentProvider === 'openai')) {
+    // OpenAI/Copilot vision format (both use same API format)
+    console.log('[AI] Including visual context in message (provider:', currentProvider, ')');
     messages.push({
       role: 'user',
       content: [
@@ -382,39 +491,29 @@ function pollForToken(deviceCode, interval) {
 }
 
 /**
- * Call GitHub Copilot API
+ * Exchange OAuth token for Copilot session token
+ * Required because the OAuth token alone can't call Copilot API directly
  */
-function callCopilot(messages) {
+function exchangeForCopilotSession() {
   return new Promise((resolve, reject) => {
     if (!apiKeys.copilot) {
-      // Try to load saved token
-      if (!loadCopilotToken()) {
-        return reject(new Error('Not authenticated. Use /login to authenticate with GitHub Copilot.'));
-      }
+      return reject(new Error('No OAuth token available'));
     }
 
-    const config = AI_PROVIDERS.copilot;
-    const hasVision = messages.some(m => Array.isArray(m.content));
-    
-    const data = JSON.stringify({
-      model: hasVision ? config.visionModel : config.model,
-      messages: messages,
-      max_tokens: 2048,
-      temperature: 0.7,
-      stream: false
-    });
+    console.log('[Copilot] Exchanging OAuth token for session token...');
+    console.log('[Copilot] OAuth token prefix:', apiKeys.copilot.substring(0, 10) + '...');
 
+    // First try the Copilot internal endpoint
     const options = {
-      hostname: config.baseUrl,
-      path: config.path,
-      method: 'POST',
+      hostname: 'api.github.com',
+      path: '/copilot_internal/v2/token',
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKeys.copilot}`,
-        'Editor-Version': 'vscode/1.85.0',
-        'Editor-Plugin-Version': 'copilot/1.0.0',
-        'Copilot-Integration-Id': 'copilot-agent-overlay',
-        'Content-Length': Buffer.byteLength(data)
+        'Authorization': `token ${apiKeys.copilot}`,
+        'Accept': 'application/json',
+        'User-Agent': 'GithubCopilot/1.155.0',
+        'Editor-Version': 'vscode/1.96.0',
+        'Editor-Plugin-Version': 'copilot-chat/0.22.0'
       }
     };
 
@@ -422,30 +521,200 @@ function callCopilot(messages) {
       let body = '';
       res.on('data', chunk => body += chunk);
       res.on('end', () => {
+        console.log('[Copilot] Token exchange response:', res.statusCode);
+        console.log('[Copilot] Response body preview:', body.substring(0, 200));
+        
+        if (res.statusCode === 401 || res.statusCode === 403) {
+          console.log('[Copilot] Token exchange got', res.statusCode, '- will use OAuth token directly');
+          apiKeys.copilotSession = apiKeys.copilot;
+          return resolve(apiKeys.copilot);
+        }
+        
         try {
-          if (res.statusCode === 401) {
-            // Token expired or invalid
-            apiKeys.copilot = '';
-            return reject(new Error('Token expired. Use /login to re-authenticate.'));
-          }
-          
           const result = JSON.parse(body);
-          if (result.choices && result.choices[0]) {
-            resolve(result.choices[0].message.content);
-          } else if (result.error) {
-            reject(new Error(result.error.message || 'Copilot API error'));
+          if (result.token) {
+            apiKeys.copilotSession = result.token;
+            console.log('[Copilot] Session token obtained successfully, expires:', result.expires_at);
+            console.log('[Copilot] Session token prefix:', result.token.substring(0, 15) + '...');
+            resolve(result.token);
+          } else if (result.message) {
+            console.log('[Copilot] API message:', result.message);
+            apiKeys.copilotSession = apiKeys.copilot;
+            resolve(apiKeys.copilot);
           } else {
-            reject(new Error('Invalid response from Copilot'));
+            console.log('[Copilot] Unexpected response format, using OAuth token');
+            apiKeys.copilotSession = apiKeys.copilot;
+            resolve(apiKeys.copilot);
           }
         } catch (e) {
-          reject(new Error(`Parse error: ${e.message}`));
+          console.log('[Copilot] Token exchange parse error:', e.message);
+          apiKeys.copilotSession = apiKeys.copilot;
+          resolve(apiKeys.copilot);
         }
       });
     });
 
-    req.on('error', reject);
-    req.write(data);
+    req.on('error', (e) => {
+      console.log('[Copilot] Token exchange network error:', e.message);
+      apiKeys.copilotSession = apiKeys.copilot;
+      resolve(apiKeys.copilot);
+    });
+    
     req.end();
+  });
+}
+
+/**
+ * Call GitHub Copilot API
+ * Uses session token (not OAuth token) - exchanges if needed
+ */
+async function callCopilot(messages) {
+  // Ensure we have OAuth token
+  if (!apiKeys.copilot) {
+    if (!loadCopilotToken()) {
+      throw new Error('Not authenticated. Use /login to authenticate with GitHub Copilot.');
+    }
+  }
+
+  // Exchange for session token if we don't have one
+  if (!apiKeys.copilotSession) {
+    try {
+      await exchangeForCopilotSession();
+    } catch (e) {
+      throw new Error(`Session token exchange failed: ${e.message}`);
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    const hasVision = messages.some(m => Array.isArray(m.content));
+    const modelInfo = COPILOT_MODELS[currentCopilotModel] || COPILOT_MODELS['gpt-4o'];
+    const modelId = hasVision && !modelInfo.vision ? 'gpt-4o' : modelInfo.id;
+    
+    console.log(`[Copilot] Vision request: ${hasVision}, Model: ${modelId}`);
+    
+    const data = JSON.stringify({
+      model: modelId,
+      messages: messages,
+      max_tokens: 4096,
+      temperature: 0.7,
+      stream: false
+    });
+
+    // Try multiple endpoint formats
+    const tryEndpoint = (hostname, pathPrefix = '') => {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKeys.copilotSession}`,
+        'Accept': 'application/json',
+        'User-Agent': 'GithubCopilot/1.0.0',
+        'Editor-Version': 'vscode/1.96.0',
+        'Editor-Plugin-Version': 'copilot-chat/0.22.0',
+        'Copilot-Integration-Id': 'vscode-chat',
+        'X-Request-Id': `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        'Openai-Organization': 'github-copilot',
+        'Openai-Intent': 'conversation-panel',
+        'Content-Length': Buffer.byteLength(data)
+      };
+      
+      // CRITICAL: Add vision header for image requests
+      if (hasVision) {
+        headers['Copilot-Vision-Request'] = 'true';
+        console.log('[Copilot] Added Copilot-Vision-Request header');
+      }
+      
+      const options = {
+        hostname: hostname,
+        path: pathPrefix + '/chat/completions',
+        method: 'POST',
+        headers: headers
+      };
+
+      console.log(`[Copilot] Calling ${hostname}${options.path} with model ${modelId}...`);
+
+      return new Promise((resolveReq, rejectReq) => {
+        const req = https.request(options, (res) => {
+          let body = '';
+          res.on('data', chunk => body += chunk);
+          res.on('end', () => {
+            console.log('[Copilot] API response status:', res.statusCode);
+            
+            if (res.statusCode === 401) {
+              // Session token expired, clear it
+              apiKeys.copilotSession = '';
+              return rejectReq(new Error('SESSION_EXPIRED'));
+            }
+            
+            if (res.statusCode === 403) {
+              return rejectReq(new Error('ACCESS_DENIED'));
+            }
+            
+            if (res.statusCode >= 400) {
+              console.error('[Copilot] Error response:', body.substring(0, 300));
+              return rejectReq(new Error(`API_ERROR_${res.statusCode}: ${body.substring(0, 200)}`));
+            }
+
+            try {
+              const result = JSON.parse(body);
+              if (result.choices && result.choices[0]) {
+                resolveReq(result.choices[0].message.content);
+              } else if (result.error) {
+                rejectReq(new Error(result.error.message || 'Copilot API error'));
+              } else {
+                console.error('[Copilot] Unexpected response:', JSON.stringify(result).substring(0, 300));
+                rejectReq(new Error('Invalid response format'));
+              }
+            } catch (e) {
+              console.error('[Copilot] Parse error. Body:', body.substring(0, 300));
+              rejectReq(new Error(`PARSE_ERROR: ${body.substring(0, 100)}`));
+            }
+          });
+        });
+
+        req.on('error', (e) => {
+          console.error('[Copilot] Request error:', e.message);
+          rejectReq(e);
+        });
+        
+        req.write(data);
+        req.end();
+      });
+    };
+
+    // Try primary endpoint first
+    tryEndpoint('api.githubcopilot.com')
+      .then(resolve)
+      .catch(async (err) => {
+        console.log('[Copilot] Primary endpoint failed:', err.message);
+        
+        // If session expired, re-exchange and retry once
+        if (err.message === 'SESSION_EXPIRED') {
+          try {
+            await exchangeForCopilotSession();
+            const result = await tryEndpoint('api.githubcopilot.com');
+            return resolve(result);
+          } catch (retryErr) {
+            return reject(new Error('Session expired. Please try /login again.'));
+          }
+        }
+        
+        // Try alternate endpoint
+        try {
+          console.log('[Copilot] Trying alternate endpoint...');
+          const result = await tryEndpoint('copilot-proxy.githubusercontent.com', '/v1');
+          resolve(result);
+        } catch (altErr) {
+          console.log('[Copilot] Alternate endpoint also failed:', altErr.message);
+          
+          // Return user-friendly error messages
+          if (err.message.includes('ACCESS_DENIED')) {
+            reject(new Error('Access denied. Ensure you have an active GitHub Copilot subscription.'));
+          } else if (err.message.includes('PARSE_ERROR')) {
+            reject(new Error('API returned invalid response. You may need to re-authenticate with /login'));
+          } else {
+            reject(new Error(`Copilot API error: ${err.message}`));
+          }
+        }
+      });
   });
 }
 
@@ -745,16 +1014,46 @@ function handleCommand(command) {
 
     case '/logout':
       apiKeys.copilot = '';
+      apiKeys.copilotSession = '';
       try {
         if (fs.existsSync(TOKEN_FILE)) fs.unlinkSync(TOKEN_FILE);
       } catch (e) {}
       return { type: 'system', message: 'Logged out from GitHub Copilot.' };
 
+    case '/model':
+      if (parts.length > 1) {
+        const model = parts[1].toLowerCase();
+        if (setCopilotModel(model)) {
+          const modelInfo = COPILOT_MODELS[model];
+          return { 
+            type: 'system', 
+            message: `Switched to ${modelInfo.name}${modelInfo.vision ? ' (supports vision)' : ''}`
+          };
+        } else {
+          const available = Object.entries(COPILOT_MODELS)
+            .map(([k, v]) => `  ${k} - ${v.name}`)
+            .join('\n');
+          return { 
+            type: 'error', 
+            message: `Unknown model. Available models:\n${available}`
+          };
+        }
+      } else {
+        const models = getCopilotModels();
+        const list = models.map(m => 
+          `${m.current ? '→' : ' '} ${m.id} - ${m.name}${m.vision ? ' 👁' : ''}`
+        ).join('\n');
+        return {
+          type: 'info',
+          message: `Current model: ${COPILOT_MODELS[currentCopilotModel].name}\n\nAvailable models:\n${list}\n\nUse /model <name> to switch`
+        };
+      }
+
     case '/status':
       const status = getStatus();
       return {
         type: 'info',
-        message: `Provider: ${status.provider}\nCopilot: ${status.hasCopilotKey ? 'Authenticated' : 'Not authenticated'}\nOpenAI: ${status.hasOpenAIKey ? 'Key set' : 'No key'}\nAnthropic: ${status.hasAnthropicKey ? 'Key set' : 'No key'}\nHistory: ${status.historyLength} messages\nVisual: ${status.visualContextCount} captures`
+        message: `Provider: ${status.provider}\nModel: ${COPILOT_MODELS[currentCopilotModel]?.name || currentCopilotModel}\nCopilot: ${status.hasCopilotKey ? 'Authenticated' : 'Not authenticated'}\nOpenAI: ${status.hasOpenAIKey ? 'Key set' : 'No key'}\nAnthropic: ${status.hasAnthropicKey ? 'Key set' : 'No key'}\nHistory: ${status.historyLength} messages\nVisual: ${status.visualContextCount} captures`
       };
 
     case '/help':
@@ -763,6 +1062,7 @@ function handleCommand(command) {
         message: `Available commands:
 /login - Authenticate with GitHub Copilot (recommended)
 /logout - Remove GitHub Copilot authentication
+/model [name] - List or set Copilot model
 /provider [name] - Get/set AI provider (copilot, openai, anthropic, ollama)
 /setkey <provider> <key> - Set API key
 /status - Show authentication status
@@ -793,18 +1093,441 @@ function setOAuthCallback(callback) {
 function getStatus() {
   return {
     provider: currentProvider,
+    model: currentCopilotModel,
+    modelName: COPILOT_MODELS[currentCopilotModel]?.name || currentCopilotModel,
     hasCopilotKey: !!apiKeys.copilot,
+    hasApiKey: currentProvider === 'copilot' ? !!apiKeys.copilot : 
+               currentProvider === 'openai' ? !!apiKeys.openai :
+               currentProvider === 'anthropic' ? !!apiKeys.anthropic : true,
     hasOpenAIKey: !!apiKeys.openai,
     hasAnthropicKey: !!apiKeys.anthropic,
     historyLength: conversationHistory.length,
     visualContextCount: visualContextBuffer.length,
-    availableProviders: Object.keys(AI_PROVIDERS)
+    availableProviders: Object.keys(AI_PROVIDERS),
+    copilotModels: getCopilotModels()
   };
+}
+
+// ===== SAFETY GUARDRAILS =====
+
+/**
+ * Action risk levels for safety classification
+ */
+const ActionRiskLevel = {
+  SAFE: 'SAFE',         // Read-only, no risk (e.g., screenshot)
+  LOW: 'LOW',           // Minor risk (e.g., scroll, move mouse)
+  MEDIUM: 'MEDIUM',     // Moderate risk (e.g., click, type text)
+  HIGH: 'HIGH',         // Significant risk (e.g., file operations, form submit)
+  CRITICAL: 'CRITICAL'  // Dangerous (e.g., delete, purchase, payment)
+};
+
+/**
+ * Dangerous text patterns that require user confirmation
+ */
+const DANGER_PATTERNS = [
+  // Destructive actions
+  /\b(delete|remove|erase|destroy|clear|reset|uninstall|format)\b/i,
+  // Financial actions
+  /\b(buy|purchase|order|checkout|pay|payment|subscribe|donate|transfer|send money)\b/i,
+  // Account actions
+  /\b(logout|log out|sign out|deactivate|close account|cancel subscription)\b/i,
+  // System actions
+  /\b(shutdown|restart|reboot|sleep|hibernate|power off)\b/i,
+  // Confirmation buttons with risk
+  /\b(confirm|yes,? delete|yes,? remove|permanently|irreversible|cannot be undone)\b/i,
+  // Administrative actions
+  /\b(admin|administrator|root|sudo|elevated|run as)\b/i
+];
+
+/**
+ * Safe/benign patterns that reduce risk level
+ */
+const SAFE_PATTERNS = [
+  /\b(cancel|back|close|dismiss|skip|later|no thanks|maybe later)\b/i,
+  /\b(search|find|view|show|display|open|read|look)\b/i,
+  /\b(help|info|about|settings|preferences)\b/i
+];
+
+/**
+ * Pending action awaiting user confirmation
+ */
+let pendingAction = null;
+
+/**
+ * Analyze the safety/risk level of an action
+ * @param {Object} action - The action to analyze
+ * @param {Object} targetInfo - Information about what's at the click target
+ * @returns {Object} Safety analysis result
+ */
+function analyzeActionSafety(action, targetInfo = {}) {
+  const result = {
+    actionId: `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    action: action,
+    targetInfo: targetInfo,
+    riskLevel: ActionRiskLevel.SAFE,
+    warnings: [],
+    requiresConfirmation: false,
+    description: '',
+    timestamp: Date.now()
+  };
+  
+  // Check action type base risk
+  switch (action.type) {
+    case 'screenshot':
+    case 'wait':
+      result.riskLevel = ActionRiskLevel.SAFE;
+      break;
+    case 'scroll':
+      result.riskLevel = ActionRiskLevel.LOW;
+      break;
+    case 'click':
+    case 'double_click':
+      result.riskLevel = ActionRiskLevel.MEDIUM;
+      break;
+    case 'right_click':
+      result.riskLevel = ActionRiskLevel.MEDIUM;
+      result.warnings.push('Right-click may open context menu with destructive options');
+      break;
+    case 'type':
+      result.riskLevel = ActionRiskLevel.MEDIUM;
+      // Check what's being typed
+      if (action.text && action.text.length > 100) {
+        result.warnings.push('Typing large amount of text');
+      }
+      break;
+    case 'key':
+      // Analyze key combinations
+      const key = (action.key || '').toLowerCase();
+      if (key.includes('delete') || key.includes('backspace')) {
+        result.riskLevel = ActionRiskLevel.HIGH;
+        result.warnings.push('Delete/Backspace key may remove content');
+      } else if (key.includes('enter') || key.includes('return')) {
+        result.riskLevel = ActionRiskLevel.MEDIUM;
+        result.warnings.push('Enter key may submit form or confirm action');
+      } else if (key.includes('ctrl') || key.includes('cmd') || key.includes('alt')) {
+        result.riskLevel = ActionRiskLevel.MEDIUM;
+        result.warnings.push('Keyboard shortcut detected');
+      }
+      break;
+    case 'drag':
+      result.riskLevel = ActionRiskLevel.MEDIUM;
+      break;
+  }
+  
+  // Check target info for dangerous patterns
+  const textToCheck = [
+    targetInfo.text || '',
+    targetInfo.buttonText || '',
+    targetInfo.label || '',
+    action.reason || '',
+    ...(targetInfo.nearbyText || [])
+  ].join(' ');
+  
+  // Check for danger patterns
+  for (const pattern of DANGER_PATTERNS) {
+    if (pattern.test(textToCheck)) {
+      result.riskLevel = ActionRiskLevel.HIGH;
+      result.warnings.push(`Detected risky keyword: ${textToCheck.match(pattern)?.[0]}`);
+      result.requiresConfirmation = true;
+    }
+  }
+  
+  // Check for safe patterns that might reduce risk
+  let hasSafePattern = false;
+  for (const pattern of SAFE_PATTERNS) {
+    if (pattern.test(textToCheck)) {
+      hasSafePattern = true;
+      break;
+    }
+  }
+  
+  // Elevate to CRITICAL if multiple danger flags
+  if (result.warnings.length >= 2 && result.riskLevel === ActionRiskLevel.HIGH) {
+    result.riskLevel = ActionRiskLevel.CRITICAL;
+  }
+  
+  // Always require confirmation for HIGH or CRITICAL
+  if (result.riskLevel === ActionRiskLevel.HIGH || result.riskLevel === ActionRiskLevel.CRITICAL) {
+    result.requiresConfirmation = true;
+  }
+  
+  // Generate human-readable description
+  result.description = describeAction(action, targetInfo);
+  
+  return result;
+}
+
+/**
+ * Generate human-readable description of an action
+ */
+function describeAction(action, targetInfo = {}) {
+  const target = targetInfo.text || targetInfo.buttonText || targetInfo.label || '';
+  const location = action.x !== undefined ? `at (${action.x}, ${action.y})` : '';
+  
+  switch (action.type) {
+    case 'click':
+      return `Click ${target ? `"${target}"` : ''} ${location}`.trim();
+    case 'double_click':
+      return `Double-click ${target ? `"${target}"` : ''} ${location}`.trim();
+    case 'right_click':
+      return `Right-click ${target ? `"${target}"` : ''} ${location}`.trim();
+    case 'type':
+      const preview = action.text?.length > 30 ? action.text.substring(0, 30) + '...' : action.text;
+      return `Type "${preview}"`;
+    case 'key':
+      return `Press ${action.key}`;
+    case 'scroll':
+      return `Scroll ${action.direction} ${action.amount || 3} times`;
+    case 'drag':
+      return `Drag from (${action.fromX}, ${action.fromY}) to (${action.toX}, ${action.toY})`;
+    case 'wait':
+      return `Wait ${action.ms}ms`;
+    case 'screenshot':
+      return 'Take screenshot';
+    default:
+      return `${action.type} action`;
+  }
+}
+
+/**
+ * Store pending action for user confirmation
+ */
+function setPendingAction(actionData) {
+  pendingAction = actionData;
+  return actionData.actionId;
+}
+
+/**
+ * Get pending action
+ */
+function getPendingAction() {
+  return pendingAction;
+}
+
+/**
+ * Clear pending action
+ */
+function clearPendingAction() {
+  pendingAction = null;
+}
+
+/**
+ * Confirm pending action
+ */
+function confirmPendingAction(actionId) {
+  if (pendingAction && pendingAction.actionId === actionId) {
+    const action = pendingAction;
+    pendingAction = null;
+    return action;
+  }
+  return null;
+}
+
+/**
+ * Reject pending action
+ */
+function rejectPendingAction(actionId) {
+  if (pendingAction && pendingAction.actionId === actionId) {
+    pendingAction = null;
+    return true;
+  }
+  return false;
+}
+
+// ===== AGENTIC ACTION HANDLING =====
+
+/**
+ * Parse AI response to extract actions
+ * @param {string} aiResponse - The AI's response text
+ * @returns {Object|null} Parsed action object or null if no actions
+ */
+function parseActions(aiResponse) {
+  return systemAutomation.parseAIActions(aiResponse);
+}
+
+/**
+ * Check if AI response contains actions
+ * @param {string} aiResponse - The AI's response text  
+ * @returns {boolean}
+ */
+function hasActions(aiResponse) {
+  const parsed = parseActions(aiResponse);
+  return parsed && parsed.actions && parsed.actions.length > 0;
+}
+
+/**
+ * Execute actions from AI response with safety checks
+ * @param {Object} actionData - Parsed action data with actions array
+ * @param {Function} onAction - Callback after each action
+ * @param {Function} onScreenshot - Callback when screenshot is needed
+ * @param {Object} options - Additional options
+ * @param {Function} options.onRequireConfirmation - Callback when action needs user confirmation
+ * @param {Object} options.targetAnalysis - Visual analysis of click targets
+ * @returns {Object} Execution results
+ */
+async function executeActions(actionData, onAction = null, onScreenshot = null, options = {}) {
+  if (!actionData || !actionData.actions || !Array.isArray(actionData.actions)) {
+    return { success: false, error: 'No valid actions provided' };
+  }
+
+  const { onRequireConfirmation, targetAnalysis = {}, actionExecutor } = options;
+
+  console.log('[AI-SERVICE] Executing actions:', actionData.thought || 'No thought provided');
+  console.log('[AI-SERVICE] Actions:', JSON.stringify(actionData.actions, null, 2));
+
+  const results = [];
+  let screenshotRequested = false;
+  let pendingConfirmation = false;
+
+  for (let i = 0; i < actionData.actions.length; i++) {
+    const action = actionData.actions[i];
+    
+    // Handle screenshot requests specially
+    if (action.type === 'screenshot') {
+      screenshotRequested = true;
+      if (onScreenshot) {
+        await onScreenshot();
+      }
+      results.push({ success: true, action: 'screenshot', message: 'Screenshot captured' });
+      continue;
+    }
+
+    // ===== SAFETY CHECK =====
+    // Get target info if available (from visual analysis)
+    const targetInfo = targetAnalysis[`${action.x},${action.y}`] || {
+      text: action.reason || '',
+      buttonText: action.targetText || '',
+      nearbyText: []
+    };
+    
+    // Analyze safety
+    const safety = analyzeActionSafety(action, targetInfo);
+    console.log(`[AI-SERVICE] Action ${i} safety: ${safety.riskLevel}`, safety.warnings);
+    
+    // If HIGH or CRITICAL risk, require confirmation
+    if (safety.requiresConfirmation) {
+      console.log(`[AI-SERVICE] Action ${i} requires user confirmation`);
+      
+      // Store as pending action
+      setPendingAction({
+        ...safety,
+        actionIndex: i,
+        remainingActions: actionData.actions.slice(i),
+        completedResults: [...results],
+        thought: actionData.thought,
+        verification: actionData.verification
+      });
+      
+      // Notify via callback
+      if (onRequireConfirmation) {
+        onRequireConfirmation(safety);
+      }
+      
+      pendingConfirmation = true;
+      break; // Stop execution, wait for confirmation
+    }
+
+    // Execute the action (SAFE/LOW/MEDIUM risk)
+    const result = await (actionExecutor ? actionExecutor(action) : systemAutomation.executeAction(action));
+    result.reason = action.reason || '';
+    result.safety = safety;
+    results.push(result);
+
+    // Callback for UI updates
+    if (onAction) {
+      onAction(result, i, actionData.actions.length);
+    }
+
+    // Stop on failure unless action specifies continue_on_error
+    if (!result.success && !action.continue_on_error) {
+      console.log(`[AI-SERVICE] Sequence stopped at action ${i} due to error`);
+      break;
+    }
+  }
+
+  return {
+    success: !pendingConfirmation && results.every(r => r.success),
+    thought: actionData.thought,
+    verification: actionData.verification,
+    results,
+    screenshotRequested,
+    pendingConfirmation,
+    pendingActionId: pendingConfirmation ? getPendingAction()?.actionId : null
+  };
+}
+
+/**
+ * Resume execution after user confirms pending action
+ * @param {Function} onAction - Callback after each action
+ * @param {Function} onScreenshot - Callback when screenshot is needed
+ * @returns {Object} Execution results
+ */
+async function resumeAfterConfirmation(onAction = null, onScreenshot = null, options = {}) {
+  const pending = getPendingAction();
+  if (!pending) {
+    return { success: false, error: 'No pending action to resume' };
+  }
+  
+  const { actionExecutor } = options;
+  
+  console.log('[AI-SERVICE] Resuming after user confirmation');
+  
+  const results = [...pending.completedResults];
+  let screenshotRequested = false;
+  
+  // Execute the confirmed action and remaining actions
+  for (let i = 0; i < pending.remainingActions.length; i++) {
+    const action = pending.remainingActions[i];
+    
+    if (action.type === 'screenshot') {
+      screenshotRequested = true;
+      if (onScreenshot) {
+        await onScreenshot();
+      }
+      results.push({ success: true, action: 'screenshot', message: 'Screenshot captured' });
+      continue;
+    }
+    
+    // Execute action (user confirmed, skip safety for first action)
+    const result = await (actionExecutor ? actionExecutor(action) : systemAutomation.executeAction(action));
+    result.reason = action.reason || '';
+    result.userConfirmed = i === 0; // First one was confirmed
+    results.push(result);
+    
+    if (onAction) {
+      onAction(result, pending.actionIndex + i, pending.actionIndex + pending.remainingActions.length);
+    }
+    
+    if (!result.success && !action.continue_on_error) {
+      break;
+    }
+  }
+  
+  clearPendingAction();
+  
+  return {
+    success: results.every(r => r.success),
+    thought: pending.thought,
+    verification: pending.verification,
+    results,
+    screenshotRequested,
+    userConfirmed: true
+  };
+}
+
+/**
+ * Convert grid coordinate to pixel position
+ */
+function gridToPixels(coord) {
+  return systemAutomation.gridToPixels(coord, { width: 1920, height: 1080 });
 }
 
 module.exports = {
   setProvider,
   setApiKey,
+  setCopilotModel,
+  getCopilotModels,
+  getCurrentCopilotModel,
   addVisualContext,
   getLatestVisualContext,
   clearVisualContext,
@@ -814,5 +1537,22 @@ module.exports = {
   startCopilotOAuth,
   setOAuthCallback,
   loadCopilotToken,
-  AI_PROVIDERS
+  AI_PROVIDERS,
+  COPILOT_MODELS,
+  // Agentic capabilities
+  parseActions,
+  hasActions,
+  executeActions,
+  gridToPixels,
+  systemAutomation,
+  // Safety guardrails
+  ActionRiskLevel,
+  analyzeActionSafety,
+  describeAction,
+  setPendingAction,
+  getPendingAction,
+  clearPendingAction,
+  confirmPendingAction,
+  rejectPendingAction,
+  resumeAfterConfirmation
 };

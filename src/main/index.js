@@ -25,6 +25,261 @@ const aiService = require('./ai-service.js');
 // Visual awareness for advanced screen analysis
 const visualAwareness = require('./visual-awareness.js');
 
+// ===== ACTION SAFETY GUARDRAILS =====
+// Risk levels for action classification
+const ActionRiskLevel = {
+  SAFE: 'safe',           // Read-only: screenshot, scroll view, hover
+  LOW: 'low',             // Navigation: click links, tabs, non-destructive buttons
+  MEDIUM: 'medium',       // Input: typing, form filling, selections
+  HIGH: 'high',           // Destructive: delete, remove, close, cancel
+  CRITICAL: 'critical'    // Financial: purchase, payment, account changes
+};
+
+// Dangerous action patterns that require elevated confirmation
+const DANGER_PATTERNS = {
+  critical: [
+    /\b(buy|purchase|order|checkout|pay|payment|subscribe|upgrade)\b/i,
+    /\b(confirm.*purchase|place.*order|complete.*transaction)\b/i,
+    /\b(add.*card|save.*payment|billing)\b/i,
+    /\b(delete.*account|close.*account|deactivate)\b/i,
+    /\b(unsubscribe|cancel.*subscription|downgrade)\b/i,
+    /\b(transfer|send.*money|withdraw)\b/i,
+  ],
+  high: [
+    /\b(delete|remove|trash|discard|erase|clear)\b/i,
+    /\b(cancel|abort|terminate|end|stop)\b/i,
+    /\b(uninstall|unlink|disconnect|revoke)\b/i,
+    /\b(reset|restore.*default|factory.*reset)\b/i,
+    /\b(sign.*out|log.*out|logout)\b/i,
+    /\b(submit|send|post|publish)\b/i,
+    /\b(accept|agree|confirm|approve)\b/i,
+    /\b(permanently|forever|cannot.*undo|irreversible)\b/i,
+  ],
+  medium: [
+    /\b(save|update|change|modify|edit)\b/i,
+    /\b(enable|disable|toggle|switch)\b/i,
+    /\b(select|choose|pick|set)\b/i,
+    /\b(upload|download|import|export)\b/i,
+  ]
+};
+
+// UI element types that indicate higher risk
+const HIGH_RISK_ELEMENTS = [
+  'button[class*="delete"]', 'button[class*="remove"]', 'button[class*="danger"]',
+  '[class*="destructive"]', '[class*="warning"]', '[class*="critical"]',
+  'input[type="submit"]', 'button[type="submit"]',
+  '[class*="checkout"]', '[class*="purchase"]', '[class*="payment"]'
+];
+
+/**
+ * Analyze text content to determine action risk level
+ * @param {string} text - Text to analyze (button label, nearby text, etc.)
+ * @returns {string} Risk level
+ */
+function analyzeTextRisk(text) {
+  if (!text) return ActionRiskLevel.LOW;
+  
+  const normalizedText = text.toLowerCase().trim();
+  
+  // Check critical patterns first
+  for (const pattern of DANGER_PATTERNS.critical) {
+    if (pattern.test(normalizedText)) {
+      return ActionRiskLevel.CRITICAL;
+    }
+  }
+  
+  // Check high-risk patterns
+  for (const pattern of DANGER_PATTERNS.high) {
+    if (pattern.test(normalizedText)) {
+      return ActionRiskLevel.HIGH;
+    }
+  }
+  
+  // Check medium-risk patterns
+  for (const pattern of DANGER_PATTERNS.medium) {
+    if (pattern.test(normalizedText)) {
+      return ActionRiskLevel.MEDIUM;
+    }
+  }
+  
+  return ActionRiskLevel.LOW;
+}
+
+/**
+ * Analyze an action and its target to determine risk and required confirmation
+ * @param {Object} action - The action to analyze
+ * @param {Object} targetInfo - Information about the target element/region
+ * @returns {Object} Analysis result with risk level, requires confirmation, and reasoning
+ */
+function analyzeActionSafety(action, targetInfo = {}) {
+  const analysis = {
+    riskLevel: ActionRiskLevel.SAFE,
+    requiresConfirmation: false,
+    requiresExplicitApproval: false,
+    reasoning: [],
+    warnings: [],
+    targetDescription: targetInfo.description || 'Unknown target'
+  };
+  
+  // Determine base risk from action type
+  switch (action.type) {
+    case 'screenshot':
+    case 'scroll':
+    case 'hover':
+    case 'wait':
+      analysis.riskLevel = ActionRiskLevel.SAFE;
+      analysis.reasoning.push('Read-only operation');
+      break;
+      
+    case 'click':
+      analysis.riskLevel = ActionRiskLevel.LOW;
+      analysis.reasoning.push('Click interaction');
+      
+      // Elevate risk based on target analysis
+      if (targetInfo.text) {
+        const textRisk = analyzeTextRisk(targetInfo.text);
+        if (textRisk === ActionRiskLevel.CRITICAL || textRisk === ActionRiskLevel.HIGH) {
+          analysis.riskLevel = textRisk;
+          analysis.reasoning.push(`Target text "${targetInfo.text}" indicates ${textRisk} risk`);
+        }
+      }
+      
+      if (targetInfo.nearbyText) {
+        const nearbyRisk = analyzeTextRisk(targetInfo.nearbyText);
+        if (nearbyRisk === ActionRiskLevel.CRITICAL) {
+          analysis.riskLevel = ActionRiskLevel.CRITICAL;
+          analysis.warnings.push(`Context suggests financial/critical action: "${targetInfo.nearbyText}"`);
+        } else if (nearbyRisk === ActionRiskLevel.HIGH && analysis.riskLevel !== ActionRiskLevel.CRITICAL) {
+          analysis.riskLevel = ActionRiskLevel.HIGH;
+          analysis.warnings.push(`Context suggests destructive action: "${targetInfo.nearbyText}"`);
+        }
+      }
+      break;
+      
+    case 'type':
+    case 'input':
+      analysis.riskLevel = ActionRiskLevel.MEDIUM;
+      analysis.reasoning.push('Text input operation');
+      
+      // Check if typing in sensitive fields
+      if (targetInfo.fieldType) {
+        if (['password', 'credit-card', 'cvv', 'ssn'].includes(targetInfo.fieldType)) {
+          analysis.riskLevel = ActionRiskLevel.HIGH;
+          analysis.warnings.push('Entering sensitive information');
+        }
+      }
+      break;
+      
+    case 'key':
+    case 'hotkey':
+      analysis.riskLevel = ActionRiskLevel.MEDIUM;
+      analysis.reasoning.push('Keyboard shortcut');
+      
+      // Check for dangerous shortcuts
+      const key = action.params?.key?.toLowerCase() || '';
+      if (key.includes('delete') || key.includes('backspace')) {
+        analysis.riskLevel = ActionRiskLevel.HIGH;
+        analysis.warnings.push('Delete key pressed');
+      }
+      if (key.includes('enter') || key.includes('return')) {
+        // Enter could submit forms
+        analysis.riskLevel = ActionRiskLevel.MEDIUM;
+        analysis.reasoning.push('Enter key may submit form');
+      }
+      break;
+      
+    default:
+      analysis.riskLevel = ActionRiskLevel.MEDIUM;
+      analysis.reasoning.push('Unknown action type');
+  }
+  
+  // Set confirmation requirements based on risk level
+  switch (analysis.riskLevel) {
+    case ActionRiskLevel.CRITICAL:
+      analysis.requiresConfirmation = true;
+      analysis.requiresExplicitApproval = true;
+      analysis.warnings.push('⚠️ CRITICAL: This action may involve financial transaction or account changes');
+      break;
+    case ActionRiskLevel.HIGH:
+      analysis.requiresConfirmation = true;
+      analysis.requiresExplicitApproval = true;
+      analysis.warnings.push('⚠️ HIGH RISK: This action may be destructive or irreversible');
+      break;
+    case ActionRiskLevel.MEDIUM:
+      analysis.requiresConfirmation = true;
+      analysis.requiresExplicitApproval = false;
+      break;
+    default:
+      analysis.requiresConfirmation = false;
+      analysis.requiresExplicitApproval = false;
+  }
+  
+  return analysis;
+}
+
+/**
+ * Format a human-readable description of what an action will do
+ * @param {Object} action - The action object
+ * @param {Object} targetInfo - Target analysis results
+ * @returns {string} Human-readable description
+ */
+function describeAction(action, targetInfo = {}) {
+  const parts = [];
+  
+  switch (action.type) {
+    case 'click':
+      parts.push(`Click at`);
+      if (action.params?.label) {
+        parts.push(`grid position ${action.params.label}`);
+      } else if (action.params?.x !== undefined) {
+        parts.push(`coordinates (${action.params.x}, ${action.params.y})`);
+      }
+      if (targetInfo.text) {
+        parts.push(`on "${targetInfo.text}"`);
+      }
+      if (targetInfo.elementType) {
+        parts.push(`(${targetInfo.elementType})`);
+      }
+      break;
+      
+    case 'type':
+      const text = action.params?.text || '';
+      const preview = text.length > 50 ? text.substring(0, 50) + '...' : text;
+      parts.push(`Type "${preview}"`);
+      if (targetInfo.fieldName) {
+        parts.push(`into ${targetInfo.fieldName}`);
+      }
+      break;
+      
+    case 'key':
+      parts.push(`Press ${action.params?.key || 'key'}`);
+      if (action.params?.modifiers?.length) {
+        parts.push(`with ${action.params.modifiers.join('+')}`);
+      }
+      break;
+      
+    case 'screenshot':
+      parts.push('Capture screenshot');
+      break;
+      
+    case 'scroll':
+      parts.push(`Scroll ${action.params?.direction || 'down'}`);
+      break;
+      
+    case 'wait':
+      parts.push(`Wait ${action.params?.duration || 1000}ms`);
+      break;
+      
+    default:
+      parts.push(`Execute ${action.type} action`);
+  }
+  
+  return parts.join(' ');
+}
+
+// Store pending actions awaiting confirmation
+let pendingConfirmation = null;
+
 // Ensure caches land in a writable location to avoid Windows permission issues
 const cacheRoot = path.join(os.tmpdir(), 'copilot-liku-electron-cache');
 const mediaCache = path.join(cacheRoot, 'media');
@@ -59,7 +314,7 @@ let isChatVisible = false;
  * Create the transparent overlay window that floats above all other windows
  */
 function createOverlayWindow() {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const { width, height } = screen.getPrimaryDisplay().bounds;
   
   overlayWindow = new BrowserWindow({
     width,
@@ -469,7 +724,12 @@ function registerOverlayShortcuts() {
   globalShortcut.register('CommandOrControl+Alt+F', () => {
     if (overlayWindow && overlayMode === 'selection') {
       console.log('[SHORTCUTS] Ctrl+Alt+F pressed - toggle fine grid');
+      console.log('[SHORTCUTS] overlayWindow destroyed?', overlayWindow.isDestroyed());
+      console.log('[SHORTCUTS] Sending overlay-command to webContents');
       overlayWindow.webContents.send('overlay-command', { action: 'toggle-fine' });
+      console.log('[SHORTCUTS] Sent overlay-command');
+    } else {
+      console.log('[SHORTCUTS] Ctrl+Alt+F pressed but not in selection mode or no overlay');
     }
   });
   
@@ -566,12 +826,29 @@ function setupIPC() {
     setOverlayMode(mode);
   });
 
+  // Agentic mode flag (when true, actions execute automatically)
+  let agenticMode = false;
+  let pendingActions = null;
+
   // Handle chat messages
   ipcMain.on('chat-message', async (event, message) => {
     console.log('Chat message:', message);
     
     // Check for slash commands first
     if (message.startsWith('/')) {
+      // Handle agentic mode toggle
+      if (message === '/agentic' || message === '/agent') {
+        agenticMode = !agenticMode;
+        if (chatWindow) {
+          chatWindow.webContents.send('agent-response', {
+            text: `Agentic mode ${agenticMode ? 'ENABLED' : 'DISABLED'}. ${agenticMode ? 'Actions will execute automatically.' : 'Actions will require confirmation.'}`,
+            type: 'system',
+            timestamp: Date.now()
+          });
+        }
+        return;
+      }
+      
       let commandResult = aiService.handleCommand(message);
       
       // Handle async commands (like /login)
@@ -591,12 +868,17 @@ function setupIPC() {
       }
     }
 
-    // Check if we should include visual context
+    // Check if we should include visual context (expanded triggers for agentic actions)
     const includeVisualContext = message.toLowerCase().includes('screen') || 
                                   message.toLowerCase().includes('see') ||
                                   message.toLowerCase().includes('look') ||
                                   message.toLowerCase().includes('show') ||
                                   message.toLowerCase().includes('capture') ||
+                                  message.toLowerCase().includes('click') ||
+                                  message.toLowerCase().includes('type') ||
+                                  message.toLowerCase().includes('print') ||
+                                  message.toLowerCase().includes('open') ||
+                                  message.toLowerCase().includes('close') ||
                                   visualContextHistory.length > 0;
 
     // Send initial "thinking" indicator
@@ -614,12 +896,43 @@ function setupIPC() {
         chatWindow.webContents.send('agent-typing', { isTyping: false });
         
         if (result.success) {
-          chatWindow.webContents.send('agent-response', {
-            text: result.message,
-            timestamp: Date.now(),
-            provider: result.provider,
-            hasVisualContext: result.hasVisualContext
-          });
+          // Check if response contains actions
+          console.log('[AGENTIC] Parsing response for actions...');
+          const actionData = aiService.parseActions(result.message);
+          console.log('[AGENTIC] parseActions result:', actionData ? 'found' : 'null');
+          
+          if (actionData && actionData.actions && actionData.actions.length > 0) {
+            console.log('[AGENTIC] AI returned actions:', actionData.actions.length);
+            console.log('[AGENTIC] Actions:', JSON.stringify(actionData.actions));
+            
+            // Store pending actions
+            pendingActions = actionData;
+            
+            // Send response with action data
+            chatWindow.webContents.send('agent-response', {
+              text: result.message,
+              timestamp: Date.now(),
+              provider: result.provider,
+              hasVisualContext: result.hasVisualContext,
+              hasActions: true,
+              actionData: actionData
+            });
+            
+            // If agentic mode, execute immediately
+            if (agenticMode) {
+              console.log('[AGENTIC] Auto-executing actions (agentic mode)');
+              executeActionsAndRespond(actionData);
+            }
+          } else {
+            console.log('[AGENTIC] No actions detected in response');
+            // Normal response without actions
+            chatWindow.webContents.send('agent-response', {
+              text: result.message,
+              timestamp: Date.now(),
+              provider: result.provider,
+              hasVisualContext: result.hasVisualContext
+            });
+          }
         } else {
           chatWindow.webContents.send('agent-response', {
             text: `Error: ${result.error}`,
@@ -641,6 +954,501 @@ function setupIPC() {
     }
   });
 
+  // Helper for executing actions with visual feedback and overlay management
+  async function performSafeAgenticAction(action) {
+    // Only intercept clicks/drags that need overlay interaction
+    if (action.type === 'click' || action.type === 'double_click' || action.type === 'right_click' || action.type === 'drag') {
+       let x = action.x || action.fromX;
+       let y = action.y || action.fromY;
+       
+       // Coordinate Scaling for Precision (Fix for Q4)
+       // If visual context exists, scale from Image Space -> Screen Space
+       const latestVisual = aiService.getLatestVisualContext();
+       if (latestVisual && latestVisual.width && latestVisual.height) {
+         const display = screen.getPrimaryDisplay();
+         const screenW = display.bounds.width; // e.g., 1920
+         const screenH = display.bounds.height; // e.g., 1080
+         // Calculate scale multiples
+         const scaleX = screenW / latestVisual.width; 
+         const scaleY = screenH / latestVisual.height;
+         
+         // Only apply if there's a significant difference (e.g. > 1% mismatch)
+         if (Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01) {
+           console.log(`[EXECUTOR] Scaling coords from ${latestVisual.width}x${latestVisual.height} to ${screenW}x${screenH} (Target: ${x},${y})`);
+           x = Math.round(x * scaleX);
+           y = Math.round(y * scaleY);
+           // Update action object for system automation
+           if(action.x) action.x = x;
+           if(action.y) action.y = y;
+           if(action.fromX) action.fromX = x;
+           if(action.fromY) action.fromY = y;
+           if(action.toX) action.toX = Math.round(action.toX * scaleX);
+           if(action.toY) action.toY = Math.round(action.toY * scaleY);
+           console.log(`[EXECUTOR] Scaled target: ${x},${y}`);
+         }
+       }
+       
+       console.log(`[EXECUTOR] Intercepting ${action.type} at (${x},${y})`);
+
+       // 1. Visual Feedback (Pulse - Doppler Effect)
+       if (overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.webContents) {
+         overlayWindow.webContents.send('overlay-command', {
+           action: 'pulse-click',
+           x: x, 
+           y: y,
+           label: action.reason ? 'Action' : undefined
+         });
+       }
+       
+       // 2. Wait for user to see pulse (Doppler expansion)
+       await new Promise(r => setTimeout(r, 600));
+       
+       // 3. Prepare for Pass-through
+       const wasVisible = overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible();
+       if (wasVisible) {
+         // A. Disable renderer pointer-events (CSS level)
+         // This ensures elements like dots don't capture the click
+         overlayWindow.webContents.send('overlay-command', {
+           action: 'set-click-through',
+           enabled: true
+         });
+
+         // B. Set Electron window to ignore mouse events FULLY (no forwarding)
+         // This ensures the window is completely transparent to the OS mouse subsystem
+         overlayWindow.setIgnoreMouseEvents(true);
+         
+         // Give OS time to update window regions
+         await new Promise(r => setTimeout(r, 50));
+       }
+       
+       // 4. Exec via System Automation
+       let result;
+       try {
+         result = await aiService.systemAutomation.executeAction(action);
+       } catch (e) {
+         result = { success: false, error: e.message };
+       }
+       
+       // 5. Restore Overlay Interactability
+       if (wasVisible && overlayWindow && !overlayWindow.isDestroyed()) {
+         // Brief delay to ensure OS processed the click
+         await new Promise(r => setTimeout(r, 50));
+         
+         // A. Restore renderer pointer-events
+         overlayWindow.webContents.send('overlay-command', {
+           action: 'set-click-through',
+           enabled: false
+         });
+         
+         // B. Restore Electron window behavior (forwarding enabled for UI interaction)
+         // Note: We use forward: true so users can click dots but see through transparent areas
+         overlayWindow.setIgnoreMouseEvents(true, { forward: true });
+       }
+       
+       return result;
+    }
+    
+    // Non-spatial actions (type, key, wait) - just execute
+    return aiService.systemAutomation.executeAction(action);
+  }
+
+  // Execute actions and send results
+  async function executeActionsAndRespond(actionData) {
+    if (!chatWindow) return;
+    
+    chatWindow.webContents.send('action-executing', { 
+      thought: actionData.thought,
+      total: actionData.actions.length 
+    });
+    
+    try {
+      const results = await aiService.executeActions(
+        actionData,
+        // Progress callback
+        (result, index, total) => {
+          chatWindow.webContents.send('action-progress', {
+            current: index + 1,
+            total,
+            result
+          });
+        },
+        // Screenshot callback - MUST hide overlay before capture
+        async () => {
+          // Hide overlay before capturing so AI sees actual screen
+          const wasOverlayVisible = overlayWindow && overlayWindow.isVisible();
+          if (wasOverlayVisible) {
+            overlayWindow.hide();
+            await new Promise(resolve => setTimeout(resolve, 50));
+          }
+
+          const sources = await require('electron').desktopCapturer.getSources({
+            types: ['screen'],
+            thumbnailSize: { 
+              width: screen.getPrimaryDisplay().bounds.width,
+              height: screen.getPrimaryDisplay().bounds.height
+            }
+          });
+
+          // Restore overlay after capture
+          if (wasOverlayVisible && overlayWindow) {
+            overlayWindow.show();
+          }
+
+          if (sources.length > 0) {
+            const imageData = {
+              dataURL: sources[0].thumbnail.toDataURL(),
+              width: sources[0].thumbnail.getSize().width,
+              height: sources[0].thumbnail.getSize().height,
+              timestamp: Date.now()
+            };
+            storeVisualContext(imageData);
+          }
+        },
+        // Options with safe executor
+        { actionExecutor: performSafeAgenticAction }
+      );
+      
+      // Send completion notification
+      chatWindow.webContents.send('action-complete', {
+        success: results.success,
+        actionsCount: actionData.actions.length,
+        thought: results.thought,
+        verification: results.verification,
+        results: results.results
+      });
+      
+      // If screenshot was requested, capture and show result
+      if (results.screenshotRequested) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Hide overlay before capturing
+        const wasOverlayVisible = overlayWindow && overlayWindow.isVisible();
+        if (wasOverlayVisible) {
+          overlayWindow.hide();
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
+        const sources = await require('electron').desktopCapturer.getSources({
+          types: ['screen'],
+          thumbnailSize: { 
+            width: screen.getPrimaryDisplay().bounds.width,
+            height: screen.getPrimaryDisplay().bounds.height
+          }
+        });
+
+        // Restore overlay after capture
+        if (wasOverlayVisible && overlayWindow) {
+          overlayWindow.show();
+        }
+
+        if (sources.length > 0) {
+          const imageData = {
+            dataURL: sources[0].thumbnail.toDataURL(),
+            width: sources[0].thumbnail.getSize().width,
+            height: sources[0].thumbnail.getSize().height,
+            timestamp: Date.now()
+          };
+          storeVisualContext(imageData);
+          chatWindow.webContents.send('screen-captured', imageData);
+        }
+      }
+      
+    } catch (error) {
+      console.error('[AGENTIC] Action execution error:', error);
+      chatWindow.webContents.send('action-complete', {
+        success: false,
+        actionsCount: actionData.actions ? actionData.actions.length : 0,
+        error: error.message
+      });
+    }
+    
+    pendingActions = null;
+  }
+
+  // Handle confirmed action execution
+  ipcMain.on('execute-actions', async (event, actionData) => {
+    console.log('[AGENTIC] User confirmed action execution');
+    await executeActionsAndRespond(actionData || pendingActions);
+  });
+
+  // Handle action cancellation
+  ipcMain.on('cancel-actions', () => {
+    console.log('[AGENTIC] User cancelled actions');
+    pendingActions = null;
+    aiService.clearPendingAction();
+    if (chatWindow) {
+      chatWindow.webContents.send('agent-response', {
+        text: 'Actions cancelled.',
+        type: 'system',
+        timestamp: Date.now()
+      });
+    }
+  });
+
+  // ===== SAFETY GUARDRAILS IPC HANDLERS =====
+  
+  // Analyze action safety before execution
+  ipcMain.handle('analyze-action-safety', (event, { action, targetInfo }) => {
+    return aiService.analyzeActionSafety(action, targetInfo || {});
+  });
+
+  // Get pending action awaiting confirmation
+  ipcMain.handle('get-pending-action', () => {
+    return aiService.getPendingAction();
+  });
+
+  // Confirm pending action and resume execution
+  ipcMain.handle('confirm-pending-action', async (event, { actionId }) => {
+    console.log('[SAFETY] User confirmed action:', actionId);
+    
+    const pending = aiService.getPendingAction();
+    if (!pending || pending.actionId !== actionId) {
+      return { success: false, error: 'No matching pending action' };
+    }
+    
+    // Resume execution after confirmation
+    try {
+      const results = await aiService.resumeAfterConfirmation(
+        // Progress callback
+        (result, index, total) => {
+          if (chatWindow && !chatWindow.isDestroyed()) {
+            chatWindow.webContents.send('action-progress', {
+              current: index + 1,
+              total,
+              result,
+              userConfirmed: true
+            });
+          }
+        },
+        // Screenshot callback
+        async () => {
+          if (overlayWindow && !overlayWindow.isDestroyed()) {
+            overlayWindow.hide();
+          }
+          await new Promise(r => setTimeout(r, 100));
+          
+          const sources = await desktopCapturer.getSources({
+            types: ['screen'],
+            thumbnailSize: { 
+              width: screen.getPrimaryDisplay().bounds.width,
+              height: screen.getPrimaryDisplay().bounds.height
+            }
+          });
+          
+          if (overlayWindow && !overlayWindow.isDestroyed()) {
+            overlayWindow.show();
+          }
+          
+          if (sources.length > 0) {
+            const imageData = {
+              dataURL: sources[0].thumbnail.toDataURL(),
+              width: sources[0].thumbnail.getSize().width,
+              height: sources[0].thumbnail.getSize().height,
+              timestamp: Date.now()
+            };
+            storeVisualContext(imageData);
+          }
+        },
+        // Options with safe executor
+        { actionExecutor: performSafeAgenticAction }
+      );
+      
+      // Notify chat of completion
+      if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.webContents.send('action-complete', {
+          success: results.success,
+          userConfirmed: true,
+          results: results.results
+        });
+      }
+      
+      return { success: true, results };
+    } catch (error) {
+      console.error('[SAFETY] Resume after confirmation failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Reject pending action
+  ipcMain.handle('reject-pending-action', (event, { actionId }) => {
+    console.log('[SAFETY] User rejected action:', actionId);
+    
+    const rejected = aiService.rejectPendingAction(actionId);
+    
+    if (rejected && chatWindow && !chatWindow.isDestroyed()) {
+      chatWindow.webContents.send('action-rejected', {
+        actionId,
+        message: 'Action rejected by user'
+      });
+      chatWindow.webContents.send('agent-response', {
+        text: '🛡️ Action rejected. The potentially risky action was not executed.',
+        type: 'system',
+        timestamp: Date.now()
+      });
+    }
+    
+    return { success: rejected };
+  });
+
+  // Convert grid label to screen coordinates
+  ipcMain.handle('label-to-coordinates', (event, label) => {
+    // Use gridToPixels from ai-service which uses system-automation
+    const coords = aiService.gridToPixels(label);
+    if (coords) {
+      return {
+        success: true,
+        label,
+        x: coords.x,
+        y: coords.y,
+        screenX: coords.x,
+        screenY: coords.y
+      };
+    }
+    return { success: false, error: `Invalid grid label: ${label}` };
+  });
+
+  // Safe click with overlay hide/show and safety analysis
+  ipcMain.handle('safe-click-at', async (event, { x, y, button = 'left', label, targetInfo }) => {
+    console.log(`[SAFETY] Safe click requested at (${x}, ${y}), button: ${button}`);
+    
+    // Analyze safety
+    const action = { type: 'click', x, y, button, reason: label || '' };
+    const safety = aiService.analyzeActionSafety(action, targetInfo || {});
+    
+    // If HIGH or CRITICAL, don't execute - require explicit confirmation
+    if (safety.requiresConfirmation) {
+      console.log(`[SAFETY] Click requires confirmation: ${safety.riskLevel}`);
+      
+      aiService.setPendingAction({
+        ...safety,
+        actionIndex: 0,
+        remainingActions: [action],
+        completedResults: [],
+        thought: `Click at (${x}, ${y})`,
+        verification: 'Verify click target'
+      });
+      
+      // Notify chat window
+      if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.webContents.send('action-requires-confirmation', {
+          actionId: safety.actionId,
+          action: action,
+          safety: safety,
+          description: safety.description,
+          riskLevel: safety.riskLevel,
+          warnings: safety.warnings
+        });
+      }
+      
+      return {
+        success: false,
+        pending: true,
+        actionId: safety.actionId,
+        riskLevel: safety.riskLevel,
+        message: `Action requires confirmation: ${safety.warnings.join(', ')}`
+      };
+    }
+    
+    // SAFE/LOW/MEDIUM - execute with visual feedback
+    try {
+      // INJECTION: Ensure visual feedback system is loaded
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+         try {
+             const isLoaded = await overlayWindow.webContents.executeJavaScript('window.hasPulseSystem === true').catch(() => false);
+             
+             if (!isLoaded) {
+                 const css = `
+                    .pulse-ring {
+                      position: absolute;
+                      border-radius: 50%;
+                      pointer-events: none;
+                      animation: pulse-animation 0.8s ease-out forwards;
+                      border: 2px solid #00ffcc;
+                      background: radial-gradient(circle, rgba(0,255,204,0.3) 0%, rgba(0,255,204,0) 70%);
+                      box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+                      z-index: 2147483647;
+                      transform: translate(-50%, -50%);
+                    }
+                    @keyframes pulse-animation {
+                      0% { width: 10px; height: 10px; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                      100% { width: 100px; height: 100px; opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+                    }
+                 `;
+                 await overlayWindow.webContents.insertCSS(css);
+                 overlayWindow.webContents.executeJavaScript(`
+                    const { ipcRenderer } = require('electron');
+                    window.showPulseClick = (x, y) => {
+                      const el = document.createElement('div');
+                      el.className = 'pulse-ring';
+                      el.style.left = x + 'px';
+                      el.style.top = y + 'px';
+                      document.body.appendChild(el);
+                      setTimeout(() => el.remove(), 1000);
+                    };
+                    ipcRenderer.removeAllListeners('overlay-command');
+                    ipcRenderer.on('overlay-command', (event, data) => {
+                        if (data.action === 'pulse-click') window.showPulseClick(data.x, data.y);
+                    });
+                    window.hasPulseSystem = true;
+                 `);
+             }
+         } catch(e) { console.error('Safe click injection error:', e); }
+      }
+
+      // Show visual indicator on overlay
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.webContents.send('overlay-command', {
+          action: 'pulse-click', // Updated to pulse
+          x, y,
+          label: label || `${x},${y}`
+        });
+      }
+      
+      await new Promise(r => setTimeout(r, 150));
+      
+      // Hide overlay for click-through
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.hide();
+      }
+      
+      await new Promise(r => setTimeout(r, 50));
+      
+      // Execute click via system-automation
+      const result = await aiService.systemAutomation.executeAction({
+        type: 'click',
+        x: Math.round(x),
+        y: Math.round(y),
+        button
+      });
+      
+      await new Promise(r => setTimeout(r, 100));
+      
+      // Restore overlay
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.show();
+      }
+      
+      console.log(`[SAFETY] Click executed: ${result.success}`);
+      
+      return {
+        success: result.success,
+        x, y,
+        riskLevel: safety.riskLevel,
+        error: result.error
+      };
+      
+    } catch (error) {
+      console.error('[SAFETY] Safe click failed:', error);
+      
+      // Always restore overlay on error
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.show();
+      }
+      
+      return { success: false, error: error.message };
+    }
+  });
+
   // ===== WINDOW CONTROLS =====
   ipcMain.on('minimize-chat', () => {
     if (chatWindow) {
@@ -656,15 +1464,29 @@ function setupIPC() {
   });
 
   // ===== SCREEN CAPTURE (AI Visual Awareness) =====
+  // CRITICAL: Hide overlay before capture so AI sees actual screen content without dots
   ipcMain.on('capture-screen', async (event, options = {}) => {
     try {
+      // Hide overlay BEFORE capturing so screenshot shows actual screen (not dots)
+      const wasOverlayVisible = overlayWindow && overlayWindow.isVisible();
+      if (wasOverlayVisible) {
+        overlayWindow.hide();
+        // Brief delay to ensure overlay is fully hidden
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
       const sources = await desktopCapturer.getSources({
         types: ['screen'],
         thumbnailSize: { 
-          width: screen.getPrimaryDisplay().workAreaSize.width,
-          height: screen.getPrimaryDisplay().workAreaSize.height
+          width: screen.getPrimaryDisplay().bounds.width,
+          height: screen.getPrimaryDisplay().bounds.height
         }
       });
+
+      // Restore overlay after capture
+      if (wasOverlayVisible && overlayWindow) {
+        overlayWindow.show();
+      }
 
       if (sources.length > 0) {
         const primarySource = sources[0];
@@ -688,13 +1510,17 @@ function setupIPC() {
         }
 
         // Log for debugging
-        console.log(`Screen captured: ${imageData.width}x${imageData.height}`);
+        console.log(`Screen captured: ${imageData.width}x${imageData.height} (overlay was ${wasOverlayVisible ? 'hidden' : 'already hidden'})`);
 
         // Store in visual context for AI processing
         storeVisualContext(imageData);
       }
     } catch (error) {
       console.error('Screen capture failed:', error);
+      // Ensure overlay is restored on error
+      if (overlayWindow && !overlayWindow.isVisible()) {
+        overlayWindow.show();
+      }
       if (chatWindow) {
         chatWindow.webContents.send('screen-captured', { error: error.message });
       }
@@ -704,13 +1530,25 @@ function setupIPC() {
   // Capture a specific region
   ipcMain.on('capture-region', async (event, { x, y, width, height }) => {
     try {
+      // Hide overlay BEFORE capturing
+      const wasOverlayVisible = overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible();
+      if (wasOverlayVisible) {
+        overlayWindow.hide();
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
       const sources = await desktopCapturer.getSources({
         types: ['screen'],
         thumbnailSize: { 
-          width: screen.getPrimaryDisplay().workAreaSize.width,
-          height: screen.getPrimaryDisplay().workAreaSize.height
+          width: screen.getPrimaryDisplay().bounds.width,
+          height: screen.getPrimaryDisplay().bounds.height
         }
       });
+
+      // Restore overlay after capture
+      if (wasOverlayVisible && overlayWindow) {
+        overlayWindow.show();
+      }
 
       if (sources.length > 0) {
         const primarySource = sources[0];
@@ -742,6 +1580,10 @@ function setupIPC() {
       }
     } catch (error) {
       console.error('Region capture failed:', error);
+      // Ensure overlay is restored on error
+      if (overlayWindow && !overlayWindow.isVisible()) {
+        overlayWindow.show();
+      }
     }
   });
 
@@ -753,14 +1595,142 @@ function setupIPC() {
       isChatVisible,
       visualContextCount: visualContextHistory.length,
       aiProvider: aiStatus.provider,
+      model: aiStatus.model,
       aiStatus
     };
   });
 
-  // Get AI service status
-  ipcMain.handle('get-ai-status', () => {
-    return aiService.getStatus();
+  // ===== AI CLICK-THROUGH AUTOMATION (Q4 FIX) =====
+  // This allows AI to click at coordinates THROUGH the overlay to the background app
+  // The overlay should NOT intercept these programmatic clicks
+  ipcMain.handle('click-through-at', async (event, { x, y, button = 'left', label }) => {
+    try {
+      console.log(`[CLICK-THROUGH] Executing click at (${x}, ${y}) label=${label || 'none'}`);
+
+      // INJECTION: Ensure visual feedback system is loaded on first click
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+         try {
+             // Check if pulse system is loaded in renderer
+             const isLoaded = await overlayWindow.webContents.executeJavaScript('window.hasPulseSystem === true').catch(() => false);
+             
+             if (!isLoaded) {
+                 console.log('[CLICK-THROUGH] Injecting visual feedback system...');
+                 const css = `
+                    .pulse-ring {
+                      position: absolute;
+                      border-radius: 50%;
+                      pointer-events: none;
+                      animation: pulse-animation 0.8s ease-out forwards;
+                      border: 2px solid #00ffcc;
+                      background: radial-gradient(circle, rgba(0,255,204,0.3) 0%, rgba(0,255,204,0) 70%);
+                      box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+                      z-index: 2147483647;
+                      transform: translate(-50%, -50%);
+                    }
+                    @keyframes pulse-animation {
+                      0% { width: 10px; height: 10px; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                      100% { width: 100px; height: 100px; opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+                    }
+                 `;
+                 await overlayWindow.webContents.insertCSS(css);
+                 
+                 const js = `
+                    const { ipcRenderer } = require('electron');
+                    window.showPulseClick = (x, y) => {
+                      const el = document.createElement('div');
+                      el.className = 'pulse-ring';
+                      el.style.left = x + 'px';
+                      el.style.top = y + 'px';
+                      document.body.appendChild(el);
+                      setTimeout(() => el.remove(), 1000);
+                    };
+                    ipcRenderer.removeAllListeners('overlay-command');
+                    ipcRenderer.on('overlay-command', (event, data) => {
+                        if (data.action === 'pulse-click') window.showPulseClick(data.x, data.y);
+                    });
+                    window.hasPulseSystem = true;
+                 `;
+                 await overlayWindow.webContents.executeJavaScript(js);
+             }
+         } catch (e) { console.error('Visual injection error:', e); }
+      }
+      
+      // 1. Show visual feedback on overlay (optional - for user awareness)
+      if (overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.webContents) {
+        overlayWindow.webContents.send('overlay-command', {
+          action: 'pulse-click', // Changed from highlight-coordinate to specific pulse-click
+          x, y, label
+        });
+      }
+      
+      // 2. Brief delay for visual feedback (increased to let pulse show)
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // 3. Hide overlay to ensure click goes through
+      const wasVisible = overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible();
+      if (wasVisible) {
+        overlayWindow.hide();
+        // Give Windows DWM more time to process transparency
+        await new Promise(resolve => setTimeout(resolve, 150));
+      }
+      
+      // 4. Execute the click using robotjs or similar automation
+      // Note: This requires robotjs to be installed and working
+      try {
+        const robot = require('robotjs');
+        // Double move to ensure OS registers cursor position
+        robot.moveMouse(x, y);
+        robot.moveMouse(x, y);
+        await new Promise(resolve => setTimeout(resolve, 50));
+        robot.mouseClick(button);
+        console.log(`[CLICK-THROUGH] Click executed successfully at (${x}, ${y})`);
+      } catch (robotError) {
+        console.error('[CLICK-THROUGH] Robot click failed:', robotError.message);
+        // Fallback: try using PowerShell on Windows
+        if (process.platform === 'win32') {
+          const { exec } = require('child_process');
+          const psCommand = `
+            Add-Type -AssemblyName System.Windows.Forms
+            [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point(${x}, ${y})
+            Add-Type -MemberDefinition '[DllImport("user32.dll")] public static extern void mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);' -Name U32 -Namespace W
+            [W.U32]::mouse_event(0x02, 0, 0, 0, 0)
+            [W.U32]::mouse_event(0x04, 0, 0, 0, 0)
+          `;
+          await new Promise((resolve, reject) => {
+            exec(`powershell -Command "${psCommand.replace(/"/g, '\\"')}"`, (error) => {
+              if (error) reject(error);
+              else resolve();
+            });
+          });
+          console.log(`[CLICK-THROUGH] PowerShell click executed at (${x}, ${y})`);
+        } else {
+          throw robotError;
+        }
+      }
+      
+      // 5. Restore overlay after a delay (let the click register)
+      await new Promise(resolve => setTimeout(resolve, 150));
+      if (wasVisible && overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.show();
+      }
+      
+      return { success: true, x, y, label };
+    } catch (error) {
+      console.error('[CLICK-THROUGH] Error:', error);
+      // Ensure overlay is restored on error
+      if (overlayWindow && !overlayWindow.isDestroyed() && !overlayWindow.isVisible()) {
+        overlayWindow.show();
+      }
+      return { success: false, error: error.message };
+    }
   });
+
+  // NOTE: label-to-coordinates, analyze-action-safety, safe-click-at, confirm-pending-action,
+  // reject-pending-action, and get-pending-action handlers are registered above in 
+  // SAFETY GUARDRAILS IPC HANDLERS section. Do NOT register duplicate handlers here.
+
+  // NOTE: strict mode requires unique IPC handlers
+  // Previously duplicate handlers were removed from here.
 
   // Set AI provider
   ipcMain.on('set-ai-provider', (event, provider) => {
@@ -779,6 +1749,38 @@ function setupIPC() {
     const success = aiService.setApiKey(provider, key);
     if (chatWindow) {
       chatWindow.webContents.send('api-key-set', { provider, success });
+    }
+  });
+
+  // Check auth status for a provider
+  ipcMain.on('check-auth', async (event, provider) => {
+    const status = aiService.getStatus();
+    const currentProvider = provider || status.provider;
+    let authStatus = 'disconnected';
+    
+    if (currentProvider === 'copilot') {
+      // Check if Copilot token exists
+      const tokenPath = require('path').join(app.getPath('appData'), 'copilot-agent', 'copilot-token.json');
+      try {
+        if (require('fs').existsSync(tokenPath)) {
+          authStatus = 'connected';
+        }
+      } catch (e) {
+        authStatus = 'disconnected';
+      }
+    } else if (currentProvider === 'ollama') {
+      // Ollama doesn't need auth, just check if running
+      authStatus = 'connected';
+    } else {
+      // OpenAI/Anthropic need API keys
+      authStatus = status.hasApiKey ? 'connected' : 'disconnected';
+    }
+    
+    if (chatWindow) {
+      chatWindow.webContents.send('auth-status', {
+        provider: currentProvider,
+        status: authStatus
+      });
     }
   });
 
@@ -885,11 +1887,31 @@ app.whenReady().then(() => {
         type: result.success ? 'system' : 'error',
         timestamp: Date.now()
       });
+      
+      // Also send auth status update
+      chatWindow.webContents.send('auth-status', {
+        provider: 'copilot',
+        status: result.success ? 'connected' : 'error'
+      });
     }
   });
   
   // Try to load saved Copilot token
   aiService.loadCopilotToken();
+  
+  // Send initial auth status after a short delay (wait for chat window to be ready)
+  setTimeout(() => {
+    if (chatWindow && !chatWindow.isDestroyed()) {
+      const status = aiService.getStatus();
+      const tokenPath = require('path').join(app.getPath('appData'), 'copilot-agent', 'copilot-token.json');
+      const hasCopilotToken = require('fs').existsSync(tokenPath);
+      
+      chatWindow.webContents.send('auth-status', {
+        provider: status.provider,
+        status: hasCopilotToken ? 'connected' : 'disconnected'
+      });
+    }
+  }, 1000);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
