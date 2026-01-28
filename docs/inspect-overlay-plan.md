@@ -102,6 +102,16 @@ between the user and the AI, improving precision for actionable targets.
 - Native Context: Window metadata consistently attached to AI context.
 - Verification: Diff heatmap appears after actions and is logged.
 
+## Execution Checklist (Copilot)
+- [ ] Confirm `scaleFactor` normalization in renderer and main process.
+- [ ] Add inspect toggle + status indicator visible in selection mode.
+- [ ] Render region boxes + tooltip (role/text/confidence).
+- [ ] Emit `inspect.region[]` payload through IPC to main.
+- [ ] Wire `targetId` selection to action executor.
+- [ ] Add active window context capture and include in AI prompt.
+- [ ] Add screenshot diff utility and basic heatmap.
+- [ ] Add verification summary to AI response.
+
 ## Implementation Notes
 - Use `screen.getPrimaryDisplay().scaleFactor` for DPI normalization.
 - Throttle redraw on mouse move (<= 60fps).
