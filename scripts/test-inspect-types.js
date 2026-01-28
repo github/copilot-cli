@@ -38,12 +38,14 @@ assert.strictEqual(denormalized.y, 200, 'Denormalized y with scale 1.5');
 console.log('✓ denormalizeCoordinates works');
 
 // Test isPointInRegion
+// Note: Uses exclusive bounds (x < right, y < bottom) for mathematical correctness
 const testRegion = inspectTypes.createInspectRegion({ x: 100, y: 100, width: 50, height: 50 });
 assert.strictEqual(inspectTypes.isPointInRegion(125, 125, testRegion), true, 'Point inside region');
 assert.strictEqual(inspectTypes.isPointInRegion(100, 100, testRegion), true, 'Point at top-left corner');
-assert.strictEqual(inspectTypes.isPointInRegion(150, 150, testRegion), true, 'Point at bottom-right corner');
+assert.strictEqual(inspectTypes.isPointInRegion(149, 149, testRegion), true, 'Point just inside bottom-right');
+assert.strictEqual(inspectTypes.isPointInRegion(150, 150, testRegion), false, 'Point at bottom-right corner (exclusive)');
 assert.strictEqual(inspectTypes.isPointInRegion(99, 125, testRegion), false, 'Point outside left');
-assert.strictEqual(inspectTypes.isPointInRegion(151, 125, testRegion), false, 'Point outside right');
+assert.strictEqual(inspectTypes.isPointInRegion(150, 125, testRegion), false, 'Point outside right');
 console.log('✓ isPointInRegion works');
 
 // Test findRegionAtPoint

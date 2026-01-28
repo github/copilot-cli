@@ -577,7 +577,9 @@ function createRegionElement(region, index) {
   el.style.height = `${bounds.height || 0}px`;
   
   // Add classes for state
-  if (region.confidence < 0.7) {
+  // Handle undefined/null confidence - default to 1.0 (high confidence)
+  const confidence = region.confidence ?? 1.0;
+  if (confidence < 0.7) {
     el.classList.add('low-confidence');
   }
   if (region.id === state.selectedRegionId) {
@@ -753,6 +755,7 @@ function clearInspectRegions() {
 
 /**
  * Find region at a point (for hover detection)
+ * Uses exclusive bounds (x < right, y < bottom) for correct hit detection
  * @param {number} x - X coordinate
  * @param {number} y - Y coordinate
  * @returns {Object|null}
@@ -760,7 +763,8 @@ function clearInspectRegions() {
 function findRegionAtPoint(x, y) {
   for (const region of state.inspectRegions) {
     const b = region.bounds;
-    if (x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height) {
+    // Use exclusive bounds (< instead of <=) for mathematical correctness
+    if (x >= b.x && x < b.x + b.width && y >= b.y && y < b.y + b.height) {
       return region;
     }
   }

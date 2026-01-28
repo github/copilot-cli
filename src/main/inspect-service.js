@@ -25,7 +25,8 @@ const MAX_ACTION_TRACES = 100;
 function setInspectMode(enabled) {
   inspectMode = enabled;
   if (!enabled) {
-    selectedRegionId = null;
+    // Clear all state when disabling inspect mode
+    clearRegions();
   }
   return inspectMode;
 }
@@ -47,16 +48,15 @@ function isInspectModeActive() {
  * @returns {Object[]} Processed regions
  */
 function updateRegions(rawRegions, source = 'unknown') {
-  if (!Array.isArray(rawRegions)) return currentRegions;
-
-  // Get scale factor for normalization
-  const scaleFactor = getScaleFactor();
+  if (!Array.isArray(rawRegions)) return [...currentRegions];
 
   // Convert raw regions to inspect regions
+  // Note: Accessibility API coordinates are already in screen space,
+  // so no DPI scaling is needed here. Scale factor is stored in
+  // windowContext for AI reference.
   const newRegions = rawRegions
     .filter(r => r && (r.bounds || (r.x !== undefined && r.y !== undefined)))
     .map(r => {
-      // Normalize coordinates with scale factor
       const bounds = r.bounds || { x: r.x, y: r.y, width: r.width || 0, height: r.height || 0 };
       
       return inspectTypes.createInspectRegion({
@@ -76,7 +76,7 @@ function updateRegions(rawRegions, source = 'unknown') {
   // Merge with existing regions (prefer newer, dedupe by overlap)
   currentRegions = mergeRegions(currentRegions, newRegions);
   
-  return currentRegions;
+  return [...currentRegions];
 }
 
 /**
@@ -89,10 +89,11 @@ function clearRegions() {
 
 /**
  * Get current inspect regions
- * @returns {Object[]}
+ * @returns {Object[]} Copy of current regions array
  */
 function getRegions() {
-  return currentRegions;
+  // Return a shallow copy to prevent external mutations
+  return [...currentRegions];
 }
 
 /**
@@ -284,10 +285,10 @@ Current regions available: ${currentRegions.length}
 
 /**
  * Detect regions from current screen using available methods
- * @param {Object} screenshot - Screenshot data (optional)
+ * @param {Object} options - Detection options
  * @returns {Object} Detection results
  */
-async function detectRegions(screenshot = null) {
+async function detectRegions(options = {}) {
   const results = {
     regions: [],
     sources: [],
@@ -298,7 +299,7 @@ async function detectRegions(screenshot = null) {
     // Try accessibility API first
     const uiElements = await visualAwareness.detectUIElements({ depth: 3 });
     if (uiElements.elements && uiElements.elements.length > 0) {
-      const accessibilityRegions = updateRegions(
+      updateRegions(
         uiElements.elements.map(e => ({
           label: e.Name || e.ClassName || '',
           role: e.ControlType?.replace('ControlType.', '') || 'element',
@@ -313,7 +314,8 @@ async function detectRegions(screenshot = null) {
     // Update window context
     await updateWindowContext();
     
-    results.regions = currentRegions;
+    // Return copy of regions to prevent external mutation
+    results.regions = [...currentRegions];
     results.windowContext = windowContext;
     
   } catch (error) {
@@ -362,35 +364,40 @@ function calculateConfidence(region, source) {
  */
 function mergeRegions(existing, incoming) {
   const merged = [];
-  const used = new Set();
+  const usedExisting = new Set();
+  const addedIds = new Set();
 
   // Add incoming regions, checking for overlaps with existing
   for (const inc of incoming) {
     let isDupe = false;
     for (const ex of existing) {
+      if (usedExisting.has(ex.id)) continue; // Skip already processed existing regions
+      
       if (regionsOverlap(inc, ex, 0.8)) {
         // Significant overlap - prefer higher confidence
-        if (inc.confidence >= ex.confidence) {
-          merged.push(inc);
-        } else {
-          merged.push(ex);
+        const winner = inc.confidence >= ex.confidence ? inc : ex;
+        if (!addedIds.has(winner.id)) {
+          merged.push(winner);
+          addedIds.add(winner.id);
         }
-        used.add(ex.id);
+        usedExisting.add(ex.id);
         isDupe = true;
         break;
       }
     }
-    if (!isDupe) {
+    if (!isDupe && !addedIds.has(inc.id)) {
       merged.push(inc);
+      addedIds.add(inc.id);
     }
   }
 
   // Add remaining existing regions not overlapping
   for (const ex of existing) {
-    if (!used.has(ex.id)) {
+    if (!usedExisting.has(ex.id) && !addedIds.has(ex.id)) {
       const hasOverlap = incoming.some(inc => regionsOverlap(ex, inc, 0.5));
       if (!hasOverlap) {
         merged.push(ex);
+        addedIds.add(ex.id);
       }
     }
   }
@@ -420,6 +427,9 @@ function regionsOverlap(r1, r2, threshold = 0.5) {
   const r1Area = b1.width * b1.height;
   const r2Area = b2.width * b2.height;
   const minArea = Math.min(r1Area, r2Area);
+
+  // Handle zero area case
+  if (minArea <= 0) return false;
 
   return intersectArea / minArea >= threshold;
 }

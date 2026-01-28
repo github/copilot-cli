@@ -536,11 +536,13 @@ function registerOverlayShortcuts() {
       
       // If enabled, trigger region detection
       if (newState) {
-        // Use async detection
+        // Use async detection with error handling
         inspectService.detectRegions().then(results => {
           if (overlayWindow && !overlayWindow.isDestroyed()) {
             overlayWindow.webContents.send('inspect-regions-update', results.regions);
           }
+        }).catch(err => {
+          console.error('[SHORTCUTS] Inspect region detection failed:', err);
         });
       }
     }
@@ -1405,13 +1407,17 @@ function setupIPC() {
     
     // If enabled, trigger region detection
     if (newState) {
-      detectAndSendInspectRegions();
+      detectAndSendInspectRegions().catch(err => {
+        console.error('[INSPECT] Region detection failed:', err);
+      });
     }
   });
   
   // Request inspect regions detection
   ipcMain.on('request-inspect-regions', async () => {
-    await detectAndSendInspectRegions();
+    await detectAndSendInspectRegions().catch(err => {
+      console.error('[INSPECT] Region detection request failed:', err);
+    });
   });
   
   // Handle inspect region selection from overlay

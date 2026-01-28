@@ -650,7 +650,7 @@ async function callCopilot(messages) {
         'Editor-Version': 'vscode/1.96.0',
         'Editor-Plugin-Version': 'copilot-chat/0.22.0',
         'Copilot-Integration-Id': 'vscode-chat',
-        'X-Request-Id': `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        'X-Request-Id': `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
         'Openai-Organization': 'github-copilot',
         'Openai-Intent': 'conversation-panel',
         'Content-Length': Buffer.byteLength(data)
@@ -1201,7 +1201,7 @@ let pendingAction = null;
  */
 function analyzeActionSafety(action, targetInfo = {}) {
   const result = {
-    actionId: `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    actionId: `action-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
     action: action,
     targetInfo: targetInfo,
     riskLevel: ActionRiskLevel.SAFE,
@@ -1280,6 +1280,21 @@ function analyzeActionSafety(action, targetInfo = {}) {
   // Always require confirmation for HIGH or CRITICAL
   if (result.riskLevel === ActionRiskLevel.HIGH || result.riskLevel === ActionRiskLevel.CRITICAL) {
     result.requiresConfirmation = true;
+  }
+  
+  // Check for low confidence inspect region targets
+  if (targetInfo.confidence !== undefined && targetInfo.confidence < 0.7) {
+    result.warnings.push(`Low confidence target (${Math.round(targetInfo.confidence * 100)}%)`);
+    result.requiresConfirmation = true;
+    if (result.riskLevel === ActionRiskLevel.SAFE || result.riskLevel === ActionRiskLevel.LOW) {
+      result.riskLevel = ActionRiskLevel.MEDIUM;
+    }
+  }
+  
+  // Check if target is from inspect mode with very low confidence
+  if (targetInfo.confidence !== undefined && targetInfo.confidence < 0.5) {
+    result.riskLevel = ActionRiskLevel.HIGH;
+    result.warnings.push('Very low confidence - verify target manually');
   }
   
   // Generate human-readable description

@@ -49,7 +49,7 @@
  */
 function createInspectRegion(params) {
   return {
-    id: params.id || `region-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: params.id || `region-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
     bounds: {
       x: params.x || params.bounds?.x || 0,
       y: params.y || params.bounds?.y || 0,
@@ -93,7 +93,7 @@ function createWindowContext(params) {
  */
 function createActionTrace(params) {
   return {
-    actionId: params.actionId || `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    actionId: params.actionId || `action-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
     type: params.type || 'unknown',
     targetId: params.targetId || null,
     x: params.x || 0,
@@ -141,9 +141,9 @@ function denormalizeCoordinates(x, y, scaleFactor = 1) {
 function isPointInRegion(x, y, region) {
   const { bounds } = region;
   return x >= bounds.x && 
-         x <= bounds.x + bounds.width && 
+         x < bounds.x + bounds.width && 
          y >= bounds.y && 
-         y <= bounds.y + bounds.height;
+         y < bounds.y + bounds.height;
 }
 
 /**
