@@ -62,6 +62,11 @@ To make the overlay click-through again:
 |----------|--------|
 | `Ctrl+Alt+Space` (macOS: `Cmd+Alt+Space`) | Toggle chat window |
 | `Ctrl+Shift+O` (macOS: `Cmd+Shift+O`) | Toggle overlay visibility |
+| `Ctrl+Alt+I` (macOS: `Cmd+Alt+I`) | Toggle inspect mode |
+| `Ctrl+Alt+F` (macOS: `Cmd+Alt+F`) | Toggle fine grid dots |
+| `Ctrl+Alt+G` (macOS: `Cmd+Alt+G`) | Show all grid levels |
+| `Ctrl+Alt+=` (macOS: `Cmd+Alt+=`) | Zoom in grid |
+| `Ctrl+Alt+-` (macOS: `Cmd+Alt+-`) | Zoom out grid |
 
 ## Tray Menu
 
@@ -125,6 +130,26 @@ Right-click the tray icon to see:
 - ✅ Click dots to select screen positions
 - ✅ Mode indicator visible in top-right
 - ⚠️ Cannot interact with applications below overlay
+
+### Inspect Mode (New!)
+- ✅ Detects UI elements using accessibility APIs
+- ✅ Shows bounding boxes around actionable regions
+- ✅ Hover reveals tooltips with element details
+- ✅ Click regions to select for AI targeting
+- ✅ AI receives detected regions for precision clicks
+- ✅ Toggle with `Ctrl+Alt+I`
+
+**Using Inspect Mode:**
+1. Enable selection mode first
+2. Press `Ctrl+Alt+I` to toggle inspect mode
+3. Cyan boxes appear around detected UI elements
+4. Hover over a box to see:
+   - Element role (button, textbox, etc.)
+   - Label/text content
+   - Confidence score
+   - Click coordinates
+5. Click a region to select it for AI targeting
+6. The AI will use the precise coordinates for actions
 
 ## Tips & Tricks
 

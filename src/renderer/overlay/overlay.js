@@ -19,7 +19,12 @@ let state = {
     zoom: { visible: false, text: '1x', timeout: null },
     mode: { visible: true, text: 'Selection Mode' },
     feedback: { visible: false, text: '', timeout: null }
-  }
+  },
+  // Inspect mode state
+  inspectMode: false,
+  inspectRegions: [],
+  hoveredRegion: null,
+  selectedRegionId: null
 };
 
 // ===== CANVAS SETUP =====
@@ -35,7 +40,12 @@ const ui = {
   gridStatus: document.getElementById('grid-status'),
   coordsStatus: document.getElementById('coords-status'),
   interactionRegion: document.getElementById('interaction-region'),
-  border: document.getElementById('overlay-border')
+  border: document.getElementById('overlay-border'),
+  // Inspect elements
+  inspectContainer: document.getElementById('inspect-container'),
+  inspectIndicator: document.getElementById('inspect-indicator'),
+  inspectTooltip: document.getElementById('inspect-tooltip'),
+  regionCount: document.getElementById('region-count')
 };
 
 // ===== RENDERING ENGINE =====
@@ -411,7 +421,32 @@ if (window.electronAPI) {
       }
       requestDraw();
     }
+    // Load inspect mode state if available
+    if (initialState.inspectMode !== undefined) {
+      state.inspectMode = initialState.inspectMode;
+      updateInspectIndicator();
+    }
   }).catch(err => console.error('Failed to get initial state:', err));
+  
+  // Listen for inspect regions update
+  if (window.electronAPI.onInspectRegionsUpdate) {
+    window.electronAPI.onInspectRegionsUpdate((regions) => {
+      console.log('Received inspect regions:', regions?.length || 0);
+      updateInspectRegions(regions);
+    });
+  }
+  
+  // Listen for inspect mode toggle
+  if (window.electronAPI.onInspectModeChanged) {
+    window.electronAPI.onInspectModeChanged((enabled) => {
+      console.log('Inspect mode changed:', enabled);
+      state.inspectMode = enabled;
+      updateInspectIndicator();
+      if (!enabled) {
+        clearInspectRegions();
+      }
+    });
+  }
   
   // Identify
   console.log('Hooked electronAPI events');
@@ -445,6 +480,8 @@ function handleCommand(data) {
     case 'set-click-through':
       document.body.style.pointerEvents = data.enabled ? 'none' : '';
       if(ui.interactionRegion) ui.interactionRegion.style.pointerEvents = data.enabled ? 'none' : '';
+      // Also update inspect regions pointer events
+      if(ui.inspectContainer) ui.inspectContainer.style.pointerEvents = data.enabled ? 'none' : '';
       break;
     case 'pulse-click':
     case 'highlight-coordinate':
@@ -456,6 +493,23 @@ function handleCommand(data) {
         // For now, we rely on main process calculating it via ai-service
       }
       break;
+    // Inspect mode commands
+    case 'toggle-inspect':
+      state.inspectMode = !state.inspectMode;
+      showFeedback(state.inspectMode ? 'Inspect Mode ON' : 'Inspect Mode OFF');
+      updateInspectIndicator();
+      if (!state.inspectMode) {
+        clearInspectRegions();
+      }
+      break;
+    case 'update-inspect-regions':
+      if (data.regions) {
+        updateInspectRegions(data.regions);
+      }
+      break;
+    case 'clear-inspect-regions':
+      clearInspectRegions();
+      break;
   }
   
   if (ui.gridStatus) {
@@ -463,8 +517,266 @@ function handleCommand(data) {
   }
 }
 
+// ===== INSPECT MODE FUNCTIONS =====
+
+/**
+ * Update inspect indicator visibility
+ */
+function updateInspectIndicator() {
+  if (ui.inspectIndicator) {
+    if (state.inspectMode) {
+      ui.inspectIndicator.classList.add('visible');
+    } else {
+      ui.inspectIndicator.classList.remove('visible');
+    }
+  }
+}
+
+/**
+ * Update inspect regions display
+ * @param {Array} regions - Array of region objects with bounds, label, role, confidence
+ */
+function updateInspectRegions(regions) {
+  if (!ui.inspectContainer) return;
+  
+  // Clear existing regions
+  ui.inspectContainer.innerHTML = '';
+  state.inspectRegions = regions || [];
+  
+  // Update region count
+  if (ui.regionCount) {
+    ui.regionCount.textContent = state.inspectRegions.length;
+  }
+  
+  // Render regions
+  state.inspectRegions.forEach((region, index) => {
+    const el = createRegionElement(region, index);
+    ui.inspectContainer.appendChild(el);
+  });
+  
+  console.log(`Rendered ${state.inspectRegions.length} inspect regions`);
+}
+
+/**
+ * Create a DOM element for an inspect region
+ * @param {Object} region - Region data
+ * @param {number} index - Region index
+ * @returns {HTMLElement}
+ */
+function createRegionElement(region, index) {
+  const el = document.createElement('div');
+  el.className = 'inspect-region';
+  el.dataset.regionId = region.id;
+  el.dataset.index = index;
+  
+  // Position and size
+  const bounds = region.bounds || {};
+  el.style.left = `${bounds.x || 0}px`;
+  el.style.top = `${bounds.y || 0}px`;
+  el.style.width = `${bounds.width || 0}px`;
+  el.style.height = `${bounds.height || 0}px`;
+  
+  // Add classes for state
+  // Handle undefined/null confidence - default to 1.0 (high confidence)
+  const confidence = region.confidence ?? 1.0;
+  if (confidence < 0.7) {
+    el.classList.add('low-confidence');
+  }
+  if (region.id === state.selectedRegionId) {
+    el.classList.add('selected');
+  }
+  
+  // Add label
+  const label = document.createElement('span');
+  label.className = 'inspect-region-label';
+  label.textContent = region.label || region.role || `Region ${index + 1}`;
+  el.appendChild(label);
+  
+  // Event handlers
+  el.addEventListener('mouseenter', (e) => {
+    state.hoveredRegion = region;
+    showInspectTooltip(region, e.clientX, e.clientY);
+  });
+  
+  el.addEventListener('mouseleave', () => {
+    state.hoveredRegion = null;
+    hideInspectTooltip();
+  });
+  
+  el.addEventListener('mousemove', (e) => {
+    if (state.hoveredRegion === region) {
+      positionTooltip(e.clientX, e.clientY);
+    }
+  });
+  
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectRegion(region);
+  });
+  
+  return el;
+}
+
+/**
+ * Show inspect tooltip for a region
+ * @param {Object} region - Region data
+ * @param {number} x - Mouse X position
+ * @param {number} y - Mouse Y position
+ */
+function showInspectTooltip(region, x, y) {
+  if (!ui.inspectTooltip) return;
+  
+  // Update tooltip content
+  const roleEl = ui.inspectTooltip.querySelector('.tooltip-role');
+  const labelEl = ui.inspectTooltip.querySelector('.tooltip-label');
+  const textEl = document.getElementById('tooltip-text');
+  const posEl = document.getElementById('tooltip-position');
+  const confEl = document.getElementById('tooltip-confidence');
+  const confBar = document.getElementById('tooltip-confidence-bar');
+  
+  if (roleEl) roleEl.textContent = region.role || 'element';
+  if (labelEl) labelEl.textContent = region.label || 'Unknown';
+  if (textEl) textEl.textContent = region.text || '-';
+  
+  const centerX = Math.round((region.bounds?.x || 0) + (region.bounds?.width || 0) / 2);
+  const centerY = Math.round((region.bounds?.y || 0) + (region.bounds?.height || 0) / 2);
+  if (posEl) posEl.textContent = `${centerX}, ${centerY}`;
+  
+  const confidence = Math.round((region.confidence || 0.5) * 100);
+  if (confEl) confEl.textContent = `${confidence}%`;
+  if (confBar) confBar.style.width = `${confidence}%`;
+  
+  // Position and show tooltip
+  positionTooltip(x, y);
+  ui.inspectTooltip.classList.add('visible');
+}
+
+/**
+ * Position tooltip near cursor
+ * @param {number} x - Mouse X
+ * @param {number} y - Mouse Y
+ */
+function positionTooltip(x, y) {
+  if (!ui.inspectTooltip) return;
+  
+  const offset = 15;
+  const tooltipRect = ui.inspectTooltip.getBoundingClientRect();
+  
+  // Default position: below and to the right of cursor
+  let left = x + offset;
+  let top = y + offset;
+  
+  // Adjust if tooltip would go off screen
+  if (left + tooltipRect.width > window.innerWidth) {
+    left = x - tooltipRect.width - offset;
+  }
+  if (top + tooltipRect.height > window.innerHeight) {
+    top = y - tooltipRect.height - offset;
+  }
+  
+  ui.inspectTooltip.style.left = `${left}px`;
+  ui.inspectTooltip.style.top = `${top}px`;
+}
+
+/**
+ * Hide inspect tooltip
+ */
+function hideInspectTooltip() {
+  if (ui.inspectTooltip) {
+    ui.inspectTooltip.classList.remove('visible');
+  }
+}
+
+/**
+ * Select a region and notify main process
+ * @param {Object} region - Region to select
+ */
+function selectRegion(region) {
+  // Update state
+  state.selectedRegionId = region.id;
+  
+  // Update visual state
+  document.querySelectorAll('.inspect-region').forEach(el => {
+    el.classList.remove('selected');
+    if (el.dataset.regionId === region.id) {
+      el.classList.add('selected');
+    }
+  });
+  
+  // Show pulse at region center
+  const centerX = (region.bounds?.x || 0) + (region.bounds?.width || 0) / 2;
+  const centerY = (region.bounds?.y || 0) + (region.bounds?.height || 0) / 2;
+  showPulse(centerX, centerY);
+  
+  // Notify main process
+  if (window.electronAPI?.selectInspectRegion) {
+    window.electronAPI.selectInspectRegion({
+      targetId: region.id,
+      region: region,
+      bounds: region.bounds,
+      x: centerX,
+      y: centerY
+    });
+  } else if (window.electronAPI?.selectDot) {
+    // Fallback to dot selection
+    window.electronAPI.selectDot({
+      id: `inspect-${region.id}`,
+      x: centerX,
+      y: centerY,
+      label: region.label || region.role,
+      targetId: region.id,
+      type: 'inspect-region',
+      screenX: centerX,
+      screenY: centerY,
+      region: region
+    });
+  }
+  
+  showFeedback(`Selected: ${region.label || region.role || 'Region'}`);
+}
+
+/**
+ * Clear all inspect regions
+ */
+function clearInspectRegions() {
+  if (ui.inspectContainer) {
+    ui.inspectContainer.innerHTML = '';
+  }
+  state.inspectRegions = [];
+  state.hoveredRegion = null;
+  state.selectedRegionId = null;
+  
+  if (ui.regionCount) {
+    ui.regionCount.textContent = '0';
+  }
+  
+  hideInspectTooltip();
+}
+
+/**
+ * Find region at a point (for hover detection)
+ * Uses exclusive bounds (x < right, y < bottom) for correct hit detection
+ * @param {number} x - X coordinate
+ * @param {number} y - Y coordinate
+ * @returns {Object|null}
+ */
+function findRegionAtPoint(x, y) {
+  for (const region of state.inspectRegions) {
+    const b = region.bounds;
+    // Use exclusive bounds (< instead of <=) for mathematical correctness
+    if (x >= b.x && x < b.x + b.width && y >= b.y && y < b.y + b.height) {
+      return region;
+    }
+  }
+  return null;
+}
+
 // Expose Helper Global
 window.labelToScreenCoordinates = labelToScreenCoordinates;
+
+// Expose inspect functions globally for debugging
+window.updateInspectRegions = updateInspectRegions;
+window.clearInspectRegions = clearInspectRegions;
 
 console.log('High-Performance Canvas Overlay Loaded');
 requestDraw(); 
