@@ -3,6 +3,7 @@
  * Handles integration with AI backends (GitHub Copilot, OpenAI, Claude, local models)
  * Supports visual context for AI awareness of screen content
  * Supports AGENTIC actions (mouse, keyboard, system control)
+ * Supports inspect mode for precision targeting
  */
 
 const https = require('https');
@@ -11,6 +12,15 @@ const fs = require('fs');
 const path = require('path');
 const { shell } = require('electron');
 const systemAutomation = require('./system-automation');
+
+// Lazy-load inspect service to avoid circular dependencies
+let inspectService = null;
+function getInspectService() {
+  if (!inspectService) {
+    inspectService = require('./inspect-service');
+  }
+  return inspectService;
+}
 
 // ===== CONFIGURATION =====
 
@@ -263,8 +273,39 @@ function buildMessages(userMessage, includeVisual = false) {
     messages.push(msg);
   });
 
-  // Build user message with optional visual context
+  // Build user message with optional visual and inspect context
   const latestVisual = includeVisual ? getLatestVisualContext() : null;
+  
+  // Get inspect context if inspect mode is active
+  let inspectContextText = '';
+  try {
+    const inspect = getInspectService();
+    if (inspect.isInspectModeActive()) {
+      const inspectContext = inspect.generateAIContext();
+      if (inspectContext.regions && inspectContext.regions.length > 0) {
+        inspectContextText = `\n\n## Detected UI Regions (Inspect Mode)
+${inspectContext.regions.slice(0, 20).map((r, i) => 
+  `${i + 1}. **${r.label || 'Unknown'}** (${r.role}) at (${r.center.x}, ${r.center.y}) - confidence: ${Math.round(r.confidence * 100)}%`
+).join('\n')}
+
+**Note**: Use the coordinates provided above for precise targeting. If confidence is below 70%, verify with user before clicking.`;
+        
+        // Add window context if available
+        if (inspectContext.windowContext) {
+          inspectContextText += `\n\n## Active Window
+- App: ${inspectContext.windowContext.appName || 'Unknown'}
+- Title: ${inspectContext.windowContext.windowTitle || 'Unknown'}
+- Scale Factor: ${inspectContext.windowContext.scaleFactor || 1}`;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[AI] Could not get inspect context:', e.message);
+  }
+  
+  const enhancedMessage = inspectContextText 
+    ? `${userMessage}${inspectContextText}` 
+    : userMessage;
 
   if (latestVisual && (currentProvider === 'copilot' || currentProvider === 'openai')) {
     // OpenAI/Copilot vision format (both use same API format)
@@ -272,7 +313,7 @@ function buildMessages(userMessage, includeVisual = false) {
     messages.push({
       role: 'user',
       content: [
-        { type: 'text', text: userMessage },
+        { type: 'text', text: enhancedMessage },
         {
           type: 'image_url',
           image_url: {
@@ -296,7 +337,7 @@ function buildMessages(userMessage, includeVisual = false) {
             data: base64Data
           }
         },
-        { type: 'text', text: userMessage }
+        { type: 'text', text: enhancedMessage }
       ]
     });
   } else if (latestVisual && currentProvider === 'ollama') {
@@ -304,13 +345,13 @@ function buildMessages(userMessage, includeVisual = false) {
     const base64Data = latestVisual.dataURL.replace(/^data:image\/\w+;base64,/, '');
     messages.push({
       role: 'user',
-      content: userMessage,
+      content: enhancedMessage,
       images: [base64Data]
     });
   } else {
     messages.push({
       role: 'user',
-      content: userMessage
+      content: enhancedMessage
     });
   }
 

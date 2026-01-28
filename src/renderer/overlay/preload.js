@@ -18,5 +18,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Grid math helpers (shared with main)
   getGridConstants: () => gridMath.constants,
-  labelToScreenCoordinates: (label) => gridMath.labelToScreenCoordinates(label)
+  labelToScreenCoordinates: (label) => gridMath.labelToScreenCoordinates(label),
+  
+  // ===== INSPECT MODE API =====
+  
+  // Select an inspect region (sends targetId + bounds to main)
+  selectInspectRegion: (data) => ipcRenderer.send('inspect-region-selected', data),
+  
+  // Listen for inspect regions updates
+  onInspectRegionsUpdate: (callback) => ipcRenderer.on('inspect-regions-update', (event, regions) => callback(regions)),
+  
+  // Listen for inspect mode toggle
+  onInspectModeChanged: (callback) => ipcRenderer.on('inspect-mode-changed', (event, enabled) => callback(enabled)),
+  
+  // Request inspect region detection
+  requestInspectRegions: () => ipcRenderer.send('request-inspect-regions'),
+  
+  // Toggle inspect mode
+  toggleInspectMode: () => ipcRenderer.send('toggle-inspect-mode')
 });

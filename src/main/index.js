@@ -25,6 +25,9 @@ const aiService = require('./ai-service.js');
 // Visual awareness for advanced screen analysis
 const visualAwareness = require('./visual-awareness.js');
 
+// Inspect service for overlay region detection and targeting
+const inspectService = require('./inspect-service.js');
+
 
 // Ensure caches land in a writable location to avoid Windows permission issues
 const cacheRoot = path.join(os.tmpdir(), 'copilot-liku-electron-cache');
@@ -472,7 +475,7 @@ function setOverlayMode(mode) {
  * which means keyboard events go to background apps, not the overlay window
  */
 function registerOverlayShortcuts() {
-  console.log('[SHORTCUTS] Registering overlay shortcuts (Ctrl+Alt+F/G/+/-/X)');
+  console.log('[SHORTCUTS] Registering overlay shortcuts (Ctrl+Alt+F/G/+/-/X/I)');
   
   // Ctrl+Alt+F to toggle fine grid
   globalShortcut.register('CommandOrControl+Alt+F', () => {
@@ -518,6 +521,30 @@ function registerOverlayShortcuts() {
       overlayWindow.webContents.send('overlay-command', { action: 'cancel' });
     }
   });
+  
+  // Ctrl+Alt+I to toggle inspect mode
+  globalShortcut.register('CommandOrControl+Alt+I', () => {
+    if (overlayWindow && overlayMode === 'selection') {
+      console.log('[SHORTCUTS] Ctrl+Alt+I pressed - toggle inspect mode');
+      // Toggle inspect mode via IPC
+      const newState = !inspectService.isInspectModeActive();
+      inspectService.setInspectMode(newState);
+      
+      // Notify overlay
+      overlayWindow.webContents.send('inspect-mode-changed', newState);
+      overlayWindow.webContents.send('overlay-command', { action: 'toggle-inspect' });
+      
+      // If enabled, trigger region detection
+      if (newState) {
+        // Use async detection
+        inspectService.detectRegions().then(results => {
+          if (overlayWindow && !overlayWindow.isDestroyed()) {
+            overlayWindow.webContents.send('inspect-regions-update', results.regions);
+          }
+        });
+      }
+    }
+  });
 }
 
 /**
@@ -530,7 +557,8 @@ function unregisterOverlayShortcuts() {
     'CommandOrControl+Alt+G',
     'CommandOrControl+Alt+=',
     'CommandOrControl+Alt+-',
-    'CommandOrControl+Alt+X'
+    'CommandOrControl+Alt+X',
+    'CommandOrControl+Alt+I'
   ];
   keys.forEach(key => {
     try {
@@ -1350,9 +1378,109 @@ function setupIPC() {
       visualContextCount: visualContextHistory.length,
       aiProvider: aiStatus.provider,
       model: aiStatus.model,
-      aiStatus
+      aiStatus,
+      // Inspect mode state
+      inspectMode: inspectService.isInspectModeActive(),
+      inspectRegionCount: inspectService.getRegions().length
     };
   });
+
+  // ===== INSPECT MODE IPC HANDLERS =====
+  
+  // Toggle inspect mode
+  ipcMain.on('toggle-inspect-mode', () => {
+    const newState = !inspectService.isInspectModeActive();
+    inspectService.setInspectMode(newState);
+    console.log(`[INSPECT] Mode toggled: ${newState}`);
+    
+    // Notify overlay
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      overlayWindow.webContents.send('inspect-mode-changed', newState);
+    }
+    
+    // Notify chat
+    if (chatWindow && !chatWindow.isDestroyed()) {
+      chatWindow.webContents.send('inspect-mode-changed', newState);
+    }
+    
+    // If enabled, trigger region detection
+    if (newState) {
+      detectAndSendInspectRegions();
+    }
+  });
+  
+  // Request inspect regions detection
+  ipcMain.on('request-inspect-regions', async () => {
+    await detectAndSendInspectRegions();
+  });
+  
+  // Handle inspect region selection from overlay
+  ipcMain.on('inspect-region-selected', (event, data) => {
+    console.log('[INSPECT] Region selected:', data);
+    
+    // Record the action
+    const trace = inspectService.recordAction({
+      type: 'select',
+      targetId: data.targetId,
+      x: data.x,
+      y: data.y
+    }, data.targetId);
+    
+    // Forward to chat window with targetId for AI targeting
+    if (chatWindow && !chatWindow.isDestroyed()) {
+      chatWindow.webContents.send('inspect-region-selected', {
+        ...data,
+        actionId: trace.actionId
+      });
+    }
+    
+    // Select the region in service
+    inspectService.selectRegion(data.targetId);
+  });
+  
+  // Get inspect context for AI
+  ipcMain.handle('get-inspect-context', () => {
+    return inspectService.generateAIContext();
+  });
+  
+  // Get inspect regions
+  ipcMain.handle('get-inspect-regions', () => {
+    return inspectService.getRegions();
+  });
+  
+  // Get window context
+  ipcMain.handle('get-window-context', async () => {
+    return await inspectService.updateWindowContext();
+  });
+  
+  /**
+   * Detect UI regions and send to overlay
+   */
+  async function detectAndSendInspectRegions() {
+    try {
+      console.log('[INSPECT] Detecting regions...');
+      const results = await inspectService.detectRegions();
+      
+      // Send regions to overlay
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.webContents.send('inspect-regions-update', results.regions);
+      }
+      
+      // Notify chat of new context
+      if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.webContents.send('inspect-context-update', {
+          regionCount: results.regions.length,
+          windowContext: results.windowContext
+        });
+      }
+      
+      console.log(`[INSPECT] Detected ${results.regions.length} regions`);
+      return results;
+    } catch (error) {
+      console.error('[INSPECT] Detection failed:', error);
+      return { regions: [], error: error.message };
+    }
+  }
 
   // ===== AI CLICK-THROUGH AUTOMATION (Q4 FIX) =====
   // This allows AI to click at coordinates THROUGH the overlay to the background app
