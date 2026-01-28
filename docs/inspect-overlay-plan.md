@@ -112,6 +112,10 @@ between the user and the AI, improving precision for actionable targets.
 - [ ] Add screenshot diff utility and basic heatmap.
 - [ ] Add verification summary to AI response.
 
+## Agent Session Settings
+- Preferred model: Claude Opus 4.5
+- Tools: enable web search + fetch for Electron/CDP/OS‑accessibility references
+
 ## Implementation Notes
 - Use `screen.getPrimaryDisplay().scaleFactor` for DPI normalization.
 - Throttle redraw on mouse move (<= 60fps).
