@@ -73,6 +73,10 @@ Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premi
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
+## Overlay Development
+
+See `docs/inspect-overlay-plan.md` for the inspect overlay plan and acceptance criteria.
+
 
 ## 📢 Feedback and Participation
 
