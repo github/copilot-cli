@@ -1,3 +1,9 @@
+## 0.0.398 - 2026-01-28
+
+- Fix a regression that caused "Invalid session id" errors for agent shell calls
+- CLI header uses middle-truncation for paths in narrow terminals, preserving first and last folders
+- Skills from parent directories are now invocable and work in non-git directories
+
 ## 0.0.397 - 2026-01-28
 
 - `/mcp show <server-name>` displays server details and available tools
