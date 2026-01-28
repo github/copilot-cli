@@ -3,7 +3,7 @@
  * Advanced screen analysis, OCR, element detection, and active window tracking
  */
 
-const { exec, spawn } = require('child_process');
+const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -355,7 +355,7 @@ function detectUIElements(options = {}) {
       return;
     }
 
-    const { depth = 3, includeInvisible = false } = options;
+    const { depth = 3 } = options;
 
     const psScript = `
       Add-Type -AssemblyName UIAutomationClient

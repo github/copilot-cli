@@ -5,8 +5,7 @@
  * Uses native platform APIs via child_process for zero dependencies
  */
 
-const { exec, spawn } = require('child_process');
-const path = require('path');
+const { exec } = require('child_process');
 const gridMath = require('../shared/grid-math');
 
 // Action types the AI can request
@@ -106,7 +105,6 @@ async function click(x, y, button = 'left') {
   await sleep(50);
   
   // Click using SendInput via Add-Type
-  const buttonCode = button === 'right' ? 'RIGHTDOWN,RIGHTUP' : 'LEFTDOWN,LEFTUP';
   const script = `
 Add-Type -TypeDefinition @"
 using System;

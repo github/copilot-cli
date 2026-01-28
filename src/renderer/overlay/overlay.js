@@ -154,7 +154,7 @@ function resize() {
   requestDraw();
 }
 window.addEventListener('resize', resize);
-resize(); // Initesize(); // Init
+resize(); // Init
 
 // ===== UTILS =====
 function generateLabel(col, row, isFine) {
@@ -335,16 +335,26 @@ document.addEventListener('click', (e) => {
     showPulse(x, y);
     
     // Send to main
-    const colInit = Math.round((x - START_OFFSET) / COARSE_SPACING);
-    const rowInit = Math.round((y - START_OFFSET) / COARSE_SPACING);
-    const label = generateLabel(colInit, rowInit, false);
+    let label;
+    let type;
+    if (state.zoomLevel >= 2) {
+      const fineCol = Math.round((x - FINE_START) / FINE_SPACING);
+      const fineRow = Math.round((y - FINE_START) / FINE_SPACING);
+      label = generateLabel(fineCol, fineRow, true);
+      type = 'fine';
+    } else {
+      const colInit = Math.round((x - START_OFFSET) / COARSE_SPACING);
+      const rowInit = Math.round((y - START_OFFSET) / COARSE_SPACING);
+      label = generateLabel(colInit, rowInit, false);
+      type = 'coarse';
+    }
     
     if(window.electronAPI) {
         window.electronAPI.selectDot({
           id: `virtual-${x}-${y}`,
           x, y, bg: true, label,
           screenX: x, screenY: y,
-          type: 'coarse'
+          type
         });
     }
   }

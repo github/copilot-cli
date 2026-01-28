@@ -61,9 +61,6 @@ const AI_PROVIDERS = {
 
 // GitHub Copilot OAuth Configuration
 const COPILOT_CLIENT_ID = 'Iv1.b507a08c87ecfe98';
-const GITHUB_DEVICE_CODE_URL = 'https://github.com/login/device/code';
-const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
-const COPILOT_TOKEN_EXCHANGE_URL = 'https://api.github.com/copilot_internal/v2/token';
 
 // Current configuration
 let currentProvider = 'copilot'; // Default to GitHub Copilot
@@ -1231,15 +1228,6 @@ function analyzeActionSafety(action, targetInfo = {}) {
       result.riskLevel = ActionRiskLevel.HIGH;
       result.warnings.push(`Detected risky keyword: ${textToCheck.match(pattern)?.[0]}`);
       result.requiresConfirmation = true;
-    }
-  }
-  
-  // Check for safe patterns that might reduce risk
-  let hasSafePattern = false;
-  for (const pattern of SAFE_PATTERNS) {
-    if (pattern.test(textToCheck)) {
-      hasSafePattern = true;
-      break;
     }
   }
   

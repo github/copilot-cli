@@ -25,260 +25,6 @@ const aiService = require('./ai-service.js');
 // Visual awareness for advanced screen analysis
 const visualAwareness = require('./visual-awareness.js');
 
-// ===== ACTION SAFETY GUARDRAILS =====
-// Risk levels for action classification
-const ActionRiskLevel = {
-  SAFE: 'safe',           // Read-only: screenshot, scroll view, hover
-  LOW: 'low',             // Navigation: click links, tabs, non-destructive buttons
-  MEDIUM: 'medium',       // Input: typing, form filling, selections
-  HIGH: 'high',           // Destructive: delete, remove, close, cancel
-  CRITICAL: 'critical'    // Financial: purchase, payment, account changes
-};
-
-// Dangerous action patterns that require elevated confirmation
-const DANGER_PATTERNS = {
-  critical: [
-    /\b(buy|purchase|order|checkout|pay|payment|subscribe|upgrade)\b/i,
-    /\b(confirm.*purchase|place.*order|complete.*transaction)\b/i,
-    /\b(add.*card|save.*payment|billing)\b/i,
-    /\b(delete.*account|close.*account|deactivate)\b/i,
-    /\b(unsubscribe|cancel.*subscription|downgrade)\b/i,
-    /\b(transfer|send.*money|withdraw)\b/i,
-  ],
-  high: [
-    /\b(delete|remove|trash|discard|erase|clear)\b/i,
-    /\b(cancel|abort|terminate|end|stop)\b/i,
-    /\b(uninstall|unlink|disconnect|revoke)\b/i,
-    /\b(reset|restore.*default|factory.*reset)\b/i,
-    /\b(sign.*out|log.*out|logout)\b/i,
-    /\b(submit|send|post|publish)\b/i,
-    /\b(accept|agree|confirm|approve)\b/i,
-    /\b(permanently|forever|cannot.*undo|irreversible)\b/i,
-  ],
-  medium: [
-    /\b(save|update|change|modify|edit)\b/i,
-    /\b(enable|disable|toggle|switch)\b/i,
-    /\b(select|choose|pick|set)\b/i,
-    /\b(upload|download|import|export)\b/i,
-  ]
-};
-
-// UI element types that indicate higher risk
-const HIGH_RISK_ELEMENTS = [
-  'button[class*="delete"]', 'button[class*="remove"]', 'button[class*="danger"]',
-  '[class*="destructive"]', '[class*="warning"]', '[class*="critical"]',
-  'input[type="submit"]', 'button[type="submit"]',
-  '[class*="checkout"]', '[class*="purchase"]', '[class*="payment"]'
-];
-
-/**
- * Analyze text content to determine action risk level
- * @param {string} text - Text to analyze (button label, nearby text, etc.)
- * @returns {string} Risk level
- */
-function analyzeTextRisk(text) {
-  if (!text) return ActionRiskLevel.LOW;
-  
-  const normalizedText = text.toLowerCase().trim();
-  
-  // Check critical patterns first
-  for (const pattern of DANGER_PATTERNS.critical) {
-    if (pattern.test(normalizedText)) {
-      return ActionRiskLevel.CRITICAL;
-    }
-  }
-  
-  // Check high-risk patterns
-  for (const pattern of DANGER_PATTERNS.high) {
-    if (pattern.test(normalizedText)) {
-      return ActionRiskLevel.HIGH;
-    }
-  }
-  
-  // Check medium-risk patterns
-  for (const pattern of DANGER_PATTERNS.medium) {
-    if (pattern.test(normalizedText)) {
-      return ActionRiskLevel.MEDIUM;
-    }
-  }
-  
-  return ActionRiskLevel.LOW;
-}
-
-/**
- * Analyze an action and its target to determine risk and required confirmation
- * @param {Object} action - The action to analyze
- * @param {Object} targetInfo - Information about the target element/region
- * @returns {Object} Analysis result with risk level, requires confirmation, and reasoning
- */
-function analyzeActionSafety(action, targetInfo = {}) {
-  const analysis = {
-    riskLevel: ActionRiskLevel.SAFE,
-    requiresConfirmation: false,
-    requiresExplicitApproval: false,
-    reasoning: [],
-    warnings: [],
-    targetDescription: targetInfo.description || 'Unknown target'
-  };
-  
-  // Determine base risk from action type
-  switch (action.type) {
-    case 'screenshot':
-    case 'scroll':
-    case 'hover':
-    case 'wait':
-      analysis.riskLevel = ActionRiskLevel.SAFE;
-      analysis.reasoning.push('Read-only operation');
-      break;
-      
-    case 'click':
-      analysis.riskLevel = ActionRiskLevel.LOW;
-      analysis.reasoning.push('Click interaction');
-      
-      // Elevate risk based on target analysis
-      if (targetInfo.text) {
-        const textRisk = analyzeTextRisk(targetInfo.text);
-        if (textRisk === ActionRiskLevel.CRITICAL || textRisk === ActionRiskLevel.HIGH) {
-          analysis.riskLevel = textRisk;
-          analysis.reasoning.push(`Target text "${targetInfo.text}" indicates ${textRisk} risk`);
-        }
-      }
-      
-      if (targetInfo.nearbyText) {
-        const nearbyRisk = analyzeTextRisk(targetInfo.nearbyText);
-        if (nearbyRisk === ActionRiskLevel.CRITICAL) {
-          analysis.riskLevel = ActionRiskLevel.CRITICAL;
-          analysis.warnings.push(`Context suggests financial/critical action: "${targetInfo.nearbyText}"`);
-        } else if (nearbyRisk === ActionRiskLevel.HIGH && analysis.riskLevel !== ActionRiskLevel.CRITICAL) {
-          analysis.riskLevel = ActionRiskLevel.HIGH;
-          analysis.warnings.push(`Context suggests destructive action: "${targetInfo.nearbyText}"`);
-        }
-      }
-      break;
-      
-    case 'type':
-    case 'input':
-      analysis.riskLevel = ActionRiskLevel.MEDIUM;
-      analysis.reasoning.push('Text input operation');
-      
-      // Check if typing in sensitive fields
-      if (targetInfo.fieldType) {
-        if (['password', 'credit-card', 'cvv', 'ssn'].includes(targetInfo.fieldType)) {
-          analysis.riskLevel = ActionRiskLevel.HIGH;
-          analysis.warnings.push('Entering sensitive information');
-        }
-      }
-      break;
-      
-    case 'key':
-    case 'hotkey':
-      analysis.riskLevel = ActionRiskLevel.MEDIUM;
-      analysis.reasoning.push('Keyboard shortcut');
-      
-      // Check for dangerous shortcuts
-      const key = action.params?.key?.toLowerCase() || '';
-      if (key.includes('delete') || key.includes('backspace')) {
-        analysis.riskLevel = ActionRiskLevel.HIGH;
-        analysis.warnings.push('Delete key pressed');
-      }
-      if (key.includes('enter') || key.includes('return')) {
-        // Enter could submit forms
-        analysis.riskLevel = ActionRiskLevel.MEDIUM;
-        analysis.reasoning.push('Enter key may submit form');
-      }
-      break;
-      
-    default:
-      analysis.riskLevel = ActionRiskLevel.MEDIUM;
-      analysis.reasoning.push('Unknown action type');
-  }
-  
-  // Set confirmation requirements based on risk level
-  switch (analysis.riskLevel) {
-    case ActionRiskLevel.CRITICAL:
-      analysis.requiresConfirmation = true;
-      analysis.requiresExplicitApproval = true;
-      analysis.warnings.push('⚠️ CRITICAL: This action may involve financial transaction or account changes');
-      break;
-    case ActionRiskLevel.HIGH:
-      analysis.requiresConfirmation = true;
-      analysis.requiresExplicitApproval = true;
-      analysis.warnings.push('⚠️ HIGH RISK: This action may be destructive or irreversible');
-      break;
-    case ActionRiskLevel.MEDIUM:
-      analysis.requiresConfirmation = true;
-      analysis.requiresExplicitApproval = false;
-      break;
-    default:
-      analysis.requiresConfirmation = false;
-      analysis.requiresExplicitApproval = false;
-  }
-  
-  return analysis;
-}
-
-/**
- * Format a human-readable description of what an action will do
- * @param {Object} action - The action object
- * @param {Object} targetInfo - Target analysis results
- * @returns {string} Human-readable description
- */
-function describeAction(action, targetInfo = {}) {
-  const parts = [];
-  
-  switch (action.type) {
-    case 'click':
-      parts.push(`Click at`);
-      if (action.params?.label) {
-        parts.push(`grid position ${action.params.label}`);
-      } else if (action.params?.x !== undefined) {
-        parts.push(`coordinates (${action.params.x}, ${action.params.y})`);
-      }
-      if (targetInfo.text) {
-        parts.push(`on "${targetInfo.text}"`);
-      }
-      if (targetInfo.elementType) {
-        parts.push(`(${targetInfo.elementType})`);
-      }
-      break;
-      
-    case 'type':
-      const text = action.params?.text || '';
-      const preview = text.length > 50 ? text.substring(0, 50) + '...' : text;
-      parts.push(`Type "${preview}"`);
-      if (targetInfo.fieldName) {
-        parts.push(`into ${targetInfo.fieldName}`);
-      }
-      break;
-      
-    case 'key':
-      parts.push(`Press ${action.params?.key || 'key'}`);
-      if (action.params?.modifiers?.length) {
-        parts.push(`with ${action.params.modifiers.join('+')}`);
-      }
-      break;
-      
-    case 'screenshot':
-      parts.push('Capture screenshot');
-      break;
-      
-    case 'scroll':
-      parts.push(`Scroll ${action.params?.direction || 'down'}`);
-      break;
-      
-    case 'wait':
-      parts.push(`Wait ${action.params?.duration || 1000}ms`);
-      break;
-      
-    default:
-      parts.push(`Execute ${action.type} action`);
-  }
-  
-  return parts.join(' ');
-}
-
-// Store pending actions awaiting confirmation
-let pendingConfirmation = null;
 
 // Ensure caches land in a writable location to avoid Windows permission issues
 const cacheRoot = path.join(os.tmpdir(), 'copilot-liku-electron-cache');
@@ -453,11 +199,19 @@ function createChatWindow() {
 
   chatWindow.loadFile(path.join(__dirname, '../renderer/chat/index.html'));
 
+  const persistBounds = () => {
+    if (!chatWindow) return;
+    saveChatBoundsPrefs(chatWindow.getBounds());
+  };
+
   chatWindow.webContents.on('did-finish-load', () => {
     // Force bounds one more time after load
     chatWindow.setBounds({ x: X, y: Y, width: W, height: H });
     console.log(`[CHAT] Loaded. Bounds: ${JSON.stringify(chatWindow.getBounds())}`);
   });
+
+  chatWindow.on('resize', persistBounds);
+  chatWindow.on('move', persistBounds);
 
   chatWindow.on('close', (event) => {
     if (!app.isQuitting) {
@@ -1863,16 +1617,10 @@ function storeVisualContext(imageData) {
 }
 
 /**
- * Get visual context for AI (called by agent integration)
- */
-function getVisualContext() {
-  return visualContextHistory;
-}
-
-/**
  * Initialize the application
  */
 app.whenReady().then(() => {
+  loadChatBoundsPrefs();
   createOverlayWindow();
   createChatWindow();
   createTray();
