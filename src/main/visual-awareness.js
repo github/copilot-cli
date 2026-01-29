@@ -18,6 +18,50 @@ let elementCache = new Map();
 const MAX_DIFF_HISTORY = 10;
 const DIFF_THRESHOLD = 0.05; // 5% change threshold
 
+// ===== POWERSHELL HELPER =====
+// BLOCKER-2 FIX: Write scripts to temp files instead of inline commands
+// This preserves Here-String syntax which requires newlines
+
+/**
+ * Execute a PowerShell script by writing to a temp file
+ * This fixes the Here-String (@" ... "@) syntax issue
+ * @param {string} script - PowerShell script content
+ * @param {number} timeout - Execution timeout in ms
+ * @returns {Promise<{stdout: string, stderr: string}>}
+ */
+function executePowerShellScript(script, timeout = 10000) {
+  return new Promise((resolve, reject) => {
+    const tempDir = path.join(os.tmpdir(), 'liku-ps');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+    
+    const scriptPath = path.join(tempDir, `script-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.ps1`);
+    
+    try {
+      fs.writeFileSync(scriptPath, script, 'utf8');
+    } catch (err) {
+      resolve({ error: `Failed to write temp script: ${err.message}` });
+      return;
+    }
+    
+    // Execute with -File to avoid quote escaping issues
+    exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${scriptPath}"`,
+      { timeout },
+      (error, stdout, stderr) => {
+        // Clean up temp file
+        try { fs.unlinkSync(scriptPath); } catch (e) {}
+        
+        if (error) {
+          resolve({ error: error.message, stderr });
+        } else {
+          resolve({ stdout: stdout.trim(), stderr });
+        }
+      }
+    );
+  });
+}
+
 // ===== SCREEN DIFFING =====
 
 /**
@@ -110,72 +154,66 @@ function getScreenDiffHistory() {
  * Get information about the currently active window
  * Uses PowerShell on Windows
  */
-function getActiveWindow() {
-  return new Promise((resolve, reject) => {
-    if (process.platform !== 'win32') {
-      resolve({ error: 'Active window tracking only supported on Windows currently' });
-      return;
-    }
+async function getActiveWindow() {
+  if (process.platform !== 'win32') {
+    return { error: 'Active window tracking only supported on Windows currently' };
+  }
 
-    const psScript = `
-      Add-Type @"
-        using System;
-        using System.Runtime.InteropServices;
-        using System.Text;
-        public class Win32 {
-          [DllImport("user32.dll")]
-          public static extern IntPtr GetForegroundWindow();
-          [DllImport("user32.dll")]
-          public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-          [DllImport("user32.dll")]
-          public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
-          [DllImport("user32.dll")]
-          public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-          [StructLayout(LayoutKind.Sequential)]
-          public struct RECT { public int Left, Top, Right, Bottom; }
-        }
+  const psScript = `
+Add-Type @"
+  using System;
+  using System.Runtime.InteropServices;
+  using System.Text;
+  public class Win32 {
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")]
+    public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+    [DllImport("user32.dll")]
+    public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT { public int Left, Top, Right, Bottom; }
+  }
 "@
-      $hwnd = [Win32]::GetForegroundWindow()
-      $title = New-Object System.Text.StringBuilder 256
-      [Win32]::GetWindowText($hwnd, $title, 256) | Out-Null
-      $processId = 0
-      [Win32]::GetWindowThreadProcessId($hwnd, [ref]$processId) | Out-Null
-      $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
-      $rect = New-Object Win32+RECT
-      [Win32]::GetWindowRect($hwnd, [ref]$rect) | Out-Null
-      @{
-        Title = $title.ToString()
-        ProcessName = $process.ProcessName
-        ProcessId = $processId
-        Bounds = @{
-          X = $rect.Left
-          Y = $rect.Top
-          Width = $rect.Right - $rect.Left
-          Height = $rect.Bottom - $rect.Top
-        }
-      } | ConvertTo-Json
-    `;
+$hwnd = [Win32]::GetForegroundWindow()
+$title = New-Object System.Text.StringBuilder 256
+[Win32]::GetWindowText($hwnd, $title, 256) | Out-Null
+$processId = 0
+[Win32]::GetWindowThreadProcessId($hwnd, [ref]$processId) | Out-Null
+$process = Get-Process -Id $processId -ErrorAction SilentlyContinue
+$rect = New-Object Win32+RECT
+[Win32]::GetWindowRect($hwnd, [ref]$rect) | Out-Null
+@{
+  Title = $title.ToString()
+  ProcessName = $process.ProcessName
+  ProcessId = $processId
+  Bounds = @{
+    X = $rect.Left
+    Y = $rect.Top
+    Width = $rect.Right - $rect.Left
+    Height = $rect.Bottom - $rect.Top
+  }
+} | ConvertTo-Json
+`;
 
-    exec(`powershell -NoProfile -Command "${psScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`, 
-      { timeout: 5000 },
-      (error, stdout, stderr) => {
-        if (error) {
-          resolve({ error: error.message });
-          return;
-        }
-        try {
-          const info = JSON.parse(stdout.trim());
-          activeWindowInfo = {
-            ...info,
-            timestamp: Date.now()
-          };
-          resolve(activeWindowInfo);
-        } catch (e) {
-          resolve({ error: 'Failed to parse window info' });
-        }
-      }
-    );
-  });
+  const result = await executePowerShellScript(psScript, 5000);
+  
+  if (result.error) {
+    return { error: result.error };
+  }
+  
+  try {
+    const info = JSON.parse(result.stdout);
+    activeWindowInfo = {
+      ...info,
+      timestamp: Date.now()
+    };
+    return activeWindowInfo;
+  } catch (e) {
+    return { error: 'Failed to parse window info', raw: result.stdout };
+  }
 }
 
 /**
@@ -282,65 +320,57 @@ function extractWithTesseract(imageData, language) {
 /**
  * Extract text using Windows built-in OCR
  */
-function extractWithWindowsOCR(imageData) {
-  return new Promise((resolve, reject) => {
-    if (process.platform !== 'win32') {
-      resolve({ error: 'Windows OCR only available on Windows' });
-      return;
-    }
+async function extractWithWindowsOCR(imageData) {
+  if (process.platform !== 'win32') {
+    return { error: 'Windows OCR only available on Windows' };
+  }
 
-    // Save image to temp file
-    const tempDir = path.join(os.tmpdir(), 'liku-ocr');
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
-    }
-    
-    const tempImagePath = path.join(tempDir, `ocr-${Date.now()}.png`);
-    const base64Data = imageData.dataURL.replace(/^data:image\/\w+;base64,/, '');
-    
-    try {
-      fs.writeFileSync(tempImagePath, base64Data, 'base64');
-    } catch (err) {
-      resolve({ error: 'Failed to write temp image: ' + err.message });
-      return;
-    }
+  // Save image to temp file
+  const tempDir = path.join(os.tmpdir(), 'liku-ocr');
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+  
+  const tempImagePath = path.join(tempDir, `ocr-${Date.now()}.png`);
+  const base64Data = imageData.dataURL.replace(/^data:image\/\w+;base64,/, '');
+  
+  try {
+    fs.writeFileSync(tempImagePath, base64Data, 'base64');
+  } catch (err) {
+    return { error: 'Failed to write temp image: ' + err.message };
+  }
 
-    // Use Windows OCR via PowerShell
-    const psScript = `
-      Add-Type -AssemblyName System.Runtime.WindowsRuntime
-      $null = [Windows.Media.Ocr.OcrEngine,Windows.Foundation,ContentType=WindowsRuntime]
-      $null = [Windows.Graphics.Imaging.BitmapDecoder,Windows.Foundation,ContentType=WindowsRuntime]
-      $null = [Windows.Storage.StorageFile,Windows.Foundation,ContentType=WindowsRuntime]
-      
-      $file = [Windows.Storage.StorageFile]::GetFileFromPathAsync("${tempImagePath.replace(/\\/g, '\\\\')}").GetAwaiter().GetResult()
-      $stream = $file.OpenReadAsync().GetAwaiter().GetResult()
-      $decoder = [Windows.Graphics.Imaging.BitmapDecoder]::CreateAsync($stream).GetAwaiter().GetResult()
-      $bitmap = $decoder.GetSoftwareBitmapAsync().GetAwaiter().GetResult()
-      
-      $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages()
-      $result = $engine.RecognizeAsync($bitmap).GetAwaiter().GetResult()
-      $result.Text
-    `;
+  // Use Windows OCR via PowerShell
+  const psScript = `
+Add-Type -AssemblyName System.Runtime.WindowsRuntime
+$null = [Windows.Media.Ocr.OcrEngine,Windows.Foundation,ContentType=WindowsRuntime]
+$null = [Windows.Graphics.Imaging.BitmapDecoder,Windows.Foundation,ContentType=WindowsRuntime]
+$null = [Windows.Storage.StorageFile,Windows.Foundation,ContentType=WindowsRuntime]
 
-    exec(`powershell -NoProfile -Command "${psScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`,
-      { timeout: 30000 },
-      (error, stdout, stderr) => {
-        // Clean up temp file
-        try { fs.unlinkSync(tempImagePath); } catch (e) {}
+$file = [Windows.Storage.StorageFile]::GetFileFromPathAsync("${tempImagePath.replace(/\\/g, '\\\\')}").GetAwaiter().GetResult()
+$stream = $file.OpenReadAsync().GetAwaiter().GetResult()
+$decoder = [Windows.Graphics.Imaging.BitmapDecoder]::CreateAsync($stream).GetAwaiter().GetResult()
+$bitmap = $decoder.GetSoftwareBitmapAsync().GetAwaiter().GetResult()
 
-        if (error) {
-          resolve({ error: 'Windows OCR failed: ' + error.message });
-          return;
-        }
+$engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages()
+$result = $engine.RecognizeAsync($bitmap).GetAwaiter().GetResult()
+$result.Text
+`;
 
-        resolve({
-          text: stdout.trim(),
-          provider: 'windows-ocr',
-          timestamp: Date.now()
-        });
-      }
-    );
-  });
+  const result = await executePowerShellScript(psScript, 30000);
+  
+  // Clean up temp file
+  try { fs.unlinkSync(tempImagePath); } catch (e) {}
+
+  if (result.error) {
+    return { error: 'Windows OCR failed: ' + result.error };
+  }
+
+  return {
+    text: result.stdout,
+    provider: 'windows-ocr',
+    timestamp: Date.now()
+  };
 }
 
 // ===== UI ELEMENT DETECTION =====
@@ -348,151 +378,137 @@ function extractWithWindowsOCR(imageData) {
 /**
  * Detect UI elements from accessibility tree (Windows UI Automation)
  */
-function detectUIElements(options = {}) {
-  return new Promise((resolve, reject) => {
-    if (process.platform !== 'win32') {
-      resolve({ error: 'UI Automation only available on Windows' });
-      return;
-    }
+async function detectUIElements(options = {}) {
+  if (process.platform !== 'win32') {
+    return { error: 'UI Automation only available on Windows' };
+  }
 
-    const { depth = 3 } = options;
+  const { depth = 3 } = options;
 
-    const psScript = `
-      Add-Type -AssemblyName UIAutomationClient
-      Add-Type -AssemblyName UIAutomationTypes
-      
-      function Get-UIElements {
-        param($element, $depth, $currentDepth = 0)
-        
-        if ($currentDepth -ge $depth) { return @() }
-        
-        $results = @()
-        $condition = [System.Windows.Automation.Condition]::TrueCondition
-        $children = $element.FindAll([System.Windows.Automation.TreeScope]::Children, $condition)
-        
-        foreach ($child in $children) {
-          try {
-            $rect = $child.Current.BoundingRectangle
-            if ($rect.Width -gt 0 -and $rect.Height -gt 0) {
-              $results += @{
-                Name = $child.Current.Name
-                ControlType = $child.Current.ControlType.ProgrammaticName
-                AutomationId = $child.Current.AutomationId
-                ClassName = $child.Current.ClassName
-                Bounds = @{
-                  X = [int]$rect.X
-                  Y = [int]$rect.Y
-                  Width = [int]$rect.Width
-                  Height = [int]$rect.Height
-                }
-                IsEnabled = $child.Current.IsEnabled
-              }
-              $results += Get-UIElements -element $child -depth $depth -currentDepth ($currentDepth + 1)
-            }
-          } catch {}
-        }
-        return $results
-      }
-      
-      $root = [System.Windows.Automation.AutomationElement]::FocusedElement
-      if ($null -eq $root) {
-        $root = [System.Windows.Automation.AutomationElement]::RootElement
-      }
-      
-      $elements = Get-UIElements -element $root -depth ${depth}
-      $elements | ConvertTo-Json -Depth 10
-    `;
+  const psScript = `
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
 
-    exec(`powershell -NoProfile -Command "${psScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`,
-      { timeout: 10000 },
-      (error, stdout, stderr) => {
-        if (error) {
-          resolve({ error: 'UI Automation failed: ' + error.message });
-          return;
-        }
-
-        try {
-          let elements = JSON.parse(stdout.trim() || '[]');
-          if (!Array.isArray(elements)) {
-            elements = [elements];
-          }
-
-          // Cache results
-          elementCache.set(Date.now(), elements);
-
-          resolve({
-            elements,
-            count: elements.length,
-            timestamp: Date.now()
-          });
-        } catch (e) {
-          resolve({ elements: [], count: 0, error: 'Parse error' });
-        }
-      }
-    );
-  });
-}
-
-/**
- * Find UI element at specific coordinates
- */
-function findElementAtPoint(x, y) {
-  return new Promise((resolve, reject) => {
-    if (process.platform !== 'win32') {
-      resolve({ error: 'UI Automation only available on Windows' });
-      return;
-    }
-
-    const psScript = `
-      Add-Type -AssemblyName UIAutomationClient
-      Add-Type -AssemblyName UIAutomationTypes
-      
-      $point = New-Object System.Windows.Point(${x}, ${y})
-      $element = [System.Windows.Automation.AutomationElement]::FromPoint($point)
-      
-      if ($null -ne $element) {
-        $rect = $element.Current.BoundingRectangle
-        @{
-          Name = $element.Current.Name
-          ControlType = $element.Current.ControlType.ProgrammaticName
-          AutomationId = $element.Current.AutomationId
-          ClassName = $element.Current.ClassName
-          Value = try { $element.GetCurrentPropertyValue([System.Windows.Automation.AutomationElement]::ValueProperty) } catch { $null }
+function Get-UIElements {
+  param($element, $depth, $currentDepth = 0)
+  
+  if ($currentDepth -ge $depth) { return @() }
+  
+  $results = @()
+  $condition = [System.Windows.Automation.Condition]::TrueCondition
+  $children = $element.FindAll([System.Windows.Automation.TreeScope]::Children, $condition)
+  
+  foreach ($child in $children) {
+    try {
+      $rect = $child.Current.BoundingRectangle
+      if ($rect.Width -gt 0 -and $rect.Height -gt 0) {
+        $results += @{
+          Name = $child.Current.Name
+          ControlType = $child.Current.ControlType.ProgrammaticName
+          AutomationId = $child.Current.AutomationId
+          ClassName = $child.Current.ClassName
           Bounds = @{
             X = [int]$rect.X
             Y = [int]$rect.Y
             Width = [int]$rect.Width
             Height = [int]$rect.Height
           }
-          IsEnabled = $element.Current.IsEnabled
-          HasKeyboardFocus = $element.Current.HasKeyboardFocus
-        } | ConvertTo-Json
-      } else {
-        @{ error = "No element found at point" } | ConvertTo-Json
-      }
-    `;
-
-    exec(`powershell -NoProfile -Command "${psScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`,
-      { timeout: 5000 },
-      (error, stdout, stderr) => {
-        if (error) {
-          resolve({ error: 'Element lookup failed: ' + error.message });
-          return;
+          IsEnabled = $child.Current.IsEnabled
         }
-
-        try {
-          const element = JSON.parse(stdout.trim());
-          resolve({
-            ...element,
-            queryPoint: { x, y },
-            timestamp: Date.now()
-          });
-        } catch (e) {
-          resolve({ error: 'Parse error' });
-        }
+        $results += Get-UIElements -element $child -depth $depth -currentDepth ($currentDepth + 1)
       }
-    );
-  });
+    } catch {}
+  }
+  return $results
+}
+
+$root = [System.Windows.Automation.AutomationElement]::FocusedElement
+if ($null -eq $root) {
+  $root = [System.Windows.Automation.AutomationElement]::RootElement
+}
+
+$elements = Get-UIElements -element $root -depth ${depth}
+$elements | ConvertTo-Json -Depth 10
+`;
+
+  const result = await executePowerShellScript(psScript, 10000);
+  
+  if (result.error) {
+    return { error: 'UI Automation failed: ' + result.error };
+  }
+
+  try {
+    let elements = JSON.parse(result.stdout || '[]');
+    if (!Array.isArray(elements)) {
+      elements = [elements];
+    }
+
+    // Cache results
+    elementCache.set(Date.now(), elements);
+
+    return {
+      elements,
+      count: elements.length,
+      timestamp: Date.now()
+    };
+  } catch (e) {
+    return { elements: [], count: 0, error: 'Parse error' };
+  }
+}
+
+/**
+ * Find UI element at specific coordinates
+ */
+async function findElementAtPoint(x, y) {
+  if (process.platform !== 'win32') {
+    return { error: 'UI Automation only available on Windows' };
+  }
+
+  const psScript = `
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
+
+$point = New-Object System.Windows.Point(${x}, ${y})
+$element = [System.Windows.Automation.AutomationElement]::FromPoint($point)
+
+if ($null -ne $element) {
+  $rect = $element.Current.BoundingRectangle
+  @{
+    Name = $element.Current.Name
+    ControlType = $element.Current.ControlType.ProgrammaticName
+    AutomationId = $element.Current.AutomationId
+    ClassName = $element.Current.ClassName
+    Value = try { $element.GetCurrentPropertyValue([System.Windows.Automation.AutomationElement]::ValueProperty) } catch { $null }
+    Bounds = @{
+      X = [int]$rect.X
+      Y = [int]$rect.Y
+      Width = [int]$rect.Width
+      Height = [int]$rect.Height
+    }
+    IsEnabled = $element.Current.IsEnabled
+    HasKeyboardFocus = $element.Current.HasKeyboardFocus
+  } | ConvertTo-Json
+} else {
+  @{ error = "No element found at point" } | ConvertTo-Json
+}
+`;
+
+  const result = await executePowerShellScript(psScript, 5000);
+  
+  if (result.error) {
+    return { error: 'Element lookup failed: ' + result.error };
+  }
+
+  try {
+    const element = JSON.parse(result.stdout);
+    return {
+      ...element,
+      queryPoint: { x, y },
+      timestamp: Date.now()
+    };
+  } catch (e) {
+    return { error: 'Parse error' };
+  }
 }
 
 // ===== COMPREHENSIVE SCREEN ANALYSIS =====

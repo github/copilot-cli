@@ -40,9 +40,9 @@ $classSB = New-Object System.Text.StringBuilder 256
 [void][WinAPI]::GetWindowText($hwnd, $titleSB, 256)
 [void][WinAPI]::GetClassName($hwnd, $classSB, 256)
 
-$pid = 0
-[void][WinAPI]::GetWindowThreadProcessId($hwnd, [ref]$pid)
-$proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
+$procId = 0
+[void][WinAPI]::GetWindowThreadProcessId($hwnd, [ref]$procId)
+$proc = Get-Process -Id $procId -ErrorAction SilentlyContinue
 
 $rect = New-Object WinAPI+RECT
 [void][WinAPI]::GetWindowRect($hwnd, [ref]$rect)
@@ -125,9 +125,9 @@ foreach ($hwnd in [WindowFinder]::windows) {
     ${title ? `if (-not $t.ToLower().Contains('${title.toLowerCase().replace(/'/g, "''")}')) { continue }` : ''}
     ${className ? `if (-not $c.ToLower().Contains('${className.toLowerCase().replace(/'/g, "''")}')) { continue }` : ''}
     
-    $pid = 0
-    [void][WindowFinder]::GetWindowThreadProcessId($hwnd, [ref]$pid)
-    $proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
+    $procId = 0
+    [void][WindowFinder]::GetWindowThreadProcessId($hwnd, [ref]$procId)
+    $proc = Get-Process -Id $procId -ErrorAction SilentlyContinue
     $pn = if ($proc) { $proc.ProcessName } else { "" }
     
     ${processName ? `if ($pn -ne '${processName.replace(/'/g, "''")}') { continue }` : ''}

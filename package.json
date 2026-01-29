@@ -3,9 +3,14 @@
   "version": "0.0.1",
   "description": "GitHub Copilot CLI with headless agent + ultra-thin overlay architecture",
   "main": "src/main/index.js",
+  "bin": {
+    "liku": "./src/cli/liku.js"
+  },
   "scripts": {
     "start": "node scripts/start.js",
-    "test": "node scripts/test-grid.js"
+    "test": "node scripts/test-grid.js",
+    "test:ui": "node scripts/test-ui-automation-baseline.js",
+    "liku": "node src/cli/liku.js"
   },
   "keywords": [
     "copilot",

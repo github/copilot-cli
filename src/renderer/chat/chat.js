@@ -403,12 +403,12 @@ window.electronAPI.getState().then(state => {
     modelSelect.value = state.model;
   }
   
-  // Check auth status for current provider
+  // Check auth status for current provider (async - response comes via onAuthStatus)
   checkProviderAuth(currentProvider);
 });
 
-// Initialize auth status display
-updateAuthStatus('disconnected', currentProvider);
+// Initialize auth status display as pending until check completes
+updateAuthStatus('pending', currentProvider);
 updateModelSelector(currentProvider);
 
 // ===== AGENTIC ACTION UI =====

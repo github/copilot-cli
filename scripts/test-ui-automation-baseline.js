@@ -12,7 +12,7 @@
 const path = require('path');
 
 // Dynamic import path - can point to old or new module
-const UI_MODULE_PATH = process.env.UI_MODULE_PATH || './src/main/ui-automation.js';
+const UI_MODULE_PATH = process.env.UI_MODULE_PATH || './src/main/ui-automation';
 
 async function runTests() {
   console.log('='.repeat(60));

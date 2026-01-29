@@ -6,6 +6,9 @@
  */
 
 const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 const gridMath = require('../shared/grid-math');
 
 // Action types the AI can request
@@ -20,6 +23,9 @@ const ACTION_TYPES = {
   WAIT: 'wait',             // Wait for milliseconds
   SCREENSHOT: 'screenshot', // Take a screenshot for verification
   DRAG: 'drag',             // Drag from one point to another
+  // Semantic element-based actions (preferred - more reliable)
+  CLICK_ELEMENT: 'click_element',   // Click element found by text/name
+  FIND_ELEMENT: 'find_element',     // Find element and return its info
 };
 
 // Key mappings for special keys
@@ -95,7 +101,16 @@ Add-Type -AssemblyName System.Windows.Forms
 }
 
 /**
- * Click at coordinates (Windows)
+ * Click at coordinates (Windows) - FIXED for transparent overlay click-through
+ * 
+ * Uses SendInput (modern replacement for deprecated mouse_event) and
+ * activates the target window before clicking to ensure synthetic clicks
+ * reach background applications behind the Electron overlay.
+ * 
+ * Key fixes:
+ * 1. Use SendInput instead of mouse_event (better UIPI handling)
+ * 2. Find real window under cursor (skip transparent windows)
+ * 3. SetForegroundWindow to activate target before clicking
  */
 async function click(x, y, button = 'left') {
   // Move mouse first
@@ -104,49 +119,180 @@ async function click(x, y, button = 'left') {
   // Small delay for position to register
   await sleep(50);
   
-  // Click using SendInput via Add-Type
+  // Click using SendInput + SetForegroundWindow for reliable click-through
   const script = `
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
-public class MouseClick {
+
+public class ClickThrough {
+    // SendInput structures and constants
+    [StructLayout(LayoutKind.Sequential)]
+    public struct INPUT {
+        public uint type;
+        public MOUSEINPUT mi;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MOUSEINPUT {
+        public int dx;
+        public int dy;
+        public uint mouseData;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    public const uint INPUT_MOUSE = 0;
+    public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+    public const uint MOUSEEVENTF_LEFTUP = 0x0004;
+    public const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
+    public const uint MOUSEEVENTF_RIGHTUP = 0x0010;
+    public const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+    public const uint MOUSEEVENTF_MOVE = 0x0001;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
     [DllImport("user32.dll")]
-    public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, int dwExtraInfo);
-    
-    public const uint MOUSEEVENTF_LEFTDOWN = 0x02;
-    public const uint MOUSEEVENTF_LEFTUP = 0x04;
-    public const uint MOUSEEVENTF_RIGHTDOWN = 0x08;
-    public const uint MOUSEEVENTF_RIGHTUP = 0x10;
-    public const uint MOUSEEVENTF_MIDDLEDOWN = 0x20;
-    public const uint MOUSEEVENTF_MIDDLEUP = 0x40;
-    
-    public static void LeftClick() {
-        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+    public static extern IntPtr WindowFromPoint(int x, int y);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetAncestor(IntPtr hwnd, uint gaFlags);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr lpdwProcessId);
+
+    [DllImport("kernel32.dll")]
+    public static extern uint GetCurrentThreadId();
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    public const int GWL_EXSTYLE = -20;
+    public const int WS_EX_TRANSPARENT = 0x20;
+    public const int WS_EX_LAYERED = 0x80000;
+    public const int WS_EX_TOOLWINDOW = 0x80;
+    public const uint GA_ROOT = 2;
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+    public static void ForceForeground(IntPtr hwnd) {
+        // Get the currently active window
+        IntPtr foreground = GetForegroundWindow();
+        uint foregroundThread = GetWindowThreadProcessId(foreground, IntPtr.Zero);
+        uint currentThread = GetCurrentThreadId();
+
+        // Attach our thread to the currently active window thread
+        // This allows SetForegroundWindow to work
+        if (foregroundThread != currentThread) {
+            AttachThreadInput(currentThread, foregroundThread, true);
+            SetForegroundWindow(hwnd);
+            AttachThreadInput(currentThread, foregroundThread, false);
+        } else {
+            SetForegroundWindow(hwnd);
+        }
     }
-    
-    public static void RightClick() {
-        mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
-        mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+
+    public static IntPtr GetRealWindowFromPoint(int x, int y) {
+        IntPtr hwnd = WindowFromPoint(x, y);
+        if (hwnd == IntPtr.Zero) return IntPtr.Zero;
+
+        // Walk up to find a non-overlay parent window
+        // Skip our Electron overlay (has WS_EX_LAYERED, class "Chrome_WidgetWin_1", and no title)
+        int maxIterations = 10;
+        while (maxIterations-- > 0) {
+            int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            bool isTransparent = (exStyle & WS_EX_TRANSPARENT) != 0;
+            bool isLayered = (exStyle & WS_EX_LAYERED) != 0;
+            
+            // Check class name
+            StringBuilder className = new StringBuilder(256);
+            GetClassName(hwnd, className, 256);
+            string cls = className.ToString();
+            
+            // Check window title (our overlay has no title, VS Code has a title)
+            StringBuilder windowTitle = new StringBuilder(256);
+            GetWindowText(hwnd, windowTitle, 256);
+            string title = windowTitle.ToString();
+            
+            // Our overlay: Chrome_WidgetWin_1, WS_EX_LAYERED, empty title
+            // VS Code: Chrome_WidgetWin_1, but has a title like "index.js - project - Visual Studio Code"
+            bool isOurOverlay = cls.Contains("Chrome_WidgetWin") && isLayered && string.IsNullOrEmpty(title);
+            
+            // Skip if WS_EX_TRANSPARENT OR if it's our transparent overlay
+            if (!isTransparent && !isOurOverlay) {
+                return GetAncestor(hwnd, GA_ROOT);
+            }
+            
+            IntPtr parent = GetAncestor(hwnd, 1); // GA_PARENT
+            if (parent == IntPtr.Zero || parent == hwnd) break;
+            hwnd = parent;
+        }
+        
+        return GetAncestor(hwnd, GA_ROOT);
     }
-    
-    public static void DoubleClick() {
-        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-        System.Threading.Thread.Sleep(50);
-        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
+    public static void ClickAt(int x, int y, bool rightButton) {
+        // Find the real window under the cursor (skip transparent overlay)
+        IntPtr targetWindow = GetRealWindowFromPoint(x, y);
+        
+        if (targetWindow != IntPtr.Zero) {
+            // Activate the target window so it receives the click
+            ForceForeground(targetWindow);
+            System.Threading.Thread.Sleep(30);
+        }
+
+        // Prepare SendInput for mouse click
+        INPUT[] inputs = new INPUT[2];
+        
+        uint downFlag = rightButton ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_LEFTDOWN;
+        uint upFlag = rightButton ? MOUSEEVENTF_RIGHTUP : MOUSEEVENTF_LEFTUP;
+
+        // Mouse down
+        inputs[0].type = INPUT_MOUSE;
+        inputs[0].mi.dwFlags = downFlag;
+        inputs[0].mi.dx = 0;
+        inputs[0].mi.dy = 0;
+        inputs[0].mi.mouseData = 0;
+        inputs[0].mi.time = 0;
+        inputs[0].mi.dwExtraInfo = IntPtr.Zero;
+
+        // Mouse up
+        inputs[1].type = INPUT_MOUSE;
+        inputs[1].mi.dwFlags = upFlag;
+        inputs[1].mi.dx = 0;
+        inputs[1].mi.dy = 0;
+        inputs[1].mi.mouseData = 0;
+        inputs[1].mi.time = 0;
+        inputs[1].mi.dwExtraInfo = IntPtr.Zero;
+
+        // Send the click
+        SendInput(2, inputs, Marshal.SizeOf(typeof(INPUT)));
     }
 }
 "@
-[MouseClick]::${button === 'right' ? 'RightClick' : 'LeftClick'}()
+[ClickThrough]::ClickAt(${Math.round(x)}, ${Math.round(y)}, ${button === 'right' ? '$true' : '$false'})
 `;
   await executePowerShell(script);
-  console.log(`[AUTOMATION] ${button} click at (${x}, ${y})`);
+  console.log(`[AUTOMATION] ${button} click at (${x}, ${y}) (click-through enabled)`);
 }
 
 /**
- * Double click at coordinates
+ * Double click at coordinates - FIXED for transparent overlay click-through
  */
 async function doubleClick(x, y) {
   await moveMouse(x, y);
@@ -156,24 +302,119 @@ async function doubleClick(x, y) {
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
-public class MouseDblClick {
+
+public class DblClickThrough {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct INPUT {
+        public uint type;
+        public MOUSEINPUT mi;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MOUSEINPUT {
+        public int dx;
+        public int dy;
+        public uint mouseData;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    public const uint INPUT_MOUSE = 0;
+    public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+    public const uint MOUSEEVENTF_LEFTUP = 0x0004;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
     [DllImport("user32.dll")]
-    public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, int dwExtraInfo);
-    public const uint MOUSEEVENTF_LEFTDOWN = 0x02;
-    public const uint MOUSEEVENTF_LEFTUP = 0x04;
-    public static void DoubleClick() {
-        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+    public static extern IntPtr WindowFromPoint(int x, int y);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetAncestor(IntPtr hwnd, uint gaFlags);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr lpdwProcessId);
+
+    [DllImport("kernel32.dll")]
+    public static extern uint GetCurrentThreadId();
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    public const int GWL_EXSTYLE = -20;
+    public const int WS_EX_TRANSPARENT = 0x20;
+    public const uint GA_ROOT = 2;
+
+    public static void ForceForeground(IntPtr hwnd) {
+        IntPtr foreground = GetForegroundWindow();
+        uint foregroundThread = GetWindowThreadProcessId(foreground, IntPtr.Zero);
+        uint currentThread = GetCurrentThreadId();
+        if (foregroundThread != currentThread) {
+            AttachThreadInput(currentThread, foregroundThread, true);
+            SetForegroundWindow(hwnd);
+            AttachThreadInput(currentThread, foregroundThread, false);
+        } else {
+            SetForegroundWindow(hwnd);
+        }
+    }
+
+    public static IntPtr GetRealWindowFromPoint(int x, int y) {
+        IntPtr hwnd = WindowFromPoint(x, y);
+        if (hwnd == IntPtr.Zero) return IntPtr.Zero;
+        int maxIterations = 10;
+        while (maxIterations-- > 0) {
+            int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            bool isTransparent = (exStyle & WS_EX_TRANSPARENT) != 0;
+            if (!isTransparent) return GetAncestor(hwnd, GA_ROOT);
+            IntPtr parent = GetAncestor(hwnd, 1);
+            if (parent == IntPtr.Zero || parent == hwnd) break;
+            hwnd = parent;
+        }
+        return GetAncestor(hwnd, GA_ROOT);
+    }
+
+    public static void DoubleClickAt(int x, int y) {
+        IntPtr targetWindow = GetRealWindowFromPoint(x, y);
+        if (targetWindow != IntPtr.Zero) {
+            ForceForeground(targetWindow);
+            System.Threading.Thread.Sleep(30);
+        }
+
+        INPUT[] inputs = new INPUT[4];
+        
+        // First click
+        inputs[0].type = INPUT_MOUSE;
+        inputs[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+        inputs[1].type = INPUT_MOUSE;
+        inputs[1].mi.dwFlags = MOUSEEVENTF_LEFTUP;
+
+        SendInput(2, inputs, Marshal.SizeOf(typeof(INPUT)));
         System.Threading.Thread.Sleep(50);
-        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
+        // Second click
+        inputs[2].type = INPUT_MOUSE;
+        inputs[2].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+        inputs[3].type = INPUT_MOUSE;
+        inputs[3].mi.dwFlags = MOUSEEVENTF_LEFTUP;
+
+        SendInput(2, new INPUT[] { inputs[2], inputs[3] }, Marshal.SizeOf(typeof(INPUT)));
     }
 }
 "@
-[MouseDblClick]::DoubleClick()
+[DblClickThrough]::DoubleClickAt(${Math.round(x)}, ${Math.round(y)})
 `;
   await executePowerShell(script);
-  console.log(`[AUTOMATION] Double click at (${x}, ${y})`);
+  console.log(`[AUTOMATION] Double click at (${x}, ${y}) (click-through enabled)`);
 }
 
 /**
@@ -269,27 +510,125 @@ public class MouseScroll {
 }
 
 /**
- * Drag from one point to another
+ * Drag from one point to another - FIXED for transparent overlay click-through
  */
 async function drag(fromX, fromY, toX, toY) {
   await moveMouse(fromX, fromY);
   await sleep(100);
   
-  // Mouse down
-  const downScript = `
+  // Mouse down + drag + mouse up using SendInput
+  const script = `
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
-public class MouseDrag {
+
+public class DragThrough {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct INPUT {
+        public uint type;
+        public MOUSEINPUT mi;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MOUSEINPUT {
+        public int dx;
+        public int dy;
+        public uint mouseData;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    public const uint INPUT_MOUSE = 0;
+    public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+    public const uint MOUSEEVENTF_LEFTUP = 0x0004;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
     [DllImport("user32.dll")]
-    public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, int dwExtraInfo);
-    public const uint MOUSEEVENTF_LEFTDOWN = 0x02;
-    public const uint MOUSEEVENTF_LEFTUP = 0x04;
+    public static extern IntPtr WindowFromPoint(int x, int y);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetAncestor(IntPtr hwnd, uint gaFlags);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr lpdwProcessId);
+
+    [DllImport("kernel32.dll")]
+    public static extern uint GetCurrentThreadId();
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    public const int GWL_EXSTYLE = -20;
+    public const int WS_EX_TRANSPARENT = 0x20;
+    public const uint GA_ROOT = 2;
+
+    public static void ForceForeground(IntPtr hwnd) {
+        IntPtr foreground = GetForegroundWindow();
+        uint foregroundThread = GetWindowThreadProcessId(foreground, IntPtr.Zero);
+        uint currentThread = GetCurrentThreadId();
+        if (foregroundThread != currentThread) {
+            AttachThreadInput(currentThread, foregroundThread, true);
+            SetForegroundWindow(hwnd);
+            AttachThreadInput(currentThread, foregroundThread, false);
+        } else {
+            SetForegroundWindow(hwnd);
+        }
+    }
+
+    public static IntPtr GetRealWindowFromPoint(int x, int y) {
+        IntPtr hwnd = WindowFromPoint(x, y);
+        if (hwnd == IntPtr.Zero) return IntPtr.Zero;
+        int maxIterations = 10;
+        while (maxIterations-- > 0) {
+            int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            bool isTransparent = (exStyle & WS_EX_TRANSPARENT) != 0;
+            if (!isTransparent) return GetAncestor(hwnd, GA_ROOT);
+            IntPtr parent = GetAncestor(hwnd, 1);
+            if (parent == IntPtr.Zero || parent == hwnd) break;
+            hwnd = parent;
+        }
+        return GetAncestor(hwnd, GA_ROOT);
+    }
+
+    public static void MouseDown() {
+        INPUT[] inputs = new INPUT[1];
+        inputs[0].type = INPUT_MOUSE;
+        inputs[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+        SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
+    }
+
+    public static void MouseUp() {
+        INPUT[] inputs = new INPUT[1];
+        inputs[0].type = INPUT_MOUSE;
+        inputs[0].mi.dwFlags = MOUSEEVENTF_LEFTUP;
+        SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
+    }
 }
 "@
-[MouseDrag]::mouse_event([MouseDrag]::MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+
+# Activate window at start point
+$targetWindow = [DragThrough]::GetRealWindowFromPoint(${Math.round(fromX)}, ${Math.round(fromY)})
+if ($targetWindow -ne [IntPtr]::Zero) {
+    [DragThrough]::ForceForeground($targetWindow)
+    Start-Sleep -Milliseconds 30
+}
+
+# Mouse down at start position
+[DragThrough]::MouseDown()
 `;
-  await executePowerShell(downScript);
+  await executePowerShell(script);
   
   // Move to destination
   await sleep(100);
@@ -298,11 +637,11 @@ public class MouseDrag {
   
   // Mouse up
   const upScript = `
-[MouseDrag]::mouse_event([MouseDrag]::MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+[DragThrough]::MouseUp()
 `;
   await executePowerShell(upScript);
   
-  console.log(`[AUTOMATION] Dragged from (${fromX}, ${fromY}) to (${toX}, ${toY})`);
+  console.log(`[AUTOMATION] Dragged from (${fromX}, ${fromY}) to (${toX}, ${toY}) (click-through enabled)`);
 }
 
 /**
@@ -310,6 +649,307 @@ public class MouseDrag {
  */
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ===== SEMANTIC ELEMENT-BASED AUTOMATION =====
+// More reliable than coordinate-based - finds elements by their properties
+
+/**
+ * Execute PowerShell script from a temp file (better for complex scripts)
+ */
+function executePowerShellScript(scriptContent, timeoutMs = 10000) {
+  return new Promise((resolve, reject) => {
+    const tempDir = path.join(os.tmpdir(), 'liku-automation');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+    
+    const scriptFile = path.join(tempDir, `script-${Date.now()}.ps1`);
+    fs.writeFileSync(scriptFile, scriptContent, 'utf8');
+    
+    exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${scriptFile}"`, {
+      encoding: 'utf8',
+      timeout: timeoutMs,
+      maxBuffer: 10 * 1024 * 1024
+    }, (error, stdout, stderr) => {
+      // Clean up
+      try { fs.unlinkSync(scriptFile); } catch (e) {}
+      
+      if (error) {
+        resolve({ error: error.message, stderr });
+      } else {
+        resolve({ stdout: stdout.trim(), stderr });
+      }
+    });
+  });
+}
+
+/**
+ * Find UI element by text content using Windows UI Automation
+ * Searches the entire UI tree for elements containing the specified text
+ * 
+ * @param {string} searchText - Text to search for (partial match)
+ * @param {Object} options - Search options
+ * @param {string} options.controlType - Filter by control type (Button, Text, ComboBox, etc.)
+ * @param {boolean} options.exact - Require exact text match (default: false)
+ * @returns {Object} Element info with bounds, or error
+ */
+async function findElementByText(searchText, options = {}) {
+  const { controlType = '', exact = false } = options;
+  
+  const psScript = `
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
+
+function Find-ElementByText {
+    param(
+        [string]$SearchText,
+        [string]$ControlType = "",
+        [bool]$ExactMatch = $false
+    )
+    
+    $root = [System.Windows.Automation.AutomationElement]::RootElement
+    $condition = [System.Windows.Automation.Condition]::TrueCondition
+    
+    # Find all elements
+    $elements = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
+    
+    $results = @()
+    foreach ($el in $elements) {
+        try {
+            $name = $el.Current.Name
+            $ctrlType = $el.Current.ControlType.ProgrammaticName
+            
+            # Check text match
+            $textMatch = $false
+            if ($ExactMatch) {
+                $textMatch = ($name -eq $SearchText)
+            } else {
+                $textMatch = ($name -like "*$SearchText*")
+            }
+            
+            if (-not $textMatch) { continue }
+            
+            # Check control type filter
+            if ($ControlType -ne "" -and $ctrlType -notlike "*$ControlType*") { continue }
+            
+            $rect = $el.Current.BoundingRectangle
+            if ($rect.Width -le 0 -or $rect.Height -le 0) { continue }
+            
+            $results += @{
+                Name = $name
+                ControlType = $ctrlType
+                AutomationId = $el.Current.AutomationId
+                ClassName = $el.Current.ClassName
+                Bounds = @{
+                    X = [int]$rect.X
+                    Y = [int]$rect.Y
+                    Width = [int]$rect.Width
+                    Height = [int]$rect.Height
+                    CenterX = [int]($rect.X + $rect.Width / 2)
+                    CenterY = [int]($rect.Y + $rect.Height / 2)
+                }
+                IsEnabled = $el.Current.IsEnabled
+            }
+        } catch {}
+    }
+    
+    return $results
+}
+
+$results = Find-ElementByText -SearchText "${searchText.replace(/"/g, '`"')}" -ControlType "${controlType}" -ExactMatch $${exact}
+$results | ConvertTo-Json -Depth 5
+`;
+
+  const result = await executePowerShellScript(psScript, 15000);
+  
+  if (result.error) {
+    return { error: result.error, elements: [] };
+  }
+  
+  try {
+    let elements = JSON.parse(result.stdout || '[]');
+    if (!Array.isArray(elements)) {
+      elements = elements ? [elements] : [];
+    }
+    
+    console.log(`[AUTOMATION] Found ${elements.length} elements matching "${searchText}"`);
+    
+    return {
+      success: true,
+      elements,
+      count: elements.length,
+      // Return first match for convenience
+      element: elements.length > 0 ? elements[0] : null
+    };
+  } catch (e) {
+    return { error: 'Failed to parse element results', raw: result.stdout, elements: [] };
+  }
+}
+
+/**
+ * Click on a UI element found by its text content
+ * This is MORE RELIABLE than coordinate-based clicking
+ * 
+ * @param {string} searchText - Text to search for
+ * @param {Object} options - Search options (same as findElementByText)
+ * @returns {Object} Click result
+ */
+async function clickElementByText(searchText, options = {}) {
+  console.log(`[AUTOMATION] Searching for element: "${searchText}"`);
+  
+  const findResult = await findElementByText(searchText, options);
+  
+  if (findResult.error) {
+    return { success: false, error: findResult.error };
+  }
+  
+  if (!findResult.element) {
+    return { 
+      success: false, 
+      error: `No element found containing "${searchText}"`,
+      searched: searchText
+    };
+  }
+  
+  const el = findResult.element;
+  const { CenterX, CenterY } = el.Bounds;
+  
+  console.log(`[AUTOMATION] Found "${el.Name}" at center (${CenterX}, ${CenterY})`);
+  
+  // Use UI Automation Invoke pattern for buttons (more reliable than mouse simulation)
+  if (options.useInvoke !== false && el.ControlType && el.ControlType.includes('Button')) {
+    console.log(`[AUTOMATION] Using Invoke pattern for button`);
+    const invokeResult = await invokeElementByText(searchText, options);
+    if (invokeResult.success) {
+      return invokeResult;
+    }
+    console.log(`[AUTOMATION] Invoke failed, falling back to mouse click`);
+  }
+  
+  // Click the center of the element
+  await click(CenterX, CenterY, 'left');
+  
+  return {
+    success: true,
+    message: `Clicked "${el.Name}" at (${CenterX}, ${CenterY})`,
+    element: el,
+    coordinates: { x: CenterX, y: CenterY }
+  };
+}
+
+/**
+ * Invoke a UI element using UI Automation's Invoke pattern
+ * More reliable than simulating mouse clicks for buttons
+ */
+async function invokeElementByText(searchText, options = {}) {
+  const controlType = options.controlType || '';
+  const exact = options.exact === true;
+  
+  const psScript = `
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
+
+$searchText = "${searchText.replace(/"/g, '`"')}"
+$controlType = "${controlType}"
+$exactMatch = $${exact}
+
+$root = [System.Windows.Automation.AutomationElement]::RootElement
+$condition = [System.Windows.Automation.Condition]::TrueCondition
+$elements = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
+
+$found = $null
+foreach ($el in $elements) {
+    try {
+        $name = $el.Current.Name
+        $ctrlType = $el.Current.ControlType.ProgrammaticName
+        
+        $textMatch = $false
+        if ($exactMatch) {
+            $textMatch = ($name -eq $searchText)
+        } else {
+            $textMatch = ($name -like "*$searchText*")
+        }
+        
+        if (-not $textMatch) { continue }
+        if ($controlType -ne "" -and $ctrlType -notlike "*$controlType*") { continue }
+        
+        $rect = $el.Current.BoundingRectangle
+        if ($rect.Width -le 0 -or $rect.Height -le 0) { continue }
+        
+        $found = $el
+        break
+    } catch {}
+}
+
+if ($found -eq $null) {
+    Write-Output '{"success": false, "error": "Element not found"}'
+    exit
+}
+
+# Try Invoke pattern first
+try {
+    $invokePattern = $found.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+    $invokePattern.Invoke()
+    $name = $found.Current.Name
+    $rect = $found.Current.BoundingRectangle
+    Write-Output "{\\"success\\": true, \\"method\\": \\"Invoke\\", \\"name\\": \\"$name\\", \\"x\\": $([int]($rect.X + $rect.Width/2)), \\"y\\": $([int]($rect.Y + $rect.Height/2))}"
+} catch {
+    # Try Toggle pattern for toggle buttons
+    try {
+        $togglePattern = $found.GetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern)
+        $togglePattern.Toggle()
+        $name = $found.Current.Name
+        Write-Output "{\\"success\\": true, \\"method\\": \\"Toggle\\", \\"name\\": \\"$name\\"}"
+    } catch {
+        # Try SetFocus and send click
+        try {
+            $found.SetFocus()
+            Start-Sleep -Milliseconds 100
+            $rect = $found.Current.BoundingRectangle
+            $x = [int]($rect.X + $rect.Width / 2)
+            $y = [int]($rect.Y + $rect.Height / 2)
+            
+            Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public class ClickHelper {
+    [DllImport("user32.dll")] public static extern bool SetCursorPos(int X, int Y);
+    [DllImport("user32.dll")] public static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
+    public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+    public const uint MOUSEEVENTF_LEFTUP = 0x0004;
+    public static void Click(int x, int y) {
+        SetCursorPos(x, y);
+        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+    }
+}
+'@
+            [ClickHelper]::Click($x, $y)
+            $name = $found.Current.Name
+            Write-Output "{\\"success\\": true, \\"method\\": \\"FocusClick\\", \\"name\\": \\"$name\\", \\"x\\": $x, \\"y\\": $y}"
+        } catch {
+            Write-Output "{\\"success\\": false, \\"error\\": \\"$($_.Exception.Message)\\"}"
+        }
+    }
+}
+`;
+
+  const result = await executePowerShellScript(psScript, 15000);
+  
+  if (result.error) {
+    return { success: false, error: result.error };
+  }
+  
+  try {
+    const parsed = JSON.parse(result.stdout.trim());
+    if (parsed.success) {
+      console.log(`[AUTOMATION] Invoked element using ${parsed.method} pattern`);
+    }
+    return parsed;
+  } catch (e) {
+    return { success: false, error: 'Failed to parse invoke result', raw: result.stdout };
+  }
 }
 
 /**
@@ -401,6 +1041,23 @@ async function executeAction(action) {
         // This will be handled by the caller (main process)
         result.needsScreenshot = true;
         result.message = 'Screenshot requested';
+        break;
+      
+      // Semantic element-based actions (MORE RELIABLE than coordinates)
+      case ACTION_TYPES.CLICK_ELEMENT:
+        const clickResult = await clickElementByText(action.text, {
+          controlType: action.controlType || '',
+          exact: action.exact || false
+        });
+        result = { ...result, ...clickResult };
+        break;
+        
+      case ACTION_TYPES.FIND_ELEMENT:
+        const findResult = await findElementByText(action.text, {
+          controlType: action.controlType || '',
+          exact: action.exact || false
+        });
+        result = { ...result, ...findResult };
         break;
         
       default:
@@ -523,4 +1180,7 @@ module.exports = {
   drag,
   sleep,
   getActiveWindowTitle,
+  // Semantic element-based automation (preferred approach)
+  findElementByText,
+  clickElementByText,
 };
