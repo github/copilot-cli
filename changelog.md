@@ -1,3 +1,19 @@
+## 0.0.399 - 2026-01-29
+
+- Compaction messages show clearer command hints to view checkpoint summaries
+- Press Ctrl+X then / to run slash commands without losing your input
+- Improve `/diff` command with better visual indicators and scroll acceleration
+- Add `/allow-all` and `/yolo` commands to auto-approve all permissions during a session
+- Add Copilot option for agent creation wizard to generate name, description, and instructions based on initial agent description
+- Add LSP (Language Server Protocol) tool for code intelligence (requires experimental flag)
+- Sessions get AI-generated names from first message
+- Skills remain effective after conversation history is compacted
+- /usage now includes token consumption from sub-agents (e.g., the general-purpose agent)
+- Support `.claude/commands/` single-file commands as simpler alternative to skills
+- Skills load correctly on Windows
+- Add `/diff` command to review session changes
+- Undo/rewind to previous states with double-Esc
+
 ## 0.0.398 - 2026-01-28
 
 - Fix a regression that caused "Invalid session id" errors for agent shell calls
