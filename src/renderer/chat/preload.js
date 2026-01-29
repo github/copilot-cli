@@ -77,6 +77,36 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('action-executed', (event, data) => callback(data));
   },
   
+  // ===== MULTI-AGENT SYSTEM API =====
+  // Spawn a new agent session
+  agentSpawn: (params) => ipcRenderer.invoke('agent-spawn', params),
+  
+  // Execute a task with multi-agent orchestration
+  agentRun: (params) => ipcRenderer.invoke('agent-run', params),
+  
+  // Research using researcher agent
+  agentResearch: (params) => ipcRenderer.invoke('agent-research', params),
+  
+  // Build using builder agent
+  agentBuild: (params) => ipcRenderer.invoke('agent-build', params),
+  
+  // Verify using verifier agent
+  agentVerify: (params) => ipcRenderer.invoke('agent-verify', params),
+  
+  // Get agent system status
+  agentStatus: () => ipcRenderer.invoke('agent-status'),
+  
+  // Reset agent system
+  agentReset: () => ipcRenderer.invoke('agent-reset'),
+  
+  // Get handoff history
+  agentHandoffs: () => ipcRenderer.invoke('agent-handoffs'),
+  
+  // Agent event listeners
+  onAgentEvent: (callback) => {
+    ipcRenderer.on('agent-event', (event, data) => callback(data));
+  },
+  
   // ===== STATE =====
   getState: () => ipcRenderer.invoke('get-state')
 });

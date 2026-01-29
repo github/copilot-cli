@@ -25,6 +25,9 @@ const aiService = require('./ai-service.js');
 // Visual awareness for advanced screen analysis
 const visualAwareness = require('./visual-awareness.js');
 
+// Multi-agent system for advanced AI orchestration
+const { createAgentSystem } = require('./agents/index.js');
+
 // Inspect service for overlay region detection and targeting
 const inspectService = require('./inspect-service.js');
 
@@ -629,6 +632,226 @@ function setupIPC() {
             type: 'system',
             timestamp: Date.now()
           });
+        }
+        return;
+      }
+      
+      // ===== MULTI-AGENT SYSTEM COMMANDS =====
+      // /orchestrate - Run full orchestration on a task
+      if (message.startsWith('/orchestrate ')) {
+        const task = message.slice('/orchestrate '.length).trim();
+        if (chatWindow) {
+          chatWindow.webContents.send('agent-response', {
+            text: `🎭 Starting multi-agent orchestration for: "${task}"`,
+            type: 'system',
+            timestamp: Date.now()
+          });
+          chatWindow.webContents.send('agent-typing', { isTyping: true });
+        }
+        
+        try {
+          const { orchestrator } = getAgentSystem();
+          const result = await orchestrator.orchestrate(task);
+          
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `🎭 Orchestration complete:\n\n${JSON.stringify(result, null, 2)}`,
+              type: result.status === 'success' ? 'message' : 'error',
+              timestamp: Date.now()
+            });
+          }
+        } catch (error) {
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `❌ Orchestration failed: ${error.message}`,
+              type: 'error',
+              timestamp: Date.now()
+            });
+          }
+        }
+        return;
+      }
+      
+      // /research - Use researcher agent
+      if (message.startsWith('/research ')) {
+        const query = message.slice('/research '.length).trim();
+        if (chatWindow) {
+          chatWindow.webContents.send('agent-response', {
+            text: `🔍 Researching: "${query}"`,
+            type: 'system',
+            timestamp: Date.now()
+          });
+          chatWindow.webContents.send('agent-typing', { isTyping: true });
+        }
+        
+        try {
+          const { orchestrator } = getAgentSystem();
+          const result = await orchestrator.research(query);
+          
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: result.findings?.length > 0 
+                ? `🔍 Research findings:\n\n${result.findings.join('\n\n')}`
+                : `🔍 No findings for query.`,
+              type: 'message',
+              timestamp: Date.now()
+            });
+          }
+        } catch (error) {
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `❌ Research failed: ${error.message}`,
+              type: 'error',
+              timestamp: Date.now()
+            });
+          }
+        }
+        return;
+      }
+      
+      // /build - Use builder agent
+      if (message.startsWith('/build ')) {
+        const spec = message.slice('/build '.length).trim();
+        if (chatWindow) {
+          chatWindow.webContents.send('agent-response', {
+            text: `🔨 Starting build: "${spec}"`,
+            type: 'system',
+            timestamp: Date.now()
+          });
+          chatWindow.webContents.send('agent-typing', { isTyping: true });
+        }
+        
+        try {
+          const { orchestrator } = getAgentSystem();
+          const result = await orchestrator.build(spec);
+          
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `🔨 Build complete:\n\n${JSON.stringify(result, null, 2)}`,
+              type: result.status === 'success' ? 'message' : 'error',
+              timestamp: Date.now()
+            });
+          }
+        } catch (error) {
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `❌ Build failed: ${error.message}`,
+              type: 'error',
+              timestamp: Date.now()
+            });
+          }
+        }
+        return;
+      }
+      
+      // /verify - Use verifier agent
+      if (message.startsWith('/verify ')) {
+        const target = message.slice('/verify '.length).trim();
+        if (chatWindow) {
+          chatWindow.webContents.send('agent-response', {
+            text: `✅ Verifying: "${target}"`,
+            type: 'system',
+            timestamp: Date.now()
+          });
+          chatWindow.webContents.send('agent-typing', { isTyping: true });
+        }
+        
+        try {
+          const { orchestrator } = getAgentSystem();
+          const result = await orchestrator.verify(target);
+          
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `✅ Verification results:\n\n${JSON.stringify(result, null, 2)}`,
+              type: result.passed ? 'message' : 'error',
+              timestamp: Date.now()
+            });
+          }
+        } catch (error) {
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `❌ Verification failed: ${error.message}`,
+              type: 'error',
+              timestamp: Date.now()
+            });
+          }
+        }
+        return;
+      }
+      
+      // /agent-status - Get multi-agent system status
+      if (message === '/agent-status' || message === '/agents') {
+        try {
+          const { stateManager, orchestrator } = getAgentSystem();
+          const state = stateManager.getState();
+          const currentSession = orchestrator.currentSession;
+          
+          const statusText = `
+🤖 **Multi-Agent System Status**
+
+**Session:** ${currentSession || 'No active session'}
+**Task Queue:** ${state.taskQueue.length} pending
+**Completed:** ${state.completedTasks.length}
+**Failed:** ${state.failedTasks.length}
+**Handoffs:** ${state.handoffs.length}
+
+**Available Commands:**
+• \`/orchestrate <task>\` - Full multi-agent task execution
+• \`/research <query>\` - Research using RLC patterns
+• \`/build <spec>\` - Build code with builder agent
+• \`/verify <target>\` - Verify code/changes
+• \`/agent-reset\` - Reset agent system state
+`;
+          
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-response', {
+              text: statusText,
+              type: 'system',
+              timestamp: Date.now()
+            });
+          }
+        } catch (error) {
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-response', {
+              text: `❌ Failed to get status: ${error.message}`,
+              type: 'error',
+              timestamp: Date.now()
+            });
+          }
+        }
+        return;
+      }
+      
+      // /agent-reset - Reset multi-agent system
+      if (message === '/agent-reset') {
+        try {
+          const { stateManager } = getAgentSystem();
+          stateManager.resetState();
+          agentSystem = null;
+          
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-response', {
+              text: '🔄 Multi-agent system reset successfully.',
+              type: 'system',
+              timestamp: Date.now()
+            });
+          }
+        } catch (error) {
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-response', {
+              text: `❌ Reset failed: ${error.message}`,
+              type: 'error',
+              timestamp: Date.now()
+            });
+          }
         }
         return;
       }
@@ -1717,6 +1940,170 @@ function setupIPC() {
   // Get screen diff history
   ipcMain.handle('get-screen-diff-history', () => {
     return visualAwareness.getScreenDiffHistory();
+  });
+
+  // ===== MULTI-AGENT SYSTEM IPC HANDLERS =====
+  // Initialize agent system lazily
+  let agentSystem = null;
+  
+  function getAgentSystem() {
+    if (!agentSystem) {
+      agentSystem = createAgentSystem(aiService);
+    }
+    return agentSystem;
+  }
+
+  // Spawn a new agent session
+  ipcMain.handle('agent-spawn', async (event, { task, options = {} }) => {
+    try {
+      const { orchestrator } = getAgentSystem();
+      const sessionId = await orchestrator.startSession(task);
+      
+      if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.webContents.send('agent-event', {
+          type: 'session-started',
+          sessionId,
+          task,
+          timestamp: Date.now()
+        });
+      }
+      
+      return { success: true, sessionId };
+    } catch (error) {
+      console.error('[AGENT] Spawn failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Execute a task with the agent system
+  ipcMain.handle('agent-run', async (event, { task, options = {} }) => {
+    try {
+      const { orchestrator } = getAgentSystem();
+      
+      // Notify chat of execution start
+      if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.webContents.send('agent-event', {
+          type: 'execution-started',
+          task,
+          timestamp: Date.now()
+        });
+      }
+
+      const result = await orchestrator.orchestrate(task);
+      
+      // Notify chat of completion
+      if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.webContents.send('agent-event', {
+          type: 'execution-complete',
+          task,
+          result,
+          timestamp: Date.now()
+        });
+      }
+      
+      return { success: true, result };
+    } catch (error) {
+      console.error('[AGENT] Run failed:', error);
+      
+      if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.webContents.send('agent-event', {
+          type: 'execution-error',
+          task,
+          error: error.message,
+          timestamp: Date.now()
+        });
+      }
+      
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Research a topic using the researcher agent
+  ipcMain.handle('agent-research', async (event, { query, options = {} }) => {
+    try {
+      const { orchestrator } = getAgentSystem();
+      const result = await orchestrator.research(query);
+      return { success: true, result };
+    } catch (error) {
+      console.error('[AGENT] Research failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Verify code/changes using the verifier agent
+  ipcMain.handle('agent-verify', async (event, { target, options = {} }) => {
+    try {
+      const { orchestrator } = getAgentSystem();
+      const result = await orchestrator.verify(target);
+      return { success: true, result };
+    } catch (error) {
+      console.error('[AGENT] Verify failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Build code/features using the builder agent
+  ipcMain.handle('agent-build', async (event, { specification, options = {} }) => {
+    try {
+      const { orchestrator } = getAgentSystem();
+      const result = await orchestrator.build(specification);
+      return { success: true, result };
+    } catch (error) {
+      console.error('[AGENT] Build failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Get agent system status
+  ipcMain.handle('agent-status', async () => {
+    try {
+      const { stateManager, orchestrator } = getAgentSystem();
+      const state = stateManager.getState();
+      const currentSession = orchestrator.currentSession;
+      
+      return {
+        success: true,
+        status: {
+          initialized: !!agentSystem,
+          currentSession,
+          taskQueue: state.taskQueue.length,
+          completedTasks: state.completedTasks.length,
+          failedTasks: state.failedTasks.length,
+          activeAgents: Object.keys(state.agents).filter(k => state.agents[k].currentTask).length,
+          handoffCount: state.handoffs.length,
+          sessions: state.sessions
+        }
+      };
+    } catch (error) {
+      console.error('[AGENT] Status failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Reset agent system state
+  ipcMain.handle('agent-reset', async () => {
+    try {
+      const { stateManager } = getAgentSystem();
+      stateManager.resetState();
+      agentSystem = null; // Force re-initialization
+      
+      return { success: true, message: 'Agent system reset successfully' };
+    } catch (error) {
+      console.error('[AGENT] Reset failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Get agent handoff history
+  ipcMain.handle('agent-handoffs', async () => {
+    try {
+      const { stateManager } = getAgentSystem();
+      const state = stateManager.getState();
+      return { success: true, handoffs: state.handoffs };
+    } catch (error) {
+      console.error('[AGENT] Get handoffs failed:', error);
+      return { success: false, error: error.message };
+    }
   });
 }
 
