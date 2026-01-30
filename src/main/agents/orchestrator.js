@@ -43,12 +43,20 @@ class AgentOrchestrator extends EventEmitter {
   }
 
   _initializeAgents() {
+    const modelMetadata = this.aiService?.getModelMetadata?.() || {
+      modelId: 'unknown',
+      provider: 'unknown',
+      modelVersion: null,
+      capabilities: []
+    };
+    
     const commonOptions = {
       aiService: this.aiService,
       stateManager: this.stateManager,
       orchestrator: this,
       maxRecursionDepth: this.maxRecursionDepth,
-      maxSubCalls: this.maxSubCalls
+      maxSubCalls: this.maxSubCalls,
+      modelMetadata
     };
     
     // Create one instance of each agent type
@@ -134,7 +142,15 @@ class AgentOrchestrator extends EventEmitter {
     this.emit('task:start', { task, agent: startAgent });
     
     try {
+      if (options.enableCheckpoints !== false) {
+        await this.checkpoint('pre-execution');
+      }
+      
       const result = await agent.process(task, context);
+      
+      if (options.enableCheckpoints !== false) {
+        await this.checkpoint('post-execution');
+      }
       
       this.emit('task:complete', { task, result });
       
@@ -146,6 +162,10 @@ class AgentOrchestrator extends EventEmitter {
       };
       
     } catch (error) {
+      if (options.enableCheckpoints !== false) {
+        await this.checkpoint('error-state');
+      }
+      
       this.emit('task:error', { task, error });
       
       return {
@@ -193,6 +213,39 @@ class AgentOrchestrator extends EventEmitter {
     };
     
     return targetAgent.process(task, context);
+  }
+
+  // ===== Checkpoint Management =====
+
+  async checkpoint(label = 'auto') {
+    if (!this.currentSession) return null;
+    
+    const agentStates = Array.from(this.agents.entries()).map(([role, agent]) => ({
+      role,
+      state: agent.getState()
+    }));
+    
+    const checkpoint = this.stateManager.createCheckpoint(
+      this.currentSession.id,
+      label,
+      agentStates,
+      this.handoffHistory
+    );
+    
+    this.emit('checkpoint', checkpoint);
+    return checkpoint;
+  }
+
+  async restoreFromCheckpoint(checkpointId) {
+    const checkpoint = this.stateManager.getCheckpoint(checkpointId);
+    if (!checkpoint) {
+      throw new Error(`Checkpoint not found: ${checkpointId}`);
+    }
+    
+    this.handoffHistory = [...checkpoint.handoffHistory];
+    this.emit('checkpoint:restored', checkpoint);
+    
+    return checkpoint;
   }
 
   // ===== Agent Access =====
@@ -259,7 +312,8 @@ class AgentOrchestrator extends EventEmitter {
         state: agent.getState()
       })),
       handoffHistory: this.handoffHistory,
-      stateManager: this.stateManager.getFullState()
+      stateManager: this.stateManager.getFullState(),
+      checkpoints: this.stateManager.listCheckpoints(this.currentSession?.id)
     };
   }
 
