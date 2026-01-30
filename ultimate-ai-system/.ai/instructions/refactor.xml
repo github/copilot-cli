@@ -1,0 +1,14 @@
+<instruction_set id="refactor_core">
+  <meta>
+    <trigger>Refactor, Cleanup, Optimization</trigger>
+    <profile>defensive</profile>
+  </meta>
+  <system_rule id="handover_protocol">
+    IF remaining_tokens &lt; 2000 THEN: Stop and Generate &lt;checkpoint&gt;.
+  </system_rule>
+  <workflow>
+    <step id="1_analyze">Analyze code and output &lt;analysis&gt;.</step>
+    <step id="2_implement">Stream changes using &lt;file_change&gt;.</step>
+    <step id="3_verify">Request verification with &lt;verification_cmd&gt;.</step>
+  </workflow>
+</instruction_set>

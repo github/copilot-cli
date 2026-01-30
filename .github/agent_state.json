@@ -1,0 +1,786 @@
+{
+  "version": "1.0.0",
+  "created": "2026-01-29T20:15:40.039Z",
+  "queue": [],
+  "inProgress": [],
+  "completed": [],
+  "failed": [],
+  "agents": {
+    "agent-1769717740040-ncw9u59xl": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:40.040Z",
+      "lastActive": "2026-01-29T20:15:40.040Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769717740040-jh1bit061": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:40.041Z",
+      "lastActive": "2026-01-29T20:15:40.041Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769717740040-esv9yonck": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:40.049Z",
+      "lastActive": "2026-01-29T20:15:40.049Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769717740040-2wq6ocm00": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:40.058Z",
+      "lastActive": "2026-01-29T20:15:40.058Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769717749090-jnlu04b0w": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:49.090Z",
+      "lastActive": "2026-01-29T20:15:49.091Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769717749090-fpdu9gucf": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:49.092Z",
+      "lastActive": "2026-01-29T20:15:49.092Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769717749090-i2vp37sta": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:49.092Z",
+      "lastActive": "2026-01-29T20:15:49.092Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769717749090-q258s52az": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:15:49.102Z",
+      "lastActive": "2026-01-29T20:15:49.102Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718422989-ba7h4el8h": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:02.989Z",
+      "lastActive": "2026-01-29T20:27:02.990Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718422989-3m5xir48z": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:02.991Z",
+      "lastActive": "2026-01-29T20:27:02.991Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718422989-tiam3sswd": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:02.992Z",
+      "lastActive": "2026-01-29T20:27:02.992Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718422989-uthqzqcy2": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:03.002Z",
+      "lastActive": "2026-01-29T20:27:03.002Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718436391-vmrfhtk8x": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:16.392Z",
+      "lastActive": "2026-01-29T20:27:16.393Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718436391-mqo6al579": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:16.394Z",
+      "lastActive": "2026-01-29T20:27:16.394Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718436391-v470jj41w": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:16.394Z",
+      "lastActive": "2026-01-29T20:27:16.394Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718436392-ht3px5apn": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:16.405Z",
+      "lastActive": "2026-01-29T20:27:16.405Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718448169-90uj5d3q8": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:28.170Z",
+      "lastActive": "2026-01-29T20:27:28.171Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718448169-tdh9nyyb3": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:28.171Z",
+      "lastActive": "2026-01-29T20:27:28.171Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718448170-dv6fnid43": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:28.172Z",
+      "lastActive": "2026-01-29T20:27:28.172Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718448170-n3mv8pvnx": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:28.183Z",
+      "lastActive": "2026-01-29T20:27:28.183Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718464994-6e1xra1k8": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:44.994Z",
+      "lastActive": "2026-01-29T20:27:44.995Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718464994-g9653oqwh": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:44.996Z",
+      "lastActive": "2026-01-29T20:27:44.996Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718464994-qcdg1kwsa": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:44.997Z",
+      "lastActive": "2026-01-29T20:27:44.997Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718464994-459bcc666": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:27:44.997Z",
+      "lastActive": "2026-01-29T20:27:44.997Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718496363-7hyulk71d": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:28:16.364Z",
+      "lastActive": "2026-01-29T20:28:16.366Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718496364-k30cknwwg": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:28:16.367Z",
+      "lastActive": "2026-01-29T20:28:30.409Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718496364-nhlsv8yma": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:28:16.368Z",
+      "lastActive": "2026-01-29T20:29:04.151Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718496364-vmujfzksv": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:28:16.382Z",
+      "lastActive": "2026-01-29T20:28:16.382Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718569719-oqn2jym1n": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:29.720Z",
+      "lastActive": "2026-01-29T20:29:29.721Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718569719-l6h55olea": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:29.722Z",
+      "lastActive": "2026-01-29T20:29:29.722Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718569720-y52dx4nfc": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:29.722Z",
+      "lastActive": "2026-01-29T20:29:29.722Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718569720-e495xhptw": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:29.737Z",
+      "lastActive": "2026-01-29T20:29:29.737Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718585849-ir5qbiccj": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:45.849Z",
+      "lastActive": "2026-01-29T20:29:45.850Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718585849-luw4i8y0w": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:45.851Z",
+      "lastActive": "2026-01-29T20:29:45.851Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718585849-ddepxu6ug": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:45.852Z",
+      "lastActive": "2026-01-29T20:29:45.852Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718585849-nczwdwr43": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:29:45.866Z",
+      "lastActive": "2026-01-29T20:29:45.867Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718607176-6sjaw3kje": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:07.176Z",
+      "lastActive": "2026-01-29T20:30:07.177Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718607176-p5ivetj8z": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:07.178Z",
+      "lastActive": "2026-01-29T20:30:07.178Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718607176-4pmeo3fz3": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:07.196Z",
+      "lastActive": "2026-01-29T20:30:07.196Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718607176-j5fd6cdoj": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:07.209Z",
+      "lastActive": "2026-01-29T20:30:07.209Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718645488-qvna8654q": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:45.488Z",
+      "lastActive": "2026-01-29T20:30:45.490Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718645488-i6y8p3vsy": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:45.491Z",
+      "lastActive": "2026-01-29T20:30:45.491Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718645488-fgdij9fko": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:45.492Z",
+      "lastActive": "2026-01-29T20:30:45.492Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718645488-pyxkvszpe": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:30:45.509Z",
+      "lastActive": "2026-01-29T20:30:45.509Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718696649-nkd8m6c30": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:31:36.649Z",
+      "lastActive": "2026-01-29T20:31:36.652Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718696649-6yb4mwlg2": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:31:36.654Z",
+      "lastActive": "2026-01-29T20:31:36.654Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718696649-loo9qrr2z": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:31:36.656Z",
+      "lastActive": "2026-01-29T20:31:36.656Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1769718696649-tyvlbos87": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-01-29T20:31:36.669Z",
+      "lastActive": "2026-01-29T20:31:36.669Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    }
+  },
+  "sessions": [
+    {
+      "id": "session-1769717749109-7ak1ztlnm",
+      "startedAt": "2026-01-29T20:15:49.109Z",
+      "status": "active",
+      "metadata": {
+        "task": "What files make up the CLI interface?"
+      },
+      "handoffs": [],
+      "tasks": []
+    },
+    {
+      "id": "session-1769718465011-1f78z68bq",
+      "startedAt": "2026-01-29T20:27:45.011Z",
+      "status": "active",
+      "metadata": {
+        "task": "list all agent files in this project"
+      },
+      "handoffs": [],
+      "tasks": []
+    },
+    {
+      "id": "session-1769718496399-r6vud9ldl",
+      "startedAt": "2026-01-29T20:28:16.399Z",
+      "status": "active",
+      "metadata": {
+        "task": "list all agent files in this project"
+      },
+      "handoffs": [
+        {
+          "from": "supervisor",
+          "to": "builder",
+          "context": {
+            "message": "Implement: **Implement File Listing Script** (Builder)  ",
+            "timestamp": "2026-01-29T20:28:30.408Z"
+          },
+          "timestamp": "2026-01-29T20:28:30.408Z"
+        },
+        {
+          "from": "supervisor",
+          "to": "verifier",
+          "context": {
+            "message": "Verify: **Validate File Identification** (Verifier)  ",
+            "timestamp": "2026-01-29T20:29:04.150Z"
+          },
+          "timestamp": "2026-01-29T20:29:04.150Z"
+        }
+      ],
+      "tasks": []
+    },
+    {
+      "id": "session-1769718585878-hv93kcwy4",
+      "startedAt": "2026-01-29T20:29:45.878Z",
+      "status": "active",
+      "metadata": {
+        "task": "What agent files exist in this project and what do they do?"
+      },
+      "handoffs": [],
+      "tasks": []
+    },
+    {
+      "id": "session-1769718607225-fnj1ojrl3",
+      "startedAt": "2026-01-29T20:30:07.225Z",
+      "status": "active",
+      "metadata": {
+        "task": "Verify changes"
+      },
+      "handoffs": [],
+      "tasks": []
+    },
+    {
+      "id": "session-1769718645521-e6o906apn",
+      "startedAt": "2026-01-29T20:30:45.521Z",
+      "status": "active",
+      "metadata": {
+        "task": "list agent files"
+      },
+      "handoffs": [],
+      "tasks": []
+    },
+    {
+      "id": "session-1769718696689-z23o6xwh1",
+      "startedAt": "2026-01-29T20:31:36.689Z",
+      "status": "active",
+      "metadata": {
+        "task": "list agent files"
+      },
+      "handoffs": [],
+      "tasks": []
+    }
+  ],
+  "lastModified": "2026-01-29T20:31:36.689Z"
+}
