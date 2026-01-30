@@ -141,14 +141,23 @@ Context: ${JSON.stringify(context)}`;
 Each step should be concrete and actionable.
 Specify whether each step needs Builder (implementation) or Verifier (validation).
 
-Analysis: ${analysis.analysis}`;
+Analysis: ${analysis.analysis}
+
+Current Model: ${this.modelMetadata?.modelId || 'unknown'}
+Model Capabilities: ${this.modelMetadata?.capabilities?.join(', ') || 'standard'}`;
 
     const response = await this.chat(prompt);
     
     return {
       steps: this.parseSteps(response.text),
       rawPlan: response.text,
-      assumptions: this.extractAssumptions(response.text)
+      assumptions: this.extractAssumptions(response.text),
+      modelContext: {
+        modelId: this.modelMetadata?.modelId,
+        provider: this.modelMetadata?.provider,
+        createdAt: new Date().toISOString()
+      },
+      planId: `plan-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
     };
   }
 
@@ -273,6 +282,8 @@ Analysis: ${analysis.analysis}`;
     const failed = results.filter(r => !r.success && !r.skipped);
     const skipped = results.filter(r => r.skipped);
     
+    const dependencyGraph = this.buildDependencyGraph(this.decomposedTasks);
+    
     return {
       success: failed.length === 0,
       summary: {
@@ -284,8 +295,33 @@ Analysis: ${analysis.analysis}`;
       plan: this.currentPlan,
       results,
       assumptions: this.assumptions,
+      dependencyGraph,
       timestamp: new Date().toISOString()
     };
+  }
+
+  buildDependencyGraph(tasks) {
+    const graph = {
+      nodes: tasks.map(t => ({
+        id: t.id,
+        description: t.description,
+        agent: t.targetAgent,
+        status: t.status
+      })),
+      edges: []
+    };
+    
+    for (const task of tasks) {
+      for (const depId of task.dependencies || []) {
+        graph.edges.push({
+          from: depId,
+          to: task.id,
+          type: 'depends-on'
+        });
+      }
+    }
+    
+    return graph;
   }
 
   // ===== Supervisor-specific Methods =====
