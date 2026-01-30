@@ -60,6 +60,18 @@ class BaseAgent extends EventEmitter {
     // Capabilities (subclasses override)
     this.capabilities = options.capabilities || [];
     
+    // Model metadata tracking
+    this.modelMetadata = options.modelMetadata || null;
+    this.proofChain = [];
+    this.toolHistory = [];
+    this.metrics = {
+      totalCalls: 0,
+      successfulCalls: 0,
+      failedCalls: 0,
+      avgResponseTimeMs: 0,
+      tokenUsage: { prompt: 0, completion: 0 }
+    };
+    
     // Operating contract
     this.contract = {
       noGuessing: true,
@@ -317,6 +329,45 @@ class BaseAgent extends EventEmitter {
     return proof;
   }
 
+  addStructuredProof(proof) {
+    const structuredProof = {
+      id: `proof-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      ...proof,
+      timestamp: new Date().toISOString(),
+      agentId: this.id,
+      agentRole: this.role,
+      modelMetadata: this.modelMetadata
+    };
+    
+    this.proofChain.push(structuredProof);
+    this.emit('proof', structuredProof);
+    return structuredProof;
+  }
+
+  recordToolExecution(toolName, input, output, durationMs, success) {
+    this.toolHistory.push({
+      id: `tool-${Date.now()}`,
+      toolName,
+      input,
+      output: success ? output : null,
+      error: success ? null : output,
+      durationMs,
+      success,
+      timestamp: new Date().toISOString()
+    });
+    
+    this.metrics.totalCalls++;
+    if (success) {
+      this.metrics.successfulCalls++;
+    } else {
+      this.metrics.failedCalls++;
+    }
+    
+    // Update rolling average
+    const totalTime = this.metrics.avgResponseTimeMs * (this.metrics.totalCalls - 1) + durationMs;
+    this.metrics.avgResponseTimeMs = totalTime / this.metrics.totalCalls;
+  }
+
   // ===== State Management =====
 
   getState() {
@@ -327,7 +378,11 @@ class BaseAgent extends EventEmitter {
       currentDepth: this.currentDepth,
       subCallCount: this.subCallCount,
       activeProcesses: Array.from(this.activeProcesses.entries()),
-      conversationLength: this.conversationHistory.length
+      conversationLength: this.conversationHistory.length,
+      modelMetadata: this.modelMetadata,
+      proofChainLength: this.proofChain.length,
+      metrics: this.metrics,
+      lastActivity: new Date().toISOString()
     };
   }
 
@@ -336,6 +391,15 @@ class BaseAgent extends EventEmitter {
     this.currentDepth = 0;
     this.subCallCount = 0;
     this.activeProcesses.clear();
+    this.proofChain = [];
+    this.toolHistory = [];
+    this.metrics = {
+      totalCalls: 0,
+      successfulCalls: 0,
+      failedCalls: 0,
+      avgResponseTimeMs: 0,
+      tokenUsage: { prompt: 0, completion: 0 }
+    };
   }
 }
 
