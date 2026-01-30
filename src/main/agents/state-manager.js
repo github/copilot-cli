@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { nowIso, nowFilenameSafe } = require('../utils/time');
 
 class AgentStateManager {
   constructor(statePath = null) {
@@ -19,22 +20,66 @@ class AgentStateManager {
     try {
       if (fs.existsSync(this.statePath)) {
         const content = fs.readFileSync(this.statePath, 'utf-8');
-        return JSON.parse(content);
+        const state = JSON.parse(content);
+        return this._migrateState(state);
       }
     } catch (error) {
       console.warn(`[StateManager] Failed to load state: ${error.message}`);
     }
     
     return {
-      version: '1.0.0',
-      created: new Date().toISOString(),
+      version: '1.1.0',
+      schemaVersion: 2,
+      created: nowIso(),
       queue: [],
       inProgress: [],
       completed: [],
       failed: [],
       agents: {},
-      sessions: []
+      sessions: [],
+      modelMetadata: {
+        modelId: 'unknown',
+        provider: 'unknown',
+        modelVersion: null,
+        capabilities: []
+      },
+      sessionContext: {
+        initiatedBy: null,
+        purpose: null,
+        parentSessionId: null
+      },
+      checkpoints: []
     };
+  }
+
+  _migrateState(state) {
+    if (!state.schemaVersion || state.schemaVersion < 2) {
+      state.modelMetadata = state.modelMetadata || {
+        modelId: 'unknown',
+        provider: 'unknown',
+        modelVersion: null,
+        capabilities: []
+      };
+      state.sessionContext = state.sessionContext || {
+        initiatedBy: null,
+        purpose: null,
+        parentSessionId: null
+      };
+      state.checkpoints = state.checkpoints || [];
+      state.schemaVersion = 2;
+      state.version = '1.1.0';
+    }
+    return state;
+  }
+
+  _getStateFilePath(sessionId = null, modelId = null) {
+    const timestamp = nowFilenameSafe();
+    const modelSuffix = modelId ? `-${modelId}` : '';
+    const sessionSuffix = sessionId ? `-${sessionId.slice(-8)}` : '';
+    return path.join(
+      path.dirname(this.statePath),
+      `state-${timestamp}${modelSuffix}${sessionSuffix}.json`
+    );
   }
 
   _saveState() {
@@ -44,7 +89,7 @@ class AgentStateManager {
         fs.mkdirSync(dir, { recursive: true });
       }
       
-      this.state.lastModified = new Date().toISOString();
+      this.state.lastModified = nowIso();
       fs.writeFileSync(this.statePath, JSON.stringify(this.state, null, 2));
     } catch (error) {
       console.error(`[StateManager] Failed to save state: ${error.message}`);
@@ -58,7 +103,7 @@ class AgentStateManager {
       id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       ...task,
       status: 'queued',
-      createdAt: new Date().toISOString(),
+      createdAt: nowIso(),
       attempts: 0
     };
     
@@ -71,7 +116,7 @@ class AgentStateManager {
     const task = this.state.queue.shift();
     if (task) {
       task.status = 'in-progress';
-      task.startedAt = new Date().toISOString();
+      task.startedAt = nowIso();
       this.state.inProgress.push(task);
       this._saveState();
     }
@@ -86,7 +131,7 @@ class AgentStateManager {
       this._moveTask(taskId, 'queue', 'inProgress');
       task.status = 'in-progress';
       task.agentId = agentId;
-      task.startedAt = new Date().toISOString();
+      task.startedAt = nowIso();
       this._saveState();
     }
     return task;
@@ -97,7 +142,7 @@ class AgentStateManager {
     if (task) {
       this._moveTask(taskId, 'inProgress', 'completed');
       task.status = 'completed';
-      task.completedAt = new Date().toISOString();
+      task.completedAt = nowIso();
       task.result = result;
       this._saveState();
     }
@@ -113,7 +158,7 @@ class AgentStateManager {
         this._moveTask(taskId, 'inProgress', 'failed');
         task.status = 'failed';
         task.error = error;
-        task.failedAt = new Date().toISOString();
+        task.failedAt = nowIso();
       } else {
         // Return to queue for retry
         this._moveTask(taskId, 'inProgress', 'queue');
@@ -131,8 +176,8 @@ class AgentStateManager {
     this.state.agents[agentId] = {
       type: agentType,
       capabilities,
-      registeredAt: new Date().toISOString(),
-      lastActive: new Date().toISOString(),
+      registeredAt: nowIso(),
+      lastActive: nowIso(),
       tasksCompleted: 0,
       tasksFailed: 0
     };
@@ -141,9 +186,18 @@ class AgentStateManager {
 
   updateAgentActivity(agentId) {
     if (this.state.agents[agentId]) {
-      this.state.agents[agentId].lastActive = new Date().toISOString();
+      this.state.agents[agentId].lastActive = nowIso();
       this._saveState();
     }
+  }
+
+  setModelMetadata(metadata) {
+    this.state.modelMetadata = {
+      ...this.state.modelMetadata,
+      ...metadata,
+      lastUpdated: nowIso()
+    };
+    this._saveState();
   }
 
   // ===== Session Management =====
@@ -151,7 +205,7 @@ class AgentStateManager {
   startSession(sessionId, metadata = {}) {
     const session = {
       id: sessionId || `session-${Date.now()}`,
-      startedAt: new Date().toISOString(),
+      startedAt: nowIso(),
       status: 'active',
       metadata,
       handoffs: [],
@@ -170,7 +224,7 @@ class AgentStateManager {
         from: fromAgent,
         to: toAgent,
         context,
-        timestamp: new Date().toISOString()
+        timestamp: nowIso()
       });
       this._saveState();
     }
@@ -180,11 +234,40 @@ class AgentStateManager {
     const session = this.state.sessions.find(s => s.id === sessionId);
     if (session) {
       session.status = 'completed';
-      session.endedAt = new Date().toISOString();
+      session.endedAt = nowIso();
       session.summary = summary;
       this._saveState();
     }
     return session;
+  }
+
+  // ===== Checkpoint Management =====
+
+  createCheckpoint(sessionId, label, agentStates, handoffHistory) {
+    const checkpoint = {
+      id: `checkpoint-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      sessionId,
+      label,
+      timestamp: nowIso(),
+      agentStates: agentStates || [],
+      handoffHistory: handoffHistory || [],
+      modelMetadata: this.state.modelMetadata
+    };
+
+    this.state.checkpoints.push(checkpoint);
+    this._saveState();
+    return checkpoint;
+  }
+
+  getCheckpoint(checkpointId) {
+    return this.state.checkpoints.find(c => c.id === checkpointId) || null;
+  }
+
+  listCheckpoints(sessionId = null) {
+    if (sessionId) {
+      return this.state.checkpoints.filter(c => c.sessionId === sessionId);
+    }
+    return [...this.state.checkpoints];
   }
 
   // ===== Queries =====
@@ -232,14 +315,27 @@ class AgentStateManager {
 
   reset() {
     this.state = {
-      version: '1.0.0',
-      created: new Date().toISOString(),
+      version: '1.1.0',
+      schemaVersion: 2,
+      created: nowIso(),
       queue: [],
       inProgress: [],
       completed: [],
       failed: [],
       agents: {},
-      sessions: []
+      sessions: [],
+      modelMetadata: {
+        modelId: 'unknown',
+        provider: 'unknown',
+        modelVersion: null,
+        capabilities: []
+      },
+      sessionContext: {
+        initiatedBy: null,
+        purpose: null,
+        parentSessionId: null
+      },
+      checkpoints: []
     };
     this._saveState();
   }

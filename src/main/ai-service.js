@@ -81,6 +81,15 @@ let apiKeys = {
   anthropic: process.env.ANTHROPIC_API_KEY || ''
 };
 
+// Model metadata tracking
+let currentModelMetadata = {
+  modelId: currentCopilotModel,
+  provider: currentProvider,
+  modelVersion: COPILOT_MODELS[currentCopilotModel]?.id || null,
+  capabilities: COPILOT_MODELS[currentCopilotModel]?.vision ? ['vision', 'text'] : ['text'],
+  lastUpdated: new Date().toISOString()
+};
+
 // Token persistence path
 const TOKEN_FILE = path.join(process.env.APPDATA || process.env.HOME || '.', 'copilot-agent', 'copilot-token.json');
 
@@ -183,6 +192,8 @@ Be precise, efficient, and execute actions confidently based on visual informati
 function setProvider(provider) {
   if (AI_PROVIDERS[provider]) {
     currentProvider = provider;
+    currentModelMetadata.provider = provider;
+    currentModelMetadata.lastUpdated = new Date().toISOString();
     return true;
   }
   return false;
@@ -205,6 +216,13 @@ function setApiKey(provider, key) {
 function setCopilotModel(model) {
   if (COPILOT_MODELS[model]) {
     currentCopilotModel = model;
+    currentModelMetadata = {
+      modelId: model,
+      provider: currentProvider,
+      modelVersion: COPILOT_MODELS[model].id,
+      capabilities: COPILOT_MODELS[model].vision ? ['vision', 'text'] : ['text'],
+      lastUpdated: new Date().toISOString()
+    };
     return true;
   }
   return false;
@@ -220,6 +238,16 @@ function getCopilotModels() {
     vision: value.vision,
     current: key === currentCopilotModel
   }));
+}
+
+/**
+ * Get current model metadata
+ */
+function getModelMetadata() {
+  return {
+    ...currentModelMetadata,
+    sessionToken: apiKeys.copilotSession ? 'present' : 'absent'
+  };
 }
 
 /**
@@ -1574,6 +1602,7 @@ module.exports = {
   setCopilotModel,
   getCopilotModels,
   getCurrentCopilotModel,
+  getModelMetadata,
   addVisualContext,
   getLatestVisualContext,
   clearVisualContext,

@@ -36,6 +36,11 @@ class ResearcherAgent extends BaseAgent {
     this.chunkSize = options.chunkSize || 4000; // tokens per chunk
     this.maxChunks = options.maxChunks || 10;
     this.researchResults = [];
+    
+    // Caching and credibility tracking
+    this.researchCache = new Map();
+    this.cacheMaxAge = options.cacheMaxAge || 3600000; // 1 hour
+    this.sourceCredibility = new Map();
   }
 
   getSystemPrompt() {
@@ -349,6 +354,18 @@ Provide:
   }
 
   async research(query, probeResult) {
+    const cacheKey = this.getCacheKey(query, probeResult);
+    const cached = this.researchCache.get(cacheKey);
+    
+    if (cached && (Date.now() - cached.timestamp) < this.cacheMaxAge) {
+      this.log('info', 'Returning cached research result');
+      return {
+        ...cached.result,
+        fromCache: true,
+        cacheAge: Date.now() - cached.timestamp
+      };
+    }
+    
     this.log('info', 'Conducting direct research');
     
     // Read relevant files
@@ -390,7 +407,50 @@ Provide comprehensive findings with:
     };
     
     this.researchResults.push(result);
+    
+    // Cache the result
+    this.researchCache.set(cacheKey, {
+      result,
+      timestamp: Date.now(),
+      query,
+      modelMetadata: this.modelMetadata
+    });
+    
     return result;
+  }
+
+  getCacheKey(query, probeResult) {
+    const sources = probeResult.relevantSources.map(s => s.path || s.url).sort().join('|');
+    return `${query}::${sources}`;
+  }
+
+  updateSourceCredibility(sourcePath, wasHelpful) {
+    const current = this.sourceCredibility.get(sourcePath) || {
+      helpful: 0,
+      unhelpful: 0,
+      lastAccessed: null
+    };
+    
+    if (wasHelpful) {
+      current.helpful++;
+    } else {
+      current.unhelpful++;
+    }
+    current.lastAccessed = new Date().toISOString();
+    
+    this.sourceCredibility.set(sourcePath, current);
+  }
+
+  clearCache() {
+    this.researchCache.clear();
+  }
+
+  getCacheStats() {
+    return {
+      size: this.researchCache.size,
+      maxAge: this.cacheMaxAge,
+      entries: Array.from(this.researchCache.keys())
+    };
   }
 
   // ===== Utility Methods =====
@@ -443,6 +503,8 @@ Provide comprehensive findings with:
   reset() {
     super.reset();
     this.researchResults = [];
+    this.researchCache.clear();
+    this.sourceCredibility.clear();
   }
 }
 

@@ -29,14 +29,34 @@ module.exports = {
   // Factory function for creating configured orchestrator
   createAgentSystem: (options = {}) => {
     const stateManager = new AgentStateManager(options.statePath);
+    
+    const modelMetadata = options.aiService?.getModelMetadata?.() || null;
+    
+    if (modelMetadata) {
+      stateManager.setModelMetadata(modelMetadata);
+    }
+    
     const orchestrator = new AgentOrchestrator({
       stateManager,
       aiService: options.aiService,
       maxRecursionDepth: options.maxRecursionDepth || 3,
       maxSubCalls: options.maxSubCalls || 10,
-      enableLongContext: options.enableLongContext !== false
+      enableLongContext: options.enableLongContext !== false,
+      modelMetadata
     });
     
     return orchestrator;
+  },
+  
+  // Recovery function for checkpoint restoration
+  recoverFromCheckpoint: (checkpointId, options = {}) => {
+    const stateManager = new AgentStateManager(options.statePath);
+    const checkpoint = stateManager.getCheckpoint(checkpointId);
+    
+    if (!checkpoint) {
+      throw new Error(`Checkpoint not found: ${checkpointId}`);
+    }
+    
+    return checkpoint;
   }
 };

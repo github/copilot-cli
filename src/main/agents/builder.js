@@ -238,9 +238,19 @@ Provide:
   async implementChanges(changePlan, context) {
     const filesModified = [];
     const errors = [];
+    const rollbackData = [];
     
     for (const change of changePlan.changes) {
       try {
+        const originalContent = changePlan.understanding.fileContents[change.file];
+        if (originalContent) {
+          rollbackData.push({
+            file: change.file,
+            originalContent,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
         // Generate the actual edit
         const prompt = `Generate the exact code change for this modification:
 
@@ -267,7 +277,11 @@ Provide the change in unified diff format:
           this.diffs.push({
             file: change.file,
             diff: diffMatch[1],
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            modelMetadata: this.modelMetadata,
+            planId: changePlan.planId,
+            rationale: change.description,
+            rollbackAvailable: !!originalContent
           });
           filesModified.push(change.file);
         }
@@ -287,7 +301,8 @@ Provide the change in unified diff format:
     return {
       filesModified,
       errors,
-      diffs: this.diffs
+      diffs: this.diffs,
+      rollbackData
     };
   }
 
@@ -376,6 +391,35 @@ Provide the change in unified diff format:
     this.log('warn', 'Builder blocked', blockerReport);
     
     return blockerReport;
+  }
+
+  async rollback(rollbackData) {
+    const results = [];
+    
+    for (const item of rollbackData) {
+      try {
+        fs.writeFileSync(item.file, item.originalContent);
+        results.push({
+          file: item.file,
+          success: true,
+          timestamp: new Date().toISOString()
+        });
+        
+        this.addStructuredProof({
+          type: 'rollback',
+          file: item.file,
+          reason: 'Rollback requested'
+        });
+      } catch (error) {
+        results.push({
+          file: item.file,
+          success: false,
+          error: error.message
+        });
+      }
+    }
+    
+    return results;
   }
 
   // ===== Builder-specific Methods =====
