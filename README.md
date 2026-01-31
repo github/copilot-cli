@@ -51,11 +51,11 @@ winget install GitHub.Copilot.Prerelease
 Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
 
 ```bash
-brew install copilot-cli
+brew install --cask copilot-cli
 ```
 
 ```bash
-brew install copilot-cli@prerelease
+brew install --cask copilot-cli
 ```
 
 Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
