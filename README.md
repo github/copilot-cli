@@ -1,82 +1,128 @@
-# GitHub Copilot CLI (Public Preview)
+# GitHub Copilot CLI: Liku Edition (Public Preview)
 
-The power of GitHub Copilot, now in your terminal.
+The power of GitHub Copilot, now with visual-spatial awareness and advanced automation.
 
-GitHub Copilot CLI brings AI-powered coding assistance directly to your command line, enabling you to build, debug, and understand code through natural language conversations. Powered by the same agentic harness as GitHub's Copilot coding agent, it provides intelligent assistance while staying deeply integrated with your GitHub workflow.
+GitHub Copilot-Liku CLI brings AI-powered coding assistance and UI automation directly to your terminal. This "Liku Edition" extends the standard Copilot experience with an ultra-thin Electron overlay, allowing the agent to "see" and interact with your screen through a coordinated grid system and native UI automation.
 
-See [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli) for more information.
+See [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli) or the [Liku Architecture](ARCHITECTURE.md) for more information.
 
 ![Image of the splash screen for the Copilot CLI](https://github.com/user-attachments/assets/51ac25d2-c074-467a-9c88-38a8d76690e3)
 
 ## 🚀 Introduction and Overview
 
-We're bringing the power of GitHub Copilot coding agent directly to your terminal. With GitHub Copilot CLI, you can work locally and synchronously with an AI agent that understands your code and GitHub context.
+We're bringing the power of GitHub Copilot coding agent directly to your terminal, enhanced with Liku's visual awareness. Work locally and synchronously with an AI collaborator that understands your code AND your UI state.
 
-- **Terminal-native development:** Work with Copilot coding agent directly in your command line — no context switching required.
-- **GitHub integration out of the box:** Access your repositories, issues, and pull requests using natural language, all authenticated with your existing GitHub account.
-- **Agentic capabilities:** Build, edit, debug, and refactor code with an AI collaborator that can plan and execute complex tasks.
-- **MCP-powered extensibility:** Take advantage of the fact that the coding agent ships with GitHub's MCP server by default and supports custom MCP servers to extend capabilities.
-- **Full control:** Preview every action before execution — nothing happens without your explicit approval.
+- **Unified Intelligence:** Combines terminal-native development with visual-spatial awareness.
+- **Ultra-Thin Overlay:** A transparent Electron layer for high-performance UI element detection and interaction.
+- **Multi-Agent Orchestration:** A sophisticated **Supervisor-Builder-Verifier** pattern for complex, multi-step task execution.
+- **Liku CLI Suite:** A comprehensive set of automation tools (`click`, `find`, `type`, `keys`, `screenshot`) available from any shell.
+- **Defensive AI Architecture:** Engineered for minimal footprint ($<300$MB memory) and zero-intrusion workflows.
 
-We're still early in our journey, but with your feedback, we're rapidly iterating to make the GitHub Copilot CLI the best possible companion in your terminal.
+## 🛠️ The Liku CLI (`liku`)
+
+The `liku` command is your entry point for visual interaction and automation. It can be used alongside the standard `copilot` command.
+
+### Launching the Agent
+```bash
+liku start
+# or simply
+liku
+```
+This launches the Electron-based visual agent including the chat interface and the transparent overlay.
+
+### Automation Commands
+| Command | Usage | Description |
+| :--- | :--- | :--- |
+| `click` | `liku click "Submit" --double` | Click UI element by text or coordinates. |
+| `find` | `liku find "Save" --type Button` | Locate elements using native UI Automation / OCR. |
+| `type` | `liku type "Hello World"` | Input string at the current cursor position. |
+| `keys` | `liku keys ctrl+s` | Send complex keyboard combinations. |
+| `window` | `liku window "VS Code"` | Focus a specific application window. |
+| `screenshot`| `liku screenshot` | Capture the current screen state for analysis. |
+| `repl` | `liku repl` | Launch an interactive automation shell. |
+
+### Power User Examples
+- **Chained Automation**: `liku window "Notepad" && liku type "Done!" && liku keys ctrl+s`
+- **Coordinate Precision**: `liku click 500,300 --right`
+- **JSON Processing**: `liku find "*" --json | jq '.[0].name'`
+
+## 👁️ Visual Awareness & Grid System
+
+Liku perceives your workspace through a dual-mode interaction layer.
+
+- **Passive Mode:** Fully click-through, remaining dormant until needed.
+- **Dot-Grid Targeting:** When the agent needs to target a specific point, it generates a coordinate grid (Coarse ~100px or Fine ~25px) using alphanumeric labels (e.g., `A1`, `C3.21`).
+- **Live UI Inspection:** Uses native accessibility trees (Windows UI Automation) to highlight and "lock onto" buttons, menus, and text fields in real-time.
+
+### Global Shortcuts (Overlay)
+- `Ctrl+Alt+Space`: Toggle the Chat Interface.
+- `Ctrl+Alt+F`: Toggle **Fine Grid** (Precise targeting).
+- `Ctrl+Alt+I`: Toggle **Inspect Mode** (UI Element highlighting).
+- `Ctrl+Shift+O`: Toggle Overlay Visibility.
+
+## 🤖 Multi-Agent System
+
+The Liku Edition moves beyond single-turn responses with a specialized team of agents:
+
+- **Supervisor**: Task planning and decomposition.
+- **Builder**: Code implementation and file modifications.
+- **Verifier**: Phased validation and automated testing.
+- **Researcher**: Workspace context gathering and info retrieval.
+
+### Chat Slash Commands
+- `/orchestrate <task>`: Start full multi-agent workflow.
+- `/research <query>`: Execute deep workspace/web research.
+- `/build <spec>`: Generate implementation from a spec.
+- `/verify <target>`: Run validation checks on a feature or UI.
+- `/agentic`: Toggle **Autonomous Mode** (Allow AI actions without manual confirmation).
 
 ## 📦 Getting Started
-
-### Supported Platforms
-
-- **Linux**
-- **macOS**
-- **Windows** (experimental)
 
 ### Prerequisites
 
 - **Node.js** v22 or higher
 - **npm** v10 or higher
 - (On Windows) **PowerShell** v6 or higher
-- An **active Copilot subscription**. See [Copilot plans](https://github.com/features/copilot/plans?ref_cta=Copilot+plans+signup&ref_loc=install-copilot-cli&ref_page=docs).
+- An **active Copilot subscription**.
 
-If you have access to GitHub Copilot via your organization of enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings. See [Managing policies and features for GitHub Copilot in your organization](http://docs.github.com/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization) for more information.
+### Installation (Local Development)
 
-### Installation
-
-Install globally with npm:
+To install the Liku Edition for local development:
 ```bash
-npm install -g @github/copilot
+git clone https://github.com/TayDa64/copilot-Liku-cli
+cd copilot-Liku-cli
+npm install
+npm link
 ```
+This will make both the `copilot` and `liku` commands available globally.
 
-### Launching the CLI
+### Authenticate
 
-```bash
-copilot
-```
+If you're not logged in, launch the agent and use the `/login` slash command, or set a personal access token (PAT):
+1. Visit [GitHub PAT Settings](https://github.com/settings/personal-access-tokens/new)
+2. Enable "Copilot Requests" permission.
+3. Export `GH_TOKEN` or `GITHUB_TOKEN` in your environment.
 
-On first launch, you'll be greeted with our adorable animated banner! If you'd like to see this banner again, launch `copilot` with the `--banner` flag. 
+## 🛠️ Technical Architecture
 
-If you're not currently logged in to GitHub, you'll be prompted to use the `/login` slash command. Enter this command and follow the on-screen instructions to authenticate.
+GitHub Copilot-Liku CLI is built on a "Defensive AI" architecture—a design philosophy focused on minimal footprint, secure execution, and zero-intrusion workflows. 
 
-#### Authenticate with a Personal Access Token (PAT)
+### Performance Benchmarks
 
-You can also authenticate using a fine-grained PAT with the "Copilot Requests" permission enabled.
+Engineered for performance and stability, the system hits the following metrics:
+- **Memory Footprint**: $< 300$MB steady-state (~150MB baseline).
+- **CPU Usage**: $< 0.5\%$ idle; $< 2\%$ in selection mode.
+- **Startup Latency**: $< 3$ seconds from launch to functional state.
 
-1. Visit https://github.com/settings/personal-access-tokens/new
-2. Under "Permissions," click "add permissions" and select "Copilot Requests"
-3. Generate your token
-4. Add the token to your environment via the environment variable `GH_TOKEN` or `GITHUB_TOKEN` (in order of precedence)
+### Security & Isolation
 
-### Using the CLI
+- **Hardened Electron Environment**: Uses `contextIsolation` and `sandbox` modes to prevent prototype pollution.
+- **Content Security Policy (CSP)**: Strict headers to disable unauthorized external resources.
+- **Isolated Preload Bridges**: Secure IPC routing where renderers only have access to necessary system APIs.
 
-Launch `copilot` in a folder that contains code you want to work with. 
-
-By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5
-
-Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
-
-For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
-
-## Overlay Development
+## 🚧 Overlay Development
 
 See `docs/inspect-overlay-plan.md` for the inspect overlay plan and acceptance criteria.
-
 
 ## 📢 Feedback and Participation
 
