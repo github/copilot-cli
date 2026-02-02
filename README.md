@@ -153,6 +153,7 @@ See `docs/inspect-overlay-plan.md` for the inspect overlay plan and acceptance c
 - **[Quick Start Guide](QUICKSTART.md)** - Get up and running quickly
 - **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
 - **[Publishing Guide](PUBLISHING.md)** - How to publish the package to npm
+- **[Release Process](RELEASE_PROCESS.md)** - How to create and manage releases
 - **[Architecture](ARCHITECTURE.md)** - System design and architecture
 - **[Configuration](CONFIGURATION.md)** - Configuration options
 - **[Testing](TESTING.md)** - Testing guide and practices

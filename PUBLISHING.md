@@ -124,43 +124,89 @@ npm publish
 
 ## Automated Publishing with GitHub Actions
 
-To automate publishing on GitHub releases, create `.github/workflows/publish.yml`:
+This repository includes automated publishing via GitHub Actions. Publishing is triggered when you create a GitHub release.
 
-```yaml
-name: Publish to npm
+### Setup
 
-on:
-  release:
-    types: [published]
+The workflow is already configured in `.github/workflows/publish-npm.yml`. To enable it:
 
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run tests
-        run: npm test
-      
-      - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+1. **Create an npm access token**:
+   - Go to https://www.npmjs.com/settings/YOUR-USERNAME/tokens
+   - Click "Generate New Token" → "Automation"
+   - Copy the token
+
+2. **Add token to GitHub secrets**:
+   - Go to your repository settings
+   - Navigate to Secrets and variables → Actions
+   - Click "New repository secret"
+   - Name: `NPM_TOKEN`
+   - Value: Paste your npm token
+   - Click "Add secret"
+
+### Usage
+
+Once set up, publishing is automatic:
+
+1. **Update version**:
+   ```bash
+   npm version patch  # or minor, or major
+   git push origin main --tags
+   ```
+
+2. **Create a GitHub release**:
+   - Go to https://github.com/TayDa64/copilot-Liku-cli/releases/new
+   - Select the tag you created
+   - Write release notes
+   - Click "Publish release"
+
+3. **Automated workflow runs**:
+   - Checks out code
+   - Installs dependencies
+   - Runs tests
+   - Verifies package contents
+   - Publishes to npm automatically
+   - Comments on release with install instructions
+
+### Workflow Features
+
+- ✅ Automatic version checking (won't republish existing versions)
+- ✅ Package verification before publishing
+- ✅ Test execution
+- ✅ Automatic comment with install instructions
+- ✅ Manual dispatch option for testing
+
+For detailed release process, see [RELEASE_PROCESS.md](RELEASE_PROCESS.md).
+
+## Manual Publishing to npm
+
+If you prefer to publish manually instead of using the automated workflow:
+
+### First-Time Publication
+
+For the first publication to npm:
+
+```bash
+# Login to npm
+npm login
+
+# Publish the package (public)
+npm publish --access public
 ```
 
-Then:
-1. Create an npm access token at https://www.npmjs.com/settings/YOUR-USERNAME/tokens
-2. Add it as `NPM_TOKEN` in GitHub repository secrets
-3. Create a GitHub release to trigger publication
+### Subsequent Releases
+
+For version updates:
+
+```bash
+# 1. Update version
+npm version patch  # or minor, or major
+
+# 2. Push tags
+git push origin main --tags
+
+# 3. Publish
+npm publish
+```
 
 ## Post-Publication
 
