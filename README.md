@@ -85,16 +85,39 @@ The Liku Edition moves beyond single-turn responses with a specialized team of a
 - (On Windows) **PowerShell** v6 or higher
 - An **active Copilot subscription**.
 
-### Installation (Local Development)
+### Installation
 
-To install the Liku Edition for local development:
+#### Global Installation (Recommended for Users)
+
+Once published to npm, install globally with:
+```bash
+npm install -g copilot-liku-cli
+```
+
+This will make the `liku` command available globally from any directory.
+
+To verify installation:
+```bash
+liku --version
+```
+
+To update to the latest version:
+```bash
+npm update -g copilot-liku-cli
+```
+
+#### Local Development Installation
+
+To install the Liku Edition for local development and contributing:
 ```bash
 git clone https://github.com/TayDa64/copilot-Liku-cli
 cd copilot-Liku-cli
 npm install
 npm link
 ```
-This will make both the `copilot` and `liku` commands available globally.
+This will make the `liku` command available globally, linked to your local development copy.
+
+**Note for contributors:** Use `npm link` during development so changes are immediately reflected without reinstalling.
 
 ### Authenticate
 
@@ -123,6 +146,15 @@ Engineered for performance and stability, the system hits the following metrics:
 ## 🚧 Overlay Development
 
 See `docs/inspect-overlay-plan.md` for the inspect overlay plan and acceptance criteria.
+
+## 📚 Documentation
+
+- **[Installation Guide](INSTALLATION.md)** - Detailed installation instructions for all platforms
+- **[Quick Start Guide](QUICKSTART.md)** - Get up and running quickly
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+- **[Architecture](ARCHITECTURE.md)** - System design and architecture
+- **[Configuration](CONFIGURATION.md)** - Configuration options
+- **[Testing](TESTING.md)** - Testing guide and practices
 
 ## 📢 Feedback and Participation
 
