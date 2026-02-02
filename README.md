@@ -129,7 +129,7 @@ Once activated, the setting is persisted in your config, so the `--experimental`
 
 #### Experimental Features
 
-- **Autopilot mode:** Press `Shift+Tab` to toggle autopilot mode, which encourages the agent to continue working until a task is completed.
+- **Autopilot mode:** Autopilot is a new mode (press `Shift+Tab` to cycle through modes), which encourages the agent to continue working until a task is completed.
 
 Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
