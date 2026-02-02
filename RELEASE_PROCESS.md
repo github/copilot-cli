@@ -9,7 +9,7 @@ This document describes the process for creating and publishing a new release of
 - [ ] All planned features/fixes are merged to `main`
 - [ ] All tests are passing
 - [ ] Documentation is up to date
-- [ ] CHANGELOG.md is updated with release notes
+- [ ] changelog.md is updated with release notes
 - [ ] No known critical bugs
 
 ### 2. Version Bump

@@ -11,6 +11,8 @@ changelog.md
 OVERLAY_PROOF.png
 
 # Project management
+# Note: .github/ is excluded to reduce package size. 
+# Workflow files are still visible in the GitHub repository for transparency.
 .github/
 .git/
 .gitignore
