@@ -1,0 +1,46 @@
+# Test files
+scripts/test-*.js
+scripts/*.ps1
+
+# Documentation (most can be included, but some might be too large)
+FINAL_SUMMARY.txt
+GPT-reports.md
+IMPLEMENTATION_SUMMARY.md
+baseline-app.md
+changelog.md
+OVERLAY_PROOF.png
+
+# Project management
+# Note: .github/ is excluded to reduce package size. 
+# Workflow files are still visible in the GitHub repository for transparency.
+.github/
+.git/
+.gitignore
+
+# Development files
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build artifacts
+out/
+build/
+dist/
+*.log
+
+# Specific directories
+ultimate-ai-system/
+docs/
+
+# Keep these important files for npm users
+# README.md
+# LICENSE.md
+# QUICKSTART.md
+# INSTALLATION.md
+# CONTRIBUTING.md
+# ARCHITECTURE.md
+# CONFIGURATION.md
+# TESTING.md

@@ -16,10 +16,45 @@
     "copilot",
     "electron",
     "overlay",
-    "agent"
+    "agent",
+    "cli",
+    "automation",
+    "ui-automation",
+    "ai"
   ],
   "author": "GitHub",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TayDa64/copilot-Liku-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TayDa64/copilot-Liku-cli/issues"
+  },
+  "homepage": "https://github.com/TayDa64/copilot-Liku-cli#readme",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "os": [
+    "darwin",
+    "win32",
+    "linux"
+  ],
+  "files": [
+    "src/",
+    "scripts/start.js",
+    "README.md",
+    "LICENSE.md",
+    "QUICKSTART.md",
+    "INSTALLATION.md",
+    "CONTRIBUTING.md",
+    "ARCHITECTURE.md",
+    "CONFIGURATION.md",
+    "TESTING.md",
+    "ELECTRON_README.md",
+    "PROJECT_STATUS.md"
+  ],
   "dependencies": {
     "electron": "^35.7.5"
   }

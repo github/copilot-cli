@@ -9,6 +9,22 @@
 
 ### Install
 
+#### Option 1: Global Install (npm)
+
+Once published to npm, install globally:
+```bash
+npm install -g copilot-liku-cli
+```
+
+Then run from any directory:
+```bash
+liku          # Start the application
+liku --help   # See available commands
+```
+
+#### Option 2: Local Development
+
+For contributing or local development:
 ```bash
 # Clone the repository
 git clone https://github.com/TayDa64/copilot-Liku-cli.git
@@ -17,7 +33,12 @@ cd copilot-Liku-cli
 # Install dependencies
 npm install
 
+# Link for global usage
+npm link
+
 # Start the application
+liku start
+# or
 npm start
 ```
 

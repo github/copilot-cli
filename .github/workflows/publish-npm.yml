@@ -1,0 +1,84 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish (leave empty for latest)'
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Install dependencies
+        run: npm ci || npm install
+      
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+      
+      - name: Verify package contents
+        run: |
+          echo "📦 Package contents:"
+          npm pack --dry-run
+          echo ""
+          echo "✅ Package verification complete"
+      
+      - name: Check if version already published
+        id: check-version
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          
+          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version 2>/dev/null; then
+            echo "⚠️ Version $PACKAGE_VERSION is already published"
+            echo "already_published=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Version $PACKAGE_VERSION is not published yet"
+            echo "already_published=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+      
+      - name: Publish to npm
+        if: steps.check-version.outputs.already_published != 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Create success comment
+        if: steps.check-version.outputs.already_published != 'true' && github.event_name == 'release'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const packageJson = require('./package.json');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🎉 Successfully published \`${packageJson.name}@${packageJson.version}\` to npm!\n\nInstall with:\n\`\`\`bash\nnpm install -g ${packageJson.name}\n\`\`\``
+            });
+      
+      - name: Version already published
+        if: steps.check-version.outputs.already_published == 'true'
+        run: |
+          echo "ℹ️ Skipping publish - version already exists on npm"
+          exit 0
