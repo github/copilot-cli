@@ -41,6 +41,20 @@
     "win32",
     "linux"
   ],
+  "files": [
+    "src/",
+    "scripts/start.js",
+    "README.md",
+    "LICENSE.md",
+    "QUICKSTART.md",
+    "INSTALLATION.md",
+    "CONTRIBUTING.md",
+    "ARCHITECTURE.md",
+    "CONFIGURATION.md",
+    "TESTING.md",
+    "ELECTRON_README.md",
+    "PROJECT_STATUS.md"
+  ],
   "dependencies": {
     "electron": "^35.7.5"
   }
