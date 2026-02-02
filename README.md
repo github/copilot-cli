@@ -124,17 +124,7 @@ For more information about how to use the GitHub Copilot CLI, see [our official 
 
 ## 🔧 Configuring LSP Servers
 
-GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence. This feature is currently experimental and provides intelligent code features like go-to-definition, hover information, and diagnostics.
-
-### Enabling LSP Support
-
-To use LSP features, you must enable experimental mode:
-
-```bash
-copilot --experimental
-```
-
-Or use the `/experimental` command within an interactive session.
+GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence. This feature provides intelligent code features like go-to-definition, hover information, and diagnostics.
 
 ### Installing Language Servers
 
@@ -164,7 +154,6 @@ Example configuration:
     "typescript": {
       "command": "typescript-language-server",
       "args": ["--stdio"],
-      "disabled": false,
       "fileExtensions": {
         ".ts": "typescript",
         ".tsx": "typescript"
