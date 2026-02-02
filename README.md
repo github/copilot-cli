@@ -122,6 +122,53 @@ Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premi
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
+## 🔧 Configuring LSP Servers
+
+GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence. This feature provides intelligent code features like go-to-definition, hover information, and diagnostics.
+
+### Installing Language Servers
+
+Copilot CLI does not bundle LSP servers. You need to install them separately. For example, to set up TypeScript support:
+
+```bash
+npm install -g typescript-language-server
+```
+
+For other languages, install the corresponding LSP server and configure it following the same pattern shown below.
+
+### Configuring LSP Servers
+
+LSP servers are configured through a dedicated LSP configuration file. You can configure LSP servers at the user level or repository level:
+
+**User-level configuration** (applies to all projects):
+Edit `~/.copilot/lsp-config.json`
+
+**Repository-level configuration** (applies to specific project):
+Create `.github/lsp.json` in your repository root
+
+Example configuration:
+
+```json
+{
+  "lspServers": {
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "fileExtensions": {
+        ".ts": "typescript",
+        ".tsx": "typescript"
+      }
+    }
+  }
+}
+```
+
+### Viewing LSP Server Status
+
+Check configured LSP servers using the `/lsp` command in an interactive session, or view your configuration files directly.
+
+For more information, see the [changelog](./changelog.md).
+
 ## 📢 Feedback and Participation
 
 We're excited to have you join us early in the Copilot CLI journey.
