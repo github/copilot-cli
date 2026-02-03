@@ -1,10 +1,10 @@
 {
   "name": "copilot-liku-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "GitHub Copilot CLI with headless agent + ultra-thin overlay architecture",
   "main": "src/main/index.js",
   "bin": {
-    "liku": "./src/cli/liku.js"
+    "liku": "src/cli/liku.js"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -26,7 +26,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TayDa64/copilot-Liku-cli.git"
+    "url": "git+https://github.com/TayDa64/copilot-Liku-cli.git"
   },
   "bugs": {
     "url": "https://github.com/TayDa64/copilot-Liku-cli/issues"

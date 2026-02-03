@@ -1,5 +1,9 @@
 # GitHub Copilot CLI: Liku Edition (Public Preview)
 
+[![npm version](https://img.shields.io/npm/v/copilot-liku-cli.svg)](https://www.npmjs.com/package/copilot-liku-cli)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+
 The power of GitHub Copilot, now with visual-spatial awareness and advanced automation.
 
 GitHub Copilot-Liku CLI brings AI-powered coding assistance and UI automation directly to your terminal. This "Liku Edition" extends the standard Copilot experience with an ultra-thin Electron overlay, allowing the agent to "see" and interact with your screen through a coordinated grid system and native UI automation.
@@ -89,7 +93,7 @@ The Liku Edition moves beyond single-turn responses with a specialized team of a
 
 #### Global Installation (Recommended for Users)
 
-Once published to npm, install globally with:
+Install globally from npm:
 ```bash
 npm install -g copilot-liku-cli
 ```
