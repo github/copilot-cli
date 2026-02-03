@@ -162,6 +162,7 @@ class UIWatcher extends EventEmitter {
   
   /**
    * Get the currently active/focused window
+   * Uses file-based script execution for reliable parsing
    */
   async getActiveWindow() {
     const script = `
@@ -194,10 +195,24 @@ $proc = Get-Process -Id $processId -ErrorAction SilentlyContinue
 } | ConvertTo-Json -Compress
 `;
     
+    // Use file-based execution for reliable parsing
+    const tempFile = path.join(os.tmpdir(), `liku-activewin-${Date.now()}.ps1`);
+    
     return new Promise((resolve, reject) => {
-      exec(`powershell -NoProfile -Command "${script.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`, 
-        { encoding: 'utf8', timeout: 2000 },
+      // Write script to temp file
+      try {
+        fs.writeFileSync(tempFile, script, 'utf8');
+      } catch (e) {
+        resolve(null);
+        return;
+      }
+      
+      exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${tempFile}"`, 
+        { encoding: 'utf8', timeout: 3000 },
         (error, stdout, stderr) => {
+          // Clean up temp file
+          try { fs.unlinkSync(tempFile); } catch {}
+          
           if (error) {
             resolve(null);
             return;
@@ -214,11 +229,12 @@ $proc = Get-Process -Id $processId -ErrorAction SilentlyContinue
   
   /**
    * Detect UI elements using Windows UI Automation
+   * Uses file-based script execution for reliable parsing
    */
   async detectElements(activeWindow) {
     // Build scope filter based on active window
     const windowFilter = this.options.focusedWindowOnly && activeWindow
-      ? `$targetWindow = "${(activeWindow.title || '').replace(/"/g, '\\"')}"`
+      ? `$targetWindow = "${(activeWindow.title || '').replace(/"/g, '`"')}"`
       : '$targetWindow = ""';
     
     const script = `
@@ -289,10 +305,24 @@ foreach ($el in $elements) {
 $results | ConvertTo-Json -Depth 4 -Compress
 `;
 
+    // Use file-based execution for reliable parsing (inline -Command breaks on complex scripts)
+    const tempFile = path.join(os.tmpdir(), `liku-detect-${Date.now()}.ps1`);
+    
     return new Promise((resolve, reject) => {
-      exec(`powershell -NoProfile -Command "${script.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`,
-        { encoding: 'utf8', timeout: 5000, maxBuffer: 10 * 1024 * 1024 },
+      // Write script to temp file
+      try {
+        fs.writeFileSync(tempFile, script, 'utf8');
+      } catch (e) {
+        resolve([]);
+        return;
+      }
+      
+      exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${tempFile}"`,
+        { encoding: 'utf8', timeout: 8000, maxBuffer: 10 * 1024 * 1024 },
         (error, stdout, stderr) => {
+          // Clean up temp file
+          try { fs.unlinkSync(tempFile); } catch {}
+          
           if (error) {
             resolve([]);
             return;

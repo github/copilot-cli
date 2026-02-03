@@ -35,7 +35,7 @@ const DANGEROUS_COMMAND_PATTERNS = [
   // Destructive file operations
   /\b(rm|del|erase|rmdir|rd)\s+(-[rf]+|\/[sq]+|\*)/i,
   /Remove-Item.*-Recurse.*-Force/i,
-  /\bformat\b/i,
+  /\bformat\s+[a-z]:/i,  // Match "format C:" but not "Format-Table"
   // System modification
   /\b(shutdown|restart|reboot)\b/i,
   /\breg\s+(delete|add)\b/i,

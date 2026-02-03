@@ -29,13 +29,18 @@ function getInspectService() {
   return inspectService;
 }
 
-// Lazy-load UI watcher for live UI context
+// Shared UI watcher for live UI context (set by index.js after starting)
 let uiWatcher = null;
+
+/**
+ * Set the shared UI watcher instance (called from index.js)
+ */
+function setUIWatcher(watcher) {
+  uiWatcher = watcher;
+  console.log('[AI-SERVICE] UI Watcher connected');
+}
+
 function getUIWatcher() {
-  if (!uiWatcher) {
-    const { UIWatcher } = require('./ui-watcher');
-    uiWatcher = new UIWatcher();
-  }
   return uiWatcher;
 }
 
@@ -424,8 +429,10 @@ ${inspectContext.regions.slice(0, 20).map((r, i) =>
       const uiContext = watcher.getContextForAI();
       if (uiContext && uiContext.trim()) {
         liveUIContextText = `\n\n${uiContext}`;
-        console.log('[AI] Including live UI context from watcher');
+        console.log('[AI] Including live UI context from watcher (', uiContext.split('\n').length, 'lines)');
       }
+    } else {
+      console.log('[AI] UI Watcher not available or not running (watcher:', !!watcher, ', running:', watcher?.isRunning, ')');
     }
   } catch (e) {
     console.warn('[AI] Could not get live UI context:', e.message);
@@ -1386,7 +1393,7 @@ function analyzeActionSafety(action, targetInfo = {}) {
       const dangerousPatterns = [
         /\b(rm|del|erase|rmdir|rd)\s+(-[rf]+|\/[sq]+|\*)/i,
         /Remove-Item.*-Recurse.*-Force/i,
-        /\bformat\b/i,
+        /\bformat\s+[a-z]:/i,  // Match "format C:" but not "Format-Table"
         /\b(shutdown|restart|reboot)\b/i,
         /\breg\s+(delete|add)\b/i,
         /\bnet\s+(user|localgroup)\b/i,
@@ -1573,7 +1580,7 @@ async function executeActions(actionData, onAction = null, onScreenshot = null, 
     return { success: false, error: 'No valid actions provided' };
   }
 
-  const { onRequireConfirmation, targetAnalysis = {}, actionExecutor } = options;
+  const { onRequireConfirmation, targetAnalysis = {}, actionExecutor, skipSafetyConfirmation = false } = options;
 
   console.log('[AI-SERVICE] Executing actions:', actionData.thought || 'No thought provided');
   console.log('[AI-SERVICE] Actions:', JSON.stringify(actionData.actions, null, 2));
@@ -1607,8 +1614,8 @@ async function executeActions(actionData, onAction = null, onScreenshot = null, 
     const safety = analyzeActionSafety(action, targetInfo);
     console.log(`[AI-SERVICE] Action ${i} safety: ${safety.riskLevel}`, safety.warnings);
     
-    // If HIGH or CRITICAL risk, require confirmation
-    if (safety.requiresConfirmation) {
+    // If HIGH or CRITICAL risk, require confirmation (unless user already confirmed via Execute button)
+    if (safety.requiresConfirmation && !skipSafetyConfirmation) {
       console.log(`[AI-SERVICE] Action ${i} requires user confirmation`);
       
       // Store as pending action
@@ -1628,6 +1635,10 @@ async function executeActions(actionData, onAction = null, onScreenshot = null, 
       
       pendingConfirmation = true;
       break; // Stop execution, wait for confirmation
+    }
+    
+    if (skipSafetyConfirmation && safety.requiresConfirmation) {
+      console.log(`[AI-SERVICE] Action ${i} safety bypassed (user pre-confirmed via Execute button)`);
     }
 
     // Execute the action (SAFE/LOW/MEDIUM risk)
@@ -1758,5 +1769,8 @@ module.exports = {
   clearPendingAction,
   confirmPendingAction,
   rejectPendingAction,
-  resumeAfterConfirmation
+  resumeAfterConfirmation,
+  // UI awareness
+  setUIWatcher,
+  getUIWatcher
 };

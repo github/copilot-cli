@@ -128,7 +128,8 @@ test('Dangerous command patterns are comprehensive', () => {
   const mustBeDangerous = [
     'rm -rf /home/user',
     'del /q /s C:\\Windows',
-    'format D:',
+    'format C:',            // Format a drive
+    'format D:',            // Format another drive
     'Remove-Item -Recurse -Force folder',
     'shutdown /r',
     'reg delete HKLM\\SOFTWARE',
@@ -138,7 +139,7 @@ test('Dangerous command patterns are comprehensive', () => {
     assert(isCommandDangerous(cmd), `Should flag "${cmd}" as dangerous`);
   }
   
-  // Should NOT flag these
+  // Should NOT flag these (including Format-Table false positive fix)
   const mustBeSafe = [
     'Get-Process',
     'dir /b',
@@ -147,7 +148,9 @@ test('Dangerous command patterns are comprehensive', () => {
     'ls -la',
     'Get-ChildItem',
     'npm install',
-    'node script.js'
+    'node script.js',
+    'Get-ChildItem | Format-Table',         // PowerShell Format-Table cmdlet (NOT dangerous!)
+    'Get-Process | Format-Table Name, CPU', // Another Format-Table use case
   ];
   
   for (const cmd of mustBeSafe) {

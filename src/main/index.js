@@ -1069,7 +1069,7 @@ function setupIPC() {
   }
 
   // Execute actions and send results
-  async function executeActionsAndRespond(actionData) {
+  async function executeActionsAndRespond(actionData, { skipSafetyConfirmation = false } = {}) {
     if (!chatWindow) return;
     
     chatWindow.webContents.send('action-executing', { 
@@ -1131,8 +1131,8 @@ function setupIPC() {
             storeVisualContext(imageData);
           }
         },
-        // Options with safe executor
-        { actionExecutor: performSafeAgenticAction }
+        // Options with safe executor and skip confirmation if user already clicked Execute
+        { actionExecutor: performSafeAgenticAction, skipSafetyConfirmation }
       );
       
       // Send completion notification
@@ -1200,7 +1200,8 @@ function setupIPC() {
   // Handle confirmed action execution
   ipcMain.on('execute-actions', async (event, actionData) => {
     console.log('[AGENTIC] User confirmed action execution');
-    await executeActionsAndRespond(actionData || pendingActions);
+    // User clicked Execute button = they gave consent, skip secondary confirmation
+    await executeActionsAndRespond(actionData || pendingActions, { skipSafetyConfirmation: true });
   });
 
   // Handle action cancellation
@@ -2187,6 +2188,10 @@ app.whenReady().then(() => {
       }
     });
     uiWatcher.start();
+    
+    // Share the started watcher with AI service for live UI context
+    aiService.setUIWatcher(uiWatcher);
+    
     console.log('[Main] UI Watcher started for live UI monitoring');
   } catch (e) {
     console.warn('[Main] Could not start UI watcher:', e.message);

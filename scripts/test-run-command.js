@@ -113,13 +113,27 @@ async function runTests() {
     const dangerousCommands = [
       'rm -rf /tmp',           // Has -rf flag followed by path
       'del /s /q C:\\temp',    // Windows delete with flags
-      'format C:',             // Format drive
+      'format C:',             // Format drive (should be caught)
+      'format D:',             // Format another drive
       'Remove-Item -Recurse -Force C:\\temp',  // PowerShell destructive
       'shutdown /s',           // Shutdown
     ];
     for (const cmd of dangerousCommands) {
       const result = isCommandDangerous(cmd);
       assert(result === true, `"${cmd}" SHOULD be flagged as dangerous (got: ${result})`);
+    }
+  });
+
+  // Test 5b: Format-Table should NOT be flagged (false positive fix)
+  test('Format-Table is NOT flagged as dangerous', () => {
+    const safeFormatCommands = [
+      'Get-ChildItem | Format-Table',
+      'Get-Process | Format-Table Name, CPU -AutoSize',
+      'Get-Service | Format-Table -Property Name, Status',
+    ];
+    for (const cmd of safeFormatCommands) {
+      const result = isCommandDangerous(cmd);
+      assert(result === false, `"${cmd}" should NOT be flagged as dangerous (got: ${result})`);
     }
   });
 
