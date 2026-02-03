@@ -26,7 +26,28 @@ const ACTION_TYPES = {
   // Semantic element-based actions (preferred - more reliable)
   CLICK_ELEMENT: 'click_element',   // Click element found by text/name
   FIND_ELEMENT: 'find_element',     // Find element and return its info
+  // Direct command execution (most reliable for terminal operations)
+  RUN_COMMAND: 'run_command',       // Run shell command directly
 };
+
+// Dangerous command patterns that require confirmation
+const DANGEROUS_COMMAND_PATTERNS = [
+  // Destructive file operations
+  /\b(rm|del|erase|rmdir|rd)\s+(-[rf]+|\/[sq]+|\*)/i,
+  /Remove-Item.*-Recurse.*-Force/i,
+  /\bformat\b/i,
+  // System modification
+  /\b(shutdown|restart|reboot)\b/i,
+  /\breg\s+(delete|add)\b/i,
+  /\bnet\s+(user|localgroup)\b/i,
+  // Elevated operations
+  /\b(sudo|runas)\b/i,
+  /Start-Process.*-Verb\s+RunAs/i,
+  /Set-ExecutionPolicy/i,
+  /Stop-Process.*-Force/i,
+  // Dangerous downloads
+  /\b(curl|wget|Invoke-WebRequest|iwr|irm)\b.*\|\s*(bash|sh|iex|Invoke-Expression)/i,
+];
 
 // Key mappings for special keys
 const SPECIAL_KEYS = {
@@ -788,6 +809,129 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// ===== DIRECT COMMAND EXECUTION =====
+// Most reliable for terminal operations - runs shell commands directly
+
+/**
+ * Truncate output for token efficiency while preserving useful info
+ */
+function truncateOutput(output, maxLen = 4000) {
+  if (!output || output.length <= maxLen) return output;
+  
+  const headLen = Math.floor(maxLen * 0.4);
+  const tailLen = Math.floor(maxLen * 0.4);
+  
+  return output.slice(0, headLen) + 
+    `\n\n... [${output.length - headLen - tailLen} characters truncated] ...\n\n` +
+    output.slice(-tailLen);
+}
+
+/**
+ * Check if a command is dangerous and requires confirmation
+ */
+function isCommandDangerous(command) {
+  return DANGEROUS_COMMAND_PATTERNS.some(pattern => pattern.test(command));
+}
+
+/**
+ * Execute a shell command directly
+ * This is the MOST RELIABLE way to run terminal commands!
+ */
+async function executeCommand(command, options = {}) {
+  const { 
+    cwd = os.homedir(), 
+    shell = 'powershell', 
+    timeout = 30000,
+    maxOutput = 50000 
+  } = options;
+  
+  console.log(`[AUTOMATION] Executing command: ${command}`);
+  console.log(`[AUTOMATION] Working directory: ${cwd}, Shell: ${shell}`);
+  
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    
+    // Determine shell executable
+    let shellExe;
+    let shellArgs;
+    if (shell === 'cmd') {
+      shellExe = 'cmd.exe';
+      shellArgs = ['/c', command];
+    } else if (shell === 'bash') {
+      shellExe = 'bash';
+      shellArgs = ['-c', command];
+    } else {
+      // Default: PowerShell
+      shellExe = 'powershell.exe';
+      shellArgs = ['-NoProfile', '-Command', command];
+    }
+    
+    const { spawn } = require('child_process');
+    const child = spawn(shellExe, shellArgs, {
+      cwd: cwd || os.homedir(),
+      timeout: Math.min(timeout, 120000),
+      shell: false,
+      windowsHide: true
+    });
+    
+    let stdout = '';
+    let stderr = '';
+    let killed = false;
+    
+    // Set timeout
+    const timer = setTimeout(() => {
+      killed = true;
+      child.kill('SIGTERM');
+    }, Math.min(timeout, 120000));
+    
+    child.stdout.on('data', (data) => {
+      stdout += data.toString();
+      // Prevent memory issues
+      if (stdout.length > maxOutput * 2) {
+        stdout = stdout.slice(-maxOutput);
+      }
+    });
+    
+    child.stderr.on('data', (data) => {
+      stderr += data.toString();
+      if (stderr.length > maxOutput) {
+        stderr = stderr.slice(-maxOutput);
+      }
+    });
+    
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      const duration = Date.now() - startTime;
+      
+      const result = {
+        success: code === 0 && !killed,
+        stdout: truncateOutput(stdout.trim(), 4000),
+        stderr: stderr.trim().slice(0, 1000),
+        exitCode: killed ? -1 : (code || 0),
+        duration,
+        truncated: stdout.length > 4000,
+        originalLength: stdout.length,
+        timedOut: killed
+      };
+      
+      console.log(`[AUTOMATION] Command completed: exit=${result.exitCode}, duration=${duration}ms, output=${result.stdout.length} chars`);
+      resolve(result);
+    });
+    
+    child.on('error', (err) => {
+      clearTimeout(timer);
+      resolve({
+        success: false,
+        stdout: '',
+        stderr: err.message,
+        exitCode: -1,
+        duration: Date.now() - startTime,
+        error: err.message
+      });
+    });
+  });
+}
+
 // ===== SEMANTIC ELEMENT-BASED AUTOMATION =====
 // More reliable than coordinate-based - finds elements by their properties
 
@@ -1195,6 +1339,23 @@ async function executeAction(action) {
           exact: action.exact || false
         });
         result = { ...result, ...findResult };
+        break;
+      
+      case ACTION_TYPES.RUN_COMMAND:
+        const cmdResult = await executeCommand(action.command, {
+          cwd: action.cwd,
+          shell: action.shell || 'powershell',
+          timeout: action.timeout || 30000
+        });
+        result = { 
+          ...result, 
+          ...cmdResult,
+          command: action.command,
+          cwd: action.cwd || os.homedir()
+        };
+        result.message = cmdResult.success 
+          ? `Command completed (exit ${cmdResult.exitCode})`
+          : `Command failed: ${cmdResult.stderr || cmdResult.error}`;
         break;
         
       default:

@@ -466,6 +466,13 @@ $results | ConvertTo-Json -Depth 4 -Compress
   }
   
   /**
+   * Check if watcher is running (alias for isPolling)
+   */
+  get isRunning() {
+    return this.isPolling;
+  }
+  
+  /**
    * Clean up
    */
   killPsProcess() {

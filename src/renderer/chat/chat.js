@@ -446,7 +446,7 @@ function showActionConfirmation(actionData) {
         break;
       case 'key':
         icon = '⌨️';
-        desc = `Press: ${action.keys}`;
+        desc = `Press: ${action.key || action.keys || 'unknown'}`;
         break;
       case 'scroll':
         icon = '📜';
@@ -463,6 +463,14 @@ function showActionConfirmation(actionData) {
       case 'drag':
         icon = '✋';
         desc = `Drag from (${action.fromX}, ${action.fromY}) to (${action.toX}, ${action.toY})`;
+        break;
+      case 'run_command':
+        icon = '💻';
+        const cmdDisplay = action.command.length > 40 
+          ? action.command.substring(0, 40) + '...' 
+          : action.command;
+        desc = `Run: <code>${cmdDisplay}</code>`;
+        if (action.cwd) desc += ` in ${action.cwd}`;
         break;
       default:
         desc = JSON.stringify(action);

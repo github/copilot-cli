@@ -229,6 +229,7 @@ When the user asks you to DO something, respond with a JSON action block:
 - \`{"type": "drag", "fromX": <n>, "fromY": <n>, "toX": <n>, "toY": <n>}\` - Drag
 - \`{"type": "wait", "ms": <number>}\` - Wait milliseconds (IMPORTANT: add waits between multi-step actions!)
 - \`{"type": "screenshot"}\` - Take screenshot to verify result
+- \`{"type": "run_command", "command": "<shell command>", "cwd": "<optional path>", "shell": "powershell|cmd|bash"}\` - **PREFERRED FOR SHELL TASKS**: Execute shell command directly and return output (timeout: 30s)
 
 ### Grid to Pixel Conversion:
 - A0 → (50, 50), B0 → (150, 50), C0 → (250, 50)
@@ -251,15 +252,19 @@ When the user asks you to DO something, respond with a JSON action block:
 
 **Common Task Patterns**:
 ${PLATFORM === 'win32' ? `
-- **Open new terminal**: Use \`win+x\` then \`i\` (or \`win+r\` → type "wt" → \`enter\`)
+- **Run shell commands**: Use \`run_command\` action - e.g., \`{"type": "run_command", "command": "Get-Process | Select-Object -First 5"}\`
+- **List files**: \`{"type": "run_command", "command": "dir", "cwd": "C:\\\\Users"}\` or \`{"type": "run_command", "command": "Get-ChildItem"}\`
+- **Open terminal GUI**: Use \`win+x\` then \`i\` (or \`win+r\` → type "wt" → \`enter\`) - only if user wants visible terminal
 - **Open application**: Use \`win\` key, type app name, press \`enter\`
 - **Save file**: \`ctrl+s\`
 - **Copy/Paste**: \`ctrl+c\` / \`ctrl+v\`` : PLATFORM === 'darwin' ? `
-- **Open terminal**: \`cmd+space\`, type "Terminal", \`enter\`
+- **Run shell commands**: Use \`run_command\` action - e.g., \`{"type": "run_command", "command": "ls -la", "shell": "bash"}\`
+- **Open terminal GUI**: \`cmd+space\`, type "Terminal", \`enter\` - only if user wants visible terminal
 - **Open application**: \`cmd+space\`, type app name, \`enter\`
 - **Save file**: \`cmd+s\`
 - **Copy/Paste**: \`cmd+c\` / \`cmd+v\`` : `
-- **Open terminal**: \`ctrl+alt+t\`
+- **Run shell commands**: Use \`run_command\` action - e.g., \`{"type": "run_command", "command": "ls -la", "shell": "bash"}\`
+- **Open terminal GUI**: \`ctrl+alt+t\` - only if user wants visible terminal
 - **Open application**: \`super\` key, type name, \`enter\`
 - **Save file**: \`ctrl+s\`
 - **Copy/Paste**: \`ctrl+c\` / \`ctrl+v\``}
@@ -1374,6 +1379,35 @@ function analyzeActionSafety(action, targetInfo = {}) {
       break;
     case 'drag':
       result.riskLevel = ActionRiskLevel.MEDIUM;
+      break;
+    case 'run_command':
+      // Analyze command safety
+      const cmd = (action.command || '').toLowerCase();
+      const dangerousPatterns = [
+        /\b(rm|del|erase|rmdir|rd)\s+(-[rf]+|\/[sq]+|\*)/i,
+        /Remove-Item.*-Recurse.*-Force/i,
+        /\bformat\b/i,
+        /\b(shutdown|restart|reboot)\b/i,
+        /\breg\s+(delete|add)\b/i,
+        /\bnet\s+(user|localgroup)\b/i,
+        /\b(sudo|runas)\b/i,
+        /Start-Process.*-Verb\s+RunAs/i,
+        /Set-ExecutionPolicy/i,
+        /Stop-Process.*-Force/i,
+      ];
+      
+      const isDangerous = dangerousPatterns.some(p => p.test(action.command || ''));
+      if (isDangerous) {
+        result.riskLevel = ActionRiskLevel.CRITICAL;
+        result.warnings.push('Potentially destructive command');
+        result.requiresConfirmation = true;
+      } else if (cmd.includes('rm ') || cmd.includes('del ') || cmd.includes('remove')) {
+        result.riskLevel = ActionRiskLevel.HIGH;
+        result.warnings.push('Command may delete files');
+        result.requiresConfirmation = true;
+      } else {
+        result.riskLevel = ActionRiskLevel.MEDIUM;
+      }
       break;
   }
   

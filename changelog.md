@@ -1,3 +1,26 @@
+## 0.0.5 - Liku Edition - 2025-02-04
+
+### New Feature: Integrated Terminal (`run_command`)
+- **Direct shell command execution** - AI can now run commands without opening terminal windows
+- New `run_command` action type: `{"type": "run_command", "command": "dir", "cwd": "C:\\Users"}`
+- Supports PowerShell (default), cmd, and bash shells
+- 30-second timeout with output truncation at 4000 characters
+- Command output returned directly to AI for analysis
+
+### Safety Analysis
+- Dangerous command patterns detected and flagged (rm -rf, format, del /s, etc.)
+- Risk levels: CRITICAL (destructive), HIGH (delete operations), MEDIUM (normal commands)
+- AI receives safety assessment before execution
+
+### Bug Fixes
+- Fixed "Press: undefined" in action UI - `action.keys` → `action.key || action.keys`
+- Fixed UIWatcher `isRunning` property - added getter returning `isPolling` state
+
+### System Prompt Updates
+- Documented `run_command` action type in AI system prompt
+- Updated common task patterns to prefer `run_command` for shell operations
+- AI now uses direct command execution instead of unreliable Win+R automation
+
 ## 0.0.4 - Liku Edition - 2025-02-03
 
 ### Focus & Input Fixes
