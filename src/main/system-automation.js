@@ -89,6 +89,33 @@ function executePowerShell(command) {
 }
 
 /**
+ * Focus the desktop / unfocus Electron windows before sending keyboard input
+ * This is critical for SendKeys/SendInput to reach the correct target
+ */
+async function focusDesktop() {
+  const script = `
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class FocusHelper {
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetDesktopWindow();
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetShellWindow();
+}
+"@
+# Focus shell window (explorer desktop) 
+$shell = [FocusHelper]::GetShellWindow()
+[FocusHelper]::SetForegroundWindow($shell)
+Start-Sleep -Milliseconds 50
+`;
+  await executePowerShell(script);
+  console.log('[AUTOMATION] Focused desktop before input');
+}
+
+/**
  * Move mouse to coordinates (Windows)
  */
 async function moveMouse(x, y) {

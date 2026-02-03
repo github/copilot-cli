@@ -1,6 +1,6 @@
 {
   "name": "copilot-liku-cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "GitHub Copilot CLI with headless agent + ultra-thin overlay architecture",
   "main": "src/main/index.js",
   "bin": {

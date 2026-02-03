@@ -118,9 +118,12 @@ function createOverlayWindow() {
   });
 
   // Pipe renderer console to main for debugging without DevTools
-  overlayWindow.webContents.on('console-message', (event) => {
-    const { level, message, line, sourceId } = event;
-    console.log(`[overlay console] (${level}) ${sourceId}:${line} - ${message}`);
+  overlayWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    const levelNames = ['verbose', 'info', 'warn', 'error'];
+    const levelStr = levelNames[level] || `level-${level}`;
+    const lineStr = line !== undefined ? `:${line}` : '';
+    const source = sourceId ? sourceId.split('/').pop() : 'overlay';
+    console.log(`[overlay console] (${levelStr}) ${source}${lineStr} - ${message}`);
   });
 
   // Prevent overlay from appearing in Dock/Taskbar
@@ -1074,6 +1077,17 @@ function setupIPC() {
       total: actionData.actions.length 
     });
     
+    // CRITICAL: Blur chat window before executing actions so keyboard/mouse
+    // input reaches the desktop instead of staying within Electron
+    if (chatWindow && !chatWindow.isDestroyed()) {
+      chatWindow.blur();
+    }
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      overlayWindow.blur();
+      // Temporarily lower overlay z-index so popups (like Run dialog) appear above
+      overlayWindow.setAlwaysOnTop(true, 'pop-up-menu');
+    }
+    
     try {
       const results = await aiService.executeActions(
         actionData,
@@ -1173,6 +1187,11 @@ function setupIPC() {
         actionsCount: actionData.actions ? actionData.actions.length : 0,
         error: error.message
       });
+    } finally {
+      // Restore overlay z-index after action execution
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.setAlwaysOnTop(true, 'screen-saver');
+      }
     }
     
     pendingActions = null;

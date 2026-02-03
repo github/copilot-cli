@@ -1,3 +1,23 @@
+## 0.0.4 - Liku Edition - 2025-02-03
+
+### Focus & Input Fixes
+- **Root Cause Fixed**: Keyboard automation (Win+R, typing, etc.) was failing because:
+  1. Chat window kept focus after user sent message → input went to chat, not desktop
+  2. Overlay at `screen-saver` z-level blocked system dialogs (Run, Start menu)
+- Now blur chat/overlay windows before action execution
+- Temporarily lower overlay z-index to `pop-up-menu` during automation
+- Restore `screen-saver` z-index after actions complete
+
+### Console Logging Fix
+- Fixed "undefined" line numbers in overlay console logs
+- Now shows proper log levels (verbose/info/warn/error) instead of numeric codes
+- Handles undefined line numbers gracefully
+
+### Architecture: Integrated Terminal Design
+- Researched node-pty + xterm.js for future `run_command` action type
+- Would allow AI to run shell commands directly instead of unreliable Win+R automation
+- See docs/INTEGRATED_TERMINAL_ARCHITECTURE.md (coming soon)
+
 ## 0.0.3 - Liku Edition - 2025-01-XX
 
 ### OS Awareness
