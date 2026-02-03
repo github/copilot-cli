@@ -29,6 +29,16 @@ function getInspectService() {
   return inspectService;
 }
 
+// Lazy-load UI watcher for live UI context
+let uiWatcher = null;
+function getUIWatcher() {
+  if (!uiWatcher) {
+    const { UIWatcher } = require('./ui-watcher');
+    uiWatcher = new UIWatcher();
+  }
+  return uiWatcher;
+}
+
 // ===== CONFIGURATION =====
 
 // Available models for GitHub Copilot (based on Copilot CLI changelog)
@@ -401,8 +411,23 @@ ${inspectContext.regions.slice(0, 20).map((r, i) =>
     console.warn('[AI] Could not get inspect context:', e.message);
   }
   
-  const enhancedMessage = inspectContextText 
-    ? `${userMessage}${inspectContextText}` 
+  // Get live UI context from the UI watcher (always-on mirror)
+  let liveUIContextText = '';
+  try {
+    const watcher = getUIWatcher();
+    if (watcher && watcher.isRunning) {
+      const uiContext = watcher.getContextForAI();
+      if (uiContext && uiContext.trim()) {
+        liveUIContextText = `\n\n${uiContext}`;
+        console.log('[AI] Including live UI context from watcher');
+      }
+    }
+  } catch (e) {
+    console.warn('[AI] Could not get live UI context:', e.message);
+  }
+  
+  const enhancedMessage = inspectContextText || liveUIContextText
+    ? `${userMessage}${inspectContextText}${liveUIContextText}` 
     : userMessage;
 
   if (latestVisual && (currentProvider === 'copilot' || currentProvider === 'openai')) {

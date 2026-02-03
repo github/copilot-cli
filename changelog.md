@@ -1,3 +1,25 @@
+## 0.0.3 - Liku Edition - 2025-01-XX
+
+### OS Awareness
+- Added platform detection (`PLATFORM`, `OS_NAME`) to AI service
+- AI system prompt now includes OS-specific keyboard shortcuts (Windows, macOS, Linux)
+- AI correctly uses Windows-specific shortcuts (Win+X, Win+R, etc.) instead of macOS/Linux ones
+
+### Windows Key Fix
+- Fixed Windows key support using SendInput with VK_LWIN (0x5B) virtual key code
+- `pressKey()` now properly handles `win+`, `windows+`, `super+` key combos
+- Replaced broken `^{ESC}` mapping with proper SendInput implementation
+
+### Live UI Mirror Architecture
+- New `ui-watcher.js` service for continuous background monitoring of Windows UI tree
+- Polls Windows UI Automation every 300-500ms with configurable intervals
+- Maintains element cache with bounds, text, roles for AI context
+- `getContextForAI()` provides formatted UI state snapshot for AI messages
+- Element lookup methods: `findElementByText()`, `getElementAtPoint()`
+- Events: 'ui-changed', 'poll-complete', 'started', 'stopped'
+- AI now receives live UI context automatically (no manual screenshots needed)
+- Overlay integration for real-time UI change notifications
+
 ## 0.0.341 - 2025-10-14
 
 - Added `/terminal-setup` command to set up multi-line input on terminals not implementing the kitty protocol

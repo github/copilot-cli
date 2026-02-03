@@ -24,7 +24,10 @@ let state = {
   inspectMode: false,
   inspectRegions: [],
   hoveredRegion: null,
-  selectedRegionId: null
+  selectedRegionId: null,
+  // Live UI mirror state
+  uiMirrorMode: false,
+  uiMirrorElements: []
 };
 
 // ===== CANVAS SETUP =====
@@ -444,6 +447,23 @@ if (window.electronAPI) {
       updateInspectIndicator();
       if (!enabled) {
         clearInspectRegions();
+      }
+    });
+  }
+  
+  // Listen for live UI watcher updates (background UI changes)
+  if (window.electronAPI.onUIWatcherUpdate) {
+    window.electronAPI.onUIWatcherUpdate((diff) => {
+      if (diff && (diff.added?.length || diff.changed?.length || diff.removed?.length)) {
+        console.log('[Overlay] UI watcher update:', {
+          added: diff.added?.length || 0,
+          changed: diff.changed?.length || 0,
+          removed: diff.removed?.length || 0
+        });
+        // Update UI mirror elements for subtle visual feedback
+        state.uiMirrorElements = diff.currentElements || [];
+        // Could trigger subtle highlight of changed elements here
+        // For now, just log - full visual rendering can be added later
       }
     });
   }

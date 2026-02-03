@@ -25,6 +25,9 @@ const aiService = require('./ai-service.js');
 // Visual awareness for advanced screen analysis
 const visualAwareness = require('./visual-awareness.js');
 
+// Live UI Watcher for continuous UI monitoring
+const { UIWatcher } = require('./ui-watcher.js');
+
 // Multi-agent system for advanced AI orchestration
 const { createAgentSystem } = require('./agents/index.js');
 
@@ -57,6 +60,9 @@ try {
 let overlayWindow = null;
 let chatWindow = null;
 let tray = null;
+
+// Live UI watcher instance
+let uiWatcher = null;
 
 // State management
 let overlayMode = 'selection'; // start in selection so the grid is visible immediately
@@ -2148,6 +2154,25 @@ app.whenReady().then(() => {
   registerShortcuts();
   setupIPC();
   
+  // Start the UI watcher for live UI monitoring
+  try {
+    uiWatcher = new UIWatcher({
+      pollInterval: 400,
+      maxElements: 60,
+      includeInvisible: false
+    });
+    uiWatcher.on('ui-changed', (diff) => {
+      // Forward UI changes to overlay for live mirror updates
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        overlayWindow.webContents.send('ui-watcher-update', diff);
+      }
+    });
+    uiWatcher.start();
+    console.log('[Main] UI Watcher started for live UI monitoring');
+  } catch (e) {
+    console.warn('[Main] Could not start UI watcher:', e.message);
+  }
+  
   // Set up Copilot OAuth callback to notify chat on auth completion
   aiService.setOAuthCallback((result) => {
     if (chatWindow && !chatWindow.isDestroyed()) {
@@ -2197,9 +2222,13 @@ app.on('window-all-closed', () => {
   }
 });
 
-// Clean up shortcuts on quit
+// Clean up shortcuts and UI watcher on quit
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
+  if (uiWatcher) {
+    uiWatcher.stop();
+    console.log('[Main] UI Watcher stopped');
+  }
 });
 
 // Prevent app from quitting when closing chat window

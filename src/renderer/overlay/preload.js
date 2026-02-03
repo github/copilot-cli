@@ -86,5 +86,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   requestInspectRegions: () => ipcRenderer.send('request-inspect-regions'),
   
   // Toggle inspect mode
-  toggleInspectMode: () => ipcRenderer.send('toggle-inspect-mode')
+  toggleInspectMode: () => ipcRenderer.send('toggle-inspect-mode'),
+  
+  // ===== LIVE UI MIRROR API =====
+  
+  // Listen for live UI watcher updates (element changes in background)
+  onUIWatcherUpdate: (callback) => ipcRenderer.on('ui-watcher-update', (event, diff) => callback(diff))
 });
