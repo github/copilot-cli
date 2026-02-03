@@ -1481,4 +1481,9 @@ module.exports = {
   // Semantic element-based automation (preferred approach)
   findElementByText,
   clickElementByText,
+  // v0.0.5: Command execution
+  DANGEROUS_COMMAND_PATTERNS,
+  isCommandDangerous,
+  truncateOutput,
+  executeCommand,
 };
