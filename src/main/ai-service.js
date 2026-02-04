@@ -185,9 +185,23 @@ const SYSTEM_PROMPT = `You are Liku, an intelligent AGENTIC AI assistant integra
 
 ${getPlatformContext()}
 
+## LIVE UI AWARENESS (ALWAYS ACTIVE!)
+
+You have **REAL-TIME awareness** of the screen through Windows UI Automation - NO screenshot needed for:
+- Listing visible buttons, text fields, menus, tabs
+- Finding elements by name/text
+- Knowing the active window title and bounds
+- Answering "what do you see" or "what buttons are there" questions
+
+A **Live UI State** section is included with your messages containing current screen elements.
+**TRUST THIS DATA** - it auto-refreshes every 400ms via Windows UI Automation.
+
+For SPATIAL tasks (pixel-precise clicking on unlabeled/visual areas), request a screenshot.
+For ELEMENT tasks (clicking named buttons, finding text), use the live UI data directly!
+
 ## Your Core Capabilities
 
-1. **Screen Vision**: When the user captures their screen, you receive it as an image. ALWAYS analyze visible content immediately.
+1. **Screen Vision**: When the user captures their screen, you receive it as an image. Use this for spatial/visual tasks. For element-based tasks, the Live UI State is sufficient.
 
 2. **SEMANTIC ELEMENT ACTIONS (PREFERRED!)**: You can interact with UI elements by their text/name - MORE RELIABLE than coordinates:
    - \`{"type": "click_element", "text": "Submit", "reason": "Click Submit button"}\` - Finds and clicks element by text
@@ -428,7 +442,8 @@ ${inspectContext.regions.slice(0, 20).map((r, i) =>
     if (watcher && watcher.isRunning) {
       const uiContext = watcher.getContextForAI();
       if (uiContext && uiContext.trim()) {
-        liveUIContextText = `\n\n${uiContext}`;
+        // Frame the context as trustworthy real-time data
+        liveUIContextText = `\n\n---\n🔴 **LIVE UI STATE** (auto-refreshed every 400ms - TRUST THIS DATA!)\n${uiContext}\n---`;
         console.log('[AI] Including live UI context from watcher (', uiContext.split('\n').length, 'lines)');
       }
     } else {
@@ -1061,10 +1076,36 @@ function callOllama(messages) {
 }
 
 /**
- * Send a message and get AI response
+ * Detect if AI response was truncated mid-stream
+ * Uses heuristics to identify incomplete responses
+ */
+function detectTruncation(response) {
+  if (!response || response.length < 100) return false;
+  
+  const truncationSignals = [
+    // Ends mid-JSON block
+    /```json\s*\{[^}]*$/s.test(response),
+    // Ends with unclosed code block
+    (response.match(/```/g) || []).length % 2 !== 0,
+    // Ends mid-sentence (lowercase letter or comma, no terminal punctuation)
+    /[a-z,]\s*$/i.test(response) && !/[.!?:]\s*$/i.test(response),
+    // Ends with numbered list item starting
+    /\d+\.\s*$/m.test(response),
+    // Ends with "- " suggesting incomplete list item
+    /-\s*$/m.test(response),
+    // Has unclosed parentheses/brackets
+    (response.match(/\(/g) || []).length > (response.match(/\)/g) || []).length,
+    (response.match(/\[/g) || []).length > (response.match(/\]/g) || []).length
+  ];
+  
+  return truncationSignals.some(Boolean);
+}
+
+/**
+ * Send a message and get AI response with auto-continuation
  */
 async function sendMessage(userMessage, options = {}) {
-  const { includeVisualContext = false, coordinates = null } = options;
+  const { includeVisualContext = false, coordinates = null, maxContinuations = 2 } = options;
 
   // Enhance message with coordinate context if provided
   let enhancedMessage = userMessage;
@@ -1109,6 +1150,50 @@ async function sendMessage(userMessage, options = {}) {
         response = await callOllama(messages);
         break;
     }
+
+    // Auto-continuation for truncated responses
+    let fullResponse = response;
+    let continuationCount = 0;
+    
+    while (detectTruncation(fullResponse) && continuationCount < maxContinuations) {
+      continuationCount++;
+      console.log(`[AI] Response appears truncated, continuing (${continuationCount}/${maxContinuations})...`);
+      
+      // Add partial response to history temporarily
+      conversationHistory.push({ role: 'assistant', content: fullResponse });
+      
+      // Build continuation request
+      const continueMessages = buildMessages('Continue from where you left off. Do not repeat what you already said.', false);
+      
+      try {
+        let continuation;
+        switch (currentProvider) {
+          case 'copilot':
+            continuation = await callCopilot(continueMessages);
+            break;
+          case 'openai':
+            continuation = await callOpenAI(continueMessages);
+            break;
+          case 'anthropic':
+            continuation = await callAnthropic(continueMessages);
+            break;
+          case 'ollama':
+          default:
+            continuation = await callOllama(continueMessages);
+        }
+        
+        // Append continuation
+        fullResponse += '\n' + continuation;
+        
+        // Update history with combined response
+        conversationHistory.pop(); // Remove partial
+      } catch (contErr) {
+        console.warn('[AI] Continuation failed:', contErr.message);
+        break;
+      }
+    }
+    
+    response = fullResponse;
 
     // Add to conversation history
     conversationHistory.push({ role: 'user', content: enhancedMessage });

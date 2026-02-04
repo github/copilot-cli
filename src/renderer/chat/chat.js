@@ -7,6 +7,71 @@ let messages = [];
 let contextItems = [];
 let pendingActions = null;
 
+// ===== CHAT HISTORY PERSISTENCE =====
+const HISTORY_KEY = 'liku-chat-history';
+const MAX_PERSISTED_MESSAGES = 100;
+
+function saveHistory() {
+  try {
+    const toSave = messages.slice(-MAX_PERSISTED_MESSAGES).map(m => ({
+      text: m.text,
+      type: m.type,
+      timestamp: m.timestamp
+    }));
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(toSave));
+  } catch (e) {
+    console.warn('[CHAT] Failed to save history:', e);
+  }
+}
+
+function loadHistory() {
+  try {
+    const saved = localStorage.getItem(HISTORY_KEY);
+    if (saved) {
+      const loaded = JSON.parse(saved);
+      if (Array.isArray(loaded) && loaded.length > 0) {
+        // Remove empty state if present
+        const emptyState = chatHistory.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+        
+        loaded.forEach(msg => {
+          // Recreate message elements without re-saving
+          const messageEl = document.createElement('div');
+          messageEl.className = `message ${msg.type}`;
+          
+          const textEl = document.createElement('div');
+          textEl.textContent = msg.text;
+          messageEl.appendChild(textEl);
+          
+          const timestampEl = document.createElement('div');
+          timestampEl.className = 'timestamp';
+          timestampEl.textContent = new Date(msg.timestamp).toLocaleTimeString();
+          messageEl.appendChild(timestampEl);
+          
+          chatHistory.appendChild(messageEl);
+          messages.push(msg);
+        });
+        
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        console.log(`[CHAT] Loaded ${loaded.length} messages from history`);
+      }
+    }
+  } catch (e) {
+    console.warn('[CHAT] Failed to load history:', e);
+  }
+}
+
+function clearHistory() {
+  try {
+    localStorage.removeItem(HISTORY_KEY);
+    messages = [];
+    chatHistory.innerHTML = '';
+    console.log('[CHAT] History cleared');
+  } catch (e) {
+    console.warn('[CHAT] Failed to clear history:', e);
+  }
+}
+
 // ===== ELEMENTS =====
 const chatHistory = document.getElementById('chat-history');
 const messageInput = document.getElementById('message-input');
@@ -136,6 +201,69 @@ function addMessage(text, type = 'agent', timestamp = Date.now(), extra = {}) {
   if (type === 'user' || type === 'agent') {
     updateTokenCount(estimateTokens(text));
   }
+  
+  // Auto-save chat history
+  saveHistory();
+}
+
+// ===== AGENT ROUTING =====
+const AGENT_TRIGGERS = {
+  research: /\b(research|investigate|find out about|look up|ground|gather info|search for)\b/i,
+  verify: /\b(verify|validate|check|confirm|test|ensure)\b/i,
+  build: /\b(build|create|implement|code|develop|make|write code)\b/i,
+  orchestrate: /\b(spawn|agent|subagent|orchestrate|coordinate|multi-step|complex task)\b/i
+};
+
+function detectAgentIntent(text) {
+  // Check for explicit agent invocation first
+  if (AGENT_TRIGGERS.orchestrate.test(text)) return 'orchestrate';
+  if (AGENT_TRIGGERS.research.test(text)) return 'research';
+  if (AGENT_TRIGGERS.verify.test(text)) return 'verify';
+  if (AGENT_TRIGGERS.build.test(text)) return 'build';
+  return null;
+}
+
+async function routeToAgent(text, agentType) {
+  addMessage(`🤖 Routing to ${agentType} agent...`, 'system');
+  showTypingIndicator();
+  
+  try {
+    let result;
+    switch (agentType) {
+      case 'research':
+        result = await window.electronAPI.agentResearch({ query: text });
+        break;
+      case 'verify':
+        result = await window.electronAPI.agentVerify({ target: text });
+        break;
+      case 'build':
+        result = await window.electronAPI.agentBuild({ specification: text });
+        break;
+      case 'orchestrate':
+      default:
+        result = await window.electronAPI.agentRun({ task: text });
+    }
+    
+    removeTypingIndicator();
+    
+    if (result.success) {
+      const responseText = result.result?.result?.response || 
+                          result.result?.response || 
+                          JSON.stringify(result.result, null, 2);
+      addMessage(`✅ Agent completed:\n${responseText}`, 'agent');
+    } else {
+      addMessage(`❌ Agent error: ${result.error}`, 'system');
+      // Fallback to regular AI
+      addMessage('Falling back to regular AI...', 'system');
+      window.electronAPI.sendMessage(text);
+    }
+  } catch (err) {
+    removeTypingIndicator();
+    console.error('[CHAT] Agent routing failed:', err);
+    addMessage(`⚠️ Agent unavailable: ${err.message}. Using regular AI.`, 'system');
+    // Fallback to regular AI
+    window.electronAPI.sendMessage(text);
+  }
 }
 
 function sendMessage() {
@@ -143,7 +271,16 @@ function sendMessage() {
   if (!text) return;
 
   addMessage(text, 'user');
-  window.electronAPI.sendMessage(text);
+  
+  // Check for agent-level tasks
+  const agentType = detectAgentIntent(text);
+  
+  if (agentType) {
+    routeToAgent(text, agentType);
+  } else {
+    // Regular AI message
+    window.electronAPI.sendMessage(text);
+  }
   
   messageInput.value = '';
   messageInput.style.height = 'auto';
@@ -383,6 +520,9 @@ function updateVisualContextIndicator(count) {
 }
 
 // ===== INITIALIZATION =====
+// Load persisted chat history first
+loadHistory();
+
 window.electronAPI.getState().then(state => {
   currentMode = state.overlayMode;
   updateModeDisplay();
@@ -568,6 +708,43 @@ if (window.electronAPI.onActionProgress) {
 if (window.electronAPI.onActionComplete) {
   window.electronAPI.onActionComplete((data) => {
     showActionComplete(data);
+  });
+}
+
+// ===== AGENT EVENT HANDLING =====
+if (window.electronAPI.onAgentEvent) {
+  window.electronAPI.onAgentEvent((data) => {
+    console.log('[CHAT] Agent event:', data.type, data);
+    switch (data.type) {
+      case 'session-started':
+        addMessage(`🚀 Agent session started: ${data.sessionId}`, 'system');
+        break;
+      case 'execution-started':
+        showTypingIndicator();
+        addMessage(`⚙️ Agent working on: ${typeof data.task === 'string' ? data.task : data.task?.description || 'task'}`, 'system');
+        break;
+      case 'execution-complete':
+        removeTypingIndicator();
+        if (data.result?.success) {
+          const response = data.result.result?.response || 
+                          data.result.response || 
+                          'Task completed successfully';
+          addMessage(`✅ ${response}`, 'agent');
+        } else {
+          addMessage(`❌ Agent failed: ${data.result?.error || 'Unknown error'}`, 'system');
+        }
+        break;
+      case 'execution-error':
+        removeTypingIndicator();
+        addMessage(`❌ Agent error: ${data.error}`, 'system');
+        break;
+      case 'handoff':
+        addMessage(`🔄 Agent handoff: ${data.from} → ${data.to}`, 'system');
+        break;
+      case 'agent:log':
+        console.log('[AGENT LOG]', data);
+        break;
+    }
   });
 }
 
