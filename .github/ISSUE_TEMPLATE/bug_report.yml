@@ -8,7 +8,14 @@ body:
     attributes:
       value: |
         <br />
-        Thank you for taking the time to report a bug!  Please answer each question below to the best of your ability; it is okay to leave questions blank if you have to.
+        Thank you for taking the time to report a bug! Please answer each question below to the best of your ability; it is okay to leave questions blank if you have to.
+
+        ⚠️ **Security notice**: This is a public repository. Before sharing logs or files, please review them for:
+        - API keys, tokens, or credentials
+        - Personal identifiable information (PII)
+        - Internal URLs, hostnames, or filesystem paths
+
+        Please avoid sharing contents from `~/.copilot/` unless you've reviewed and redacted sensitive data.
   - type: textarea
     id: description
     attributes:

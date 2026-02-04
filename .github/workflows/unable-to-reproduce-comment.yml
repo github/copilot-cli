@@ -9,8 +9,9 @@ permissions:
 
 jobs:
   add-comment-to-unable-to-reproduce-issues:
-    if: github.event.label.name == 'unable-to-reproduce'
+    if: github.repository == 'github/copilot-cli' && github.event.label.name == 'unable-to-reproduce'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Update issue
         env:

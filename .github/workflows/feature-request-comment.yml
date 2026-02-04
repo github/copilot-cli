@@ -9,8 +9,9 @@ permissions:
 
 jobs:
   add-comment-to-enhancement-issues:
-    if: github.event.label.name == 'enhancement'
+    if: github.repository == 'github/copilot-cli' && github.event.label.name == 'enhancement'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
@@ -29,3 +30,6 @@ jobs:
         contribute.
     steps:
       - run: gh issue comment "$NUMBER" --body "$BODY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}

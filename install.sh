@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 # GitHub Copilot CLI Installation Script
 # Usage: curl -fsSL https://gh.io/copilot-install | bash
@@ -39,16 +39,34 @@ if [ "${VERSION}" = "latest" ] || [ -z "$VERSION" ]; then
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
   CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/latest/download/SHA256SUMS.txt"
 elif [ "${VERSION}" = "prerelease" ]; then
-  # Get the latest prerelease tag
-  if ! command -v git >/dev/null 2>&1; then
-    echo "Error: git is required to install prerelease versions" >&2
-    exit 1
+  # Get the latest prerelease tag.
+  # Prefer GitHub Releases API; fallback to git tags with a conservative prerelease regex.
+  VERSION=""
+
+  if command -v curl >/dev/null 2>&1; then
+    VERSION="$(curl -fsSL https://api.github.com/repos/github/copilot-cli/releases \
+      | awk -F'"' '/"prerelease": true/ {p=1} p && /"tag_name":/ {print $4; exit}')" || true
   fi
-  VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | tail -1 | awk -F/ '{print $NF}')"
-  if [ -z "$VERSION" ]; then
+
+  if [ -z "${VERSION}" ]; then
+    if ! command -v git >/dev/null 2>&1; then
+      echo "Error: git is required to install prerelease versions (or install curl)." >&2
+      exit 1
+    fi
+
+    VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli \
+      | awk -F/ '{print $NF}' \
+      | sed 's/\^{}$//' \
+      | grep -E '^v?[0-9].*-(rc|beta|alpha|pre|preview)' \
+      | sort -V \
+      | tail -1)" || true
+  fi
+
+  if [ -z "${VERSION}" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
   fi
+
   echo "Latest prerelease version: $VERSION"
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/copilot-${PLATFORM}-${ARCH}.tar.gz"
   CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/SHA256SUMS.txt"
@@ -65,14 +83,14 @@ echo "Downloading from: $DOWNLOAD_URL"
 
 # Download and extract with error handling
 TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
 TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$DOWNLOAD_URL" -o "$TMP_TARBALL"
+  curl -fsSL --retry 3 --retry-delay 2 "$DOWNLOAD_URL" -o "$TMP_TARBALL"
 elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
+  wget --tries=3 -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
 else
-  echo "Error: Neither curl nor wget found. Please install one of them."
-  rm -rf "$TMP_DIR"
+  echo "Error: Neither curl nor wget found. Please install one of them." >&2
   exit 1
 fi
 
@@ -80,37 +98,49 @@ fi
 TMP_CHECKSUMS="$TMP_DIR/SHA256SUMS.txt"
 CHECKSUMS_AVAILABLE=false
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
+  curl -fsSL --retry 3 --retry-delay 2 "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
 elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$TMP_CHECKSUMS" "$CHECKSUMS_URL" 2>/dev/null && CHECKSUMS_AVAILABLE=true
+  wget --tries=3 -qO "$TMP_CHECKSUMS" "$CHECKSUMS_URL" 2>/dev/null && CHECKSUMS_AVAILABLE=true
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
-  if command -v sha256sum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && sha256sum -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
-      echo "✓ Checksum validated"
-    else
-      echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
-      exit 1
-    fi
-  elif command -v shasum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && shasum -a 256 -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
-      echo "✓ Checksum validated"
-    else
-      echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
-      exit 1
-    fi
+  target_filename="copilot-${PLATFORM}-${ARCH}.tar.gz"
+  expected="$(grep -E "${target_filename}$" "$TMP_CHECKSUMS" | head -n1 | awk '{print $1}')" || true
+
+  if [ -z "$expected" ]; then
+    echo "Warning: checksum entry not found for ${target_filename}; skipping checksum validation." >&2
   else
-    echo "Warning: No sha256sum or shasum found, skipping checksum validation."
+    if command -v sha256sum >/dev/null 2>&1; then
+      actual="$(sha256sum "$TMP_TARBALL" | awk '{print $1}')"
+    elif command -v shasum >/dev/null 2>&1; then
+      actual="$(shasum -a 256 "$TMP_TARBALL" | awk '{print $1}')"
+    else
+      echo "Error: No sha256sum or shasum found. Cannot validate download integrity." >&2
+      echo "Install sha256sum or shasum, or set SKIP_CHECKSUM=1 to bypass (not recommended)." >&2
+      if [ "${SKIP_CHECKSUM:-0}" != "1" ]; then
+        exit 1
+      fi
+      actual=""
+    fi
+
+    if [ -n "${actual}" ] && [ "$expected" = "$actual" ]; then
+      echo "✓ Checksum validated"
+    elif [ -n "${actual}" ]; then
+      echo "Error: Checksum validation failed." >&2
+      exit 1
+    fi
   fi
 fi
 
 # Check that the file is a valid tarball
 if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
   echo "Error: Downloaded file is not a valid tarball or is corrupted." >&2
-  rm -rf "$TMP_DIR"
+  exit 1
+fi
+
+# Validate tarball contents (avoid extracting unexpected files into bin/)
+if ! tar -tzf "$TMP_TARBALL" | grep -qx 'copilot'; then
+  echo "Error: tarball contents unexpected (expected a single 'copilot' binary)." >&2
   exit 1
 fi
 
@@ -134,7 +164,6 @@ fi
 tar -xz -C "$INSTALL_DIR" -f "$TMP_TARBALL"
 chmod +x "$INSTALL_DIR/copilot"
 echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
-rm -rf "$TMP_DIR"
 
 # Check if installed binary is accessible
 if ! command -v copilot >/dev/null 2>&1; then
@@ -144,7 +173,9 @@ if ! command -v copilot >/dev/null 2>&1; then
   # Detect shell rc file
   case "$(basename "${SHELL:-/bin/sh}")" in
     zsh)  RC_FILE="$HOME/.zshrc" ;;
-    bash) RC_FILE="$HOME/.bashrc" ;;
+    bash)
+      if [ -f "$HOME/.bashrc" ]; then RC_FILE="$HOME/.bashrc"; else RC_FILE="$HOME/.bash_profile"; fi
+      ;;
     *)    RC_FILE="$HOME/.profile" ;;
   esac
 

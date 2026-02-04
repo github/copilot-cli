@@ -15,22 +15,29 @@ permissions:
 
 jobs:
   close-on-adding-invalid-label:
-    if:
-      github.repository == 'github/copilot-cli' && github.event.label.name ==
-      'invalid'
+    if: |
+      github.repository == 'github/copilot-cli' &&
+      github.event.label.name == 'invalid' &&
+      (
+        github.event_name == 'issues' ||
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Close issue
         if: ${{ github.event_name == 'issues' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          URL: ${{ github.event.issue.html_url }}
-        run: gh issue close $URL
+          NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: gh issue close "$NUMBER" --repo "$REPO"
 
       - name: Close PR
         if: ${{ github.event_name == 'pull_request_target' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr close $URL
+          NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: gh pr close "$NUMBER" --repo "$REPO"
