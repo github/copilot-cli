@@ -28,6 +28,7 @@ const ACTION_TYPES = {
   FIND_ELEMENT: 'find_element',     // Find element and return its info
   // Direct command execution (most reliable for terminal operations)
   RUN_COMMAND: 'run_command',       // Run shell command directly
+  FOCUS_WINDOW: 'focus_window',     // Focus a specific window
 };
 
 // Dangerous command patterns that require confirmation
@@ -225,12 +226,28 @@ public class ClickThrough {
 
     [DllImport("user32.dll")]
     public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr hWnd);
+    
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
+
+    [DllImport("user32.dll")]
+    public static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
 
     public const int GWL_EXSTYLE = -20;
     public const int WS_EX_TRANSPARENT = 0x20;
     public const int WS_EX_LAYERED = 0x80000;
     public const int WS_EX_TOOLWINDOW = 0x80;
     public const uint GA_ROOT = 2;
+    public const int SW_RESTORE = 9;
+    public const uint SPI_GETFOREGROUNDLOCKTIMEOUT = 0x2000;
+    public const uint SPI_SETFOREGROUNDLOCKTIMEOUT = 0x2001;
+    public const uint SPIF_SENDCHANGE = 0x02;
 
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
@@ -239,19 +256,50 @@ public class ClickThrough {
     public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
     public static void ForceForeground(IntPtr hwnd) {
-        // Get the currently active window
+        if (hwnd == IntPtr.Zero) return;
+        
+        // Restore if minimized
+        if (IsIconic(hwnd)) {
+            ShowWindow(hwnd, SW_RESTORE);
+            System.Threading.Thread.Sleep(50);
+        }
+        
         IntPtr foreground = GetForegroundWindow();
-        uint foregroundThread = GetWindowThreadProcessId(foreground, IntPtr.Zero);
-        uint currentThread = GetCurrentThreadId();
+        if (foreground == hwnd) return;
+        
+        // 1. Unlock Focus Stealing
+        int originalTimeout = 0;
+        IntPtr timeoutPtr = Marshal.AllocHGlobal(4);
+        try {
+            SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0, timeoutPtr, 0);
+            originalTimeout = Marshal.ReadInt32(timeoutPtr);
+            SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, IntPtr.Zero, SPIF_SENDCHANGE);
+        } catch {}
 
-        // Attach our thread to the currently active window thread
-        // This allows SetForegroundWindow to work
-        if (foregroundThread != currentThread) {
-            AttachThreadInput(currentThread, foregroundThread, true);
-            SetForegroundWindow(hwnd);
-            AttachThreadInput(currentThread, foregroundThread, false);
-        } else {
-            SetForegroundWindow(hwnd);
+        try {
+            uint foregroundThread = GetWindowThreadProcessId(foreground, IntPtr.Zero);
+            uint currentThread = GetCurrentThreadId();
+            bool success = false;
+
+            // 2. AttachThreadInput + SetForegroundWindow
+            if (foregroundThread != currentThread) {
+                AttachThreadInput(currentThread, foregroundThread, true);
+                success = SetForegroundWindow(hwnd);
+                AttachThreadInput(currentThread, foregroundThread, false);
+            } else {
+                success = SetForegroundWindow(hwnd);
+            }
+            
+            // 3. Last Resort: SwitchToThisWindow
+            if (!success) {
+                SwitchToThisWindow(hwnd, true);
+            }
+        } finally {
+            try {
+                Marshal.WriteInt32(timeoutPtr, originalTimeout);
+                SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, timeoutPtr, SPIF_SENDCHANGE);
+            } catch {}
+            Marshal.FreeHGlobal(timeoutPtr);
         }
     }
 
@@ -337,6 +385,100 @@ public class ClickThrough {
 `;
   await executePowerShell(script);
   console.log(`[AUTOMATION] ${button} click at (${x}, ${y}) (click-through enabled)`);
+}
+
+/**
+ * Focus a specific window by its handle
+ */
+async function focusWindow(hwnd) {
+    if (!hwnd) return;
+    
+    const script = `
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public class WindowFocus {
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr lpdwProcessId);
+    [DllImport("kernel32.dll")]
+    public static extern uint GetCurrentThreadId();
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
+    [DllImport("user32.dll")]
+    public static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
+    
+    public const int SW_RESTORE = 9;
+    public const uint SPI_GETFOREGROUNDLOCKTIMEOUT = 0x2000;
+    public const uint SPI_SETFOREGROUNDLOCKTIMEOUT = 0x2001;
+    public const uint SPIF_SENDCHANGE = 0x02;
+
+    public static void Focus(IntPtr hwnd) {
+        if (hwnd == IntPtr.Zero) return;
+        
+        // Restore if minimized
+        if (IsIconic(hwnd)) {
+            ShowWindow(hwnd, SW_RESTORE);
+            System.Threading.Thread.Sleep(100);
+        }
+
+        IntPtr foreground = GetForegroundWindow();
+        if (foreground == hwnd) return;
+        
+        // 1. Try to unlock Focus Stealing capability
+        int originalTimeout = 0;
+        IntPtr timeoutPtr = Marshal.AllocHGlobal(4);
+        try {
+            SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0, timeoutPtr, 0);
+            originalTimeout = Marshal.ReadInt32(timeoutPtr);
+            
+            // Set timeout to 0 to bypass lock
+            SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, IntPtr.Zero, SPIF_SENDCHANGE);
+        } catch {}
+
+        try {
+            uint foregroundThread = GetWindowThreadProcessId(foreground, IntPtr.Zero);
+            uint currentThread = GetCurrentThreadId();
+            bool success = false;
+
+            // 2. Try AttachThreadInput + SetForegroundWindow
+            if (foregroundThread != currentThread) {
+                AttachThreadInput(currentThread, foregroundThread, true);
+                success = SetForegroundWindow(hwnd);
+                AttachThreadInput(currentThread, foregroundThread, false);
+            } else {
+                success = SetForegroundWindow(hwnd);
+            }
+            
+            // 3. Last Resort: SwitchToThisWindow
+            if (!success) {
+                SwitchToThisWindow(hwnd, true);
+            }
+        } finally {
+            // Restore original timeout
+            try {
+                Marshal.WriteInt32(timeoutPtr, originalTimeout);
+                SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, timeoutPtr, SPIF_SENDCHANGE);
+            } catch {}
+            Marshal.FreeHGlobal(timeoutPtr);
+        }
+    }
+}
+"@
+[WindowFocus]::Focus([IntPtr]::new(${hwnd}))
+`;
+    await executePowerShell(script);
+    console.log(`[AUTOMATION] Focused window handle: ${hwnd}`);
 }
 
 /**
@@ -957,9 +1099,12 @@ function executePowerShellScript(scriptContent, timeoutMs = 10000) {
       try { fs.unlinkSync(scriptFile); } catch (e) {}
       
       if (error) {
-        resolve({ error: error.message, stderr });
+        console.error(`[AUTOMATION] Script failed: ${error.message}`);
+        console.error(`[AUTOMATION] STDERR: ${stderr}`);
+        // Return structured error instead of failing promise
+        resolve({ error: error.message, stderr, stdout, failed: true });
       } else {
-        resolve({ stdout: stdout.trim(), stderr });
+        resolve({ stdout: stdout.trim(), stderr, success: true });
       }
     });
   });
@@ -979,67 +1124,151 @@ async function findElementByText(searchText, options = {}) {
   const { controlType = '', exact = false } = options;
   
   const psScript = `
-Add-Type -AssemblyName UIAutomationClient
-Add-Type -AssemblyName UIAutomationTypes
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
 
-function Find-ElementByText {
-    param(
-        [string]$SearchText,
-        [string]$ControlType = "",
-        [bool]$ExactMatch = $false
-    )
-    
-    $root = [System.Windows.Automation.AutomationElement]::RootElement
-    $condition = [System.Windows.Automation.Condition]::TrueCondition
-    
-    # Find all elements
-    $elements = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
-    
-    $results = @()
-    foreach ($el in $elements) {
-        try {
-            $name = $el.Current.Name
-            $ctrlType = $el.Current.ControlType.ProgrammaticName
-            
-            # Check text match
-            $textMatch = $false
-            if ($ExactMatch) {
-                $textMatch = ($name -eq $SearchText)
-            } else {
-                $textMatch = ($name -like "*$SearchText*")
-            }
-            
-            if (-not $textMatch) { continue }
-            
-            # Check control type filter
-            if ($ControlType -ne "" -and $ctrlType -notlike "*$ControlType*") { continue }
-            
-            $rect = $el.Current.BoundingRectangle
-            if ($rect.Width -le 0 -or $rect.Height -le 0) { continue }
-            
-            $results += @{
-                Name = $name
-                ControlType = $ctrlType
-                AutomationId = $el.Current.AutomationId
-                ClassName = $el.Current.ClassName
-                Bounds = @{
-                    X = [int]$rect.X
-                    Y = [int]$rect.Y
-                    Width = [int]$rect.Width
-                    Height = [int]$rect.Height
-                    CenterX = [int]($rect.X + $rect.Width / 2)
-                    CenterY = [int]($rect.Y + $rect.Height / 2)
-                }
-                IsEnabled = $el.Current.IsEnabled
-            }
-        } catch {}
-    }
-    
-    return $results
+try {
+    Add-Type -AssemblyName UIAutomationClient
+    Add-Type -AssemblyName UIAutomationTypes
+} catch {
+    Write-Output '{"error": "Failed to load UIAutomation assemblies"}'
+    exit 0
 }
 
-$results = Find-ElementByText -SearchText "${searchText.replace(/"/g, '`"')}" -ControlType "${controlType}" -ExactMatch $${exact}
-$results | ConvertTo-Json -Depth 5
+function Find-InElement {
+    param($Root, $Text, $IsExact, $CtrlType)
+    
+    $condition = [System.Windows.Automation.Condition]::TrueCondition
+    
+    # Use TreeWalker for lighter iteration than FindAll if possible, but FindAll is easier to robustly code
+    # Optimization: Filter by ControlType if provided to reduce elements
+    if ($CtrlType) {
+        # Check if known type to map to Condition
+        # Skipping for now to keep string matching simple
+    }
+
+    try {
+        $elements = $Root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
+        
+        foreach ($el in $elements) {
+            try {
+                if (-not $el.Current.IsEnabled -or $el.Current.IsOffscreen) { continue }
+                
+                $name = $el.Current.Name
+                if ([string]::IsNullOrEmpty($name)) { continue }
+                
+                $match = $false
+                if ($IsExact) { $match = ($name -eq $Text) }
+                else { $match = ($name -like "*$Text*") }
+                
+                if ($match) {
+                     # Optional ControlType check
+                     if ($CtrlType -and $el.Current.ControlType.ProgrammaticName -notlike "*$CtrlType*") { continue }
+                     
+                     return $el
+                }
+            } catch {}
+        }
+    } catch {}
+    return $null
+}
+
+function Get-ElementData {
+    param($el)
+    try {
+        $rect = $el.Current.BoundingRectangle
+        if ($rect.Width -le 0 -or $rect.Height -le 0) { return $null }
+        
+        # Walk up to find the parent Window handle
+        $handle = 0
+        try {
+            if ($el.Current.NativeWindowHandle -ne 0) {
+                $handle = $el.Current.NativeWindowHandle
+            } else {
+                $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
+                $parent = $walker.GetParent($el)
+                $maxSteps = 10
+                while ($parent -and $maxSteps -gt 0) {
+                   if ($parent.Current.NativeWindowHandle -ne 0) {
+                       $handle = $parent.Current.NativeWindowHandle
+                       break
+                   }
+                   $parent = $walker.GetParent($parent)
+                   $maxSteps--
+                }
+            }
+        } catch {}
+
+        return @{
+            Name = $el.Current.Name
+            ControlType = $el.Current.ControlType.ProgrammaticName
+            AutomationId = $el.Current.AutomationId
+            WindowHandle = $handle
+            Bounds = @{
+                X = [int]$rect.X
+                Y = [int]$rect.Y
+                Width = [int]$rect.Width
+                Height = [int]$rect.Height
+                CenterX = [int]($rect.X + $rect.Width / 2)
+                CenterY = [int]($rect.Y + $rect.Height / 2)
+            }
+        }
+    } catch { return $null }
+}
+
+try {
+    $searchText = "${searchText.replace(/"/g, '`"')}"
+    $controlType = "${controlType}"
+    $exact = $${exact}
+    
+    # 1. Search Active Window (Fast Path)
+    # Using System.Windows.Forms to get active window handle is unreliable in pure scripts sometimes
+    # Use Automation Root -> First child focus? No, FocusElement.
+    
+    try {
+       $focused = [System.Windows.Automation.AutomationElement]::FocusedElement
+       if ($focused) {
+            # Walk up to get the window
+            $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
+            $node = $focused
+            while ($node -and $node.Current.ControlType.Id -ne [System.Windows.Automation.ControlType]::Window.Id) {
+                try { $parent = $walker.GetParent($node); $node = $parent } catch { break }
+            }
+            if ($node) {
+                # Found active window, search it
+                $found = Find-InElement -Root $node -Text $searchText -IsExact $exact -CtrlType $controlType
+                if ($found) {
+                    $data = Get-ElementData -el $found
+                    if ($data) {
+                        $data | ConvertTo-Json -Compress
+                        exit 0
+                    }
+                }
+            }
+       }
+    } catch {}
+
+    # 2. Iterate Top Level Windows (Robust Path)
+    $root = [System.Windows.Automation.AutomationElement]::RootElement
+    $winCondition = New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Window)
+    $windows = $root.FindAll([System.Windows.Automation.TreeScope]::Children, $winCondition)
+    
+    foreach ($win in $windows) {
+        $found = Find-InElement -Root $win -Text $searchText -IsExact $exact -CtrlType $controlType
+        if ($found) {
+            $data = Get-ElementData -el $found
+            if ($data) {
+                $data | ConvertTo-Json -Compress
+                exit 0
+            }
+        }
+    }
+    
+    Write-Output '{"error": "Element not found"}'
+
+} catch {
+    Write-Output "{\\"error\\": \\"$($_.Exception.Message.Replace('"', '\\"'))\\"}"
+}
 `;
 
   const result = await executePowerShellScript(psScript, 15000);
@@ -1049,7 +1278,13 @@ $results | ConvertTo-Json -Depth 5
   }
   
   try {
-    let elements = JSON.parse(result.stdout || '[]');
+    let elements = JSON.parse(result.stdout.trim() || '[]');
+    
+    // Check for error object from PowerShell
+    if (!Array.isArray(elements) && elements.error) {
+        return { success: false, error: elements.error };
+    }
+
     if (!Array.isArray(elements)) {
       elements = elements ? [elements] : [];
     }
@@ -1098,6 +1333,13 @@ async function clickElementByText(searchText, options = {}) {
   
   console.log(`[AUTOMATION] Found "${el.Name}" at center (${CenterX}, ${CenterY})`);
   
+  // Ensure the window containing the element is focused (fixes obscured window issues)
+  if (el.WindowHandle && el.WindowHandle !== 0) {
+    console.log(`[AUTOMATION] Auto-focusing window handle: ${el.WindowHandle}`);
+    await focusWindow(el.WindowHandle);
+    await sleep(150);
+  }
+  
   // Use UI Automation Invoke pattern for buttons (more reliable than mouse simulation)
   if (options.useInvoke !== false && el.ControlType && el.ControlType.includes('Button')) {
     console.log(`[AUTOMATION] Using Invoke pattern for button`);
@@ -1128,70 +1370,20 @@ async function invokeElementByText(searchText, options = {}) {
   const exact = options.exact === true;
   
   const psScript = `
-Add-Type -AssemblyName UIAutomationClient
-Add-Type -AssemblyName UIAutomationTypes
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
 
-$searchText = "${searchText.replace(/"/g, '`"')}"
-$controlType = "${controlType}"
-$exactMatch = $${exact}
-
-$root = [System.Windows.Automation.AutomationElement]::RootElement
-$condition = [System.Windows.Automation.Condition]::TrueCondition
-$elements = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
-
-$found = $null
-foreach ($el in $elements) {
-    try {
-        $name = $el.Current.Name
-        $ctrlType = $el.Current.ControlType.ProgrammaticName
-        
-        $textMatch = $false
-        if ($exactMatch) {
-            $textMatch = ($name -eq $searchText)
-        } else {
-            $textMatch = ($name -like "*$searchText*")
-        }
-        
-        if (-not $textMatch) { continue }
-        if ($controlType -ne "" -and $ctrlType -notlike "*$controlType*") { continue }
-        
-        $rect = $el.Current.BoundingRectangle
-        if ($rect.Width -le 0 -or $rect.Height -le 0) { continue }
-        
-        $found = $el
-        break
-    } catch {}
-}
-
-if ($found -eq $null) {
-    Write-Output '{"success": false, "error": "Element not found"}'
-    exit
-}
-
-# Try Invoke pattern first
 try {
-    $invokePattern = $found.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
-    $invokePattern.Invoke()
-    $name = $found.Current.Name
-    $rect = $found.Current.BoundingRectangle
-    Write-Output "{\\"success\\": true, \\"method\\": \\"Invoke\\", \\"name\\": \\"$name\\", \\"x\\": $([int]($rect.X + $rect.Width/2)), \\"y\\": $([int]($rect.Y + $rect.Height/2))}"
+    Add-Type -AssemblyName UIAutomationClient
+    Add-Type -AssemblyName UIAutomationTypes
 } catch {
-    # Try Toggle pattern for toggle buttons
-    try {
-        $togglePattern = $found.GetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern)
-        $togglePattern.Toggle()
-        $name = $found.Current.Name
-        Write-Output "{\\"success\\": true, \\"method\\": \\"Toggle\\", \\"name\\": \\"$name\\"}"
-    } catch {
-        # Try SetFocus and send click
-        try {
-            $found.SetFocus()
-            Start-Sleep -Milliseconds 100
-            $rect = $found.Current.BoundingRectangle
-            $x = [int]($rect.X + $rect.Width / 2)
-            $y = [int]($rect.Y + $rect.Height / 2)
-            
-            Add-Type -TypeDefinition @'
+    Write-Output '{"error": "Failed to load UIAutomation assemblies"}'
+    exit 0
+}
+
+# Define ClickHelper globally to avoid type re-definition errors and syntax issues
+try {
+Add-Type -TypeDefinition @'
 using System;
 using System.Runtime.InteropServices;
 public class ClickHelper {
@@ -1206,13 +1398,124 @@ public class ClickHelper {
     }
 }
 '@
-            [ClickHelper]::Click($x, $y)
-            $name = $found.Current.Name
-            Write-Output "{\\"success\\": true, \\"method\\": \\"FocusClick\\", \\"name\\": \\"$name\\", \\"x\\": $x, \\"y\\": $y}"
-        } catch {
-            Write-Output "{\\"success\\": false, \\"error\\": \\"$($_.Exception.Message)\\"}"
+} catch {}
+
+function Invoke-FoundElement {
+    param($element)
+    try {
+        # Try Invoke pattern first
+        if ($element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)) {
+            $invokePattern = $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+            $invokePattern.Invoke()
+            $name = $element.Current.Name
+            $rect = $element.Current.BoundingRectangle
+            Write-Output "{\\"success\\": true, \\"method\\": \\"Invoke\\", \\"name\\": \\"$name\\", \\"x\\": $([int]($rect.X + $rect.Width/2)), \\"y\\": $([int]($rect.Y + $rect.Height/2))}"
+            return $true
         }
+    } catch {}
+
+    try {
+        # Try Toggle pattern
+        if ($element.GetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern)) {
+            $togglePattern = $element.GetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern)
+            $togglePattern.Toggle()
+            $name = $element.Current.Name
+            Write-Output "{\\"success\\": true, \\"method\\": \\"Toggle\\", \\"name\\": \\"$name\\"}"
+            return $true
+        }
+    } catch {}
+    
+    # Try Select (if Item)
+    try {
+        if ($element.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern)) {
+            $selPattern = $element.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern)
+            $selPattern.Select()
+            $name = $element.Current.Name
+            Write-Output "{\\"success\\": true, \\"method\\": \\"Select\\", \\"name\\": \\"$name\\"}"
+            return $true
+        }
+    } catch {}
+
+    # Fallback to Focus + Click
+    try {
+        $element.SetFocus()
+        Start-Sleep -Milliseconds 100
+        $rect = $element.Current.BoundingRectangle
+        $x = [int]($rect.X + $rect.Width / 2)
+        $y = [int]($rect.Y + $rect.Height / 2)
+        
+        [ClickHelper]::Click($x, $y)
+        $name = $element.Current.Name
+        Write-Output "{\\"success\\": true, \\"method\\": \\"FocusClick\\", \\"name\\": \\"$name\\", \\"x\\": $x, \\"y\\": $y}"
+        return $true
+    } catch {
+        return $false
     }
+}
+
+function Find-And-Invoke {
+    param($Root, $Text, $IsExact, $CtrlType)
+    
+    $condition = [System.Windows.Automation.Condition]::TrueCondition
+    try {
+        $elements = $Root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
+        
+        foreach ($el in $elements) {
+            try {
+                if (-not $el.Current.IsEnabled -or $el.Current.IsOffscreen) { continue }
+                
+                $name = $el.Current.Name
+                if ([string]::IsNullOrEmpty($name)) { continue }
+                
+                $match = $false
+                if ($IsExact) { $match = ($name -eq $Text) }
+                else { $match = ($name -like "*$Text*") }
+                
+                if ($match) {
+                     if ($CtrlType -and $el.Current.ControlType.ProgrammaticName -notlike "*$CtrlType*") { continue }
+                     
+                     if (Invoke-FoundElement -element $el) {
+                         exit 0
+                     }
+                }
+            } catch {}
+        }
+    } catch {}
+}
+
+$searchText = "${searchText.replace(/"/g, '`"')}"
+$controlType = "${controlType}"
+$exact = $${exact}
+
+try {
+    # 1. Search Active Window
+    try {
+       $focused = [System.Windows.Automation.AutomationElement]::FocusedElement
+       if ($focused) {
+            $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
+            $node = $focused
+            while ($node -and $node.Current.ControlType.Id -ne [System.Windows.Automation.ControlType]::Window.Id) {
+                try { $parent = $walker.GetParent($node); $node = $parent } catch { break }
+            }
+            if ($node) {
+                Find-And-Invoke -Root $node -Text $searchText -IsExact $exact -CtrlType $controlType
+            }
+       }
+    } catch {}
+
+    # 2. Iterate Top Level Windows
+    $root = [System.Windows.Automation.AutomationElement]::RootElement
+    $winCondition = New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Window)
+    $windows = $root.FindAll([System.Windows.Automation.TreeScope]::Children, $winCondition)
+    
+    foreach ($win in $windows) {
+        Find-And-Invoke -Root $win -Text $searchText -IsExact $exact -CtrlType $controlType
+    }
+    
+    Write-Output '{"success": false, "error": "Element not found or not interactable"}'
+
+} catch {
+    Write-Output "{\\"success\\": false, \\"error\\": \\"Script Error: $($_.Exception.Message.Replace('"', '\\"'))\\"}"
 }
 `;
 
@@ -1357,6 +1660,11 @@ async function executeAction(action) {
           ? `Command completed (exit ${cmdResult.exitCode})`
           : `Command failed: ${cmdResult.stderr || cmdResult.error}`;
         break;
+
+      case ACTION_TYPES.FOCUS_WINDOW:
+         await focusWindow(action.hwnd || action.windowHandle);
+         result.message = `Focused window handle ${action.hwnd || action.windowHandle}`;
+         break;
         
       default:
         throw new Error(`Unknown action type: ${action.type}`);
@@ -1473,6 +1781,7 @@ module.exports = {
   click,
   doubleClick,
   typeText,
+  focusWindow,
   pressKey,
   scroll,
   drag,

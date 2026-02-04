@@ -23,8 +23,8 @@ class UIWatcher extends EventEmitter {
     
     this.options = {
       pollInterval: options.pollInterval || 400,      // ms between polls
-      focusedWindowOnly: options.focusedWindowOnly ?? true,  // only scan active window
-      maxElements: options.maxElements || 200,        // limit results for performance
+      focusedWindowOnly: options.focusedWindowOnly ?? false, // scan all visible windows by default
+      maxElements: options.maxElements || 300,        // increased limit for desktop scan
       minConfidence: options.minConfidence || 0.3,    // filter low-confidence elements
       enabled: false,
       ...options
@@ -238,6 +238,7 @@ $proc = Get-Process -Id $processId -ErrorAction SilentlyContinue
       : '$targetWindow = ""';
     
     const script = `
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
 
@@ -245,47 +246,33 @@ ${windowFilter}
 $maxElements = ${this.options.maxElements}
 
 $root = [System.Windows.Automation.AutomationElement]::RootElement
-
-# If targeting specific window, find it first
-if ($targetWindow -ne "") {
-    $nameCondition = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::NameProperty, $targetWindow
-    )
-    $targetEl = $root.FindFirst([System.Windows.Automation.TreeScope]::Children, $nameCondition)
-    if ($targetEl) { $root = $targetEl }
-}
-
 $condition = [System.Windows.Automation.Condition]::TrueCondition
-$elements = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
-
 $results = @()
 $count = 0
 
-foreach ($el in $elements) {
-    if ($count -ge $maxElements) { break }
+function Add-Element($el, $rootHwnd) {
     try {
         $rect = $el.Current.BoundingRectangle
-        if ($rect.Width -le 0 -or $rect.Height -le 0) { continue }
-        if ($rect.X -lt -10000 -or $rect.Y -lt -10000) { continue }
+        if ($rect.Width -le 0 -or $rect.Height -le 0) { return $null }
+        if ($rect.X -lt -10000 -or $rect.Y -lt -10000) { return $null }
         
         $name = $el.Current.Name
-        $ctrlType = $el.Current.ControlType.ProgrammaticName -replace 'ControlType\\.', ''
+        if ($name) { $name = $name -replace '[\\r\\n\\t]', ' ' }
+        
+        $ctrlType = $el.Current.ControlType.ProgrammaticName -replace 'ControlType\\.',''
         $autoId = $el.Current.AutomationId
-        $className = $el.Current.ClassName
-        $isEnabled = $el.Current.IsEnabled
+        if ($autoId) { $autoId = $autoId -replace '[\\r\\n\\t]', ' ' }
         
         # Skip elements with no useful identifying info
-        if ([string]::IsNullOrWhiteSpace($name) -and [string]::IsNullOrWhiteSpace($autoId)) { continue }
+        if ([string]::IsNullOrWhiteSpace($name) -and [string]::IsNullOrWhiteSpace($autoId)) { return $null }
         
-        # Generate a unique ID
-        $id = "$ctrlType|$name|$autoId|$([int]$rect.X)|$([int]$rect.Y)"
-        
-        $results += @{
-            id = $id
+        return @{
+            id = "$ctrlType|$name|$autoId|$([int]$rect.X)|$([int]$rect.Y)"
             name = $name
             type = $ctrlType
             automationId = $autoId
-            className = $className
+            className = $el.Current.ClassName
+            windowHandle = $rootHwnd
             bounds = @{
                 x = [int]$rect.X
                 y = [int]$rect.Y
@@ -296,10 +283,63 @@ foreach ($el in $elements) {
                 x = [int]($rect.X + $rect.Width / 2)
                 y = [int]($rect.Y + $rect.Height / 2)
             }
-            isEnabled = $isEnabled
+            isEnabled = $el.Current.IsEnabled
         }
-        $count++
-    } catch {}
+    } catch { return $null }
+}
+
+if ($targetWindow -ne "") {
+    # FOCUSED WINDOW MODE
+    $nameCondition = New-Object System.Windows.Automation.PropertyCondition(
+        [System.Windows.Automation.AutomationElement]::NameProperty, $targetWindow
+    )
+    $targetEl = $root.FindFirst([System.Windows.Automation.TreeScope]::Children, $nameCondition)
+    
+    if ($targetEl) {
+        $targetHwnd = 0
+        try { $targetHwnd = $targetEl.Current.NativeWindowHandle } catch {}
+        
+        $elements = $targetEl.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
+        foreach ($el in $elements) {
+            if ($count -ge $maxElements) { break }
+            $data = Add-Element $el $targetHwnd
+            if ($data) { $results += $data; $count++ }
+        }
+    }
+} else {
+    # GLOBAL DESKTOP MODE (Iterate Windows)
+    # Get all top-level windows first
+    $windows = $root.FindAll([System.Windows.Automation.TreeScope]::Children, $condition)
+    
+    foreach ($win in $windows) {
+        if ($count -ge $maxElements) { break }
+        
+        $winHwnd = 0
+        try { $winHwnd = $win.Current.NativeWindowHandle } catch {}
+        
+        # Add window itself
+        $winData = Add-Element $win $winHwnd
+        if ($winData) { $results += $winData; $count++ }
+        
+        # Only process descendants for visible windows that have size
+        if ($winData) {
+            # Limit descendants per window to avoid starving other windows
+            $winElements = $win.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
+            $winCount = 0
+            foreach ($el in $winElements) {
+                if ($count -ge $maxElements) { break }
+                # Limit per window (e.g. 50% of remaining budget or fixed 50)
+                if ($winCount -ge 50) { break } 
+                
+                $data = Add-Element $el $winHwnd
+                if ($data) { 
+                    $results += $data
+                    $count++
+                    $winCount++
+                }
+            }
+        }
+    }
 }
 
 $results | ConvertTo-Json -Depth 4 -Compress
@@ -324,14 +364,18 @@ $results | ConvertTo-Json -Depth 4 -Compress
           try { fs.unlinkSync(tempFile); } catch {}
           
           if (error) {
+            console.error('[UI-WATCHER] PowerShell detection error:', error.message);
             resolve([]);
             return;
           }
+          
           try {
             let elements = JSON.parse(stdout.trim() || '[]');
             if (!Array.isArray(elements)) elements = elements ? [elements] : [];
             resolve(elements);
           } catch (e) {
+            console.error('[UI-WATCHER] JSON Parse failed:', e.message);
+            console.error('[UI-WATCHER] STDOUT preview:', stdout.trim().substring(0, 200));
             resolve([]);
           }
         }
@@ -378,40 +422,46 @@ $results | ConvertTo-Json -Depth 4 -Compress
     const { elements, activeWindow, lastUpdate } = this.cache;
     const age = Date.now() - lastUpdate;
     
-    // Group elements by type for cleaner context
-    const byType = {};
-    elements.forEach(el => {
-      const type = el.type || 'Unknown';
-      if (!byType[type]) byType[type] = [];
-      byType[type].push(el);
-    });
-    
-    // Build context string
+    // Build context string with window hierarchy
     let context = `\n## Live UI State (${age}ms ago)\n`;
     
     if (activeWindow) {
-      context += `**Active Window**: ${activeWindow.title || 'Unknown'} (${activeWindow.processName})\n`;
-      context += `**Window Bounds**: (${activeWindow.bounds.x}, ${activeWindow.bounds.y}) ${activeWindow.bounds.width}x${activeWindow.bounds.height}\n\n`;
+      context += `**Focused Window**: ${activeWindow.title || 'Unknown'} (${activeWindow.processName})\n`;
+      context += `**Cursor**: (${activeWindow.bounds.x}, ${activeWindow.bounds.y}) ${activeWindow.bounds.width}x${activeWindow.bounds.height}\n\n`;
     }
     
-    // List interactive elements (buttons, text fields, etc.)
-    const interactiveTypes = ['Button', 'Edit', 'ComboBox', 'CheckBox', 'RadioButton', 'MenuItem', 'ListItem', 'TabItem', 'Hyperlink'];
-    
-    context += `**Interactive Elements** (${elements.length} total):\n`;
+    context += `**Visible Context** (${elements.length} elements detected):\n`;
     
     let listed = 0;
-    for (const type of interactiveTypes) {
-      const typeElements = byType[type] || [];
-      for (const el of typeElements.slice(0, 10)) { // Limit per type
-        if (listed >= 30) break; // Total limit
-        const name = el.name || el.automationId || '[unnamed]';
-        context += `- **${type}**: "${name}" at (${el.center.x}, ${el.center.y})${el.isEnabled ? '' : ' [disabled]'}\n`;
+    const limit = 300; 
+    
+    // Important interactive types to highlight
+    const importantTypes = ['Button', 'Edit', 'ComboBox', 'CheckBox', 'RadioButton', 'MenuItem', 'ListItem', 'TabItem', 'Hyperlink', 'Window'];
+    
+    for (let i = 0; i < elements.length; i++) {
+      if (listed >= limit) break;
+      
+      const el = elements[i];
+      const name = el.name || el.automationId || '[unnamed]';
+      
+      // Handle Window headers
+      if (el.type === 'Window') {
+        context += `\n[WIN] **Window**: "${name}" (Handle: ${el.windowHandle || 0})\n`;
         listed++;
+        continue;
       }
+      
+      // Skip boring layout elements unless they have a name
+      if (!importantTypes.includes(el.type) && !name && name !== '[unnamed]') continue;
+      
+      // Format element line with index for robust referencing
+      const status = el.isEnabled ? '' : ' (disabled)';
+      context += `- [${i+1}] ${el.type}: "${name}" at (${el.center.x}, ${el.center.y})${status}\n`;
+      listed++;
     }
     
     if (elements.length > listed) {
-      context += `... and ${elements.length - listed} more elements\n`;
+      context += `\n... and ${elements.length - listed} more elements (showing first ${limit})\n`;
     }
     
     return context;

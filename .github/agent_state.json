@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "created": "2026-01-29T20:15:40.039Z",
   "queue": [],
   "inProgress": [],
@@ -689,6 +689,63 @@
       "lastActive": "2026-01-29T20:31:36.669Z",
       "tasksCompleted": 0,
       "tasksFailed": 0
+    },
+    "agent-1770227184298-q47wgu4qn": {
+      "type": "supervisor",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-02-04T17:46:24.298Z",
+      "lastActive": "2026-02-04T17:46:24.298Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1770227184298-35znv6lu6": {
+      "type": "builder",
+      "capabilities": [
+        "search",
+        "read",
+        "edit",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-02-04T17:46:24.299Z",
+      "lastActive": "2026-02-04T17:46:24.299Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1770227184298-gwql6f8cc": {
+      "type": "verifier",
+      "capabilities": [
+        "search",
+        "read",
+        "execute",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-02-04T17:46:24.300Z",
+      "lastActive": "2026-02-04T17:46:24.300Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
+    },
+    "agent-1770227184298-lcp0tghwx": {
+      "type": "researcher",
+      "capabilities": [
+        "search",
+        "read",
+        "web_fetch",
+        "todo",
+        "handoff"
+      ],
+      "registeredAt": "2026-02-04T17:46:24.312Z",
+      "lastActive": "2026-02-04T17:46:24.312Z",
+      "tasksCompleted": 0,
+      "tasksFailed": 0
     }
   },
   "sessions": [
@@ -782,5 +839,18 @@
       "tasks": []
     }
   ],
-  "lastModified": "2026-01-29T20:31:36.689Z"
+  "lastModified": "2026-02-04T17:46:24.312Z",
+  "modelMetadata": {
+    "modelId": "unknown",
+    "provider": "unknown",
+    "modelVersion": null,
+    "capabilities": []
+  },
+  "sessionContext": {
+    "initiatedBy": null,
+    "purpose": null,
+    "parentSessionId": null
+  },
+  "checkpoints": [],
+  "schemaVersion": 2
 }

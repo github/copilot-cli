@@ -27,10 +27,10 @@ module.exports = {
   AgentStateManager,
   
   // Factory function for creating configured orchestrator
-  createAgentSystem: (options = {}) => {
+  createAgentSystem: (aiService, options = {}) => {
     const stateManager = new AgentStateManager(options.statePath);
     
-    const modelMetadata = options.aiService?.getModelMetadata?.() || null;
+    const modelMetadata = aiService?.getModelMetadata?.() || null;
     
     if (modelMetadata) {
       stateManager.setModelMetadata(modelMetadata);
@@ -38,14 +38,15 @@ module.exports = {
     
     const orchestrator = new AgentOrchestrator({
       stateManager,
-      aiService: options.aiService,
+      aiService: aiService,
       maxRecursionDepth: options.maxRecursionDepth || 3,
       maxSubCalls: options.maxSubCalls || 10,
       enableLongContext: options.enableLongContext !== false,
       modelMetadata
     });
     
-    return orchestrator;
+    // Return object with both orchestrator and stateManager
+    return { orchestrator, stateManager };
   },
   
   // Recovery function for checkpoint restoration

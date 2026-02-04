@@ -23,6 +23,7 @@ let state = {
   // Inspect mode state
   inspectMode: false,
   inspectRegions: [],
+  actionableRegions: [], // New: AI-detected regions for overlay
   hoveredRegion: null,
   selectedRegionId: null,
   // Live UI mirror state
@@ -74,8 +75,15 @@ function draw() {
   if (currentMode !== 'selection') return;
 
   // 1. Draw Coarse Grid (Always visible in selection)
-  ctx.fillStyle = 'rgba(0, 122, 255, 0.85)';
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+  // ADAPTIVE GRID: If we have actionable regions, fade the grid significantly to reduce clutter
+  // This prioritizes the "Live UI" view as requested
+  const hasRegions = state.actionableRegions && state.actionableRegions.length > 0;
+  const gridOpacity = hasRegions ? 0.15 : 0.85; 
+  const dotOpacity = hasRegions ? 0.15 : 0.85;
+  const labelOpacity = hasRegions ? 0.1 : 0.7;
+
+  ctx.fillStyle = `rgba(0, 122, 255, ${dotOpacity})`;
+  ctx.strokeStyle = `rgba(255, 255, 255, ${dotOpacity + 0.1})`;
   ctx.lineWidth = 2;
   
   // Font for labels
@@ -98,7 +106,7 @@ function draw() {
       // Draw Dot
       ctx.beginPath();
       ctx.arc(x, y, 6, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0, 122, 255, 0.85)';
+      ctx.fillStyle = `rgba(0, 122, 255, ${dotOpacity})`;
       ctx.fill();
       ctx.stroke();
       
@@ -108,12 +116,12 @@ function draw() {
       const bgW = metrics.width + 10;
       const bgH = 16;
       
-      // Label Background
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      // Label Background (Fainter if regions present)
+      ctx.fillStyle = `rgba(0, 0, 0, ${labelOpacity})`;
       ctx.fillRect(x - bgW / 2, y - 20 - bgH, bgW, bgH);
       
       // Label Text
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = `rgba(255, 255, 255, ${hasRegions ? 0.4 : 1.0})`;
       ctx.fillText(label, x, y - 24);
     }
   }
@@ -155,6 +163,11 @@ function draw() {
   // 3. Draw Local Fine Grid (If Zoom Level < 2)
   if (zoomLevel < 2) {
     drawLocalFineGrid();
+  }
+  
+  // 4. Draw Actionable Regions (AI Vision)
+  if (state.actionableRegions && state.actionableRegions.length > 0) {
+    drawActionableRegions();
   }
 }
 
@@ -279,6 +292,111 @@ function drawLocalFineGrid() {
   }
 }
 
+function drawActionableRegions() {
+  const { actionableRegions, hoveredRegion } = state;
+  if (!actionableRegions) return;
+
+  // Style for regions
+  ctx.lineWidth = 1;
+  ctx.textBaseline = 'top';
+
+  // Smart De-Cluttering:
+  // If we have > 50 regions, we might want to skip drawing containers that fully enclose other regions?
+  // For now, relies on the improved visual style to handle density.
+
+  actionableRegions.forEach((region, index) => {
+    const { bounds, label, type, id } = region;
+    if (!bounds || bounds.width <= 0 || bounds.height <= 0) return;
+
+    const x = bounds.x;
+    const y = bounds.y;
+    const w = bounds.width;
+    const h = bounds.height;
+    
+    // Check hover state (from mousemove or DOM interaction)
+    const isHovered = hoveredRegion && hoveredRegion.id === id;
+
+    // 1. Determine Style based on interactivity and state
+    const isPrimaryAction = ['Button', 'Hyperlink', 'MenuItem', 'TabItem', 'CheckBox'].includes(type);
+    const isInput = ['Edit', 'ComboBox', 'Document'].includes(type);
+    
+    let strokeColor, fillColor, textColor, bgAlpha;
+    
+    if (isHovered) {
+      strokeColor = 'rgba(255, 255, 0, 1.0)'; // Bright Yellow highlight
+      fillColor = 'rgba(255, 255, 0, 0.1)';
+      textColor = '#ffff00';
+      bgAlpha = 0.95;
+      ctx.lineWidth = 2;
+    } else if (isPrimaryAction) {
+      strokeColor = 'rgba(0, 255, 255, 0.7)'; // Cyan for clickable
+      fillColor = 'rgba(0, 255, 255, 0.02)';
+      textColor = '#00ffff';
+      bgAlpha = 0.8;
+      ctx.lineWidth = 1;
+    } else if (isInput) {
+      strokeColor = 'rgba(0, 255, 100, 0.6)'; // Greenish for inputs
+      fillColor = 'rgba(0, 255, 100, 0.02)';
+      textColor = '#00ff66';
+      bgAlpha = 0.7;
+      ctx.lineWidth = 1;
+    } else {
+      // Containers/Text - Subtle
+      strokeColor = 'rgba(100, 180, 255, 0.3)';
+      fillColor = 'transparent';
+      textColor = 'rgba(200, 220, 255, 0.8)';
+      bgAlpha = 0.6;
+      ctx.lineWidth = 0.5;
+    }
+
+    // 2. Draw Outline
+    ctx.strokeStyle = strokeColor;
+    ctx.fillStyle = fillColor;
+    
+    // Use dashed lines for containers/large areas to reduce noise
+    if (!isHovered && w > 300 && h > 300) {
+       ctx.setLineDash([4, 4]);
+    } else {
+       ctx.setLineDash([]);
+    }
+    
+    ctx.strokeRect(x, y, w, h);
+    ctx.fillRect(x, y, w, h);
+    ctx.setLineDash([]); // Reset
+
+    // 3. Draw Label
+    // CLARITY FIX: Only show Index by default. Show full Name only on Hover.
+    // This keeps the screen clean while allowing "Confident Communication" via ID reference.
+    const idx = index + 1;
+    let labelText = `#${idx}`;
+    
+    if (isHovered && label) {
+       // Show full info on hover
+       labelText = `${label} (${type})`;
+       ctx.font = 'bold 12px "SF Mono", "Monaco", monospace'; // Larger font on hover
+    } else {
+       ctx.font = 'bold 10px "SF Mono", "Monaco", monospace';
+    }
+
+    const textMetrics = ctx.measureText(labelText);
+    const textW = textMetrics.width + 6;
+    const textH = isHovered ? 16 : 12;
+
+    // Label Position: Interior Top-Left
+    // Ensure it doesn't go off-screen
+    let lx = x; 
+    let ly = y;
+    
+    // Label Background
+    ctx.fillStyle = `rgba(0, 20, 20, ${bgAlpha})`;
+    ctx.fillRect(lx, ly, textW, textH);
+
+    // Label Text
+    ctx.fillStyle = textColor;
+    ctx.fillText(labelText, lx + 3, ly + 1);
+  });
+}
+
 // ===== INPUT HANDLING =====
 
 // Visual Feedback Helper
@@ -306,6 +424,26 @@ document.addEventListener('mousemove', (e) => {
   
   if (state.currentMode === 'selection') {
     requestDraw();
+
+    // 0. HIT TESTING for Actionable Regions
+    const { actionableRegions } = state;
+    if (actionableRegions && actionableRegions.length > 0) {
+      const hit = actionableRegions
+        .filter(r => 
+          e.clientX >= r.bounds.x && 
+          e.clientX <= (r.bounds.x + r.bounds.width) &&
+          e.clientY >= r.bounds.y && 
+          e.clientY <= (r.bounds.y + r.bounds.height)
+        )
+        // Sort by area ascending so we pick the smallest/most specific one
+        .sort((a,b) => (a.bounds.width * a.bounds.height) - (b.bounds.width * b.bounds.height))[0];
+      
+      if (state.hoveredRegion !== (hit || null)) {
+        state.hoveredRegion = hit || null;
+        requestDraw();
+      }
+    }
+
     // Virtual Interaction Logic
     // Find nearest grid point
     const spacing = state.zoomLevel >= 2 ? FINE_SPACING : COARSE_SPACING;
@@ -475,7 +613,9 @@ if (window.electronAPI) {
 }
 
 function handleCommand(data) {
-  console.log('Command:', data.action);
+  if (data.action !== 'update-inspect-regions') {
+    console.log('Command:', data.action);
+  }
   switch (data.action) {
     case 'toggle-fine':
       state.zoomLevel = state.zoomLevel >= 2 ? 1 : 2;
@@ -524,7 +664,16 @@ function handleCommand(data) {
       break;
     case 'update-inspect-regions':
       if (data.regions) {
-        updateInspectRegions(data.regions);
+        // Reuse inspection capability for AI vision visualization
+        // Check if we should use DOM (legacy/inspect) or Canvas (performance)
+        // For high-frequency updates, we'll store in actionableRegions and use canvas
+        state.actionableRegions = data.regions;
+        requestDraw();
+        
+        // If actual inspect mode is active, also update DOM for interaction
+        if (state.inspectMode) {
+            updateInspectRegions(data.regions);
+        }
       }
       break;
     case 'clear-inspect-regions':

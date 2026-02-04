@@ -64,6 +64,51 @@ let tray = null;
 // Live UI watcher instance
 let uiWatcher = null;
 
+function initUIWatcher() {
+  if (uiWatcher) return;
+
+  // Initialize the watcher singleton
+  const { getUIWatcher } = require('./ui-watcher.js');
+  uiWatcher = getUIWatcher({
+    pollInterval: 500,
+    focusedWindowOnly: false, // Monitor all visible windows for overlay accuracy
+    maxElements: 300
+  });
+
+  // Relay poll results to the overlay window
+  uiWatcher.on('poll-complete', (data) => {
+    if (overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible()) {
+      const { elements } = data;
+      
+      // 1. Sort by position (Top-Left -> Bottom-Right) so indices [1], [2]... are readable
+      elements.sort((a, b) => {
+        // Group by 'rows' of 10px height to handle slight misalignments
+        const rowDiff = Math.abs(a.bounds.y - b.bounds.y);
+        if (rowDiff > 10) return a.bounds.y - b.bounds.y;
+        return a.bounds.x - b.bounds.x;
+      });
+
+      // 2. Transform elements for the overlay renderer
+      // Expected format: { bounds: {x,y,width,height}, label: "Name" }
+      const regions = elements.map(el => ({
+        bounds: el.bounds,
+        label: el.name || el.type || 'Element',
+        type: el.type,
+        id: el.id
+      }));
+
+      overlayWindow.webContents.send('overlay-command', { 
+        action: 'update-inspect-regions', 
+        regions 
+      });
+    }
+  });
+
+  // Start watching immediately
+  uiWatcher.start();
+  console.log('[UI-WATCHER] Initialized and started from main process');
+}
+
 // State management
 let overlayMode = 'selection'; // start in selection so the grid is visible immediately
 let isChatVisible = false;
@@ -115,6 +160,9 @@ function createOverlayWindow() {
   overlayWindow.webContents.on('did-finish-load', () => {
     overlayWindow.show();
     setOverlayMode('selection');
+    
+    // Start UI Watcher if not already running
+    initUIWatcher();
   });
 
   // Pipe renderer console to main for debugging without DevTools
@@ -1135,13 +1183,15 @@ function setupIPC() {
         { actionExecutor: performSafeAgenticAction, skipSafetyConfirmation }
       );
       
-      // Send completion notification
+      // Send completion notification - extract error from failed results if present
+      const failedResult = results.results?.find(r => !r.success);
       chatWindow.webContents.send('action-complete', {
         success: results.success,
         actionsCount: actionData.actions.length,
         thought: results.thought,
         verification: results.verification,
-        results: results.results
+        results: results.results,
+        error: failedResult?.error || (results.success ? null : 'Action execution failed')
       });
       
       // If screenshot was requested, capture and show result
@@ -2178,11 +2228,32 @@ app.whenReady().then(() => {
   try {
     uiWatcher = new UIWatcher({
       pollInterval: 400,
-      maxElements: 60,
+      maxElements: 300,
       includeInvisible: false
     });
+    
+    // Forward full element list to overlay for "Actionable AI Vision" outlines
+    uiWatcher.on('poll-complete', (data) => {
+      if (overlayWindow && !overlayWindow.isDestroyed()) {
+        // Map elements to actionable regions with numeric indices
+        const regions = data.elements.map((el, i) => ({
+          id: el.id,
+          label: `[${i+1}] ${el.name || el.type}`,
+          role: el.type,
+          bounds: el.bounds,
+          confidence: 1.0
+        }));
+        
+        // Update overlay
+        overlayWindow.webContents.send('overlay-command', { 
+            action: 'update-inspect-regions', 
+            regions 
+        });
+      }
+    });
+
     uiWatcher.on('ui-changed', (diff) => {
-      // Forward UI changes to overlay for live mirror updates
+      // Forward UI changes (diff only) - optional legacy support
       if (overlayWindow && !overlayWindow.isDestroyed()) {
         overlayWindow.webContents.send('ui-watcher-update', diff);
       }

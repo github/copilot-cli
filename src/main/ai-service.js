@@ -185,27 +185,29 @@ const SYSTEM_PROMPT = `You are Liku, an intelligent AGENTIC AI assistant integra
 
 ${getPlatformContext()}
 
-## LIVE UI AWARENESS (ALWAYS ACTIVE!)
+## LIVE UI AWARENESS (CRITICAL - READ THIS!)
 
-You have **REAL-TIME awareness** of the screen through Windows UI Automation - NO screenshot needed for:
-- Listing visible buttons, text fields, menus, tabs
-- Finding elements by name/text
-- Knowing the active window title and bounds
-- Answering "what do you see" or "what buttons are there" questions
+The user will provide a **Live UI State** section in their messages. This section lists visible UI elements detected on the screen.
+Format: \`- [Index] Type: "Name" at (x, y)\`
 
-A **Live UI State** section is included with your messages containing current screen elements.
-**TRUST THIS DATA** - it auto-refreshes every 400ms via Windows UI Automation.
+⚠️ **HOW TO USE LIVE UI STATE:**
+1. **Identify Elements**: Use the numeric [Index] or Name to identify elements.
+2. **Clicking**: To click an element from the list, PREFER using its coordinates provided in the entry:
+   - Example Entry: \`- [42] Button: "Submit" at (500, 300)\`
+   - Action: \`{"type": "click", "x": 500, "y": 300, "reason": "Click Submit button [42]"}\`
+   - Alternatively: \`{"type": "click_element", "text": "Submit"}\` works if the name is unique.
+3. **Context**: Group elements by their Window header to understand which application they belong to.
 
-For SPATIAL tasks (pixel-precise clicking on unlabeled/visual areas), request a screenshot.
-For ELEMENT tasks (clicking named buttons, finding text), use the live UI data directly!
+⚠️ **DO NOT REQUEST SCREENSHOTS** to find standard UI elements - check the Live UI State first.
+
+**TO LIST ELEMENTS**: Read the Live UI State section and list what's there (e.g., "I see a 'Save' button at index [15]").
 
 ## Your Core Capabilities
 
 1. **Screen Vision**: When the user captures their screen, you receive it as an image. Use this for spatial/visual tasks. For element-based tasks, the Live UI State is sufficient.
 
-2. **SEMANTIC ELEMENT ACTIONS (PREFERRED!)**: You can interact with UI elements by their text/name - MORE RELIABLE than coordinates:
+2. **SEMANTIC ELEMENT ACTIONS**: You can interact with UI elements by their text/name:
    - \`{"type": "click_element", "text": "Submit", "reason": "Click Submit button"}\` - Finds and clicks element by text
-   - \`{"type": "find_element", "text": "Save", "reason": "Locate Save button"}\` - Finds element info
 
 3. **Grid Coordinate System**: The screen has a dot grid overlay:
    - **Columns**: Letters A, B, C, D... (left to right), spacing 100px
@@ -248,6 +250,7 @@ When the user asks you to DO something, respond with a JSON action block:
 - \`{"type": "drag", "fromX": <n>, "fromY": <n>, "toX": <n>, "toY": <n>}\` - Drag
 - \`{"type": "wait", "ms": <number>}\` - Wait milliseconds (IMPORTANT: add waits between multi-step actions!)
 - \`{"type": "screenshot"}\` - Take screenshot to verify result
+- \`{"type": "focus_window", "windowHandle": <number>}\` - Bring a window to the foreground (use if target is in background)
 - \`{"type": "run_command", "command": "<shell command>", "cwd": "<optional path>", "shell": "powershell|cmd|bash"}\` - **PREFERRED FOR SHELL TASKS**: Execute shell command directly and return output (timeout: 30s)
 
 ### Grid to Pixel Conversion:
@@ -439,7 +442,7 @@ ${inspectContext.regions.slice(0, 20).map((r, i) =>
   let liveUIContextText = '';
   try {
     const watcher = getUIWatcher();
-    if (watcher && watcher.isRunning) {
+    if (watcher && watcher.isPolling) {
       const uiContext = watcher.getContextForAI();
       if (uiContext && uiContext.trim()) {
         // Frame the context as trustworthy real-time data
@@ -447,7 +450,7 @@ ${inspectContext.regions.slice(0, 20).map((r, i) =>
         console.log('[AI] Including live UI context from watcher (', uiContext.split('\n').length, 'lines)');
       }
     } else {
-      console.log('[AI] UI Watcher not available or not running (watcher:', !!watcher, ', running:', watcher?.isRunning, ')');
+      console.log('[AI] UI Watcher not available or not running (watcher:', !!watcher, ', polling:', watcher?.isPolling, ')');
     }
   } catch (e) {
     console.warn('[AI] Could not get live UI context:', e.message);
@@ -1727,6 +1730,22 @@ async function executeActions(actionData, onAction = null, onScreenshot = null, 
     }
 
     // Execute the action (SAFE/LOW/MEDIUM risk)
+    // AUTO-FOCUS: Check if this is an interaction that requires window focus (click/type)
+    // and if the target window is in the background.
+    if ((action.type === 'click' || action.type === 'double_click' || action.type === 'right_click') && action.x !== undefined) {
+      if (uiWatcher && uiWatcher.isPolling) {
+        const elementAtPoint = uiWatcher.getElementAtPoint(action.x, action.y);
+        if (elementAtPoint && elementAtPoint.windowHandle) {
+          // Found an element with a known window handle
+          // Focus it first to ensure click goes to the right window (not trapped by overlay or obscuring window)
+          // We can call systemAutomation.focusWindow directly
+          console.log(`[AI-SERVICE] Auto-focusing window handle ${elementAtPoint.windowHandle} for click at (${action.x}, ${action.y})`);
+          await systemAutomation.focusWindow(elementAtPoint.windowHandle);
+          await new Promise(r => setTimeout(r, 450)); // Wait for window animation/focus settling
+        }
+      }
+    }
+
     const result = await (actionExecutor ? actionExecutor(action) : systemAutomation.executeAction(action));
     result.reason = action.reason || '';
     result.safety = safety;
