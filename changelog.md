@@ -1,3 +1,15 @@
+## 0.0.404 - 2026-02-05
+
+- Add support for claude-opus-4.6 model
+- `/allow-all` and `/yolo` execute immediately
+- MCP servers shut down concurrently for improved performance
+- Cancel --resume session picker to start a new session
+- MCP server configurations default to all tools when tools parameter not specified
+- Add `/tasks` command to view and manage background tasks
+- Enable background agents for all users
+- Simplify and clarify `/delegate` command messaging
+- GITHUB_TOKEN environment variable now accessible in agent shell sessions
+
 ## 0.0.403 - 2026-02-04
 
 - Windows Task Manager displays correct application name
