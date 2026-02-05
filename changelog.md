@@ -1,3 +1,10 @@
+## 0.0.405 - 2026-02-05
+
+- Plugin and marketplace names support uppercase letters
+- `/experimental` shows help screen listing experimental features
+- Fix SQL tool disconnects
+- Plugins can bundle LSP server configurations
+
 ## 0.0.404 - 2026-02-05
 
 - Add support for claude-opus-4.6 model
