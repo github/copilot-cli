@@ -1,5 +1,9 @@
 # GitHub Copilot CLI (Public Preview)
 
+## Workflow Status
+![Stale Issues](https://github.com/github/copilot-cli/actions/workflows/stale-issues.yml/badge.svg)
+![No Response](https://github.com/github/copilot-cli/actions/workflows/no-response.yml/badge.svg)
+
 The power of GitHub Copilot, now in your terminal.
 
 GitHub Copilot CLI brings AI-powered coding assistance directly to your command line, enabling you to build, debug, and understand code through natural language conversations. Powered by the same agentic harness as GitHub's Copilot coding agent, it provides intelligent assistance while staying deeply integrated with your GitHub workflow.

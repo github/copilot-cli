@@ -8,9 +8,11 @@ permissions:
 
 jobs:
   stale:
+    if: github.repository == 'github/copilot-cli'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e # v9.0.0
         with:
           stale-issue-label: 'stale, triage' # The label that will be added to the issues when automatically marked as stale
           start-date: '2025-01-01T00:00:00Z' # Skip stale action for issues created before it

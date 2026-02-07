@@ -5,7 +5,9 @@ on:
       - closed
 jobs:
   label_issues:
+    if: github.repository == 'github/copilot-cli'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       issues: write
     steps:

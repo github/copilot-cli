@@ -6,39 +6,75 @@ on:
 
 jobs:
   publish-winget:
+    if: github.repository == 'github/copilot-cli'
     name: Submit to WinGet repository
 
     # GitHub token permissions needed for winget-create to submit a PR
     permissions:
       contents: read
-      pull-requests: write
 
     # winget-create is only supported on Windows
     runs-on: windows-latest
+    timeout-minutes: 30
       
     # winget-create will read the following environment variable to access the GitHub token needed for submitting a PR
     # See https://aka.ms/winget-create-token
     env:
       WINGET_CREATE_GITHUB_TOKEN: ${{ secrets.WINGET_CREATE_GITHUB_TOKEN }}
+      RELEASE_ASSETS_JSON: ${{ toJSON(github.event.release.assets) }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      IS_PRERELEASE: ${{ github.event.release.prerelease }}
 
     steps:
+      - name: Validate required secret
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:WINGET_CREATE_GITHUB_TOKEN)) {
+            Write-Error "WINGET_CREATE_GITHUB_TOKEN secret is not configured"
+            exit 1
+          }
+
       - name: Submit package using wingetcreate
+        shell: pwsh
         run: |
           # Set the package ID based on the release info
-          $packageId = if ('${{ !github.event.release.prerelease }}' -eq 'true') { 'GitHub.Copilot' } else { 'GitHub.Copilot.Prerelease' }
-          
-          # Get installer info from release event
-          $assets = '${{ toJSON(github.event.release.assets) }}' | ConvertFrom-Json
-          $packageVersion = (${{ toJSON(github.event.release.tag_name) }})
-          
+          $isPrerelease = ($env:IS_PRERELEASE -eq 'true')
+          $packageId = if ($isPrerelease) { 'GitHub.Copilot.Prerelease' } else { 'GitHub.Copilot' }
+
+          # Get installer info from release event (passed via env to avoid script injection patterns)
+          $assets = $env:RELEASE_ASSETS_JSON | ConvertFrom-Json
+          $packageVersion = $env:RELEASE_TAG
+
           # Find the download URLs for the x64 and arm64 installers separately
           # This allows overrides to be used so that wingetcreate does not have to guess the architecture from the filename
           $installerUrlx64 = $assets | Where-Object -Property name -like '*win32-x64.zip' | Select-Object -ExpandProperty browser_download_url
           $installerUrlarm64 = $assets | Where-Object -Property name -like '*win32-arm64.zip' | Select-Object -ExpandProperty browser_download_url
-          
+
+          if ([string]::IsNullOrWhiteSpace($installerUrlx64) -or [string]::IsNullOrWhiteSpace($installerUrlarm64)) {
+            Write-Error "Could not determine installer URLs from release assets"
+            exit 1
+          }
+
+          # Download wingetcreate (with retries)
+          $maxRetries = 3
+          $retryDelaySeconds = 5
+          for ($i = 1; $i -le $maxRetries; $i++) {
+            try {
+              curl.exe -JLO https://aka.ms/wingetcreate/latest
+              if (Test-Path "wingetcreate.exe") { break }
+            } catch {
+              Write-Warning "Download attempt $i failed: $($_.Exception.Message)"
+            }
+            Start-Sleep -Seconds $retryDelaySeconds
+          }
+
+          if (-not (Test-Path "wingetcreate.exe")) {
+            Write-Error "Failed to download wingetcreate after $maxRetries attempts"
+            exit 1
+          }
+
           # Update package using wingetcreate
-          curl.exe -JLO https://aka.ms/wingetcreate/latest
           .\wingetcreate.exe update $packageId `
-            --version $packageVersion `
+            --version "$packageVersion" `
             --urls "$installerUrlx64|x64" "$installerUrlarm64|arm64" `
             --submit

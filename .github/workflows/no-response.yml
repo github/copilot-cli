@@ -11,9 +11,11 @@ permissions:
 
 jobs:
   noResponse:
+    if: github.repository == 'github/copilot-cli'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e # v9.0.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           only-issue-labels: 'more-info-needed'
