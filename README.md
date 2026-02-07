@@ -141,10 +141,24 @@ GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code int
 
 ### Installing Language Servers
 
-Copilot CLI does not bundle LSP servers. You need to install them separately. For example, to set up TypeScript support:
+Copilot CLI does not bundle LSP servers. You need to install them separately:
 
+**TypeScript/JavaScript:**
 ```bash
 npm install -g typescript-language-server
+```
+
+**Java** (requires JDK 17+):
+```bash
+# macOS (Homebrew)
+brew install jdtls
+
+# Or download from https://github.com/eclipse-jdtls/eclipse.jdt.ls
+```
+
+**Python:**
+```bash
+pip install python-lsp-server
 ```
 
 For other languages, install the corresponding LSP server and configure it following the same pattern shown below.
@@ -159,7 +173,7 @@ Edit `~/.copilot/lsp-config.json`
 **Repository-level configuration** (applies to specific project):
 Create `.github/lsp.json` in your repository root
 
-Example configuration:
+#### TypeScript
 
 ```json
 {
@@ -170,6 +184,71 @@ Example configuration:
       "fileExtensions": {
         ".ts": "typescript",
         ".tsx": "typescript"
+      }
+    }
+  }
+}
+```
+
+#### Java
+
+```json
+{
+  "lspServers": {
+    "java": {
+      "command": "jdtls",
+      "args": [],
+      "fileExtensions": {
+        ".java": "java"
+      }
+    }
+  }
+}
+```
+
+#### Python
+
+```json
+{
+  "lspServers": {
+    "python": {
+      "command": "pylsp",
+      "args": [],
+      "fileExtensions": {
+        ".py": "python"
+      }
+    }
+  }
+}
+```
+
+#### Multiple languages
+
+Combine configurations to support multiple languages in one file:
+
+```json
+{
+  "lspServers": {
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "fileExtensions": {
+        ".ts": "typescript",
+        ".tsx": "typescript"
+      }
+    },
+    "java": {
+      "command": "jdtls",
+      "args": [],
+      "fileExtensions": {
+        ".java": "java"
+      }
+    },
+    "python": {
+      "command": "pylsp",
+      "args": [],
+      "fileExtensions": {
+        ".py": "python"
       }
     }
   }
