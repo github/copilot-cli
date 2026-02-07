@@ -1,3 +1,16 @@
+## 0.0.406 - 2026-02-07
+
+- Add support for Claude Opus 4.6 Fast (Preview)
+- Markdown formatting displays in non-interactive mode output
+- Display warning when user has no Copilot subscription
+- Commands from plugins are now translated into skills
+- Add `/changelog` command to view release notes
+- plugin marketplace add accepts URLs as sources
+- `--no-experimental` flag disables experimental features
+- CLI interface renders without extra blank line
+- `/mcp show` displays enabled/disabled status for MCP tools
+- MCP tool responses now include structured content (images, resources) for richer UI display in VS Code
+
 ## 0.0.405 - 2026-02-05
 
 - Plugin and marketplace names support uppercase letters
