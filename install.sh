@@ -44,8 +44,13 @@ elif [ "${VERSION}" = "prerelease" ]; then
     echo "Error: git is required to install prerelease versions" >&2
     exit 1
   fi
-  # Use --sort to avoid pipeline and reduce subprocess spawning
+  # Use --sort to avoid pipeline and reduce subprocess spawning (requires Git 2.18+)
+  # Fallback to tail if --sort is not supported
   VERSION="$(git ls-remote --tags --sort=-version:refname https://github.com/github/copilot-cli 2>/dev/null | head -1 | awk -F/ '{print $NF}')"
+  if [ -z "$VERSION" ]; then
+    # Fallback for older Git versions
+    VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli 2>/dev/null | tail -1 | awk -F/ '{print $NF}')"
+  fi
   if [ -z "$VERSION" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
@@ -93,23 +98,23 @@ else
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
-  CHECKSUM_CMD=""
+  # Validate checksum using available tool
+  CHECKSUM_VALID=false
   if command -v sha256sum >/dev/null 2>&1; then
-    CHECKSUM_CMD="sha256sum"
+    (cd "$TMP_DIR" && sha256sum -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1) && CHECKSUM_VALID=true
   elif command -v shasum >/dev/null 2>&1; then
-    CHECKSUM_CMD="shasum -a 256"
-  fi
-  
-  if [ -n "$CHECKSUM_CMD" ]; then
-    if (cd "$TMP_DIR" && $CHECKSUM_CMD -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
-      echo "✓ Checksum validated"
-    else
-      echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
-      exit 1
-    fi
+    (cd "$TMP_DIR" && shasum -a 256 -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1) && CHECKSUM_VALID=true
   else
     echo "Warning: No sha256sum or shasum found, skipping checksum validation."
+  fi
+  
+  if [ "$CHECKSUM_VALID" = true ]; then
+    echo "✓ Checksum validated"
+  elif command -v sha256sum >/dev/null 2>&1 || command -v shasum >/dev/null 2>&1; then
+    # Only fail if a checksum tool was available but validation failed
+    echo "Error: Checksum validation failed." >&2
+    rm -rf "$TMP_DIR"
+    exit 1
   fi
 fi
 
