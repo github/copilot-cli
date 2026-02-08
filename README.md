@@ -145,7 +145,7 @@ Copilot CLI does not bundle LSP servers. You need to install them separately:
 
 **TypeScript/JavaScript:**
 ```bash
-npm install -g typescript-language-server
+npm install -g typescript typescript-language-server
 ```
 
 **Java** (requires JDK 17+):
