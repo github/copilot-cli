@@ -239,7 +239,7 @@ Combine configurations to support multiple languages in one file:
     },
     "java": {
       "command": "jdtls",
-      "args": [],
+      "args": ["-data", "/path/to/java-workspace"],
       "fileExtensions": {
         ".java": "java"
       }
