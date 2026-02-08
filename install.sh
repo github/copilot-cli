@@ -44,7 +44,8 @@ elif [ "${VERSION}" = "prerelease" ]; then
     echo "Error: git is required to install prerelease versions" >&2
     exit 1
   fi
-  VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | tail -1 | awk -F/ '{print $NF}')"
+  # Use --sort to avoid pipeline and reduce subprocess spawning
+  VERSION="$(git ls-remote --tags --sort=-version:refname https://github.com/github/copilot-cli 2>/dev/null | head -1 | awk -F/ '{print $NF}')"
   if [ -z "$VERSION" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
@@ -63,39 +64,44 @@ else
 fi
 echo "Downloading from: $DOWNLOAD_URL"
 
+# Detect which downloader is available (check once and cache)
+if command -v curl >/dev/null 2>&1; then
+  DOWNLOADER="curl"
+elif command -v wget >/dev/null 2>&1; then
+  DOWNLOADER="wget"
+else
+  echo "Error: Neither curl nor wget found. Please install one of them."
+  exit 1
+fi
+
 # Download and extract with error handling
 TMP_DIR="$(mktemp -d)"
 TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
-if command -v curl >/dev/null 2>&1; then
+if [ "$DOWNLOADER" = "curl" ]; then
   curl -fsSL "$DOWNLOAD_URL" -o "$TMP_TARBALL"
-elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
 else
-  echo "Error: Neither curl nor wget found. Please install one of them."
-  rm -rf "$TMP_DIR"
-  exit 1
+  wget -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
 fi
 
 # Attempt to download checksums file and validate
 TMP_CHECKSUMS="$TMP_DIR/SHA256SUMS.txt"
 CHECKSUMS_AVAILABLE=false
-if command -v curl >/dev/null 2>&1; then
+if [ "$DOWNLOADER" = "curl" ]; then
   curl -fsSL "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
-elif command -v wget >/dev/null 2>&1; then
+else
   wget -qO "$TMP_CHECKSUMS" "$CHECKSUMS_URL" 2>/dev/null && CHECKSUMS_AVAILABLE=true
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
+  CHECKSUM_CMD=""
   if command -v sha256sum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && sha256sum -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
-      echo "✓ Checksum validated"
-    else
-      echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
-      exit 1
-    fi
+    CHECKSUM_CMD="sha256sum"
   elif command -v shasum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && shasum -a 256 -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
+    CHECKSUM_CMD="shasum -a 256"
+  fi
+  
+  if [ -n "$CHECKSUM_CMD" ]; then
+    if (cd "$TMP_DIR" && $CHECKSUM_CMD -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
