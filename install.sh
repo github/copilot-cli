@@ -45,10 +45,10 @@ elif [ "${VERSION}" = "prerelease" ]; then
     exit 1
   fi
   # Use --sort with semantic version sorting to avoid pipeline and reduce subprocess spawning (requires Git 2.18+)
-  # Fallback to tail if --sort is not supported
+  # Fallback to tail if --sort is not supported or returns empty
   VERSION="$(git ls-remote --tags --sort=-v:refname https://github.com/github/copilot-cli 2>/dev/null | head -1 | awk -F/ '{print $NF}')"
   if [ -z "$VERSION" ]; then
-    # Fallback for older Git versions
+    # Fallback for older Git versions or if --sort returned empty
     VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli 2>/dev/null | tail -1 | awk -F/ '{print $NF}')"
   fi
   if [ -z "$VERSION" ]; then
@@ -110,7 +110,6 @@ if [ "$CHECKSUMS_AVAILABLE" = true ]; then
   else
     echo "Warning: No sha256sum or shasum found, skipping checksum validation."
   fi
-  
   if [ "$CHECKSUM_VALID" = true ]; then
     echo "✓ Checksum validated"
   elif [ "$CHECKSUM_TOOL_AVAILABLE" = true ]; then
