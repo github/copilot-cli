@@ -1,3 +1,77 @@
+## 0.0.406 - 2026-02-07
+
+- Add support for Claude Opus 4.6 Fast (Preview)
+- Markdown formatting displays in non-interactive mode output
+- Display warning when user has no Copilot subscription
+- Commands from plugins are now translated into skills
+- Add `/changelog` command to view release notes
+- plugin marketplace add accepts URLs as sources
+- `--no-experimental` flag disables experimental features
+- CLI interface renders without extra blank line
+- `/mcp show` displays enabled/disabled status for MCP tools
+- MCP tool responses now include structured content (images, resources) for richer UI display in VS Code
+
+## 0.0.405 - 2026-02-05
+
+- Plugin and marketplace names support uppercase letters
+- `/experimental` shows help screen listing experimental features
+- Fix SQL tool disconnects
+- Plugins can bundle LSP server configurations
+
+## 0.0.404 - 2026-02-05
+
+- Add support for claude-opus-4.6 model
+- `/allow-all` and `/yolo` execute immediately
+- MCP servers shut down concurrently for improved performance
+- Cancel --resume session picker to start a new session
+- MCP server configurations default to all tools when tools parameter not specified
+- Add `/tasks` command to view and manage background tasks
+- Enable background agents for all users
+- Simplify and clarify `/delegate` command messaging
+- GITHUB_TOKEN environment variable now accessible in agent shell sessions
+
+## 0.0.403 - 2026-02-04
+
+- Windows Task Manager displays correct application name
+- Introduce security check preventing use of modules outside of application bundle
+- ACP model info includes usage multiplier and enablement status
+- Fix logic checking user organization membership
+- Stop MCP servers before updating plugins
+- Detached shell processes work on vanilla macOS installations
+- Escape key consistently aborts permission dialogs regardless of selection
+- Plugin skills work in prompt mode
+- Config files preserve custom fields when CLI updates them
+- Reasoning summaries enabled by default for supporting models
+- Support comma-separated tools in custom agent frontmatter
+- Skills with unknown frontmatter fields now load with warnings instead of being silently skipped
+
+## 0.0.402 - 2026-02-03
+
+- ACP server supports agent and plan session modes
+- MCP configuration applies to ACP mode
+- Agent creation wizard styling improvements
+- Custom agents with unknown fields load with warnings instead of errors
+- Custom agents receive environment context when run as subagents
+- Plugins can provide hooks for session lifecycle events
+- Plugin update command works for direct plugins and handles Windows file locks
+- Stop MCP servers when uninstalling plugins
+
+## 0.0.401 - 2026-02-03
+
+- Support `.agents/skills` directory for auto-loading skills
+- Improve handling of chat history when switching between model families
+- MCP tools returning structuredContent now display correctly in CLI
+- Support Claude-style .mcp.json format without mcpServers wrapper
+- Inserting new line with shift+enter keybinding in VS Code integrated terminal
+- Large multi-line pastes work correctly
+- ACP terminal-auth passes correct arguments to login
+- Arrow and special keys work reliably when held down
+- Slash command ghost text appends correctly
+- Add `copilot login` subcommand and support ACP terminal-auth
+- Add agentStop and subagentStop hooks to control agent completion
+- CLI handles unknown keypresses gracefully
+- /diff displays accurate line numbers with dual column layout
+
 ## 0.0.400 - 2026-01-30
 
 - Add MCP server instructions support
