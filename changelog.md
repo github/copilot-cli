@@ -1,3 +1,241 @@
+## 0.0.406 - 2026-02-07
+
+- Add support for Claude Opus 4.6 Fast (Preview)
+- Markdown formatting displays in non-interactive mode output
+- Display warning when user has no Copilot subscription
+- Commands from plugins are now translated into skills
+- Add `/changelog` command to view release notes
+- plugin marketplace add accepts URLs as sources
+- `--no-experimental` flag disables experimental features
+- CLI interface renders without extra blank line
+- `/mcp show` displays enabled/disabled status for MCP tools
+- MCP tool responses now include structured content (images, resources) for richer UI display in VS Code
+
+## 0.0.405 - 2026-02-05
+
+- Plugin and marketplace names support uppercase letters
+- `/experimental` shows help screen listing experimental features
+- Fix SQL tool disconnects
+- Plugins can bundle LSP server configurations
+
+## 0.0.404 - 2026-02-05
+
+- Add support for claude-opus-4.6 model
+- `/allow-all` and `/yolo` execute immediately
+- MCP servers shut down concurrently for improved performance
+- Cancel --resume session picker to start a new session
+- MCP server configurations default to all tools when tools parameter not specified
+- Add `/tasks` command to view and manage background tasks
+- Enable background agents for all users
+- Simplify and clarify `/delegate` command messaging
+- GITHUB_TOKEN environment variable now accessible in agent shell sessions
+
+## 0.0.403 - 2026-02-04
+
+- Windows Task Manager displays correct application name
+- Introduce security check preventing use of modules outside of application bundle
+- ACP model info includes usage multiplier and enablement status
+- Fix logic checking user organization membership
+- Stop MCP servers before updating plugins
+- Detached shell processes work on vanilla macOS installations
+- Escape key consistently aborts permission dialogs regardless of selection
+- Plugin skills work in prompt mode
+- Config files preserve custom fields when CLI updates them
+- Reasoning summaries enabled by default for supporting models
+- Support comma-separated tools in custom agent frontmatter
+- Skills with unknown frontmatter fields now load with warnings instead of being silently skipped
+
+## 0.0.402 - 2026-02-03
+
+- ACP server supports agent and plan session modes
+- MCP configuration applies to ACP mode
+- Agent creation wizard styling improvements
+- Custom agents with unknown fields load with warnings instead of errors
+- Custom agents receive environment context when run as subagents
+- Plugins can provide hooks for session lifecycle events
+- Plugin update command works for direct plugins and handles Windows file locks
+- Stop MCP servers when uninstalling plugins
+
+## 0.0.401 - 2026-02-03
+
+- Support `.agents/skills` directory for auto-loading skills
+- Improve handling of chat history when switching between model families
+- MCP tools returning structuredContent now display correctly in CLI
+- Support Claude-style .mcp.json format without mcpServers wrapper
+- Inserting new line with shift+enter keybinding in VS Code integrated terminal
+- Large multi-line pastes work correctly
+- ACP terminal-auth passes correct arguments to login
+- Arrow and special keys work reliably when held down
+- Slash command ghost text appends correctly
+- Add `copilot login` subcommand and support ACP terminal-auth
+- Add agentStop and subagentStop hooks to control agent completion
+- CLI handles unknown keypresses gracefully
+- /diff displays accurate line numbers with dual column layout
+
+## 0.0.400 - 2026-01-30
+
+- Add MCP server instructions support
+- Timeline displays user responses to `ask_user` tool prompts with username
+- Ordered lists display with numbers instead of dashes
+- Add theme picker with `/theme` command and GitHub Dark/Light themes
+- Fix support for pasting large content on Windows Terminal
+- Better handle large results from grep and glob tools to avoid memory issues
+- CLI now sends DELETE requests to remove MCP servers when shutting down
+- Fix not being able to arrow key out of text inputs in select lists
+- ACP server supports changing models during a session
+- ACP server support permission flags: --yolo, --allow-all, etc. and permissions config
+- Show progress indicator in terminal tab when thinking
+- Remove bundled LSP servers (TypeScript, Python)
+- Improve compatibility with remote MCP servers that use OAuth
+- Markdown table headers display in bold
+- Add autopilot mode for autonomous task completion (experimental)
+- Add fuzzy search to model picker
+- Freeform text input in list pickers works correctly
+- Add `copilot plugin` subcommand for non-interactive plugin management
+- CLI is more responsive in sessions with many messages
+- Shell path detection more accurately handles spaces, quotes, and Windows switches
+- Diff mode file list uses carousel navigation, showing up to 5 files at a time
+- Holding backspace continues deleting text
+- Better support for UNIX keyboard bindings (Ctrl+A/E/W/U/K, Alt+arrows) and multiline content in various text inputs
+- Add `launch_messages` config for startup announcements
+- The Code Review tool handles large changesets by ignoring build artifacts and limiting to 100 files
+
+## 0.0.399 - 2026-01-29
+
+- Compaction messages show clearer command hints to view checkpoint summaries
+- Press Ctrl+X then / to run slash commands without losing your input
+- Improve `/diff` command with better visual indicators and scroll acceleration
+- Add `/allow-all` and `/yolo` commands to auto-approve all permissions during a session
+- Add Copilot option for agent creation wizard to generate name, description, and instructions based on initial agent description
+- Add LSP (Language Server Protocol) tool for code intelligence (requires experimental flag)
+- Sessions get AI-generated names from first message
+- Skills remain effective after conversation history is compacted
+- /usage now includes token consumption from sub-agents (e.g., the general-purpose agent)
+- Support `.claude/commands/` single-file commands as simpler alternative to skills
+- Skills load correctly on Windows
+- Add `/diff` command to review session changes
+- Undo/rewind to previous states with double-Esc
+
+## 0.0.398 - 2026-01-28
+
+- Fix a regression that caused "Invalid session id" errors for agent shell calls
+- CLI header uses middle-truncation for paths in narrow terminals, preserving first and last folders
+- Skills from parent directories are now invocable and work in non-git directories
+
+## 0.0.397 - 2026-01-28
+
+- `/mcp show <server-name>` displays server details and available tools
+- Header layout adapts better to narrow terminal widths
+- Plan mode input text is more readable
+- Content pasted into the prompt over 30 KB is automatically saved to workspace files
+- Homebrew tools work correctly on macOS with zsh as default shell
+- Add --acp flag to start as Agent Client Protocol server
+- Directories now appear in @mention autocomplete
+- Session summary displays accurate line counts
+
+## 0.0.396 - 2026-01-27
+
+- Skill names can include uppercase letters
+- Ctrl+E moves cursor to end of line when typing without expanding timeline
+- `/skills add` works with directories that contain SKILL.md directly
+- Subagent timeline entries display with bold, capitalized names
+- Timeline entries show filled circle for success status
+- Improve horizontal alignment of UI elements
+- Simplify compaction timeline entries
+- Create custom agents through interactive CLI wizard
+- Tool filtering flags now apply to subagents
+- Error messages consistently reference /login and /logout commands
+- Add `copilot version` and `copilot update` commands
+- preToolUse hooks can deny tool execution and modify arguments
+- Fix PTY leak in bash session handling
+- `/plugin install` supports GitHub repos, URLs, and local paths
+- Add `/experimental` command and `--experimental` flag to opt into experimental features
+- Add `/init` command to generate Copilot instructions
+- Reorder model picker list for better organization
+- Plugins can provide custom agents
+- Open plan files in VS Code on WSL and devcontainers
+- /diff shows changes from entire repository when run from subdirectory
+- /skills add correctly counts skills when directory path has trailing slash
+- Undo/rewind shows accurate count of affected files
+- Pre-releases on GitHub now show detailed changelog notes
+
+## 0.0.395 - 2026-01-26
+
+- Select escape item shows blinking cursor to indicate text input
+- `/mcp show` displays all configured MCP servers including defaults and servers from additional configuration.
+- `/mcp show` displays servers from installed plugins
+- Rewind shows clear warning in non-git repos or repos without commits
+- Cursor hides when terminal loses focus
+- Formatted text and links display correctly when wrapping
+- Load local shell configuration in agent sessions
+- Plugin skills are now usable by the agent
+- CLI handles missing tree-sitter files gracefully instead of crashing
+- Completed tool calls display in prompt mode
+- Add commenting to /diff mode for line-specific feedback
+
+## 0.0.394 - 2026-01-24
+
+- Deduplicate identical model instruction files to save context
+- Exit summary displays accurate usage metrics instead of zeros
+- Getting git branch works in repositories with no commits
+- Add support for GitHub Enterprise Cloud (\*.ghe.com) in /delegate command
+- Directory path uses consistent muted text color with git branch and model display
+- Plugin skills work in agent responses
+- Timeline hides startup messages to reduce noise
+- Fixed timeline entry regression where read_agent and other tools showed incorrect content
+- Git status updates on-demand instead of polling every 15 seconds
+- SDK supports infinite sessions with automatic context compaction
+- Memory loading errors are handled gracefully without user warnings
+- `/delegate` command accepts optional prompt, uses conversation context
+- Auto-update no longer removes old CLI package versions
+- Improve task completion with clearer detached process guidance
+- Simplified bottom bar by hiding some keyboard hints
+- Queue slash commands alongside messages using Ctrl+D
+- Press `/` to search sessions in `/resume`
+
+## 0.0.393 - 2026-01-23
+
+- Show conversation compaction status as timeline messages instead of header indicator
+- Memory loading no longer warns when outside a Git repository
+- Add support for GHE Cloud (\*.ghe.com) remote custom agents
+- Plugin uninstall now works correctly
+- Expose MCP server and tool names in tool.execution_start events for better error handling
+- Add Esc-Esc to undo file changes to any previous snapshot
+
+## 0.0.392 - 2026-01-22
+
+- Add `/plugin` command for plugin marketplace management
+- Add /rename command as alias for /session rename
+- Add /plugin update command to update installed plugins
+- Edit tool now displays diffs when expanded in timeline
+
+## 0.0.390 - 2026-01-22
+
+- Preserve extended thinking after compaction
+- Custom agents with MCP servers avoid unnecessary restarts
+- Enable steering during plan mode
+
+## 0.0.389 - 2026-01-22
+
+- Improve `/session` command visual hierarchy and colors
+- Subagents receive correct tools when using different models
+- grep and glob tools now find hidden files and dotfiles
+- Add MSI installer for Windows
+- Remove Node version requirement from npm package
+- MCP servers can now authenticate using OAuth 2.0 with automatic token management and refresh
+- Display progress messages from MCP tools in timeline
+- Plugins can bundle MCP servers that load automatically when installed
+- Invoke skills using slash commands like /skill-name
+- Add `/diff` command to review changes made during the current session
+- Show warning when repository memory fails to load
+- Subagents no longer hang on user input requests
+- Rate limit errors now show retry timing in user-friendly messages
+- Messages sent during `/compact` are automatically queued
+- Add `/models` as alias for `/model` command
+- Change license to MIT License
+- Reduce padding in welcome header
+- Shell commands (!) can run in parallel while agent is working
+
 ## 0.0.388 - 2026-01-20
 
 - Add `/review` command to analyze code changes

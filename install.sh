@@ -35,7 +35,24 @@ case "$(uname -m)" in
 esac
 
 # Determine download URL based on VERSION
-if [ -n "$VERSION" ]; then
+if [ "${VERSION}" = "latest" ] || [ -z "$VERSION" ]; then
+  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
+  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/latest/download/SHA256SUMS.txt"
+elif [ "${VERSION}" = "prerelease" ]; then
+  # Get the latest prerelease tag
+  if ! command -v git >/dev/null 2>&1; then
+    echo "Error: git is required to install prerelease versions" >&2
+    exit 1
+  fi
+  VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | tail -1 | awk -F/ '{print $NF}')"
+  if [ -z "$VERSION" ]; then
+    echo "Error: Could not determine prerelease version" >&2
+    exit 1
+  fi
+  echo "Latest prerelease version: $VERSION"
+  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/copilot-${PLATFORM}-${ARCH}.tar.gz"
+  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/SHA256SUMS.txt"
+else
   # Prefix version with 'v' if not already present
   case "$VERSION" in
     v*) ;;
@@ -43,9 +60,6 @@ if [ -n "$VERSION" ]; then
   esac
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/copilot-${PLATFORM}-${ARCH}.tar.gz"
   CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/download/${VERSION}/SHA256SUMS.txt"
-else
-  DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
-  CHECKSUMS_URL="https://github.com/github/copilot-cli/releases/latest/download/SHA256SUMS.txt"
 fi
 echo "Downloading from: $DOWNLOAD_URL"
 
@@ -122,16 +136,34 @@ chmod +x "$INSTALL_DIR/copilot"
 echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
 rm -rf "$TMP_DIR"
 
-# Check if install directory is in PATH
-case ":$PATH:" in
-  *":$INSTALL_DIR:"*) ;;
-  *)
+# Check if installed binary is accessible
+if ! command -v copilot >/dev/null 2>&1; then
+  echo ""
+  echo "Notice: $INSTALL_DIR is not in your PATH"
+
+  # Detect shell rc file
+  case "$(basename "${SHELL:-/bin/sh}")" in
+    zsh)  RC_FILE="$HOME/.zshrc" ;;
+    bash) RC_FILE="$HOME/.bashrc" ;;
+    *)    RC_FILE="$HOME/.profile" ;;
+  esac
+
+  # Prompt user to add to shell rc file (only if interactive)
+  if [ -t 0 ] || [ -e /dev/tty ]; then
     echo ""
-    echo "Warning: $INSTALL_DIR is not in your PATH"
-    echo "Add it to your PATH by adding this line to your shell profile:"
-    echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
-    ;;
-esac
+    printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
+    if read -r REPLY </dev/tty 2>/dev/null; then
+      if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
+        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC_FILE"
+        echo "✓ Added PATH export to $RC_FILE"
+      fi
+    fi
+  else
+    echo ""
+    echo "To add $INSTALL_DIR to your PATH permanently, add this to $RC_FILE:"
+    echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
+  fi
+fi
 
 echo ""
 echo "Installation complete! Run 'copilot help' to get started."
