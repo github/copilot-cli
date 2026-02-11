@@ -1,3 +1,42 @@
+## 0.0.407 - 2026-02-11
+
+- Improve authentication error messages in prompt mode
+- Quota exceeded error links to Copilot settings with actionable guidance
+- Theme picker shows live preview of diffs and markdown, adds colorblind and tritanopia theme variants
+- Add `/on-air` mode to hide model names and quota details for streaming
+- Show agent type and description in read_agent timeline entries
+- `/tasks` shows Recent Activity for background agents
+- Add experimental alternate screen buffer mode: --alt-screen
+- Interactive programs that query terminal state work in shell
+- Subagents fall back to session model when default model blocked by policy
+- Expose session context in session.list SDK response
+- Keyboard shortcut hints display consistently with bold styling throughout the CLI
+- Add `tools.list` RPC to query available built-in tools
+- Streaming responses automatically retry when interrupted by server errors
+- Add option to approve tool permissions permanently for a location
+- Add `/instructions` command to view and toggle custom instruction files
+- Ctrl-b and ctrl-f cursor movement now available on all platforms
+- Ctrl+d now favors deleting character after cursor, with queueing moved to ctrl+q (or ctrl+enter)
+- Editing MCP servers shows existing configuration values
+- `--resume` creates new sessions with provided UUID
+- Add workspace-local MCP configuration via `.vscode/mcp.json`
+- Skill changes from `/skills` commands take effect immediately
+- /session usage string only shows available subcommands
+- Slash commands which take prompts now work when immediately followed by a new-line
+- Remove unintended characters from status bar
+- Autopilot mode works with custom agents that specify explicit tools
+- Updated node-pty to fix file descriptor leaks
+- Windows slash flags (e.g., `dir /B`) are no longer treated as file paths
+- Diff mode no longer flickers when navigating files
+- /mcp disable and /mcp enable show clear error when server name doesn't exist
+- MCP servers using Microsoft OAuth configure automatically without manual client ID setup
+- Tab cycles modes forward, Shift+Tab backward; shell is now a mode
+- Ctrl+P runs slash commands while preserving input (replaces Ctrl+X → /)
+- Terminal title works on all TTY terminals, not just select few
+- Help text notes auto-update is disabled in CI environments by default
+- Terminal tab shows session title when idle
+- ask_user tool asks one question at a time for clearer interaction
+
 ## 0.0.406 - 2026-02-07
 
 - Add support for Claude Opus 4.6 Fast (Preview)
