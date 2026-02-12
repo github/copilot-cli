@@ -1,3 +1,14 @@
+## 0.0.409 - 2026-02-12
+
+- /diff uses full screen in alt-screen mode
+- Quick help overlay: press `?` to see grouped shortcuts and commands, navigate with arrow keys
+- Theme preview appears above theme list in screen reader mode
+- Add `list_copilot_spaces` tool to default GitHub MCP config
+- Subagents return complete responses
+- CLI now integrates with VS Code, use /ide for more information.
+- Permission prompts with long diffs are scrollable in alt-screen mode
+- Include default plugin marketplaces (copilot-plugins, awesome-copilot) for easier plugin discovery
+
 ## 0.0.408 - 2026-02-12
 
 - Add `/streamer-mode` to hide preview model names and quota details for streaming
