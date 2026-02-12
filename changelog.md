@@ -1,3 +1,15 @@
+## 0.0.408 - 2026-02-12
+
+- Add `/streamer-mode` to hide preview model names and quota details for streaming
+- Makes shellId more flexible to not error when a number is passed
+- Background tasks hint updates when detached shells are killed or removed
+- Add mouse text selection in --alt-screen mode
+- ! commands with large output no longer crash the CLI
+- Fix duplicate/ghost lines appearing when resizing the terminal in alt-screen mode
+- MCP servers respect the `cwd` working directory property
+- Add substring matching to slash command autocomplete
+- Change run command shortcut from ctrl+p to ctrl+s
+
 ## 0.0.407 - 2026-02-11
 
 - Improve authentication error messages in prompt mode
