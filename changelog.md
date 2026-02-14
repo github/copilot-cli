@@ -1,3 +1,31 @@
+## 0.0.410 - 2026-02-14
+
+- Fixed high memory usage caused by rapid logging
+- Shell mode pastes raw text instead of paste tokens
+- Reduce memory usage from encoding streaming chunks
+- Fix alt-screen and timeline URL rendering to preserve long links without truncation
+- Reduced memory growth in long sessions by evicting transient events after compaction
+- Fixed high memory usage when loading large sessions
+- Fixed high memory usage during shell commands with rapid output
+- Add `/init suppress` to control init suggestions per repository
+- Show IDE file selection indicator in the status bar when connected to an IDE
+- Add repo-level settings to disable individual validation tools
+- ACP server supports loading existing sessions
+- Page Up/Page Down keyboard scrolling in alt-screen mode
+- Add Ctrl+Z suspend/resume support on Unix platforms
+- Support tilde (~) expansion in MCP server cwd configuration
+- Support ctrl+n and ctrl+p as arrow key alternatives
+- Exit CLI with ctrl+d on empty prompt
+- Fix unknown option '--no-warnings' error
+- Shift+Enter inserts newlines in terminals with kitty keyboard protocol
+- MCP server list selection adjusts correctly after deletion
+- Shell mode removed from Shift+Tab cycle, accessed only via `!`
+- Improve /tasks dialog with consistent icons and typography
+- Exit from alt-screen no longer replays full session history
+- MCP server errors and loading issues surface in timeline
+- Reduce input jitter with frame coalescing and smoother alt-screen animations
+- Extend skill name validation to support underscores, dots, and spaces; make name and description optional in skill frontmatter with sensible fallbacks
+
 ## 0.0.409 - 2026-02-12
 
 - /diff uses full screen in alt-screen mode
