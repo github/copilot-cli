@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { nowIso, nowFilenameSafe } = require('../utils/time');
+const { PythonBridge } = require('../python-bridge');
 
 class AgentStateManager {
   constructor(statePath = null) {
@@ -48,7 +49,10 @@ class AgentStateManager {
         purpose: null,
         parentSessionId: null
       },
-      checkpoints: []
+      checkpoints: [],
+      sessionGraph: null,
+      generations: [],
+      lastSync: null
     };
   }
 
@@ -68,6 +72,13 @@ class AgentStateManager {
       state.checkpoints = state.checkpoints || [];
       state.schemaVersion = 2;
       state.version = '1.1.0';
+    }
+    if (!state.schemaVersion || state.schemaVersion < 3) {
+      state.sessionGraph = state.sessionGraph || null;
+      state.generations = state.generations || [];
+      state.lastSync = state.lastSync || null;
+      state.schemaVersion = 3;
+      state.version = '1.2.0';
     }
     return state;
   }
@@ -335,9 +346,130 @@ class AgentStateManager {
         purpose: null,
         parentSessionId: null
       },
-      checkpoints: []
+      checkpoints: [],
+      sessionGraph: null,
+      generations: [],
+      lastSync: null
     };
     this._saveState();
+  }
+
+  // ===== SessionGraph Integration =====
+
+  /**
+   * Fetch the current SessionGraph from the Python backend.
+   * Caches locally in state for offline access.
+   * @returns {Promise<object|null>} The SessionGraph dict or null
+   */
+  async fetchSessionGraph() {
+    try {
+      const bridge = PythonBridge.getShared();
+      const graph = await bridge.call('session_state', {});
+      this.state.sessionGraph = graph;
+      this.state.lastSync = nowIso();
+      this._saveState();
+      return graph;
+    } catch (error) {
+      console.warn(`[StateManager] Failed to fetch SessionGraph: ${error.message}`);
+      return this.state.sessionGraph || null;
+    }
+  }
+
+  /**
+   * Get the cached SessionGraph (no network call).
+   * @returns {object|null}
+   */
+  getCachedSessionGraph() {
+    return this.state.sessionGraph || null;
+  }
+
+  /**
+   * Get summary of the session graph (track count, section count, etc.)
+   * @returns {object} Summary stats
+   */
+  getSessionSummary() {
+    const graph = this.state.sessionGraph;
+    if (!graph) {
+      return { available: false };
+    }
+
+    const tracks = graph.tracks || [];
+    const sections = graph.sections || [];
+    const totalBars = sections.reduce((sum, s) => sum + (s.bars || s.length_bars || 0), 0);
+    const hasMidi = tracks.some(t => (t.clips || []).some(c => c.midi_path || c.midi));
+    const hasAudio = tracks.some(t => (t.clips || []).some(c => c.audio_path || c.audio));
+
+    return {
+      available: true,
+      session_id: graph.session_id || null,
+      bpm: graph.bpm || null,
+      key: graph.key || null,
+      genre: graph.genre || null,
+      trackCount: tracks.length,
+      sectionCount: sections.length,
+      totalBars,
+      hasMidi,
+      hasAudio
+    };
+  }
+
+  /**
+   * Record a generation event in state with the resulting SessionGraph.
+   * @param {string} prompt - The original user prompt
+   * @param {object} result - The GenerationResult from generate_sync
+   * @param {object} sessionGraph - The SessionGraph from session_state
+   */
+  recordGeneration(prompt, result, sessionGraph) {
+    if (!this.state.generations) {
+      this.state.generations = [];
+    }
+
+    this.state.generations.push({
+      timestamp: nowIso(),
+      prompt,
+      result: {
+        success: result?.success ?? null,
+        session_id: result?.session_id ?? null,
+        tracks: result?.tracks ?? [],
+        error: result?.error ?? null
+      },
+      sessionGraph: sessionGraph || null
+    });
+
+    // Keep only last 10 generations
+    if (this.state.generations.length > 10) {
+      this.state.generations = this.state.generations.slice(-10);
+    }
+
+    this._saveState();
+  }
+
+  /**
+   * Get history of past generations.
+   * @param {number} [limit=5]
+   * @returns {Array}
+   */
+  getGenerationHistory(limit = 5) {
+    return (this.state.generations || []).slice(-limit);
+  }
+
+  /**
+   * Sync session state between Python and Electron.
+   * Fetches graph, records in state, returns summary.
+   * @returns {Promise<object>} { synced: true/false, summary, timestamp }
+   */
+  async syncSessionState() {
+    const timestamp = nowIso();
+    try {
+      const graph = await this.fetchSessionGraph();
+      if (!graph) {
+        return { synced: false, summary: null, timestamp, error: 'No graph returned' };
+      }
+      const summary = this.getSessionSummary();
+      return { synced: true, summary, timestamp };
+    } catch (error) {
+      return { synced: false, summary: null, timestamp, error: error.message };
+    }
   }
 }
 

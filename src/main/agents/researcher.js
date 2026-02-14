@@ -12,6 +12,7 @@
  */
 
 const { BaseAgent, AgentRole, AgentCapabilities } = require('./base-agent');
+const { PythonBridge } = require('../python-bridge');
 const fs = require('fs');
 const path = require('path');
 
@@ -41,6 +42,9 @@ class ResearcherAgent extends BaseAgent {
     this.researchCache = new Map();
     this.cacheMaxAge = options.cacheMaxAge || 3600000; // 1 hour
     this.sourceCredibility = new Map();
+
+    // PythonBridge for genre intelligence (lazy init via shared singleton)
+    this.pythonBridge = null;
   }
 
   getSystemPrompt() {
@@ -505,6 +509,80 @@ Provide comprehensive findings with:
     this.researchResults = [];
     this.researchCache.clear();
     this.sourceCredibility.clear();
+  }
+
+  // ===== Genre Intelligence Methods (Sprint 3 — Task 3.4) =====
+
+  /**
+   * Lazily initialise and start the shared PythonBridge.
+   * @returns {Promise<PythonBridge>}
+   */
+  async ensurePythonBridge() {
+    if (!this.pythonBridge) {
+      this.pythonBridge = PythonBridge.getShared();
+    }
+    if (!this.pythonBridge.isRunning) {
+      this.log('info', 'Starting PythonBridge for genre intelligence');
+      await this.pythonBridge.start();
+    }
+    return this.pythonBridge;
+  }
+
+  /**
+   * Look up the 10-dimensional DNA vector for a given genre.
+   *
+   * Results are cached in ``researchCache`` to avoid repeated RPCs.
+   *
+   * @param {string} genre  Genre identifier (e.g. "trap_soul").
+   * @returns {Promise<object>}  { genre, found, vector, dimensions }
+   */
+  async queryGenreDNA(genre) {
+    // Check cache first
+    const cacheKey = `genre_dna::${genre}`;
+    const cached = this.researchCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp) < this.cacheMaxAge) {
+      this.log('info', 'Returning cached genre DNA', { genre });
+      return { ...cached.result, fromCache: true };
+    }
+
+    await this.ensurePythonBridge();
+    this.log('info', 'Querying genre DNA', { genre });
+
+    const result = await this.pythonBridge.call('genre_dna_lookup', { genre });
+
+    // Cache the result
+    this.researchCache.set(cacheKey, {
+      result,
+      timestamp: Date.now(),
+    });
+
+    return result;
+  }
+
+  /**
+   * Blend multiple genre DNA vectors with weights.
+   *
+   * @param {Array<{genre: string, weight: number}>} genres
+   * @returns {Promise<object>}  { vector, sources, description, suggested_tempo, dimensions }
+   */
+  async blendGenres(genres) {
+    await this.ensurePythonBridge();
+    this.log('info', 'Blending genres', { count: genres.length });
+
+    const result = await this.pythonBridge.call('genre_blend', { genres });
+    return result;
+  }
+
+  /**
+   * Stop and release the PythonBridge.
+   * @returns {Promise<void>}
+   */
+  async disposePythonBridge() {
+    if (this.pythonBridge) {
+      this.log('info', 'Disposing PythonBridge');
+      await this.pythonBridge.stop();
+      this.pythonBridge = null;
+    }
   }
 }
 

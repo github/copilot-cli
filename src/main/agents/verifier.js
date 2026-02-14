@@ -11,6 +11,7 @@
  */
 
 const { BaseAgent, AgentRole, AgentCapabilities } = require('./base-agent');
+const { PythonBridge } = require('../python-bridge');
 
 class VerifierAgent extends BaseAgent {
   constructor(options = {}) {
@@ -33,6 +34,9 @@ class VerifierAgent extends BaseAgent {
     this.verificationResults = [];
     this.currentPhase = null;
     this.verdict = null;
+
+    // PythonBridge for music quality critics (lazy init via shared singleton)
+    this.pythonBridge = null;
   }
 
   getSystemPrompt() {
@@ -446,6 +450,80 @@ Always structure your response as:
     this.verificationResults = [];
     this.currentPhase = null;
     this.verdict = null;
+  }
+
+  // ===== Music Quality Verification (Sprint 3 — Task 3.3) =====
+
+  /**
+   * Lazily initialise and start the shared PythonBridge.
+   * @returns {Promise<PythonBridge>}
+   */
+  async ensurePythonBridge() {
+    if (!this.pythonBridge) {
+      this.pythonBridge = PythonBridge.getShared();
+    }
+    if (!this.pythonBridge.isRunning) {
+      this.log('info', 'Starting PythonBridge for music critics');
+      await this.pythonBridge.start();
+    }
+    return this.pythonBridge;
+  }
+
+  /**
+   * Run VLC / BKAS / ADC quality-gate critics on a MIDI file.
+   *
+   * @param {string} midiPath       Path to the MIDI file.
+   * @param {string} [genre]        Genre identifier for context-aware eval.
+   * @param {object} [analysisData] Pre-extracted analysis data (voicings, bass_notes, etc.)
+   * @returns {Promise<{passed: boolean, metrics: Array, report: object}>}
+   */
+  async runMusicCritics(midiPath, genre, analysisData = {}) {
+    await this.ensurePythonBridge();
+    this.log('info', 'Running music critics', { midiPath, genre });
+
+    const report = await this.pythonBridge.call('run_critics', {
+      midi_path: midiPath,
+      genre,
+      ...analysisData,
+    });
+
+    // Record proof entries for each metric
+    if (report && Array.isArray(report.metrics)) {
+      for (const metric of report.metrics) {
+        this.addStructuredProof({
+          type: 'music-critic',
+          criticName: metric.name,
+          value: metric.value,
+          threshold: metric.threshold,
+          passed: metric.passed,
+          midiPath,
+        });
+      }
+    }
+
+    this.addProof(
+      'music-critics-overall',
+      report.overall_passed ? 'PASS' : 'FAIL',
+      midiPath
+    );
+
+    return {
+      passed: report.overall_passed,
+      metrics: report.metrics,
+      report,
+    };
+  }
+
+  /**
+   * Stop and release the PythonBridge.
+   * @returns {Promise<void>}
+   */
+  async disposePythonBridge() {
+    if (this.pythonBridge) {
+      this.log('info', 'Disposing PythonBridge');
+      await this.pythonBridge.stop();
+      this.pythonBridge = null;
+    }
   }
 }
 

@@ -12,6 +12,7 @@
  */
 
 const { BaseAgent, AgentRole, AgentCapabilities } = require('./base-agent');
+const { PythonBridge } = require('../python-bridge');
 const fs = require('fs');
 const path = require('path');
 
@@ -38,6 +39,9 @@ class BuilderAgent extends BaseAgent {
     this.blockers = [];
     this.attemptCount = 0;
     this.maxAttempts = 3;
+
+    // PythonBridge for music generation (lazy init via shared singleton)
+    this.pythonBridge = null;
   }
 
   getSystemPrompt() {
@@ -478,6 +482,112 @@ Provide the change in unified diff format:
     this.localProofs = [];
     this.blockers = [];
     this.attemptCount = 0;
+  }
+
+  // ===== Music Generation Methods (Sprint 3 — Task 3.2) =====
+
+  /**
+   * Lazily initialise and start the shared PythonBridge.
+   * @returns {Promise<PythonBridge>}
+   */
+  async ensurePythonBridge() {
+    if (!this.pythonBridge) {
+      this.pythonBridge = PythonBridge.getShared();
+    }
+    if (!this.pythonBridge.isRunning) {
+      this.log('info', 'Starting PythonBridge for music generation');
+      await this.pythonBridge.start();
+    }
+    return this.pythonBridge;
+  }
+
+  /**
+   * Generate music synchronously via the Python engine.
+   *
+   * @param {string} prompt  Natural-language music prompt.
+   * @param {object} [options]  Extra params forwarded to generate_sync.
+   * @returns {Promise<object>}  Full GenerationResult dict from the server.
+   */
+  async generateMusic(prompt, options = {}) {
+    await this.ensurePythonBridge();
+    this.log('info', 'Generating music', { prompt, options });
+
+    const result = await this.pythonBridge.call('generate_sync', {
+      prompt,
+      ...options,
+    });
+
+    this.log('info', 'Music generation complete', {
+      taskId: result.task_id,
+      success: result.success,
+    });
+
+    this.addStructuredProof({
+      type: 'music-generation',
+      prompt,
+      taskId: result.task_id,
+      success: result.success,
+      midiPath: result.midi_path || null,
+    });
+
+    return result;
+  }
+
+  /**
+   * Kick off an async generation with a section override.
+   *
+   * @param {string} taskId   Original task to reference.
+   * @param {string} section  Section identifier to regenerate.
+   * @param {object} [options]
+   * @returns {Promise<object>}  { task_id, request_id }
+   */
+  async regenerateSection(taskId, section, options = {}) {
+    await this.ensurePythonBridge();
+    this.log('info', 'Regenerating section', { taskId, section });
+
+    const result = await this.pythonBridge.call('generate', {
+      prompt: options.prompt || `Regenerate section ${section}`,
+      section,
+      original_task_id: taskId,
+      ...options,
+    });
+
+    return result;
+  }
+
+  /**
+   * Poll the status of a running generation task.
+   *
+   * @param {string} taskId
+   * @returns {Promise<object>}
+   */
+  async getGenerationStatus(taskId) {
+    await this.ensurePythonBridge();
+    return this.pythonBridge.call('get_status', { task_id: taskId });
+  }
+
+  /**
+   * Cancel a running generation task.
+   *
+   * @param {string} taskId
+   * @returns {Promise<object>}
+   */
+  async cancelGeneration(taskId) {
+    await this.ensurePythonBridge();
+    this.log('info', 'Cancelling generation', { taskId });
+    return this.pythonBridge.call('cancel', { task_id: taskId });
+  }
+
+  /**
+   * Stop and release the PythonBridge.
+   * @returns {Promise<void>}
+   */
+  async disposePythonBridge() {
+    if (this.pythonBridge) {
+      this.log('info', 'Disposing PythonBridge');
+      await this.pythonBridge.stop();
+      this.pythonBridge = null;
+    }
   }
 }
 
