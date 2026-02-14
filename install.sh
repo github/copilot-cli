@@ -44,7 +44,7 @@ elif [ "${VERSION}" = "prerelease" ]; then
     echo "Error: git is required to install prerelease versions" >&2
     exit 1
   fi
-  VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | tail -1 | awk -F/ '{print $NF}')"
+  VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | grep -E '\-.*refs/tags/' | tail -1 | awk -F/ '{print $NF}')"
   if [ -z "$VERSION" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
@@ -149,7 +149,7 @@ if ! command -v copilot >/dev/null 2>&1; then
   esac
 
   # Prompt user to add to shell rc file (only if interactive)
-  if [ -t 0 ] || [ -e /dev/tty ]; then
+  if [ -t 0 ]; then
     echo ""
     printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
     if read -r REPLY </dev/tty 2>/dev/null; then
