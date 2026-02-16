@@ -2024,7 +2024,23 @@ function setupIPC() {
   
   function getAgentSystem() {
     if (!agentSystem) {
-      agentSystem = createAgentSystem(aiService);
+      // Adapter: bridge aiService.sendMessage() → chat() interface expected by agents
+      const aiServiceAdapter = {
+        chat: async (message, options = {}) => {
+          const result = await aiService.sendMessage(message, {
+            includeVisualContext: false,
+            maxContinuations: options.maxContinuations || 2
+          });
+          if (result.success) {
+            return { text: result.message, provider: result.provider };
+          }
+          throw new Error(result.error || 'AI service call failed');
+        },
+        getModelMetadata: () => aiService.getModelMetadata(),
+        getStatus: () => aiService.getStatus(),
+        sendMessage: aiService.sendMessage  // passthrough for direct callers
+      };
+      agentSystem = createAgentSystem(aiServiceAdapter);
     }
     return agentSystem;
   }

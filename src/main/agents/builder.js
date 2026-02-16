@@ -534,6 +534,42 @@ Provide the change in unified diff format:
   }
 
   /**
+   * Generate music from a Score Plan (Copilot orchestration).
+   *
+   * @param {object} scorePlan  Score Plan dict with at least a prompt.
+   * @param {object} [options]  Extra params forwarded to generate_sync.
+   * @returns {Promise<object>}  Full GenerationResult dict from the server.
+   */
+  async generateMusicFromScorePlan(scorePlan, options = {}) {
+    await this.ensurePythonBridge();
+    const planPrompt = (scorePlan && scorePlan.prompt) ? String(scorePlan.prompt) : '';
+    const prompt = planPrompt || options.prompt || 'Score plan generation';
+    this.log('info', 'Generating music from score plan', { prompt, options });
+
+    const result = await this.pythonBridge.call('generate_sync', {
+      prompt,
+      score_plan: scorePlan,
+      ...options,
+    });
+
+    this.log('info', 'Score plan generation complete', {
+      taskId: result.task_id,
+      success: result.success,
+    });
+
+    this.addStructuredProof({
+      type: 'music-generation',
+      prompt,
+      taskId: result.task_id,
+      success: result.success,
+      midiPath: result.midi_path || null,
+      scorePlan: true,
+    });
+
+    return result;
+  }
+
+  /**
    * Kick off an async generation with a section override.
    *
    * @param {string} taskId   Original task to reference.

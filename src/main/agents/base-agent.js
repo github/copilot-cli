@@ -115,12 +115,19 @@ class BaseAgent extends EventEmitter {
     });
 
     const systemPrompt = this.getSystemPrompt();
-    const response = await this.aiService.chat(message, {
-      systemPrompt,
-      history: this.conversationHistory,
-      model: options.model,
-      ...options
-    });
+    const CHAT_TIMEOUT_MS = 60000;
+
+    const response = await Promise.race([
+      this.aiService.chat(message, {
+        systemPrompt,
+        history: this.conversationHistory,
+        model: options.model,
+        ...options
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`AI chat timed out after ${CHAT_TIMEOUT_MS / 1000}s`)), CHAT_TIMEOUT_MS)
+      )
+    ]);
 
     // Add response to history
     this.conversationHistory.push({
