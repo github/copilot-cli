@@ -510,12 +510,19 @@ Provide the change in unified diff format:
    */
   async generateMusic(prompt, options = {}) {
     await this.ensurePythonBridge();
+    if (options.trackProgress === undefined) {
+      options.trackProgress = true;
+    }
     this.log('info', 'Generating music', { prompt, options });
 
     const result = await this.pythonBridge.call('generate_sync', {
       prompt,
       ...options,
     });
+
+    if (options.trackProgress && result && result.task_id) {
+      await this.pollProgress(result.task_id, options.progressIntervalMs, options.progressTimeoutMs);
+    }
 
     this.log('info', 'Music generation complete', {
       taskId: result.task_id,
@@ -542,6 +549,9 @@ Provide the change in unified diff format:
    */
   async generateMusicFromScorePlan(scorePlan, options = {}) {
     await this.ensurePythonBridge();
+    if (options.trackProgress === undefined) {
+      options.trackProgress = true;
+    }
     const planPrompt = (scorePlan && scorePlan.prompt) ? String(scorePlan.prompt) : '';
     const prompt = planPrompt || options.prompt || 'Score plan generation';
     this.log('info', 'Generating music from score plan', { prompt, options });
@@ -551,6 +561,10 @@ Provide the change in unified diff format:
       score_plan: scorePlan,
       ...options,
     });
+
+    if (options.trackProgress && result && result.task_id) {
+      await this.pollProgress(result.task_id, options.progressIntervalMs, options.progressTimeoutMs);
+    }
 
     this.log('info', 'Score plan generation complete', {
       taskId: result.task_id,
@@ -600,6 +614,35 @@ Provide the change in unified diff format:
   async getGenerationStatus(taskId) {
     await this.ensurePythonBridge();
     return this.pythonBridge.call('get_status', { task_id: taskId });
+  }
+
+  /**
+   * Poll progress for a task and log status for visibility.
+   *
+   * @param {string} taskId
+   * @param {number} [intervalMs=1000]
+   * @param {number} [maxMs=600000]  // 10 minutes default
+   * @returns {Promise<object>}
+   */
+  async pollProgress(taskId, intervalMs = 1000, maxMs = 600000) {
+    await this.ensurePythonBridge();
+    const start = Date.now();
+    while (true) {
+      const status = await this.getGenerationStatus(taskId);
+      if (status && status.progress) {
+        const { step, percent, message } = status.progress;
+        this.log('info', 'Progress', { taskId, step, percent, message });
+      }
+      const done = status && (status.status === 'completed' || status.status === 'failed' || status.status === 'cancelled');
+      if (done) {
+        return status;
+      }
+      if (Date.now() - start > maxMs) {
+        this.log('warn', 'Progress polling timed out', { taskId });
+        return status;
+      }
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
   }
 
   /**

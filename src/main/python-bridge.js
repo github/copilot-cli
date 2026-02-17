@@ -38,8 +38,8 @@ class PythonBridge extends EventEmitter {
     super();
 
     this.pythonPath = options.pythonPath || 'python';
-    this.serverHost = options.serverHost || '127.0.0.1';
-    this.serverPort = options.serverPort || 8765;
+    this.serverHost = options.serverHost || process.env.MUSE_GATEWAY_HOST || '127.0.0.1';
+    this.serverPort = options.serverPort || Number(process.env.MUSE_GATEWAY_PORT || 8765);
     this.cwd = options.cwd || path.resolve(__dirname, '..', '..', '..', '..', 'MUSE');
 
     /** @type {import('child_process').ChildProcess | null} */
@@ -100,7 +100,7 @@ class PythonBridge extends EventEmitter {
     }
 
     // Spawn the child process
-    const args = ['-m', 'multimodal_gen.server', '--jsonrpc', '--verbose'];
+    const args = ['-m', 'multimodal_gen.server', '--gateway', '--verbose'];
 
     this._child = spawn(this.pythonPath, args, {
       cwd: this.cwd,
