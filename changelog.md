@@ -1,3 +1,26 @@
+## 0.0.411 - 2026-02-17
+
+- Improve error messaging and guidance when access denied by policy
+- Custom agents use `disable-model-invocation` instead of `infer` (backward compatible)
+- Add support for Claude Sonnet 4.6 model
+- Memory storage shows subject, fact, and citations in timeline
+- Tab completion respects the highlighted slash command selection
+- Support MCP servers from Windows On-Device Registry
+- Text selection now works in footer area in alt-screen mode
+- Support `--alt-screen on` and `--alt-screen off` syntax
+- Add `include_coauthor` config option to disable Co-authored-by trailer in git commits
+- SDK APIs for plan mode, autopilot, fleet, and workspace files
+- Autopilot mode and /fleet command now available to all users
+- Alt-screen viewport auto-scrolls when dragging selection to edge
+- Interactive shell commands complete on all versions of Windows
+- Reduce memory usage in alt-screen mode during long sessions
+- Session picker no longer flashes when using --resume in alt-screen mode
+- Terminal bell rings once when agent finishes, not on every tool completion
+- Custom instruction files are recognized regardless of casing
+- PowerShell commands with syntax errors no longer hang
+- Improve text selection responsiveness in --alt-screen mode
+- Cursor shows when suspending and hides when resuming
+
 ## 0.0.410 - 2026-02-14
 
 - Fixed high memory usage caused by rapid logging
@@ -25,6 +48,7 @@
 - MCP server errors and loading issues surface in timeline
 - Reduce input jitter with frame coalescing and smoother alt-screen animations
 - Extend skill name validation to support underscores, dots, and spaces; make name and description optional in skill frontmatter with sensible fallbacks
+- Add Copilot co-authored by trailer to git commits created
 
 ## 0.0.409 - 2026-02-12
 
