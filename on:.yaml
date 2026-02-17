@@ -1,0 +1,11 @@
+on:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure comment context exists
+        if: ${{ github.event.comment != null }}
+        run: echo "Comment ID: ${{ github.event.comment.id }}"
