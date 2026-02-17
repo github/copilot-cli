@@ -495,8 +495,13 @@ Provide the change in unified diff format:
       this.pythonBridge = PythonBridge.getShared();
     }
     if (!this.pythonBridge.isRunning) {
-      this.log('info', 'Starting PythonBridge for music generation');
-      await this.pythonBridge.start();
+      const alive = await this.pythonBridge.isAlive();
+      if (!alive) {
+        this.log('info', 'Starting PythonBridge for music generation');
+        await this.pythonBridge.start();
+      } else {
+        this.log('info', 'PythonBridge connected to existing server');
+      }
     }
     return this.pythonBridge;
   }

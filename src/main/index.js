@@ -769,6 +769,68 @@ function setupIPC() {
         }
         return;
       }
+
+      // /produce - Agentic music producer (ScorePlan -> generate -> critics -> output analysis)
+      if (message.startsWith('/produce ')) {
+        const prompt = message.slice('/produce '.length).trim();
+        if (!prompt) return;
+
+        if (chatWindow) {
+          chatWindow.webContents.send('agent-response', {
+            text: `Producing track (agentic): "${prompt}"`,
+            type: 'system',
+            timestamp: Date.now()
+          });
+          chatWindow.webContents.send('agent-typing', { isTyping: true });
+        }
+
+        try {
+          const { PythonBridge } = require('./python-bridge');
+          const bridge = PythonBridge.getShared();
+          await bridge.start();
+
+          const result = await bridge.call('produce_sync', {
+            prompt,
+            attempts: 2,
+            duration_bars: 16,
+            genre: 'ambient'
+          }, 600000);
+
+          const best = result && result.best ? result.best : null;
+          const lines = [];
+          if (best && best.result) {
+            lines.push(`Best attempt: ${best.attempt} (seed ${best.seed}) score=${best.score}`);
+            lines.push(`MIDI: ${best.result.midi_path || '(none)'}`);
+            lines.push(`Audio: ${best.result.audio_path || '(none)'}`);
+            if (best.critics) lines.push(`Critics: ${best.critics.overall_passed ? 'PASS' : 'FAIL'}`);
+            if (best.audio_analysis && typeof best.audio_analysis.genre_match_score !== 'undefined') {
+              lines.push(`Audio genre_match_score: ${best.audio_analysis.genre_match_score}`);
+            }
+          } else {
+            lines.push('No result returned from producer.');
+          }
+
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: lines.join('\n'),
+              type: 'message',
+              timestamp: Date.now()
+            });
+          }
+        } catch (error) {
+          if (chatWindow) {
+            chatWindow.webContents.send('agent-typing', { isTyping: false });
+            chatWindow.webContents.send('agent-response', {
+              text: `Produce failed: ${error.message}`,
+              type: 'error',
+              timestamp: Date.now()
+            });
+          }
+        }
+
+        return;
+      }
       
       // /build - Use builder agent
       if (message.startsWith('/build ')) {
@@ -2130,6 +2192,18 @@ function setupIPC() {
       return { success: true, result };
     } catch (error) {
       console.error('[AGENT] Verify failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Produce music using the producer agent
+  ipcMain.handle('agent-produce', async (event, { prompt, options = {} }) => {
+    try {
+      const { orchestrator } = getAgentSystem();
+      const result = await orchestrator.produce(prompt, options);
+      return { success: true, result };
+    } catch (error) {
+      console.error('[AGENT] Produce failed:', error);
       return { success: false, error: error.message };
     }
   });

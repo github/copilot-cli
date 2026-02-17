@@ -53,6 +53,9 @@ class PythonBridge extends EventEmitter {
 
     /** True once start() has completed successfully */
     this._ready = false;
+
+    /** True when we're connected to an externally-managed gateway (e.g. JUCE) */
+    this._externalGateway = false;
   }
 
   // ------------------------------------------------------------------
@@ -99,6 +102,21 @@ class PythonBridge extends EventEmitter {
       return; // Already started
     }
 
+    // Prefer attaching to an already-running gateway (JUCE auto-start) to avoid port contention.
+    // If ping succeeds, we don't spawn a child and we also won't send shutdown on stop().
+    try {
+      const res = await this._rawCall('ping', {}, 1500);
+      if (res && res.status === 'ok') {
+        this._ready = true;
+        this._running = false;
+        this._externalGateway = true;
+        this.emit('started', { port: this.serverPort, attempt: 0, external: true });
+        return;
+      }
+    } catch (_err) {
+      // No gateway reachable; fall through to spawning.
+    }
+
     // Spawn the child process
     const args = ['-m', 'multimodal_gen.server', '--gateway', '--verbose'];
 
@@ -109,6 +127,7 @@ class PythonBridge extends EventEmitter {
     });
 
     this._running = true;
+    this._externalGateway = false;
 
     // Forward stdout / stderr as events (useful for debugging)
     this._child.stdout.on('data', (data) => {
@@ -175,11 +194,13 @@ class PythonBridge extends EventEmitter {
       return;
     }
 
-    // Best-effort shutdown command
-    try {
-      await this._rawCall('shutdown', {}, 2000);
-    } catch (_err) {
-      // Ignore — we'll kill the process anyway
+    // Only request shutdown if we own the process.
+    if (!this._externalGateway) {
+      try {
+        await this._rawCall('shutdown', {}, 2000);
+      } catch (_err) {
+        // Ignore — we'll kill the process anyway
+      }
     }
 
     // Kill child process
@@ -194,6 +215,7 @@ class PythonBridge extends EventEmitter {
 
     this._running = false;
     this._ready = false;
+    this._externalGateway = false;
     this.emit('stopped', { reason: 'explicit' });
   }
 

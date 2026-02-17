@@ -92,6 +92,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Verify using verifier agent
   agentVerify: (params) => ipcRenderer.invoke('agent-verify', params),
+
+  // Produce music using producer agent
+  agentProduce: (params) => ipcRenderer.invoke('agent-produce', params),
   
   // Get agent system status
   agentStatus: () => ipcRenderer.invoke('agent-status'),

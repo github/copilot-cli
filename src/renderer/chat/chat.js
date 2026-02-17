@@ -213,6 +213,7 @@ const AGENT_TRIGGERS = {
   research: /\b(research\s+agent|spawn.*research|investigate\s+this|gather\s+info(?:rmation)?)\b/i,
   verify: /\b(verify\s+agent|spawn.*verif|validate\s+this|verification\s+agent)\b/i,
   build: /\b(build\s+agent|spawn.*build|builder\s+agent|code\s+agent)\b/i,
+  produce: /(^\\s*\\/produce\\b)|\\b(agentic\\s+producer|producer\\s+agent)\\b/i,
   orchestrate: /\b(spawn\s+(?:a\s+)?(?:sub)?agent|orchestrat|multi-?agent|agent\s+system|coordinate\s+agents?)\b/i
 };
 
@@ -220,6 +221,7 @@ function detectAgentIntent(text) {
   // Only trigger on explicit agent invocation phrases
   // Avoid false positives from common words like "check", "build", "create"
   if (AGENT_TRIGGERS.orchestrate.test(text)) return 'orchestrate';
+  if (AGENT_TRIGGERS.produce.test(text)) return 'produce';
   if (AGENT_TRIGGERS.research.test(text)) return 'research';
   if (AGENT_TRIGGERS.verify.test(text)) return 'verify';
   if (AGENT_TRIGGERS.build.test(text)) return 'build';
@@ -233,6 +235,11 @@ async function routeToAgent(text, agentType) {
   try {
     let result;
     switch (agentType) {
+      case 'produce': {
+        const cleaned = text.replace(/^\\s*\\/produce\\b\\s*/i, '');
+        result = await window.electronAPI.agentProduce({ prompt: cleaned || text });
+        break;
+      }
       case 'research':
         result = await window.electronAPI.agentResearch({ query: text });
         break;

@@ -12,7 +12,8 @@ const AgentRole = {
   SUPERVISOR: 'supervisor',
   BUILDER: 'builder',
   VERIFIER: 'verifier',
-  RESEARCHER: 'researcher'
+  RESEARCHER: 'researcher',
+  PRODUCER: 'producer'
 };
 
 // Agent capabilities

@@ -15,6 +15,7 @@ const { AgentOrchestrator } = require('./orchestrator');
 const { SupervisorAgent } = require('./supervisor');
 const { BuilderAgent } = require('./builder');
 const { VerifierAgent } = require('./verifier');
+const { ProducerAgent } = require('./producer');
 const { ResearcherAgent } = require('./researcher');
 const { AgentStateManager } = require('./state-manager');
 
@@ -23,6 +24,7 @@ module.exports = {
   SupervisorAgent,
   BuilderAgent,
   VerifierAgent,
+  ProducerAgent,
   ResearcherAgent,
   AgentStateManager,
   

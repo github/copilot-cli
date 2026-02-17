@@ -463,8 +463,13 @@ Always structure your response as:
       this.pythonBridge = PythonBridge.getShared();
     }
     if (!this.pythonBridge.isRunning) {
-      this.log('info', 'Starting PythonBridge for music critics');
-      await this.pythonBridge.start();
+      const alive = await this.pythonBridge.isAlive();
+      if (!alive) {
+        this.log('info', 'Starting PythonBridge for music critics');
+        await this.pythonBridge.start();
+      } else {
+        this.log('info', 'PythonBridge connected to existing server');
+      }
     }
     return this.pythonBridge;
   }
@@ -481,7 +486,9 @@ Always structure your response as:
     await this.ensurePythonBridge();
     this.log('info', 'Running music critics', { midiPath, genre });
 
-    const report = await this.pythonBridge.call('run_critics', {
+    const hasAnalysisData = analysisData && Object.keys(analysisData).length > 0;
+    const method = hasAnalysisData ? 'run_critics' : 'run_critics_midi';
+    const report = await this.pythonBridge.call(method, {
       midi_path: midiPath,
       genre,
       ...analysisData,

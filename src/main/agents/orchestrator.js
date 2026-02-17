@@ -15,6 +15,7 @@ const EventEmitter = require('events');
 const { SupervisorAgent } = require('./supervisor');
 const { BuilderAgent } = require('./builder');
 const { VerifierAgent } = require('./verifier');
+const { ProducerAgent } = require('./producer');
 const { ResearcherAgent } = require('./researcher');
 const { AgentStateManager } = require('./state-manager');
 const { AgentRole } = require('./base-agent');
@@ -64,6 +65,7 @@ class AgentOrchestrator extends EventEmitter {
     this.agents.set(AgentRole.BUILDER, new BuilderAgent(commonOptions));
     this.agents.set(AgentRole.VERIFIER, new VerifierAgent(commonOptions));
     this.agents.set(AgentRole.RESEARCHER, new ResearcherAgent(commonOptions));
+    this.agents.set(AgentRole.PRODUCER, new ProducerAgent(commonOptions));
     
     // Register agents with state manager
     for (const [role, agent] of this.agents) {
@@ -270,6 +272,10 @@ class AgentOrchestrator extends EventEmitter {
     return this.agents.get(AgentRole.RESEARCHER);
   }
 
+  getProducer() {
+    return this.agents.get(AgentRole.PRODUCER);
+  }
+
   // ===== Convenience Methods =====
 
   async research(query, options = {}) {
@@ -299,6 +305,13 @@ class AgentOrchestrator extends EventEmitter {
     return this.execute(task, {
       ...options,
       startAgent: AgentRole.SUPERVISOR
+    });
+  }
+
+  async produce(task, options = {}) {
+    return this.execute(task, {
+      ...options,
+      startAgent: AgentRole.PRODUCER
     });
   }
 
