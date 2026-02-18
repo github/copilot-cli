@@ -4,34 +4,45 @@ set -e
 # GitHub Copilot CLI Installation Script
 # Usage: curl -fsSL https://gh.io/copilot-install | bash
 #    or: wget -qO- https://gh.io/copilot-install | bash
+#    or: powershell ./install.sh
 # Use | sudo bash to run as root and install to /usr/local/bin
 # Export PREFIX to install to $PREFIX/bin/ directory (default: /usr/local for
 # root, $HOME/.local for non-root), e.g., export PREFIX=$HOME/custom to install
 # to $HOME/custom/bin
+# This script should be fully run-able on at least bash/Linux, bash/Darwin and PowerShell/Windows.
 
 echo "Installing GitHub Copilot CLI..."
 
-# Detect platform
-case "$(uname -s || echo "")" in
+# Detect system platform
+uname_s="$(uname -s || echo "")"
+case "${uname_s}" in
   Darwin*) PLATFORM="darwin" ;;
   Linux*) PLATFORM="linux" ;;
-  *)
+  MINGW*)  # e.g. Windows 11: MINGW64_NT-10.0-26200
     if command -v winget >/dev/null 2>&1; then
-      echo "Windows detected. Installing via winget..."
+      echo "Windows system detected. Installing via winget..."
       winget install GitHub.Copilot
       exit $?
     else
-      echo "Error: Windows detected but winget not found. Please see https://gh.io/install-copilot-readme" >&2
+      echo "Error: Windows system detected, but 'winget' tool not found. Please see https://gh.io/install-copilot-readme" >&2
       exit 1
     fi
     ;;
+  *)
+    echo "Error: Non-supported system platform detected: '$uname_s'. Please see https://gh.io/install-copilot-readme" >&2
+    exit 1
+    ;;
 esac
 
-# Detect architecture
-case "$(uname -m)" in
+# Detect system architecture
+uname_m="$(uname -m || echo "")"
+case "${uname_m}" in
   x86_64|amd64) ARCH="x64" ;;
   aarch64|arm64) ARCH="arm64" ;;
-  *) echo "Error: Unsupported architecture $(uname -m)" >&2 ; exit 1 ;;
+  *)
+    echo "Error: Unsupported system architecture detected: '$uname_m'" >&2
+    exit 1
+    ;;
 esac
 
 # Determine download URL based on VERSION
