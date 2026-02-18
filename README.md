@@ -2,7 +2,8 @@
 
 The power of GitHub Copilot, now in your terminal.
 
-GitHub Copilot CLI brings AI-powered coding assistance directly to your command line, enabling you to build, debug, and understand code through natural language conversations. Powered by the same agentic harness as GitHub's Copilot coding agent, it provides intelligent assistance while staying deeply integrated with your GitHub workflow.
+GitHub Copilot CLI brings AI-powered coding assistance directly to your command line, enabling you to build, debug, and understand code through natural language conversations.
+Powered by the same agentic harness as GitHub's Copilot coding agent, it provides intelligent assistance while staying deeply integrated with your GitHub workflow.
 
 See [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli) for more information.
 
@@ -11,7 +12,8 @@ See [our official documentation](https://docs.github.com/copilot/concepts/agents
 
 ## 🚀 Introduction and Overview
 
-We're bringing the power of GitHub Copilot coding agent directly to your terminal. With GitHub Copilot CLI, you can work locally and synchronously with an AI agent that understands your code and GitHub context.
+We're bringing the power of GitHub Copilot coding agent directly to your terminal.
+With GitHub Copilot CLI, you can work locally and synchronously with an AI agent that understands your code and GitHub context.
 
 - **Terminal-native development:** Work with Copilot coding agent directly in your command line — no context switching required.
 - **GitHub integration out of the box:** Access your repositories, issues, and pull requests using natural language, all authenticated with your existing GitHub account.
@@ -34,7 +36,8 @@ We're still early in our journey, but with your feedback, we're rapidly iteratin
 - (On Windows) **PowerShell** v6 or higher
 - An **active Copilot subscription**. See [Copilot plans](https://github.com/features/copilot/plans?ref_cta=Copilot+plans+signup&ref_loc=install-copilot-cli&ref_page=docs).
 
-If you have access to GitHub Copilot via your organization or enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings. See [Managing policies and features for GitHub Copilot in your organization](http://docs.github.com/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization) for more information.
+If you have access to GitHub Copilot via your organization or enterprise, you cannot use GitHub Copilot CLI if your organization owner or enterprise administrator has disabled it in the organization or enterprise settings.
+See [Managing policies and features for GitHub Copilot in your organization](http://docs.github.com/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/managing-policies-for-copilot-in-your-organization) for more information.
 
 ### Installation
 
@@ -68,7 +71,7 @@ npm install -g @github/copilot
 npm install -g @github/copilot@prerelease
 ```
 
-Install with the install script (macOS and Linux):
+Install with the [install script](https://github.com/github/copilot-cli/blob/main/install.sh) (macOS and Linux):
 
 ```bash
 curl -fsSL https://gh.io/copilot-install | bash
@@ -131,13 +134,15 @@ Once activated, the setting is persisted in your config, so the `--experimental`
 
 - **Autopilot mode:** Autopilot is a new mode (press `Shift+Tab` to cycle through modes), which encourages the agent to continue working until a task is completed.
 
-Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
+Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one.
+For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
 ## 🔧 Configuring LSP Servers
 
-GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence. This feature provides intelligent code features like go-to-definition, hover information, and diagnostics.
+GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence.
+This feature provides intelligent code features like go-to-definition, hover information, and diagnostics.
 
 ### Installing Language Servers
 
