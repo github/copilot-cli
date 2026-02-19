@@ -16,6 +16,55 @@
 
 const ui = require('../src/main/ui-automation');
 
+async function ensureWindowTarget(options = {}) {
+  const title = options['target-title'] || options.title || '';
+  const processName = options['target-process'] || options.process || '';
+  const className = options['target-class'] || options.class || '';
+
+  if (!title && !processName && !className) {
+    return { success: true, window: null, reason: 'no-target-requested' };
+  }
+
+  const criteria = {
+    ...(title ? { title } : {}),
+    ...(processName ? { processName } : {}),
+    ...(className ? { className } : {}),
+  };
+
+  const windows = await ui.findWindows(criteria);
+  if (!windows.length) {
+    return { success: false, window: null, reason: `No window matched ${JSON.stringify(criteria)}` };
+  }
+
+  const focusResult = await ui.focusWindow(windows[0]);
+  if (!focusResult.success) {
+    return { success: false, window: windows[0], reason: `Failed to focus window ${windows[0].title}` };
+  }
+
+  const active = await ui.getActiveWindow();
+  if (!active) {
+    return { success: false, window: windows[0], reason: 'Could not read active window after focus' };
+  }
+
+  if (processName && active.processName.toLowerCase() !== processName.toLowerCase()) {
+    return {
+      success: false,
+      window: windows[0],
+      reason: `Active window process mismatch. Expected ${processName}, got ${active.processName}`,
+    };
+  }
+
+  if (title && !active.title.toLowerCase().includes(title.toLowerCase())) {
+    return {
+      success: false,
+      window: windows[0],
+      reason: `Active window title mismatch. Expected contains "${title}", got "${active.title}"`,
+    };
+  }
+
+  return { success: true, window: active, reason: 'focused-and-verified' };
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
@@ -26,13 +75,14 @@ UI Automation Test Commands:
 
   find <text> [--type=ControlType]    Find elements by text
   click <text> [--type=ControlType]   Click element by text
-  windows [pattern]                   List windows (optionally filtered)
-  focus <title>                       Focus window by title
+  windows [pattern] [--process=name]  List windows (optionally filtered)
+  focus <title> [--process=name]      Focus window by title/criteria
   screenshot [path]                   Take screenshot
   mouse <x> <y>                       Move mouse to coordinates
   clickat <x> <y>                     Click at coordinates
   type <text>                         Type text
-  keys <combo>                        Send key combination (e.g., ctrl+s)
+  keys <combo> [--target-process=electron --target-title=Overlay]
+                                      Send key combination only after target focus verification
   dropdown <name> <option>            Select from dropdown
   wait <text> [timeout]               Wait for element
   active                              Get active window info
@@ -40,8 +90,9 @@ UI Automation Test Commands:
 Examples:
   node scripts/test-ui-automation.js find "File"
   node scripts/test-ui-automation.js click "Pick Model" --type=Button
-  node scripts/test-ui-automation.js windows "Code"
+  node scripts/test-ui-automation.js windows "Code" --process="Code - Insiders"
   node scripts/test-ui-automation.js keys "ctrl+shift+p"
+  node scripts/test-ui-automation.js keys "ctrl+shift+o" --target-process=electron --target-title=Overlay
   node scripts/test-ui-automation.js dropdown "Pick Model" "GPT-4"
 `);
     return;
@@ -115,31 +166,58 @@ Examples:
       case 'windows': {
         const pattern = positionalArgs[0] || '';
         console.log(`Finding windows${pattern ? ` matching "${pattern}"` : ''}...`);
-        
-        const windows = await ui.findWindows(pattern);
+
+        const criteria = {
+          ...(pattern ? { title: pattern } : {}),
+          ...(options.process ? { processName: options.process } : {}),
+          ...(options.class ? { className: options.class } : {}),
+          ...(options['include-untitled'] ? { includeUntitled: true } : {}),
+        };
+
+        const windows = await ui.findWindows(criteria);
         console.log(`\nFound ${windows.length} window(s):\n`);
         windows.forEach((w, i) => {
           console.log(`  [${i}] "${w.title}"`);
           console.log(`       Process: ${w.processName}`);
           console.log(`       Handle: ${w.hwnd}\n`);
         });
+
+        if (options['require-match'] && windows.length === 0) {
+          console.error('✗ No windows matched required criteria.');
+          process.exitCode = 1;
+        }
+
+        if (options['min-count']) {
+          const minCount = parseInt(options['min-count'], 10);
+          if (!Number.isNaN(minCount) && windows.length < minCount) {
+            console.error(`✗ Window count ${windows.length} below required min-count ${minCount}.`);
+            process.exitCode = 1;
+          }
+        }
         break;
       }
       
       case 'focus': {
         const title = positionalArgs[0];
-        if (!title) {
-          console.error('Usage: focus <window title>');
+        if (!title && !options.process && !options.class) {
+          console.error('Usage: focus <window title> [--process=name] [--class=name]');
           return;
         }
-        
-        console.log(`Focusing window "${title}"...`);
-        const result = await ui.focusWindow(title);
+
+        const target = {
+          ...(title ? { title } : {}),
+          ...(options.process ? { processName: options.process } : {}),
+          ...(options.class ? { className: options.class } : {}),
+        };
+
+        console.log(`Focusing window ${JSON.stringify(target)}...`);
+        const result = await ui.focusWindow(target);
         
         if (result.success) {
           console.log(`✓ Focused window: ${result.window?.title}`);
         } else {
           console.error(`✗ Focus failed: ${result.error}`);
+          process.exitCode = 1;
         }
         break;
       }
@@ -217,6 +295,17 @@ Examples:
           console.error('Usage: keys <combo> (e.g., ctrl+s, alt+f4, enter)');
           return;
         }
+
+        const targetResult = await ensureWindowTarget(options);
+        if (!targetResult.success) {
+          console.error(`✗ Target verification failed: ${targetResult.reason}`);
+          process.exitCode = 1;
+          return;
+        }
+
+        if (targetResult.window) {
+          console.log(`Target active window: "${targetResult.window.title}" (${targetResult.window.processName})`);
+        }
         
         console.log(`Sending keys: ${combo}...`);
         const result = await ui.sendKeys(combo);
@@ -225,6 +314,7 @@ Examples:
           console.log('✓ Keys sent');
         } else {
           console.error('✗ Send keys failed');
+          process.exitCode = 1;
         }
         break;
       }

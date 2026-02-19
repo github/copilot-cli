@@ -99,6 +99,34 @@
 
 ## Automated Testing
 
+### Runtime Smoke Tests (Recommended)
+
+Use these first before manual checklist items:
+
+```bash
+# Deterministic two-phase smoke test
+# Phase 1: direct in-app chat toggle (no keyboard emulation)
+# Phase 2: target-gated overlay shortcut validation
+npm run smoke:shortcuts
+
+# Direct chat smoke only (no keyboard emulation)
+npm run smoke:chat-direct
+
+# Baseline UI automation module checks
+npm run test:ui
+
+# Optional: include keyboard injection checks (disabled by default)
+node scripts/test-ui-automation-baseline.js --allow-keys
+```
+
+Why this is the default path:
+
+- Avoids accidental key injection into other focused apps (for example VS Code).
+- Separates app-runtime failures from shortcut-routing failures.
+- Produces deterministic pass/fail results using process/window targeting.
+- Uses non-zero exit codes on mismatch so CI/local scripts can fail fast.
+- Avoids accidental global key injection in default baseline runs.
+
 ### Unit Tests (Future)
 ```javascript
 // Example test structure

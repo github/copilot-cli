@@ -1,3 +1,27 @@
+## 0.0.8 - Liku Edition - 2026-02-19
+
+### Testing & Reliability Improvements
+- Added deterministic runtime smoke commands:
+  - `npm run smoke:shortcuts` (two-phase: direct chat visibility + target-gated overlay shortcut)
+  - `npm run smoke:chat-direct` (direct in-app chat toggle, no keyboard emulation)
+- Added strict pass/fail semantics for UI automation smoke commands (non-zero exits on target mismatch).
+- Added process/title-targeted key dispatch validation to prevent accidental key injection into unrelated focused apps.
+- Updated baseline UI automation tests so keyboard injection checks are opt-in (`--allow-keys` or `UI_AUTO_ALLOW_KEYS=1`).
+
+### Debug/Smoke Instrumentation
+- Added guarded debug IPC handlers in main process:
+  - `debug-toggle-chat`
+  - `debug-window-state`
+- Added `LIKU_ENABLE_DEBUG_IPC=1` gate for debug IPC access.
+- Added optional smoke hook `LIKU_SMOKE_DIRECT_CHAT=1` to trigger deterministic in-app chat toggle during runtime smoke.
+
+### UI Automation Improvements
+- Updated window discovery to support `includeUntitled` windows for Electron cases where titles are transient/empty.
+- Improved smoke scripts to assert minimum matched window counts and fail fast when expected windows are missing.
+
+### Documentation
+- Updated `README.md`, `QUICKSTART.md`, and `TESTING.md` with recommended smoke command order and shortcut source-of-truth notes.
+
 ## 0.0.5 - Liku Edition - 2025-02-04
 
 ### New Feature: Integrated Terminal (`run_command`)

@@ -10,6 +10,8 @@
     "start": "node scripts/start.js",
     "test": "node scripts/test-grid.js",
     "test:ui": "node scripts/test-ui-automation-baseline.js",
+    "smoke:shortcuts": "node scripts/smoke-shortcuts.js",
+    "smoke:chat-direct": "node scripts/smoke-chat-direct.js",
     "liku": "node src/cli/liku.js"
   },
   "keywords": [

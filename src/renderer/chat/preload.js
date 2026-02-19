@@ -111,5 +111,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   
   // ===== STATE =====
-  getState: () => ipcRenderer.invoke('get-state')
+  getState: () => ipcRenderer.invoke('get-state'),
+
+  // ===== DEBUG / SMOKE (guarded in main by LIKU_ENABLE_DEBUG_IPC) =====
+  debugToggleChat: () => ipcRenderer.invoke('debug-toggle-chat'),
+  debugWindowState: () => ipcRenderer.invoke('debug-window-state')
 });

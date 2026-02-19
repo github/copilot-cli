@@ -42,6 +42,27 @@ liku start
 npm start
 ```
 
+## Quick Verify (Recommended)
+
+After install, run these checks in order:
+
+```bash
+# 1) Deterministic runtime smoke test (default)
+npm run smoke:shortcuts
+
+# 2) Direct chat visibility smoke (no keyboard emulation)
+npm run smoke:chat-direct
+
+# 3) UI automation baseline checks
+npm run test:ui
+```
+
+This order gives clearer pass/fail signals by validating runtime health first,
+then shortcut routing, then module-level UI automation.
+
+`smoke:shortcuts` intentionally validates chat visibility via direct in-app
+toggle and validates keyboard routing on overlay with target gating.
+
 ## First Use
 
 ### 1. Application Launch
@@ -78,6 +99,9 @@ To make the overlay click-through again:
 2. Or select a dot (automatically switches to passive)
 
 ## Keyboard Shortcuts
+
+Source-of-truth for these mappings is the current main-process registration in
+`src/main/index.js`.
 
 | Shortcut | Action |
 |----------|--------|

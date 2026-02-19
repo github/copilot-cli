@@ -67,6 +67,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Get current state
   getState: () => ipcRenderer.invoke('get-state'),
 
+  // Debug / smoke controls (guarded in main by LIKU_ENABLE_DEBUG_IPC)
+  debugToggleChat: () => ipcRenderer.invoke('debug-toggle-chat'),
+  debugWindowState: () => ipcRenderer.invoke('debug-window-state'),
+
   // Grid math helpers (inlined above)
   getGridConstants: () => gridConstants,
   labelToScreenCoordinates: (label) => labelToScreenCoordinates(label),

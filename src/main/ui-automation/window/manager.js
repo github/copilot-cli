@@ -78,7 +78,7 @@ $rect = New-Object WinAPI+RECT
  * @returns {Promise<Array<{hwnd: number, title: string, processName: string, className: string, bounds: Object}>>}
  */
 async function findWindows(criteria = {}) {
-  const { title, processName, className } = criteria;
+  const { title, processName, className, includeUntitled = false } = criteria;
   
   const psScript = `
 Add-Type @'
@@ -120,7 +120,7 @@ foreach ($hwnd in [WindowFinder]::windows) {
     
     $t = $titleSB.ToString()
     $c = $classSB.ToString()
-    if ([string]::IsNullOrEmpty($t)) { continue }
+    ${includeUntitled ? '' : 'if ([string]::IsNullOrEmpty($t)) { continue }'}
     
     ${title ? `if (-not $t.ToLower().Contains('${title.toLowerCase().replace(/'/g, "''")}')) { continue }` : ''}
     ${className ? `if (-not $c.ToLower().Contains('${className.toLowerCase().replace(/'/g, "''")}')) { continue }` : ''}

@@ -130,6 +130,31 @@ If you're not logged in, launch the agent and use the `/login` slash command, or
 2. Enable "Copilot Requests" permission.
 3. Export `GH_TOKEN` or `GITHUB_TOKEN` in your environment.
 
+## ✅ Quick Verify (Recommended)
+
+Shortcut source-of-truth is `src/main/index.js` (current mapping includes
+chat `Ctrl+Alt+Space` and overlay `Ctrl+Shift+O` on Windows).
+
+Run these checks in order after setup:
+
+```bash
+# 1) Deterministic runtime smoke test (recommended default)
+npm run smoke:shortcuts
+
+# 2) Direct chat visibility smoke (no keyboard emulation)
+npm run smoke:chat-direct
+
+# 3) UI automation baseline checks
+npm run test:ui
+```
+
+Why this order:
+- Confirms app/runtime health before shortcut diagnostics.
+- Avoids accidental key injection into non-target apps.
+- Produces reliable pass/fail exit codes for local automation.
+- Keeps chat validation deterministic (direct in-app toggle) while still
+  validating keyboard routing for overlay actions.
+
 ## 🛠️ Technical Architecture
 
 GitHub Copilot-Liku CLI is built on a "Defensive AI" architecture—a design philosophy focused on minimal footprint, secure execution, and zero-intrusion workflows. 

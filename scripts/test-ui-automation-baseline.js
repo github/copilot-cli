@@ -7,6 +7,7 @@
  * Usage:
  *   node scripts/test-ui-automation-baseline.js
  *   node scripts/test-ui-automation-baseline.js --quick   (skip slow tests)
+ *   node scripts/test-ui-automation-baseline.js --allow-keys  (enable key injection tests)
  */
 
 const path = require('path');
@@ -22,6 +23,7 @@ async function runTests() {
   console.log('');
 
   const isQuick = process.argv.includes('--quick');
+  const allowKeys = process.argv.includes('--allow-keys') || process.env.UI_AUTO_ALLOW_KEYS === '1';
   const results = { passed: 0, failed: 0, skipped: 0 };
   const failures = [];
 
@@ -272,6 +274,10 @@ async function runTests() {
   console.log('\nTEST GROUP: Keyboard Functions');
   console.log('-'.repeat(40));
 
+  if (!allowKeys) {
+    console.log('○ SKIP: sendKeys test (use --allow-keys or UI_AUTO_ALLOW_KEYS=1 to enable)');
+    results.skipped++;
+  } else {
   await test('sendKeys returns {success}', async () => {
     // Send a safe key (Escape)
     const result = await ui.sendKeys('escape');
@@ -279,6 +285,7 @@ async function runTests() {
       throw new Error('Missing success field');
     }
   }, { slow: true });
+  }
 
   // =========================================================================
   // TEST: High-Level Functions

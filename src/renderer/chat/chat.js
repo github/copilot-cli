@@ -90,6 +90,19 @@ const modelSelect = document.getElementById('model-select');
 const authStatus = document.getElementById('auth-status');
 const tokenCount = document.getElementById('token-count');
 
+function applyElectronAppRegions() {
+  const titlebar = document.getElementById('titlebar');
+  const titlebarControls = document.getElementById('titlebar-controls');
+
+  if (titlebar) {
+    titlebar.style.setProperty('-webkit-app-region', 'drag');
+  }
+
+  if (titlebarControls) {
+    titlebarControls.style.setProperty('-webkit-app-region', 'no-drag');
+  }
+}
+
 // ===== TOKEN ESTIMATION =====
 // Rough estimate: ~4 chars per token for English text
 function estimateTokens(text) {
@@ -532,6 +545,7 @@ function updateVisualContextIndicator(count) {
 // ===== INITIALIZATION =====
 // Load persisted chat history first
 loadHistory();
+applyElectronAppRegions();
 
 window.electronAPI.getState().then(state => {
   currentMode = state.overlayMode;

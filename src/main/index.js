@@ -112,6 +112,24 @@ function initUIWatcher() {
 // State management
 let overlayMode = 'selection'; // start in selection so the grid is visible immediately
 let isChatVisible = false;
+const enableDebugIPC = process.env.LIKU_ENABLE_DEBUG_IPC === '1';
+
+function getWindowDebugState() {
+  return {
+    overlay: {
+      exists: !!overlayWindow,
+      visible: !!(overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible()),
+      bounds: overlayWindow && !overlayWindow.isDestroyed() ? overlayWindow.getBounds() : null,
+    },
+    chat: {
+      exists: !!chatWindow,
+      visible: !!(chatWindow && !chatWindow.isDestroyed() && chatWindow.isVisible()),
+      bounds: chatWindow && !chatWindow.isDestroyed() ? chatWindow.getBounds() : null,
+    },
+    overlayMode,
+    isChatVisible,
+  };
+}
 
 /**
  * Create the transparent overlay window that floats above all other windows
@@ -1748,6 +1766,32 @@ function setupIPC() {
     };
   });
 
+  // ===== DEBUG / SMOKE IPC HANDLERS =====
+  ipcMain.handle('debug-window-state', () => {
+    if (!enableDebugIPC) {
+      return { success: false, error: 'Debug IPC disabled. Set LIKU_ENABLE_DEBUG_IPC=1.' };
+    }
+    return { success: true, state: getWindowDebugState() };
+  });
+
+  ipcMain.handle('debug-toggle-chat', async () => {
+    if (!enableDebugIPC) {
+      return { success: false, error: 'Debug IPC disabled. Set LIKU_ENABLE_DEBUG_IPC=1.' };
+    }
+
+    const before = getWindowDebugState();
+    toggleChat();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const after = getWindowDebugState();
+
+    return {
+      success: true,
+      before,
+      after,
+      changed: before.chat.visible !== after.chat.visible,
+    };
+  });
+
   // ===== INSPECT MODE IPC HANDLERS =====
   
   // Toggle inspect mode
@@ -2313,6 +2357,13 @@ app.whenReady().then(() => {
   createTray();
   registerShortcuts();
   setupIPC();
+
+  if (process.env.LIKU_SMOKE_DIRECT_CHAT === '1') {
+    setTimeout(() => {
+      console.log('[SMOKE] Direct toggleChat() triggered by LIKU_SMOKE_DIRECT_CHAT=1');
+      toggleChat();
+    }, 300);
+  }
   
   // Start the UI watcher for live UI monitoring
   try {
