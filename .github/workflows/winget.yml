@@ -41,4 +41,24 @@ jobs:
           .\wingetcreate.exe update $packageId `
             --version $packageVersion `
             --urls "$installerUrlx64|x64" "$installerUrlarm64|arm64" `
-            --submit
+            --out manifests
+
+          # Add PowerShell dependency to installer manifest
+          $installerManifest = Get-ChildItem -Path manifests -Filter "*.installer.yaml" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $installerManifest) {
+            Write-Error "No installer manifest (*.installer.yaml) was found in the 'manifests' directory."
+            exit 1
+          }
+          $content = Get-Content -Path $installerManifest -Raw
+          $dependency = @"
+          Dependencies:
+            PackageDependencies:
+              - PackageIdentifier: Microsoft.PowerShell
+                MinimumVersion: "7.0.0"
+          "@
+          # Insert dependency block before the Installers section
+          $content = $content -replace '(?m)^Installers:', "$dependency`nInstallers:"
+          Set-Content -Path $installerManifest -Value $content
+
+          # Submit the modified manifest
+          .\wingetcreate.exe submit manifests
