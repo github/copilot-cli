@@ -34,6 +34,8 @@ const { createAgentSystem } = require('./agents/index.js');
 // Inspect service for overlay region detection and targeting
 const inspectService = require('./inspect-service.js');
 
+const { UIProvider } = require('./ui-automation/core/ui-provider.js');
+
 
 // Ensure caches land in a writable location to avoid Windows permission issues
 const cacheRoot = path.join(os.tmpdir(), 'copilot-liku-electron-cache');
@@ -63,6 +65,105 @@ let tray = null;
 
 // Live UI watcher instance
 let uiWatcher = null;
+const uiProvider = new UIProvider();
+const UI_PROVIDER_REFRESH_MS = 1500;
+const UI_PROVIDER_CACHE_TTL_MS = 3000;
+let uiProviderCache = {
+  ts: 0,
+  tree: null,
+  regions: []
+};
+let semanticDOMInterval = null;
+let lastUIProviderErrorAt = 0;
+
+function normalizeBounds(bounds) {
+  if (!bounds) return null;
+  const x = Number(bounds.x);
+  const y = Number(bounds.y);
+  const width = Number(bounds.width);
+  const height = Number(bounds.height);
+
+  if (![x, y, width, height].every(Number.isFinite)) {
+    return null;
+  }
+
+  if (width <= 0 || height <= 0) {
+    return null;
+  }
+
+  return { x, y, width, height };
+}
+
+function flattenUITree(node, output = [], depth = 0) {
+  if (!node || depth > 6 || output.length >= 300) {
+    return output;
+  }
+
+  const bounds = normalizeBounds(node.bounds);
+  if (bounds) {
+    output.push({ ...node, bounds });
+  }
+
+  if (Array.isArray(node.children)) {
+    for (const child of node.children) {
+      if (output.length >= 300) break;
+      flattenUITree(child, output, depth + 1);
+    }
+  }
+
+  return output;
+}
+
+function mapUIProviderNodeToRegion(node, index) {
+  return {
+    id: node.id || `uia-${index + 1}`,
+    label: `[${index + 1}] ${node.name || node.role || 'Element'}`,
+    role: node.role || 'Unknown',
+    type: node.role || 'Unknown',
+    bounds: node.bounds,
+    confidence: 1.0
+  };
+}
+
+function mapWatcherElementToRegion(element, index) {
+  return {
+    id: element.id || `watcher-${index + 1}`,
+    label: `[${index + 1}] ${element.name || element.type || 'Element'}`,
+    role: element.type || 'Unknown',
+    type: element.type || 'Unknown',
+    bounds: element.bounds,
+    confidence: 1.0
+  };
+}
+
+function getCachedUIProviderRegions() {
+  if (!uiProviderCache.regions.length) return null;
+  if ((Date.now() - uiProviderCache.ts) > UI_PROVIDER_CACHE_TTL_MS) return null;
+  return uiProviderCache.regions;
+}
+
+async function refreshUIProviderSnapshot() {
+  try {
+    const tree = await uiProvider.getUITree();
+    const nodes = flattenUITree(tree)
+      .filter((node) => node.isClickable || node.isFocusable || (node.name && node.name.trim().length > 0));
+    const regions = nodes.slice(0, 180).map(mapUIProviderNodeToRegion);
+
+    uiProviderCache = {
+      ts: Date.now(),
+      tree,
+      regions
+    };
+
+    aiService.setSemanticDOMSnapshot(tree);
+  } catch (error) {
+    const now = Date.now();
+    if ((now - lastUIProviderErrorAt) > 10000) {
+      console.warn('[UIProvider] Snapshot refresh failed:', error.message);
+      lastUIProviderErrorAt = now;
+    }
+  }
+}
 
 function initUIWatcher() {
   if (uiWatcher) return;
@@ -668,6 +769,17 @@ function registerShortcuts() {
  * Set up IPC handlers
  */
 function setupIPC() {
+  const uiProvider = new UIProvider();
+
+  ipcMain.handle('get-ui-tree', async () => {
+    try {
+      const tree = await uiProvider.getUITree();
+      return { success: true, data: tree };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
   // Handle dot selection from overlay
   ipcMain.on('dot-selected', (event, data) => {
     console.log('Dot selected:', data);
@@ -2376,20 +2488,18 @@ app.whenReady().then(() => {
     // Forward full element list to overlay for "Actionable AI Vision" outlines
     uiWatcher.on('poll-complete', (data) => {
       if (overlayWindow && !overlayWindow.isDestroyed()) {
-        // Map elements to actionable regions with numeric indices
-        const regions = data.elements.map((el, i) => ({
-          id: el.id,
-          label: `[${i+1}] ${el.name || el.type}`,
-          role: el.type,
-          bounds: el.bounds,
-          confidence: 1.0
-        }));
+        const cachedRegions = getCachedUIProviderRegions();
+        const regions = cachedRegions || data.elements.map(mapWatcherElementToRegion);
         
         // Update overlay
         overlayWindow.webContents.send('overlay-command', { 
             action: 'update-inspect-regions', 
             regions 
         });
+
+        if (!cachedRegions) {
+          refreshUIProviderSnapshot().catch(() => {});
+        }
       }
     });
 
@@ -2403,6 +2513,10 @@ app.whenReady().then(() => {
     
     // Share the started watcher with AI service for live UI context
     aiService.setUIWatcher(uiWatcher);
+    refreshUIProviderSnapshot().catch(() => {});
+    semanticDOMInterval = setInterval(() => {
+      refreshUIProviderSnapshot().catch(() => {});
+    }, UI_PROVIDER_REFRESH_MS);
     
     console.log('[Main] UI Watcher started for live UI monitoring');
   } catch (e) {
@@ -2461,6 +2575,10 @@ app.on('window-all-closed', () => {
 // Clean up shortcuts and UI watcher on quit
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
+  if (semanticDOMInterval) {
+    clearInterval(semanticDOMInterval);
+    semanticDOMInterval = null;
+  }
   if (uiWatcher) {
     uiWatcher.stop();
     console.log('[Main] UI Watcher stopped');

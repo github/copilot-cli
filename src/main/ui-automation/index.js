@@ -28,6 +28,7 @@ const { CONFIG, CONTROL_TYPES } = require('./config');
 
 // Core utilities
 const { sleep, debug, log, executePowerShellScript } = require('./core');
+const { UIProvider } = require('./core/ui-provider');
 
 // Element operations
 const { 
@@ -106,6 +107,7 @@ module.exports = {
   debug,
   log,
   executePowerShellScript,
+  UIProvider,
   
   // Element operations
   findElements,
