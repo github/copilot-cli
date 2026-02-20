@@ -56,9 +56,11 @@ jobs:
               - PackageIdentifier: Microsoft.PowerShell
                 MinimumVersion: "7.0.0"
           "@
-          # Insert dependency block before the Installers section
+          # Remove existing top-level Dependencies block (if any), then insert ours
+          $content = $content -replace '(?m)^Dependencies:\r?\n([ ]+.+\r?\n)*', ''
           $content = $content -replace '(?m)^Installers:', "$dependency`nInstallers:"
           Set-Content -Path $installerManifest -Value $content
 
           # Submit the modified manifest
-          .\wingetcreate.exe submit manifests
+          $manifestPath = Split-Path $installerManifest
+          .\wingetcreate.exe submit $manifestPath
