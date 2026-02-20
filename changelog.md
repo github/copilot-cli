@@ -1,3 +1,20 @@
+## 0.0.413 - 2026-02-20
+
+- Fix issue where Copilot API URL wasn't respected
+- Display heading content from reasoning for gpt models
+- Increase LSP request timeout from 30s to 90s to reduce timeout failures
+- Fixed alt-screen timeline entries not updating when tool calls complete (particularly sub-agent calls)
+- ctrl+insert can now be used to copy selected text in the alt-screen view
+- Fix read_bash, write_bash, and stop_bash in-progress icon showing filled dot instead of empty circle
+- Enable alt-screen mode by default when running with `--experimental` flag
+- Improve code search speed in large repos
+- Session info renders in the main view footer in alt-screen mode
+- Skill files with YAML array syntax for allowed-tools now load correctly
+- Support remote plugin sources (GitHub repos and git URLs) in marketplace.json plugin entries
+- Automatically migrate users from claude-sonnet-4.5 to the current default model on startup
+- Ctrl+A, Ctrl+E, and Ctrl+U navigate to logical line boundaries (newlines) instead of visual wrap boundaries
+- Add configurable status line support to display dynamic session information via custom shell scripts
+
 ## 0.0.412 - 2026-02-19
 
 - Improve quick help accessibility: screen reader-friendly tab labels, reordered layout, and grouped `help commands` output
