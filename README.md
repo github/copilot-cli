@@ -116,7 +116,7 @@ You can also authenticate using a fine-grained PAT with the "Copilot Requests" p
 
 Launch `copilot` in a folder that contains code you want to work with.
 
-By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5.
+By default, `copilot` utilizes Claude Sonnet 4.6. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5.
 
 ### Experimental Mode
 
