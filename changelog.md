@@ -1,3 +1,8 @@
+## 0.0.414 - 2026-02-21
+
+- Explore agent can now use GitHub MCP tools when available
+- Show permission elevation dialog when accepting a plan with autopilot to prevent auto-denied tool errors
+
 ## 0.0.413 - 2026-02-20
 
 - Fix issue where Copilot API URL wasn't respected
