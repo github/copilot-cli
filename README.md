@@ -120,7 +120,67 @@ By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command
 
 Each time you submit a prompt to GitHub Copilot CLI using a model, your monthly quota of premium requests is reduced by the model's multiplier (e.g., 1x, 3x). Using a 0x model does not reduce your premium request quota. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
+### Experimental Mode
+
+Experimental mode enables access to new features that are still in development. You can activate experimental mode by:
+
+- Launching with the `--experimental` flag: `copilot --experimental`
+- Using the `/experimental` slash command from within the CLI
+
+Once activated, the setting is persisted in your config, so the `--experimental` flag is no longer needed on subsequent launches.
+
+#### Experimental Features
+
+- **Autopilot mode:** Autopilot is a new mode (press `Shift+Tab` to cycle through modes), which encourages the agent to continue working until a task is completed.
+
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
+
+## 🔧 Configuring LSP Servers
+
+GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence. This feature provides intelligent code features like go-to-definition, hover information, and diagnostics.
+
+### Installing Language Servers
+
+Copilot CLI does not bundle LSP servers. You need to install them separately. For example, to set up TypeScript support:
+
+```bash
+npm install -g typescript-language-server
+```
+
+For other languages, install the corresponding LSP server and configure it following the same pattern shown below.
+
+### Configuring LSP Servers
+
+LSP servers are configured through a dedicated LSP configuration file. You can configure LSP servers at the user level or repository level:
+
+**User-level configuration** (applies to all projects):
+Edit `~/.copilot/lsp-config.json`
+
+**Repository-level configuration** (applies to specific project):
+Create `.github/lsp.json` in your repository root
+
+Example configuration:
+
+```json
+{
+  "lspServers": {
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "fileExtensions": {
+        ".ts": "typescript",
+        ".tsx": "typescript"
+      }
+    }
+  }
+}
+```
+
+### Viewing LSP Server Status
+
+Check configured LSP servers using the `/lsp` command in an interactive session, or view your configuration files directly.
+
+For more information, see the [changelog](./changelog.md).
 
 ## 📢 Feedback and Participation
 
