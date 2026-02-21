@@ -118,6 +118,8 @@ Launch `copilot` in a folder that contains code you want to work with.
 
 By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5.
 
+Each time you submit a prompt to GitHub Copilot CLI using a model, your monthly quota of premium requests is reduced by the model's multiplier (e.g., 1x, 3x). Using a 0x model does not reduce your premium request quota. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
+
 ### Experimental Mode
 
 Experimental mode enables access to new features that are still in development. You can activate experimental mode by:
@@ -130,8 +132,6 @@ Once activated, the setting is persisted in your config, so the `--experimental`
 #### Experimental Features
 
 - **Autopilot mode:** Autopilot is a new mode (press `Shift+Tab` to cycle through modes), which encourages the agent to continue working until a task is completed.
-
-Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premium requests is reduced by one. For information about premium requests, see [About premium requests](https://docs.github.com/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests).
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
