@@ -1,3 +1,29 @@
+## 0.0.421 - 2026-03-03
+
+- Autopilot permission dialog appears on first prompt submission instead of on mode switch
+- AUTO theme now reads your terminal's ANSI color palette and uses it directly, so colors match your terminal theme
+- Add structured form input for the ask_user tool using MCP Elicitations (experimental)
+- Plugin commands read extraKnownMarketplaces from project-level .claude/settings.json for Claude compatibility
+- Git hooks can detect Copilot CLI subprocesses via the COPILOT_CLI=1 environment variable to skip interactive prompts
+- Spurious "write EIO" error entries no longer appear in the timeline during session resume or terminal state transitions
+- Python-based MCP servers no longer time out due to buffered stdout
+- Error when --model flag specifies an unavailable model
+- MCP server availability correctly updates after signing in, switching accounts, or signing out
+- Display clickable PR reference next to branch name in the status bar
+- Add --plugin-dir flag to load a plugin from a local directory
+- Mouse text selection is automatically copied to the Linux primary selection buffer (middle-click to paste)
+- Fix VS Code shift+enter and ctrl+enter keybindings for multiline input
+- Use consistent ~/.copilot/pkg path for auto-update instead of XDG_STATE_HOME
+- ACP clients can configure reasoning effort via session config options
+- Click links in the terminal to open them in your default browser
+- Support repo-level config via .github/copilot/config.json for shared project settings like marketplaces and launch messages
+- Streaming output no longer truncates when running in alt-screen mode
+- Right-click paste no longer produces garbled text on Windows
+- Shell command output on Windows no longer renders as "No changes detected" in the timeline
+- GitHub API errors no longer appear as raw HTTP messages in the terminal when using the # reference picker
+- Markdown tables render with proper column widths, word wrap, and Unicode borders that adapt to terminal width
+- MCP elicitation form displays taller multi-line text input, hides tab bar for single-field forms, and fixes error flashing on field navigation
+
 ## 0.0.420 - 2026-02-27
 
 - Auto-update now also updates the binary executable, not just the JS package
