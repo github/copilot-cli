@@ -1,3 +1,49 @@
+## 0.0.422 - 2026-03-05
+
+- Display request ID in authentication and authorization error messages to aid troubleshooting
+- Load personal hooks from ~/.copilot/hooks in addition to repo-level .github/hooks
+- Timeline now shows the question in a box and displays 'Making best guess on autopilot' when ask_user is auto-responded
+- Add support for GPT-5.4 model
+- Plugin cache automatically recovers from a corrupted or incomplete clone without manual intervention
+- Show a clear, actionable error message when git is not installed and a remote plugin or marketplace is used
+- Text selection persists after copying to clipboard in alt screen
+- Scroll view no longer jumps to earlier messages when scrolling during response streaming or with popups open
+- Add copy_on_select config option to auto-copy selected text to clipboard in alt screen mode
+- IME candidate windows appear at correct cursor position in CJK input
+- Add mouse scroll support to /diff in alt-screen mode
+- Reduce memory usage in alt-screen mode for long sessions
+- Diff mode now works correctly when git color.diff=always is configured
+- Opening links on Windows correctly handles URLs with & query parameters
+- @-mention file completion always reflects the current state of the working directory
+- ESC key to cancel works correctly in tmux and other non-kitty terminals
+- Click in the prompt input to reposition the text cursor
+- Add /copy command to copy the last response to clipboard
+- Links in alt-screen mode are rendered with underline styling for better visibility
+- /delegate prompts for a target remote in multi-remote repositories and clarifies confirmation text
+- GitHub MCP server stays enabled in repositories that have both Azure DevOps and GitHub remotes
+- Colons in inline code render correctly inside markdown tables
+- Pressing Ctrl+C on the help dialog now dismisses it cleanly
+- Plugin-contributed LSP servers are now loaded, started, and shown in /lsp show
+- Pressing Enter in required enum field now selects the highlighted option
+- Hide noisy todo bookkeeping queries and show dependency details in timeline
+- CLI no longer hangs for minutes when working in a directory with a large number of files
+- Add --output-format json flag to emit JSONL in prompt mode for programmatic integrations
+- Add exitPlanMode.request protocol method for SDK plan approval support
+- Automatic notifications when background shell commands and agents complete
+- GitHub MCP server connection status is accurately tracked and counted in the status indicator
+- Press Ctrl+R to search command history with reverse incremental search (like Bash)
+- Long diff lines no longer overflow and wrap in the diff view
+- Add startup prompt hooks to auto-submit prompts or slash commands when a session starts
+- Ctrl+K joins lines when cursor is at end of line, matching standard Emacs/terminal behavior
+- Escape sequences split across input chunks no longer leak into text input
+- Rename `launch_messages` config setting to `companyAnnouncements`
+- Show a waiting message when the terminal is handed to an external editor
+- Support enabledPlugins in config for automatic plugin installation at startup
+- Improve key bindings in reverse history search: Ctrl+J to accept, Ctrl+G to cancel
+- Rename repository config from `.github/copilot/config.json` to `settings.json`
+- Support installing plugins from ssh:// URLs
+- Session usage metrics (requests, tokens, code changes) are now persisted to events.jsonl after each session ends
+
 ## 0.0.421 - 2026-03-03
 
 - Autopilot permission dialog appears on first prompt submission instead of on mode switch
