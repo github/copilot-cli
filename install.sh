@@ -65,6 +65,7 @@ echo "Downloading from: $DOWNLOAD_URL"
 
 # Download and extract with error handling
 TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
 TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
 if command -v curl >/dev/null 2>&1; then
   curl -fsSL "$DOWNLOAD_URL" -o "$TMP_TARBALL"
@@ -72,7 +73,6 @@ elif command -v wget >/dev/null 2>&1; then
   wget -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
 else
   echo "Error: Neither curl nor wget found. Please install one of them."
-  rm -rf "$TMP_DIR"
   exit 1
 fi
 
@@ -91,7 +91,6 @@ if [ "$CHECKSUMS_AVAILABLE" = true ]; then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
       exit 1
     fi
   elif command -v shasum >/dev/null 2>&1; then
@@ -99,7 +98,6 @@ if [ "$CHECKSUMS_AVAILABLE" = true ]; then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
       exit 1
     fi
   else
@@ -110,7 +108,6 @@ fi
 # Check that the file is a valid tarball
 if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
   echo "Error: Downloaded file is not a valid tarball or is corrupted." >&2
-  rm -rf "$TMP_DIR"
   exit 1
 fi
 
@@ -134,7 +131,6 @@ fi
 tar -xz -C "$INSTALL_DIR" -f "$TMP_TARBALL"
 chmod +x "$INSTALL_DIR/copilot"
 echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
-rm -rf "$TMP_DIR"
 
 # Check if installed binary is accessible
 if ! command -v copilot >/dev/null 2>&1; then
