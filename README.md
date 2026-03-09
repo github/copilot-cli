@@ -1,4 +1,4 @@
-# GitHub Copilot CLI (Public Preview)
+# GitHub Copilot CLI
 
 The power of GitHub Copilot, now in your terminal.
 
@@ -38,36 +38,6 @@ If you have access to GitHub Copilot via your organization or enterprise, you ca
 
 ### Installation
 
-Install with [WinGet](https://github.com/microsoft/winget-cli) (Windows):
-
-```bash
-winget install GitHub.Copilot
-```
-
-```bash
-winget install GitHub.Copilot.Prerelease
-```
-
-Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
-
-```bash
-brew install copilot-cli
-```
-
-```bash
-brew install copilot-cli@prerelease
-```
-
-Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
-
-```bash
-npm install -g @github/copilot
-```
-
-```bash
-npm install -g @github/copilot@prerelease
-```
-
 Install with the install script (macOS and Linux):
 
 ```bash
@@ -92,6 +62,39 @@ For example, to install version `v0.0.369` to a custom directory:
 ```bash
 curl -fsSL https://gh.io/copilot-install | VERSION="v0.0.369" PREFIX="$HOME/custom" bash
 ```
+
+Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
+
+```bash
+brew install copilot-cli
+```
+
+```bash
+brew install copilot-cli@prerelease
+```
+
+
+Install with [WinGet](https://github.com/microsoft/winget-cli) (Windows):
+
+```bash
+winget install GitHub.Copilot
+```
+
+```bash
+winget install GitHub.Copilot.Prerelease
+```
+
+
+Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):
+
+```bash
+npm install -g @github/copilot
+```
+
+```bash
+npm install -g @github/copilot@prerelease
+```
+
 
 ### Launching the CLI
 
@@ -186,6 +189,6 @@ For more information, see the [changelog](./changelog.md).
 
 We're excited to have you join us early in the Copilot CLI journey.
 
-This is an early-stage preview, and we're building quickly. Expect frequent updates--please keep your client up to date for the latest features and fixes!
+We're building quickly. Expect frequent updates--please keep your client up to date for the latest features and fixes!
 
-Your insights are invaluable! Open issue in this repo, join Discussions, and run `/feedback` from the CLI to submit a confidential feedback survey!
+Your insights are invaluable! Open an issue in this repo, join Discussions, and run `/feedback` from the CLI to submit a confidential feedback survey!

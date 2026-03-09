@@ -156,6 +156,7 @@ if ! command -v copilot >/dev/null 2>&1; then
       if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
         echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC_FILE"
         echo "✓ Added PATH export to $RC_FILE"
+        echo "  Restart your shell or run: source $RC_FILE"
       fi
     fi
   else
@@ -163,7 +164,11 @@ if ! command -v copilot >/dev/null 2>&1; then
     echo "To add $INSTALL_DIR to your PATH permanently, add this to $RC_FILE:"
     echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
   fi
-fi
 
-echo ""
-echo "Installation complete! Run 'copilot help' to get started."
+  echo ""
+  echo "Installation complete! To get started, run:"
+  echo "  export PATH=\"$INSTALL_DIR:\$PATH\" && copilot help"
+else
+  echo ""
+  echo "Installation complete! Run 'copilot help' to get started."
+fi
