@@ -1,3 +1,33 @@
+## 1.0.3 - 2026-03-09
+
+- Enable alternate screen buffer by default for staff users
+- Extensions are now available as an experimental feature — ask Copilot to write custom tools and hooks for itself using @github/copilot-sdk
+- Document GH_HOST, HTTP_PROXY, HTTPS_PROXY, NO_COLOR, and NO_PROXY environment variables in help
+- Read MCP server configuration from .devcontainer/devcontainer.json
+- Add --binary-version flag to query the CLI binary version without launching
+- Add /restart command to hot restart the CLI while preserving your session
+- Background task notifications display in timeline with expandable detail
+- Type 'quit' to exit the CLI, in addition to 'exit'
+- Add extraKnownMarketplaces repository setting to replace marketplaces
+- Add Windows Terminal support to /terminal-setup command
+- /reset-allowed-tools now fully undoes /allow-all and re-triggers the autopilot permission dialog
+- Improved handling of batched queries in the SQL tool
+- Login flow no longer hangs on Ubuntu when system keyring is unresponsive
+- Terminal is properly reset when CLI crashes unexpectedly
+- Table disables borders in screen reader mode to prevent announcing decorative characters
+- MCP servers with non-conforming outputSchema are now accessible
+- /plugin update now works for GitHub-installed plugins
+- /add-dir directories persist across session changes like /clear and /resume
+- Prevent env command from being treated as safe to allow without approval
+- Placeholder text color displays correctly when wrapping in narrow terminals
+- /plugin update now works with marketplaces defined in project settings
+- Retry status messages now display to show progress during server error recovery
+- Show loading spinner in diff mode while fetching changes
+- Suppress /init suggestion when .github/instructions/ contains instructions
+- Rename merge_strategy config to mergeStrategy for consistency
+- Suppress unknown field warnings in skill and command frontmatter
+- Trust safe sed commands to run without confirmation
+
 ## 1.0.2 - 2026-03-06
 
 To commemorate GitHub Copilot CLI reaching general availability last week, we're incrementing the major version to 1.0!
