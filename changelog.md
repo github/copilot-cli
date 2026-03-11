@@ -1,3 +1,33 @@
+## 1.0.4 - 2026-03-11
+
+- Add `session.shell.exec` and `session.shell.kill` RPC methods for executing shell commands with streaming stdout/stderr output
+- Custom agents from --plugin-dir plugins now load correctly in ACP mode
+- Adaptive color engine with dynamic color modes and interactive theme picker. Gracefully degrades on limited-color terminals and Windows
+- MCP OAuth re-authentication works reliably when callback port changes or when using Microsoft Entra ID
+- Replace /pr open with /pr view [local|web] to view PR status locally or open in browser
+- Enables OpenTelemetry instrumentation for observability into agent sessions, LLM calls, and tool executions
+- Extensions can now be written as CommonJS modules (extension.cjs)
+- Show loaded extensions count in the Environment loaded startup message
+- Support disableAllHooks flag to disable all hooks from a configuration file
+- Support Azure DevOps repository identification in session logs
+- Session export header renders each field on its own line in shared gists
+- Auto-update now retries without authentication token on SAML enforcement errors
+- Autopilot mode stops continuing after API errors instead of looping indefinitely
+- Status line context window percentage no longer inflates across turns by using the last call's input and output tokens instead of cumulative totals
+- Kitty keyboard protocol is properly disabled on suspend when using alternate screen
+- Only show reasoning headers when it's the only reasoning text available.
+- Terminal properly resets when CLI crashes, preventing shell corruption
+- /update command automatically restarts to apply updates instead of requiring manual exit
+- OAuth authentication now handles Microsoft Entra ID and other OIDC servers reliably with proper resource indicators and refresh token support
+- Show individual instruction file names in /instructions picker with [external] labels for injected files
+- Path permission dialog offers a one-time approval option in addition to adding the path to the allowed list
+- Add --reasoning-effort CLI flag to set reasoning effort level
+- Hooks can now request user confirmation before tool execution with 'ask' permission decision
+- Add configure-copilot sub-agent for managing MCP servers, custom agents, and skills via the task tool
+- Interactive shell initialization no longer times out on slow machines
+- Faster shell commands on Windows by skipping PowerShell profile loading
+- Improve CLI help documentation to use standard --option=value format and comma-separated list syntax
+
 ## 1.0.3 - 2026-03-09
 
 - Enable alternate screen buffer by default for staff users
