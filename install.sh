@@ -44,6 +44,31 @@ if [ -n "$GITHUB_TOKEN" ]; then
   GIT_REMOTE="https://x-access-token:${GITHUB_TOKEN}@github.com/github/copilot-cli"
 fi
 
+# Download a file, retrying without auth on failure (e.g. SAML enforcement)
+download() {
+  local url="$1" output="$2"
+  if command -v curl >/dev/null 2>&1; then
+    if [ ${#CURL_AUTH[@]} -gt 0 ]; then
+      if curl -fsSL "${CURL_AUTH[@]}" "$url" -o "$output" 2>/dev/null; then
+        return 0
+      fi
+      echo "Warning: Authenticated request failed, retrying without token..." >&2
+    fi
+    curl -fsSL "$url" -o "$output"
+  elif command -v wget >/dev/null 2>&1; then
+    if [ ${#WGET_AUTH[@]} -gt 0 ]; then
+      if wget -qO "$output" "${WGET_AUTH[@]}" "$url" 2>/dev/null; then
+        return 0
+      fi
+      echo "Warning: Authenticated request failed, retrying without token..." >&2
+    fi
+    wget -qO "$output" "$url"
+  else
+    echo "Error: Neither curl nor wget found. Please install one of them." >&2
+    return 1
+  fi
+}
+
 # Determine download URL based on VERSION
 if [ "${VERSION}" = "latest" ] || [ -z "$VERSION" ]; then
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
@@ -54,7 +79,11 @@ elif [ "${VERSION}" = "prerelease" ]; then
     echo "Error: git is required to install prerelease versions" >&2
     exit 1
   fi
-  VERSION="$(git ls-remote --tags "$GIT_REMOTE" | tail -1 | awk -F/ '{print $NF}')"
+  VERSION="$(git ls-remote --tags "$GIT_REMOTE" 2>/dev/null | tail -1 | awk -F/ '{print $NF}')"
+  if [ -z "$VERSION" ] && [ "$GIT_REMOTE" != "https://github.com/github/copilot-cli" ]; then
+    echo "Warning: Authenticated git request failed, retrying without token..."
+    VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | tail -1 | awk -F/ '{print $NF}')"
+  fi
   if [ -z "$VERSION" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
@@ -76,12 +105,7 @@ echo "Downloading from: $DOWNLOAD_URL"
 # Download and extract with error handling
 TMP_DIR="$(mktemp -d)"
 TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
-if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "${CURL_AUTH[@]}" "$DOWNLOAD_URL" -o "$TMP_TARBALL"
-elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$TMP_TARBALL" "${WGET_AUTH[@]}" "$DOWNLOAD_URL"
-else
-  echo "Error: Neither curl nor wget found. Please install one of them."
+if ! download "$DOWNLOAD_URL" "$TMP_TARBALL"; then
   rm -rf "$TMP_DIR"
   exit 1
 fi
@@ -89,10 +113,8 @@ fi
 # Attempt to download checksums file and validate
 TMP_CHECKSUMS="$TMP_DIR/SHA256SUMS.txt"
 CHECKSUMS_AVAILABLE=false
-if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "${CURL_AUTH[@]}" "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
-elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$TMP_CHECKSUMS" "${WGET_AUTH[@]}" "$CHECKSUMS_URL" 2>/dev/null && CHECKSUMS_AVAILABLE=true
+if download "$CHECKSUMS_URL" "$TMP_CHECKSUMS" 2>/dev/null; then
+  CHECKSUMS_AVAILABLE=true
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
