@@ -151,11 +151,19 @@ if ! command -v copilot >/dev/null 2>&1; then
   echo ""
   echo "Notice: $INSTALL_DIR is not in your PATH"
 
-  # Detect shell rc file
+  # Detect shell profile file for PATH
   case "$(basename "${SHELL:-/bin/sh}")" in
-    zsh)  RC_FILE="$HOME/.zshrc" ;;
-    bash) RC_FILE="$HOME/.bashrc" ;;
-    *)    RC_FILE="$HOME/.profile" ;;
+    zsh) RC_FILE="$HOME/.zprofile" ;;
+    bash)
+      if [ -f "$HOME/.bash_profile" ]; then
+        RC_FILE="$HOME/.bash_profile"
+      elif [ -f "$HOME/.bash_login" ]; then
+        RC_FILE="$HOME/.bash_login"
+      else
+        RC_FILE="$HOME/.profile"
+      fi
+      ;;
+    *) RC_FILE="$HOME/.profile" ;;
   esac
 
   # Prompt user to add to shell rc file (only if interactive)
