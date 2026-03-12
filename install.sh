@@ -153,7 +153,7 @@ if ! command -v copilot >/dev/null 2>&1; then
 
   # Detect shell profile file for PATH
   case "$(basename "${SHELL:-/bin/sh}")" in
-    zsh) RC_FILE="$HOME/.zprofile" ;;
+    zsh) RC_FILE="${ZDOTDIR:-$HOME}/.zprofile" ;;
     bash)
       if [ -f "$HOME/.bash_profile" ]; then
         RC_FILE="$HOME/.bash_profile"
