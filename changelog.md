@@ -1,3 +1,31 @@
+## 1.0.5 - 2026-03-13
+
+- Terminal title resets to default after running /clear or /new
+- Add /extensions command to view, enable, and disable CLI extensions
+- @ file mentions now support paths outside the project: absolute paths (@/usr/...), home directory (@~/...), and relative parent paths (@../...)
+- Toggling experimental mode with /experimental on|off automatically restarts the CLI to apply changes immediately
+- Right-click paste goes to the active dialog input instead of the main conversation input
+- Introducing /pr to help create and view PRs, automatically fix CI failures, address review feedback, and resolve merge conflicts
+- Block network (UNC) paths to prevent credential leakage via SMB authentication
+- Send follow-up messages to background agents with the write_agent tool for multi-turn conversations
+- Memory storage errors now indicate when repository doesn't exist or you lack write access
+- Show a clear error when a classic Personal Access Token (ghp\_) is set in environment variables instead of silently exiting
+- Diff view displays correctly on Windows instead of showing corrupted/overwritten text
+- Fix Kitty keyboard protocol escape sequences appearing at shutdown
+- Setting claude-sonnet-4.6 as the default model is now preserved correctly
+- Plugin uninstall reliably removes files using the stored install path
+- Add /version command to display CLI version and check for updates from within the session
+- Add experimental embedding-based dynamic retrieval of MCP and skill instructions per turn
+- Syntax highlighting in /diff with support for 17 programming languages
+- Add preCompact hook to run commands before context compaction starts
+- Request ID from the API now appears in the timeline when errors occur after retries are exhausted
+- PR descriptions with backtick-formatted code render correctly on Windows/PowerShell
+- Show a helpful error message when a file path is passed as a CLI command
+- Session reports an authentication error instead of hanging when the token is invalid or expired
+- View tool shows partial content for large single-line files (e.g. minified JS, large JSON blobs) instead of empty output
+- /changelog supports `last <N>`, `since <version>`, and `summarize` to browse and summarize multiple release notes at once
+- Hooks config files that omit the version field are now accepted by the CLI
+
 ## 1.0.4 - 2026-03-11
 
 - Add `session.shell.exec` and `session.shell.kill` RPC methods for executing shell commands with streaming stdout/stderr output
