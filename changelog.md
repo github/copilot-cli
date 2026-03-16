@@ -1,3 +1,41 @@
+## 1.0.6 - 2026-03-16
+
+- Autopilot continuation no longer gets permanently blocked after an error in a previous turn
+- In autopilot, task_complete summary is now required and renders as markdown
+- Input placeholder text is no longer read aloud by screen readers on every prompt submission
+- Free tree-sitter WASM objects after shell command parsing to prevent memory leak
+- /help dialog starts scrolled to the top in alt-screen mode
+- Auto-update correctly recovers from race conditions on Windows
+- CLI no longer fails to load on Windows after updating while another instance is running
+- Reduce memory usage by eliminating redundant environment variable copies per child process spawn
+- Remaining requests widget no longer shows inaccurate quota data for Copilot Free users
+- Resolve session crashes caused by HTTP/2 connection pool race conditions when sub-agents are active
+- CLI loads the latest version of itself after an auto-update
+- Kill command validation no longer incorrectly blocks some legitimate commands. e.g. p.kill() in a python script
+- Instruction file frontmatter applyTo field accepts both string and array values
+- Improve streaming and tool-output memory usage
+- Model can discover and use tools dynamically with tool search for Claude models
+- Hooks fire correctly when resuming a previous session
+- Prompt input in alt screen mode renders all lines without truncation
+- Links and right-click paste no longer trigger twice when running in VS Code's integrated terminal
+- Hook configuration files now work across VS Code, Claude Code, and the CLI without modification by accepting PascalCase event names alongside camelCase
+- Native module prebuilds (e.g., conpty.node on Windows ARM64) load reliably on first launch
+- Subagent elapsed time in /tasks view freezes when idle and resumes when active again
+- Flags --enable-all-github-mcp-tools, --add-github-mcp-toolset, and --add-github-mcp-tool now take effect when using the SDK (ACP mode)
+- Custom instruction file paths load correctly when using COPILOT_CUSTOM_INSTRUCTIONS_DIRS
+- Command output is no longer lost when a command causes the shell to exit
+- Plugins using .claude-plugin/plugin.json are discovered when loaded via --plugin-dir
+- Fix handling of shift+enter on VS Code with old /terminal-setup config.
+- Agent creation wizard shows the correct user agents directory path
+- Support Open Plugin spec file locations for loading plugin and marketplace manifests
+- Show friendlier error messages and provide keyboard shortcut to open event links in browsers
+- Extension tools now work with the permissions system, use `skipPermission` per-tool to bypass permission prompts
+- Hook config files now support Claude Code's nested matcher/hooks structure and optional type field
+- Sub-agents launched by the task tool are assigned human-readable IDs based on their name (e.g., `math-helper-0`) instead of generic `agent-0` identifiers
+- The create_pull_request tool now includes the PR URL in its output so the agent can share the direct link
+- read_agent output includes inbound messages that triggered each turn in multi-turn agents
+- Improve compatibility with the Open Plugins spec: support `.lsp.json`, PascalCase hook event names, `exclusive` path mode, and `:` namespace separator
+
 ## 1.0.5 - 2026-03-13
 
 - Terminal title resets to default after running /clear or /new
