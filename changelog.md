@@ -1,3 +1,19 @@
+## 1.0.7 - 2026-03-17
+
+- Improve color contrast across CLI themes for better readability and accessibility
+- User messages display with a subtle background color for visual differentiation from assistant messages
+- Add support for gpt-5.4-mini model
+- Tab bar selected tab uses compact [label] style with cleaner spacing
+- Add "customize" mode to system message config for section-level system prompt overrides
+- Double-Esc clears input when text is present, or triggers undo when the prompt is empty, with a hint shown after the first Esc
+- Session resume no longer fails with 'Session file is corrupted' for sessions created before 1.0.6
+- Branch indicator distinguishes unstaged changes (\*), staged changes (+), and untracked files (%) in the header
+- Add experimental SDK session APIs to list and manage skills, MCP servers, and plugins, with optional config auto-discovery from the working directory
+- Add subagentStart hook that fires when a subagent is spawned, with support for injecting additional context into the subagent's prompt
+- Pro and trial users now see all models they are entitled to in the model picker
+- CLI restart no longer re-sends the -i/--interactive prompt to the new session
+- Resolve an edge case where auto-update could leave an incomplete package on Windows
+
 ## 1.0.6 - 2026-03-16
 
 - Autopilot continuation no longer gets permanently blocked after an error in a previous turn
