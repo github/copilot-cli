@@ -1,3 +1,20 @@
+## 1.0.8 - 2026-03-18
+
+- Agent mode labels and borders display correct colors on non-truecolor terminals (tmux, SSH, screen)
+- Alternate screen buffer is now enabled by default for a cleaner terminal experience
+- Exit plan mode tool remains available when an extension subprocess joins an active session
+- Repo-level hooks are loaded only after folder trust is confirmed, not before the trust dialog is shown
+- Idle subagents no longer clutter the /tasks view — they are hidden after 2 minutes of inactivity
+- Add extension mode setting to control extensibility
+- MCP servers can be validated against configured registries using the experimental MCP_ALLOWLIST feature flag
+- Allow --resume to accept a task ID in addition to a session ID
+- Support defining hooks in settings.json, settings.local.json, and config.json
+- Scroll works correctly in macOS Terminal.app and other terminals that don't support SGR mouse encoding
+- Mouse scroll works correctly in tmux after returning from an external editor
+- Ctrl-C in prompt mode now exits immediately instead of waiting for the request to complete
+- Spinner animation no longer delays visible output from appearing in the timeline
+- Dialog titles display consistently inside all dialog boxes
+
 ## 1.0.7 - 2026-03-17
 
 - Improve color contrast across CLI themes for better readability and accessibility
