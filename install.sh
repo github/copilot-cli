@@ -34,6 +34,16 @@ case "$(uname -m)" in
   *) echo "Error: Unsupported architecture $(uname -m)" >&2 ; exit 1 ;;
 esac
 
+# Set up authentication for GitHub requests if GITHUB_TOKEN is available
+CURL_AUTH=()
+WGET_AUTH=()
+GIT_REMOTE="https://github.com/github/copilot-cli"
+if [ -n "$GITHUB_TOKEN" ]; then
+  CURL_AUTH=(-H "Authorization: token $GITHUB_TOKEN")
+  WGET_AUTH=(--header="Authorization: token $GITHUB_TOKEN")
+  GIT_REMOTE="https://x-access-token:${GITHUB_TOKEN}@github.com/github/copilot-cli"
+fi
+
 # Determine download URL based on VERSION
 if [ "${VERSION}" = "latest" ] || [ -z "$VERSION" ]; then
   DOWNLOAD_URL="https://github.com/github/copilot-cli/releases/latest/download/copilot-${PLATFORM}-${ARCH}.tar.gz"
@@ -44,7 +54,7 @@ elif [ "${VERSION}" = "prerelease" ]; then
     echo "Error: git is required to install prerelease versions" >&2
     exit 1
   fi
-  VERSION="$(git ls-remote --tags https://github.com/github/copilot-cli | tail -1 | awk -F/ '{print $NF}')"
+  VERSION="$(git ls-remote --tags "$GIT_REMOTE" | tail -1 | awk -F/ '{print $NF}')"
   if [ -z "$VERSION" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
@@ -67,9 +77,9 @@ echo "Downloading from: $DOWNLOAD_URL"
 TMP_DIR="$(mktemp -d)"
 TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$DOWNLOAD_URL" -o "$TMP_TARBALL"
+  curl -fsSL "${CURL_AUTH[@]}" "$DOWNLOAD_URL" -o "$TMP_TARBALL"
 elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$TMP_TARBALL" "$DOWNLOAD_URL"
+  wget -qO "$TMP_TARBALL" "${WGET_AUTH[@]}" "$DOWNLOAD_URL"
 else
   echo "Error: Neither curl nor wget found. Please install one of them."
   rm -rf "$TMP_DIR"
@@ -80,9 +90,9 @@ fi
 TMP_CHECKSUMS="$TMP_DIR/SHA256SUMS.txt"
 CHECKSUMS_AVAILABLE=false
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
+  curl -fsSL "${CURL_AUTH[@]}" "$CHECKSUMS_URL" -o "$TMP_CHECKSUMS" 2>/dev/null && CHECKSUMS_AVAILABLE=true
 elif command -v wget >/dev/null 2>&1; then
-  wget -qO "$TMP_CHECKSUMS" "$CHECKSUMS_URL" 2>/dev/null && CHECKSUMS_AVAILABLE=true
+  wget -qO "$TMP_CHECKSUMS" "${WGET_AUTH[@]}" "$CHECKSUMS_URL" 2>/dev/null && CHECKSUMS_AVAILABLE=true
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
@@ -141,11 +151,19 @@ if ! command -v copilot >/dev/null 2>&1; then
   echo ""
   echo "Notice: $INSTALL_DIR is not in your PATH"
 
-  # Detect shell rc file
+  # Detect shell profile file for PATH
   case "$(basename "${SHELL:-/bin/sh}")" in
-    zsh)  RC_FILE="$HOME/.zshrc" ;;
-    bash) RC_FILE="$HOME/.bashrc" ;;
-    *)    RC_FILE="$HOME/.profile" ;;
+    zsh) RC_FILE="${ZDOTDIR:-$HOME}/.zprofile" ;;
+    bash)
+      if [ -f "$HOME/.bash_profile" ]; then
+        RC_FILE="$HOME/.bash_profile"
+      elif [ -f "$HOME/.bash_login" ]; then
+        RC_FILE="$HOME/.bash_login"
+      else
+        RC_FILE="$HOME/.profile"
+      fi
+      ;;
+    *) RC_FILE="$HOME/.profile" ;;
   esac
 
   # Prompt user to add to shell rc file (only if interactive)

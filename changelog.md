@@ -1,3 +1,210 @@
+## 1.0.7 - 2026-03-17
+
+- Improve color contrast across CLI themes for better readability and accessibility
+- User messages display with a subtle background color for visual differentiation from assistant messages
+- Add support for gpt-5.4-mini model
+- Tab bar selected tab uses compact [label] style with cleaner spacing
+- Add "customize" mode to system message config for section-level system prompt overrides
+- Double-Esc clears input when text is present, or triggers undo when the prompt is empty, with a hint shown after the first Esc
+- Session resume no longer fails with 'Session file is corrupted' for sessions created before 1.0.6
+- Branch indicator distinguishes unstaged changes (\*), staged changes (+), and untracked files (%) in the header
+- Add experimental SDK session APIs to list and manage skills, MCP servers, and plugins, with optional config auto-discovery from the working directory
+- Add subagentStart hook that fires when a subagent is spawned, with support for injecting additional context into the subagent's prompt
+- Pro and trial users now see all models they are entitled to in the model picker
+- CLI restart no longer re-sends the -i/--interactive prompt to the new session
+- Resolve an edge case where auto-update could leave an incomplete package on Windows
+
+## 1.0.6 - 2026-03-16
+
+- Autopilot continuation no longer gets permanently blocked after an error in a previous turn
+- In autopilot, task_complete summary is now required and renders as markdown
+- Input placeholder text is no longer read aloud by screen readers on every prompt submission
+- Free tree-sitter WASM objects after shell command parsing to prevent memory leak
+- /help dialog starts scrolled to the top in alt-screen mode
+- Auto-update correctly recovers from race conditions on Windows
+- CLI no longer fails to load on Windows after updating while another instance is running
+- Reduce memory usage by eliminating redundant environment variable copies per child process spawn
+- Remaining requests widget no longer shows inaccurate quota data for Copilot Free users
+- Resolve session crashes caused by HTTP/2 connection pool race conditions when sub-agents are active
+- CLI loads the latest version of itself after an auto-update
+- Kill command validation no longer incorrectly blocks some legitimate commands. e.g. p.kill() in a python script
+- Instruction file frontmatter applyTo field accepts both string and array values
+- Improve streaming and tool-output memory usage
+- Model can discover and use tools dynamically with tool search for Claude models
+- Hooks fire correctly when resuming a previous session
+- Prompt input in alt screen mode renders all lines without truncation
+- Links and right-click paste no longer trigger twice when running in VS Code's integrated terminal
+- Hook configuration files now work across VS Code, Claude Code, and the CLI without modification by accepting PascalCase event names alongside camelCase
+- Native module prebuilds (e.g., conpty.node on Windows ARM64) load reliably on first launch
+- Subagent elapsed time in /tasks view freezes when idle and resumes when active again
+- Flags --enable-all-github-mcp-tools, --add-github-mcp-toolset, and --add-github-mcp-tool now take effect when using the SDK (ACP mode)
+- Custom instruction file paths load correctly when using COPILOT_CUSTOM_INSTRUCTIONS_DIRS
+- Command output is no longer lost when a command causes the shell to exit
+- Plugins using .claude-plugin/plugin.json are discovered when loaded via --plugin-dir
+- Fix handling of shift+enter on VS Code with old /terminal-setup config.
+- Agent creation wizard shows the correct user agents directory path
+- Support Open Plugin spec file locations for loading plugin and marketplace manifests
+- Show friendlier error messages and provide keyboard shortcut to open event links in browsers
+- Extension tools now work with the permissions system, use `skipPermission` per-tool to bypass permission prompts
+- Hook config files now support Claude Code's nested matcher/hooks structure and optional type field
+- Sub-agents launched by the task tool are assigned human-readable IDs based on their name (e.g., `math-helper-0`) instead of generic `agent-0` identifiers
+- The create_pull_request tool now includes the PR URL in its output so the agent can share the direct link
+- read_agent output includes inbound messages that triggered each turn in multi-turn agents
+- Improve compatibility with the Open Plugins spec: support `.lsp.json`, PascalCase hook event names, `exclusive` path mode, and `:` namespace separator
+
+## 1.0.5 - 2026-03-13
+
+- Terminal title resets to default after running /clear or /new
+- Add /extensions command to view, enable, and disable CLI extensions
+- @ file mentions now support paths outside the project: absolute paths (@/usr/...), home directory (@~/...), and relative parent paths (@../...)
+- Toggling experimental mode with /experimental on|off automatically restarts the CLI to apply changes immediately
+- Right-click paste goes to the active dialog input instead of the main conversation input
+- Introducing /pr to help create and view PRs, automatically fix CI failures, address review feedback, and resolve merge conflicts
+- Block network (UNC) paths to prevent credential leakage via SMB authentication
+- Send follow-up messages to background agents with the write_agent tool for multi-turn conversations
+- Memory storage errors now indicate when repository doesn't exist or you lack write access
+- Show a clear error when a classic Personal Access Token (ghp\_) is set in environment variables instead of silently exiting
+- Diff view displays correctly on Windows instead of showing corrupted/overwritten text
+- Fix Kitty keyboard protocol escape sequences appearing at shutdown
+- Setting claude-sonnet-4.6 as the default model is now preserved correctly
+- Plugin uninstall reliably removes files using the stored install path
+- Add /version command to display CLI version and check for updates from within the session
+- Add experimental embedding-based dynamic retrieval of MCP and skill instructions per turn
+- Syntax highlighting in /diff with support for 17 programming languages
+- Add preCompact hook to run commands before context compaction starts
+- Request ID from the API now appears in the timeline when errors occur after retries are exhausted
+- PR descriptions with backtick-formatted code render correctly on Windows/PowerShell
+- Show a helpful error message when a file path is passed as a CLI command
+- Session reports an authentication error instead of hanging when the token is invalid or expired
+- View tool shows partial content for large single-line files (e.g. minified JS, large JSON blobs) instead of empty output
+- /changelog supports `last <N>`, `since <version>`, and `summarize` to browse and summarize multiple release notes at once
+- Hooks config files that omit the version field are now accepted by the CLI
+
+## 1.0.4 - 2026-03-11
+
+- Add `session.shell.exec` and `session.shell.kill` RPC methods for executing shell commands with streaming stdout/stderr output
+- Custom agents from --plugin-dir plugins now load correctly in ACP mode
+- Adaptive color engine with dynamic color modes and interactive theme picker. Gracefully degrades on limited-color terminals and Windows
+- MCP OAuth re-authentication works reliably when callback port changes or when using Microsoft Entra ID
+- Replace /pr open with /pr view [local|web] to view PR status locally or open in browser
+- Enables OpenTelemetry instrumentation for observability into agent sessions, LLM calls, and tool executions
+- Extensions can now be written as CommonJS modules (extension.cjs)
+- Show loaded extensions count in the Environment loaded startup message
+- Support disableAllHooks flag to disable all hooks from a configuration file
+- Support Azure DevOps repository identification in session logs
+- Session export header renders each field on its own line in shared gists
+- Auto-update now retries without authentication token on SAML enforcement errors
+- Autopilot mode stops continuing after API errors instead of looping indefinitely
+- Status line context window percentage no longer inflates across turns by using the last call's input and output tokens instead of cumulative totals
+- Kitty keyboard protocol is properly disabled on suspend when using alternate screen
+- Only show reasoning headers when it's the only reasoning text available.
+- Terminal properly resets when CLI crashes, preventing shell corruption
+- /update command automatically restarts to apply updates instead of requiring manual exit
+- OAuth authentication now handles Microsoft Entra ID and other OIDC servers reliably with proper resource indicators and refresh token support
+- Show individual instruction file names in /instructions picker with [external] labels for injected files
+- Path permission dialog offers a one-time approval option in addition to adding the path to the allowed list
+- Add --reasoning-effort CLI flag to set reasoning effort level
+- Hooks can now request user confirmation before tool execution with 'ask' permission decision
+- Add configure-copilot sub-agent for managing MCP servers, custom agents, and skills via the task tool
+- Interactive shell initialization no longer times out on slow machines
+- Faster shell commands on Windows by skipping PowerShell profile loading
+- Improve CLI help documentation to use standard --option=value format and comma-separated list syntax
+
+## 1.0.3 - 2026-03-09
+
+- Enable alternate screen buffer by default for staff users
+- Extensions are now available as an experimental feature — ask Copilot to write custom tools and hooks for itself using @github/copilot-sdk
+- Document GH_HOST, HTTP_PROXY, HTTPS_PROXY, NO_COLOR, and NO_PROXY environment variables in help
+- Read MCP server configuration from .devcontainer/devcontainer.json
+- Add --binary-version flag to query the CLI binary version without launching
+- Add /restart command to hot restart the CLI while preserving your session
+- Background task notifications display in timeline with expandable detail
+- Type 'quit' to exit the CLI, in addition to 'exit'
+- Add extraKnownMarketplaces repository setting to replace marketplaces
+- Add Windows Terminal support to /terminal-setup command
+- /reset-allowed-tools now fully undoes /allow-all and re-triggers the autopilot permission dialog
+- Improved handling of batched queries in the SQL tool
+- Login flow no longer hangs on Ubuntu when system keyring is unresponsive
+- Terminal is properly reset when CLI crashes unexpectedly
+- Table disables borders in screen reader mode to prevent announcing decorative characters
+- MCP servers with non-conforming outputSchema are now accessible
+- /plugin update now works for GitHub-installed plugins
+- /add-dir directories persist across session changes like /clear and /resume
+- Prevent env command from being treated as safe to allow without approval
+- Placeholder text color displays correctly when wrapping in narrow terminals
+- /plugin update now works with marketplaces defined in project settings
+- Retry status messages now display to show progress during server error recovery
+- Show loading spinner in diff mode while fetching changes
+- Suppress /init suggestion when .github/instructions/ contains instructions
+- Rename merge_strategy config to mergeStrategy for consistency
+- Suppress unknown field warnings in skill and command frontmatter
+- Trust safe sed commands to run without confirmation
+
+## 1.0.2 - 2026-03-06
+
+To commemorate GitHub Copilot CLI reaching general availability last week, we're incrementing the major version to 1.0!
+
+- Type 'exit' as a bare command to close the CLI
+- Ask_user form now submits with Enter key and allows custom responses in enum fields
+- Support 'command' field as cross-platform alias for bash/powershell in hook configs
+- Hook configurations now accept timeout as alias for timeoutSec
+- Fix handling of meta with control keys (including shift+enter from /terminal-setup)
+
+## 0.0.423 - 2026-03-06
+
+- Users are prompted for shell commands with potentially dangerous expansion or substitution use cases, additional guardrails for malicious exploits
+- Block /share gist for EMU and GHE Cloud users with clear error messaging
+- Elicitation enum and boolean fields now require Enter to confirm a selection, with a ✓ indicator for confirmed values vs ❯ for the browsing cursor
+- MCP servers can now request users to visit a URL for out-of-band interactions such as OAuth flows or API key entry
+- Improve explore agent precision and large repository support with better context sharing
+- Diff mode displays cleanly on Windows with CRLF line endings
+
+## 0.0.422 - 2026-03-05
+
+- Display request ID in authentication and authorization error messages to aid troubleshooting
+- Load personal hooks from ~/.copilot/hooks in addition to repo-level .github/hooks
+- Timeline now shows the question in a box and displays 'Making best guess on autopilot' when ask_user is auto-responded
+- Add support for GPT-5.4 model
+- Plugin cache automatically recovers from a corrupted or incomplete clone without manual intervention
+- Show a clear, actionable error message when git is not installed and a remote plugin or marketplace is used
+- Text selection persists after copying to clipboard in alt screen
+- Scroll view no longer jumps to earlier messages when scrolling during response streaming or with popups open
+- Add copy_on_select config option to auto-copy selected text to clipboard in alt screen mode
+- IME candidate windows appear at correct cursor position in CJK input
+- Add mouse scroll support to /diff in alt-screen mode
+- Reduce memory usage in alt-screen mode for long sessions
+- Diff mode now works correctly when git color.diff=always is configured
+- Opening links on Windows correctly handles URLs with & query parameters
+- @-mention file completion always reflects the current state of the working directory
+- ESC key to cancel works correctly in tmux and other non-kitty terminals
+- Click in the prompt input to reposition the text cursor
+- Add /copy command to copy the last response to clipboard
+- Links in alt-screen mode are rendered with underline styling for better visibility
+- /delegate prompts for a target remote in multi-remote repositories and clarifies confirmation text
+- GitHub MCP server stays enabled in repositories that have both Azure DevOps and GitHub remotes
+- Colons in inline code render correctly inside markdown tables
+- Pressing Ctrl+C on the help dialog now dismisses it cleanly
+- Plugin-contributed LSP servers are now loaded, started, and shown in /lsp show
+- Pressing Enter in required enum field now selects the highlighted option
+- Hide noisy todo bookkeeping queries and show dependency details in timeline
+- CLI no longer hangs for minutes when working in a directory with a large number of files
+- Add --output-format json flag to emit JSONL in prompt mode for programmatic integrations
+- Add exitPlanMode.request protocol method for SDK plan approval support
+- Automatic notifications when background shell commands and agents complete
+- GitHub MCP server connection status is accurately tracked and counted in the status indicator
+- Press Ctrl+R to search command history with reverse incremental search (like Bash)
+- Long diff lines no longer overflow and wrap in the diff view
+- Add startup prompt hooks to auto-submit prompts or slash commands when a session starts
+- Ctrl+K joins lines when cursor is at end of line, matching standard Emacs/terminal behavior
+- Escape sequences split across input chunks no longer leak into text input
+- Rename `launch_messages` config setting to `companyAnnouncements`
+- Show a waiting message when the terminal is handed to an external editor
+- Support enabledPlugins in config for automatic plugin installation at startup
+- Improve key bindings in reverse history search: Ctrl+J to accept, Ctrl+G to cancel
+- Rename repository config from `.github/copilot/config.json` to `settings.json`
+- Support installing plugins from ssh:// URLs
+- Session usage metrics (requests, tokens, code changes) are now persisted to events.jsonl after each session ends
+
 ## 0.0.421 - 2026-03-03
 
 - Autopilot permission dialog appears on first prompt submission instead of on mode switch
