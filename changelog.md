@@ -1,3 +1,10 @@
+## 1.0.9 - 2026-03-19
+
+- Spurious I/O error messages (ENOTCONN, EIO) no longer appear in the timeline during SSH disconnects or terminal closes
+- Add include_gitignored config option to include gitignored files in @ file search
+- Copying text on WSL correctly preserves CJK and other non-ASCII characters
+- Marketplace and plugin installs from shortened URLs (e.g., aka.ms links) now work correctly
+
 ## 1.0.8 - 2026-03-18
 
 - Agent mode labels and borders display correct colors on non-truecolor terminals (tmux, SSH, screen)
