@@ -1,3 +1,29 @@
+## 1.0.10 - 2026-03-20
+
+- Reduced memory usage when viewing large files in their entirety
+- /login device flow works correctly in Codespaces and remote terminal environments
+- Working directory is correctly detected when using --server mode with remote sessions
+- Arrow keys work correctly in terminals using application keypad mode
+- Repo hooks (.github/hooks/) now fire correctly when using prompt mode (-p flag)
+- /copy writes formatted HTML to clipboard on Windows for pasting into Word, Outlook, and Teams
+- SDK clients can register custom slash commands when starting or joining a session
+- SDK clients can show elicitation dialogs to the user via session.ui.elicitation
+- Add experimental support for multiple concurrent sessions
+- Add --effort as a shorthand alias for --reasoning-effort
+- Add /undo command to undo the last turn and revert file changes
+- Markdown bullet lists render correctly in alt-screen mode when content contains hard line breaks
+- Elicitation form shows Shift+Tab hint for navigating between fields in reverse
+- Remote session URL displays as a compact clickable 'Open in browser' link instead of a duplicated raw URL
+- Session history is no longer lost when exiting via /quit, Ctrl+C, or restart
+- Hook matcher filters defined in nested hook structures are now correctly applied to inner hook items
+- Plugins using .claude-plugin/ or .plugin/ manifest directories now load their MCP and LSP servers correctly
+- /terminal-setup no longer shows a misleading error for WSL users
+- Model picker reorganizes models into Available, Blocked/Disabled, and Upgrade tabs based on user plan and policy
+- Workspace MCP servers from .mcp.json, .vscode/mcp.json, and devcontainer.json are now loaded only after folder trust is confirmed
+- Config settings renamed to camelCase: `includeCoAuthoredBy`, `effortLevel`, `autoUpdatesChannel`, `statusLine` (old names still work)
+- When copying assistant responses, the leading 2-space UI indent is stripped from selections where all selected lines share that indent
+- Plugins loaded via --plugin-dir now appear in /plugin list under a separate 'External Plugins' section
+
 ## 1.0.9 - 2026-03-19
 
 - Spurious I/O error messages (ENOTCONN, EIO) no longer appear in the timeline during SSH disconnects or terminal closes
