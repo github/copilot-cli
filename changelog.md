@@ -1,3 +1,22 @@
+## 1.0.11 - 2026-03-23
+
+- Ensure models appear in picker correctly, display model names where possible
+- Show a warning when MCP servers are blocked by policy (e.g. allowlist enforcement)
+- Organization policy for third-party MCP servers is now enforced for all users
+- Add ~/.agents/skills/ as a personal skill discovery directory, aligning with VS Code's GHCP4A extension default
+- Extension hooks from multiple extensions now merge instead of overwriting each other or hooks from hooks.json
+- sessionStart hook additionalContext is now injected into the conversation
+- /clear now abandons the current session entirely, while /new starts a fresh conversation (keeping the old session backgrounded)
+- GitHub MCP server user configuration is respected when connecting to remote hosts
+- Terminal screen redraws correctly after process suspend and resume (Ctrl+Z / fg)
+- MCP OAuth authentication works with MCP servers like the Atlassian Rovo MCP Server which support Dynamic Client Registration but host authorization metadata at a non-standard URL
+- /cd keeps a separate working directory per session, restored when switching sessions
+- Custom instructions, MCP servers, skills, and agents are now discovered at every directory level from the working directory up to the git root, enabling full monorepo support
+- Startup 'Environment loaded' message now shows the number of loaded hooks
+- Background agent progress (current intent and tool calls completed) now surfaces in read_agent and task timeout responses
+- statusLine.command path now supports ~ and environment variables (e.g. $HOME, ${VAR:-default})
+- /new and /clear commands accept an optional prompt to start the new session with a first message
+
 ## 1.0.10 - 2026-03-20
 
 - Reduced memory usage when viewing large files in their entirety
