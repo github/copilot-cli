@@ -54,7 +54,7 @@ elif [ "${VERSION}" = "prerelease" ]; then
     echo "Error: git is required to install prerelease versions" >&2
     exit 1
   fi
-  VERSION="$(git ls-remote --tags "$GIT_REMOTE" | tail -1 | awk -F/ '{print $NF}')"
+  VERSION="$(git ls-remote --tags --sort "version:refname" "$GIT_REMOTE" | tail -1 | awk -F/ '{print $NF}')"
   if [ -z "$VERSION" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
