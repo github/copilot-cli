@@ -1,3 +1,33 @@
+## 1.0.12 - 2026-03-26
+
+- MCP servers defined in .mcp.json start correctly when the working directory is the git root
+- Clipboard copy works correctly on Windows when non-system clip.exe shadows the system one in PATH
+- /diff view correctly renders all lines when intra-line highlighting is present
+- Plugin hooks now receive CLAUDE_PROJECT_DIR and CLAUDE_PLUGIN_DATA environment variables, and support {{project_dir}} and {{plugin_data_dir}} template variables in hook configurations
+- Workspace MCP servers are now correctly loaded and visible to the agent
+- /clear preserves MCP servers in the new session
+- Model display header shows the active reasoning effort level (e.g. "(high)") next to the model name
+- /session rename auto-generates a session name from conversation history when called without a name argument
+- Remove --alt-screen flag and alt_screen setting; alt screen is now always enabled
+- OSC 8 hyperlinks are now clickable in VS Code terminals
+- PowerShell /flag arguments (e.g., /all, /enum-devices) are no longer mistakenly treated as file paths
+- Trusted folder access prompts no longer appear incorrectly on Windows OneDrive paths and case-insensitive filesystems
+- Status line payload includes session_name field alongside session_id
+- @ file picker no longer shows .git directory contents
+- Scroll position stays in place when the terminal is resized
+- /yolo path permissions persist after using /clear to start a new session
+- Emoji characters are selected and highlighted correctly in terminal text selection
+- Sessions with active work are no longer cleaned up by the stale session reaper
+- Resume session restores the previously selected custom agent
+- CLI no longer crashes with out-of-memory errors when running shell commands that produce high-volume output
+- Pressing Escape multiple times during autopilot cancellation no longer leaves the session stuck
+- Read .claude/settings.json and .claude/settings.local.json as additional repo config sources
+- Model picker opens in full-screen view with inline reasoning effort adjustment using ← / → arrow keys
+- OTEL hook executions are now recorded as span events instead of child spans, reducing trace clutter
+- User prompt appears in the conversation immediately after pressing Enter
+- /allow-all (/yolo) now supports on, off, and show subcommands to enable, disable, or check allow-all mode
+- Ctrl+Y in plan mode opens the most recent research report when no plan exists yet
+
 ## 1.0.11 - 2026-03-23
 
 - Ensure models appear in picker correctly, display model names where possible
