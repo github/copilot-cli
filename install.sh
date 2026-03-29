@@ -148,7 +148,8 @@ if ! command -v copilot >/dev/null 2>&1; then
   echo "Notice: $INSTALL_DIR is not in your PATH"
 
   # Detect shell profile file for PATH
-  case "$(basename "${SHELL:-/bin/sh}")" in
+  CURRENT_SHELL="$(basename "${SHELL:-/bin/sh}")"
+  case "$CURRENT_SHELL" in
     zsh) RC_FILE="${ZDOTDIR:-$HOME}/.zprofile" ;;
     bash)
       if [ -f "$HOME/.bash_profile" ]; then
@@ -159,8 +160,14 @@ if ! command -v copilot >/dev/null 2>&1; then
         RC_FILE="$HOME/.profile"
       fi
       ;;
+    fish) RC_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/fish/conf.d/copilot.fish" ;;
     *) RC_FILE="$HOME/.profile" ;;
   esac
+
+  PATH_LINE="export PATH=\"$INSTALL_DIR:\$PATH\""
+  if [ "$CURRENT_SHELL" = "fish" ]; then
+    PATH_LINE="fish_add_path \"$INSTALL_DIR\""
+  fi
 
   # Prompt user to add to shell rc file (only if interactive)
   if [ -t 0 ] || [ -e /dev/tty ]; then
@@ -168,20 +175,21 @@ if ! command -v copilot >/dev/null 2>&1; then
     printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
     if read -r REPLY </dev/tty 2>/dev/null; then
       if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
-        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC_FILE"
-        echo "✓ Added PATH export to $RC_FILE"
+        mkdir -p "$(dirname "$RC_FILE")"
+        echo "$PATH_LINE" >> "$RC_FILE"
+        echo "✓ Added PATH configuration to $RC_FILE"
         echo "  Restart your shell or run: source $RC_FILE"
       fi
     fi
   else
     echo ""
     echo "To add $INSTALL_DIR to your PATH permanently, add this to $RC_FILE:"
-    echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
+    echo "  $PATH_LINE"
   fi
 
   echo ""
   echo "Installation complete! To get started, run:"
-  echo "  export PATH=\"$INSTALL_DIR:\$PATH\" && copilot help"
+  echo "  $PATH_LINE && copilot help"
 else
   echo ""
   echo "Installation complete! Run 'copilot help' to get started."
