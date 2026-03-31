@@ -1,5 +1,6 @@
 ## 1.0.14 - 2026-03-31
 
+- Add a companion uninstall script for curl/wget installs and document scripted uninstall behavior
 - Images are correctly sent to Anthropic models when using BYOM
 - Model picker selection correctly overrides the --model flag for the current session
 - Terminal output no longer clears or jumps on error exit
