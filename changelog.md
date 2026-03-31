@@ -1,3 +1,33 @@
+## 1.0.14 - 2026-03-31
+
+- Images are correctly sent to Anthropic models when using BYOM
+- Model picker selection correctly overrides the --model flag for the current session
+- Terminal output no longer clears or jumps on error exit
+- Shift+Enter inserts a newline in terminals with Kitty keyboard protocol support
+- Show underlying error details when a Git marketplace URL fails to clone
+- Temp file operations no longer trigger unnecessary permission prompts on macOS
+- Allow SDK session participants to respond to elicitation requests via handlePendingElicitation API
+- Shell processes are cleaned up properly when a session ends
+- SDK exit_plan_mode.requested event is now always emitted, regardless of whether a direct callback is configured
+- MCP servers using Microsoft Entra ID authentication no longer show the consent screen on every login
+- Grep and glob search results return promptly when a timeout is reached
+- Keystrokes are no longer dropped when typing quickly in elicitation dialogs
+- Clipboard copy on native Windows no longer includes a stray U+FEFF character at the start of pasted text
+- Fixed --config-dir being ignored when resuming a session, causing paths to silently fall back to ~/.copilot
+- MCP servers blocked by allowlist policy are now hidden from /mcp show
+- Reasoning effort setting now applies correctly when using Bring Your Own Model (BYOM) providers
+- Ensure clear error messaging when using classic PATs
+- grep tool handles large files and long lines without running out of memory
+- MCP server OAuth authentication works when the CLI runs in ACP mode
+- Split $BROWSER on spaces
+- Pasted text is no longer corrupted when mouse support is active
+- Uninstalling a marketplace plugin removes its cached data from disk
+- Reduce CPU usage during streaming by optimizing spinner rendering and task polling
+- Reduce CLI startup time by running terminal detection, auth, and git operations in parallel
+- MCP registry lookups are more reliable with automatic retries and request timeouts
+- CLI starts faster due to V8 compile cache reducing parse and compile time on repeated invocations
+- Remove support for gemini-3-pro-preview model
+
 ## 1.0.13 - 2026-03-30
 
 - Shell processes are cleaned up properly when a session ends
