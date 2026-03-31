@@ -105,13 +105,13 @@ npm install -g @github/copilot@prerelease
 If you installed with the install script on macOS or Linux, uninstall with:
 
 ```bash
-curl -fsSL https://gh.io/copilot-uninstall | bash
+curl -fsSL https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main/uninstall.sh | bash
 ```
 
 Or:
 
 ```bash
-wget -qO- https://gh.io/copilot-uninstall | bash
+wget -qO- https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main/uninstall.sh | bash
 ```
 
 Use `| sudo bash` to remove `/usr/local/bin/copilot`, or set `PREFIX` to remove
