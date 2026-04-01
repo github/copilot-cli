@@ -1,3 +1,24 @@
+## 1.0.15 - 2026-04-01
+
+- Remove support for gpt-5.1-codex, gpt-5.1-codex-mini, and gpt-5.1-codex-max models
+- Copilot mascot now blinks with subtle eye animations in interactive mode
+- User switcher and `/user list` display accounts in alphabetical order
+- Add mcp.config.list, mcp.config.add, mcp.config.update, and mcp.config.remove server RPCs for managing persistent MCP server configuration
+- Add device code flow (RFC 8628) as a fallback for MCP OAuth in headless and CI environments
+- Add `/mcp auth` command and re-authentication UI for MCP OAuth servers with account switching support
+- Add postToolUseFailure hooks for tool errors and make postToolUse run only after successful tool calls
+- Add /share html command to export sessions and research reports as self-contained interactive HTML files
+- Autopilot no longer continues after pressing Escape or Ctrl+C to cancel
+- Keystrokes typed while the CLI is loading are no longer lost
+- Large tool output preview shows correct character count and up to 500 characters
+- Add Home/End and Page Up/Page Down navigation to the diff viewer
+- CLI exits immediately after a session ends instead of waiting up to 10 seconds
+- Config settings askUser, autoUpdate, storeTokenPlaintext, logLevel, skillDirectories, and disabledSkills now use camelCase names (snake_case still accepted)
+- Many settings keys now prefer camelCase names (snake_case names still work)
+- Ctrl+D no longer queues a message; use Ctrl+Q or Ctrl+Enter to queue
+- MCP servers that are slow to connect no longer block the agent from starting
+- Pasting images from the Windows clipboard now works in WSL environments
+
 ## 1.0.14 - 2026-03-31
 
 - Images are correctly sent to Anthropic models when using BYOM
