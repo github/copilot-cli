@@ -1,3 +1,14 @@
+## 1.0.16 - 2026-04-02
+
+- SQL prompt tags no longer appear when sql tool is excluded via excludedTools or availableTools
+- MCP tool calls display tool name and parameter summary in the timeline
+- MCP server reconnects correctly with valid authentication when the working directory changes
+- Add PermissionRequest hook to allow scripts to programmatically approve or deny tool permission requests
+- Remove deprecated `marketplaces` repository setting (use `extraKnownMarketplaces` instead)
+- MCP servers load correctly after login, user switch, and /mcp reload
+- BYOK Anthropic provider now respects the configured maxOutputTokens limit
+- Remove deprecated `marketplaces` repository setting (use `extraKnownMarketplaces` instead)
+
 ## 1.0.15 - 2026-04-01
 
 - Remove support for gpt-5.1-codex, gpt-5.1-codex-mini, and gpt-5.1-codex-max models
