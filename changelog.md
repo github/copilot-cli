@@ -1,3 +1,9 @@
+## 1.0.17 - 2026-04-03
+
+- Built-in skills are now included with the CLI, starting with a guide for customizing Copilot cloud agent's environment
+- MCP OAuth flows now support HTTPS redirect URIs via a self-signed certificate fallback, improving compatibility with OAuth providers that require HTTPS (e.g., Slack)
+- /resume session picker loads significantly faster, especially with large session histories
+
 ## 1.0.16 - 2026-04-02
 
 - SQL prompt tags no longer appear when sql tool is excluded via excludedTools or availableTools
