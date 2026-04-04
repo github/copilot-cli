@@ -1,3 +1,10 @@
+## 1.0.18 - 2026-04-04
+
+- New Critic agent automatically reviews plans and complex implementations using a complementary model to catch errors early (available in experimental mode for Claude models)
+- Session resume picker correctly groups sessions by branch and repository on first use
+- preToolUse hook permissionDecision 'allow' now suppresses the tool approval prompt
+- Add notification hook event that fires asynchronously on shell completion, permission prompts, elicitation dialogs, and agent completion
+
 ## 1.0.17 - 2026-04-03
 
 - Built-in skills are now included with the CLI, starting with a guide for customizing Copilot cloud agent's environment
