@@ -1,3 +1,161 @@
+## 1.0.21 - 2026-04-07
+
+- Add `copilot mcp` command for managing MCP servers
+- Spinner no longer appears stuck when a long-running async shell command is active
+- Enterprise GitHub URL input in the login flow now accepts keyboard input and submits on Enter
+- Slash command picker no longer flickers or shifts the input while filtering
+- Timeline no longer goes blank when content shrinks (e.g., after cancelling or tool completion)
+- Plan mode timeline display shows user text without a redundant "Plan" prefix
+- Reduce memory usage by automatically shutting down shell sessions that are no longer needed
+- Hooks configured with PascalCase event names now receive VS Code-compatible snake_case payloads with hook_event_name, session_id, and ISO 8601 timestamps
+
+## 1.0.20 - 2026-04-07
+
+- Add `copilot help monitoring` topic with OpenTelemetry configuration details and examples
+- Spinner stays active until background agents and shell commands finish, and user input remains available throughout
+- Azure OpenAI BYOK defaults to the GA versionless v1 route when no API version is configured
+- Reduce UI sluggishness during live response streaming
+- /yolo and --yolo now behave identically and /yolo state persists across /restart
+
+## 1.0.19 - 2026-04-06
+
+- /mcp enable and /mcp disable now persist across sessions
+- OpenTelemetry monitoring: subagent spans now use INTERNAL span kind, and chat spans include a `github.copilot.time_to_first_chunk` attribute (streaming only)
+- Plugin hook scripts with missing execute permissions now run correctly on macOS
+- Custom agent is properly restored when resuming a session where the agent display name differs from its filename
+- Skip IDE auto-connect when session is already in use by another client
+- Slash command timeline entries now include the command name (e.g., "Review", "Plan") for better context
+
+## 1.0.18 - 2026-04-04
+
+- New Critic agent automatically reviews plans and complex implementations using a complementary model to catch errors early (available in experimental mode for Claude models)
+- Session resume picker correctly groups sessions by branch and repository on first use
+- preToolUse hook permissionDecision 'allow' now suppresses the tool approval prompt
+- Add notification hook event that fires asynchronously on shell completion, permission prompts, elicitation dialogs, and agent completion
+
+## 1.0.17 - 2026-04-03
+
+- Built-in skills are now included with the CLI, starting with a guide for customizing Copilot cloud agent's environment
+- MCP OAuth flows now support HTTPS redirect URIs via a self-signed certificate fallback, improving compatibility with OAuth providers that require HTTPS (e.g., Slack)
+- /resume session picker loads significantly faster, especially with large session histories
+
+## 1.0.16 - 2026-04-02
+
+- SQL prompt tags no longer appear when sql tool is excluded via excludedTools or availableTools
+- MCP tool calls display tool name and parameter summary in the timeline
+- MCP server reconnects correctly with valid authentication when the working directory changes
+- Add PermissionRequest hook to allow scripts to programmatically approve or deny tool permission requests
+- Remove deprecated `marketplaces` repository setting (use `extraKnownMarketplaces` instead)
+- MCP servers load correctly after login, user switch, and /mcp reload
+- BYOK Anthropic provider now respects the configured maxOutputTokens limit
+- Remove deprecated `marketplaces` repository setting (use `extraKnownMarketplaces` instead)
+
+## 1.0.15 - 2026-04-01
+
+- Remove support for gpt-5.1-codex, gpt-5.1-codex-mini, and gpt-5.1-codex-max models
+- Copilot mascot now blinks with subtle eye animations in interactive mode
+- User switcher and `/user list` display accounts in alphabetical order
+- Add mcp.config.list, mcp.config.add, mcp.config.update, and mcp.config.remove server RPCs for managing persistent MCP server configuration
+- Add device code flow (RFC 8628) as a fallback for MCP OAuth in headless and CI environments
+- Add `/mcp auth` command and re-authentication UI for MCP OAuth servers with account switching support
+- Add postToolUseFailure hooks for tool errors and make postToolUse run only after successful tool calls
+- Add /share html command to export sessions and research reports as self-contained interactive HTML files
+- Autopilot no longer continues after pressing Escape or Ctrl+C to cancel
+- Keystrokes typed while the CLI is loading are no longer lost
+- Large tool output preview shows correct character count and up to 500 characters
+- Add Home/End and Page Up/Page Down navigation to the diff viewer
+- CLI exits immediately after a session ends instead of waiting up to 10 seconds
+- Config settings askUser, autoUpdate, storeTokenPlaintext, logLevel, skillDirectories, and disabledSkills now use camelCase names (snake_case still accepted)
+- Many settings keys now prefer camelCase names (snake_case names still work)
+- Ctrl+D no longer queues a message; use Ctrl+Q or Ctrl+Enter to queue
+- MCP servers that are slow to connect no longer block the agent from starting
+- Pasting images from the Windows clipboard now works in WSL environments
+
+## 1.0.14 - 2026-03-31
+
+- Images are correctly sent to Anthropic models when using BYOM
+- Model picker selection correctly overrides the --model flag for the current session
+- Terminal output no longer clears or jumps on error exit
+- Shift+Enter inserts a newline in terminals with Kitty keyboard protocol support
+- Show underlying error details when a Git marketplace URL fails to clone
+- Temp file operations no longer trigger unnecessary permission prompts on macOS
+- Allow SDK session participants to respond to elicitation requests via handlePendingElicitation API
+- Shell processes are cleaned up properly when a session ends
+- SDK exit_plan_mode.requested event is now always emitted, regardless of whether a direct callback is configured
+- MCP servers using Microsoft Entra ID authentication no longer show the consent screen on every login
+- Grep and glob search results return promptly when a timeout is reached
+- Keystrokes are no longer dropped when typing quickly in elicitation dialogs
+- Clipboard copy on native Windows no longer includes a stray U+FEFF character at the start of pasted text
+- Fixed --config-dir being ignored when resuming a session, causing paths to silently fall back to ~/.copilot
+- MCP servers blocked by allowlist policy are now hidden from /mcp show
+- Reasoning effort setting now applies correctly when using Bring Your Own Model (BYOM) providers
+- Ensure clear error messaging when using classic PATs
+- grep tool handles large files and long lines without running out of memory
+- MCP server OAuth authentication works when the CLI runs in ACP mode
+- Split $BROWSER on spaces
+- Pasted text is no longer corrupted when mouse support is active
+- Uninstalling a marketplace plugin removes its cached data from disk
+- Reduce CPU usage during streaming by optimizing spinner rendering and task polling
+- Reduce CLI startup time by running terminal detection, auth, and git operations in parallel
+- MCP registry lookups are more reliable with automatic retries and request timeouts
+- CLI starts faster due to V8 compile cache reducing parse and compile time on repeated invocations
+- Remove support for gemini-3-pro-preview model
+
+## 1.0.13 - 2026-03-30
+
+- Shell processes are cleaned up properly when a session ends
+- Reduce CPU usage during streaming by optimizing spinner rendering and task polling
+- SDK exit_plan_mode.requested event is now always emitted, regardless of whether a direct callback is configured
+- MCP servers using Microsoft Entra ID authentication no longer show the consent screen on every login
+- Grep and glob search results return promptly when a timeout is reached
+- Keystrokes are no longer dropped when typing quickly in elicitation dialogs
+- Clipboard copy on native Windows no longer includes a stray U+FEFF character at the start of pasted text
+- Fixed --config-dir being ignored when resuming a session, causing paths to silently fall back to ~/.copilot
+- Reduce CLI startup time by running terminal detection, auth, and git operations in parallel
+- /rewind and double-Esc now open a timeline picker that can roll back to any point in conversation history, not just the previous snapshot
+- MCP registry lookups are more reliable with automatic retries and request timeouts
+- CLI starts faster due to V8 compile cache reducing parse and compile time on repeated invocations
+- MCP servers can request LLM inference (sampling) with user approval via a new review prompt
+- MCP servers blocked by allowlist policy are now hidden from /mcp show
+- Reasoning effort setting now applies correctly when using Bring Your Own Model (BYOM) providers
+- Ensure clear error messaging when using classic PATs
+- grep tool handles large files and long lines without running out of memory
+- MCP server OAuth authentication works when the CLI runs in ACP mode
+- Split $BROWSER on spaces
+- Pasted text is no longer corrupted when mouse support is active
+- Uninstalling a marketplace plugin removes its cached data from disk
+- Remove support for gemini-3-pro-preview model
+
+## 1.0.12 - 2026-03-26
+
+- MCP servers defined in .mcp.json start correctly when the working directory is the git root
+- Clipboard copy works correctly on Windows when non-system clip.exe shadows the system one in PATH
+- /diff view correctly renders all lines when intra-line highlighting is present
+- Plugin hooks now receive CLAUDE_PROJECT_DIR and CLAUDE_PLUGIN_DATA environment variables, and support {{project_dir}} and {{plugin_data_dir}} template variables in hook configurations
+- Workspace MCP servers are now correctly loaded and visible to the agent
+- /clear preserves MCP servers in the new session
+- Model display header shows the active reasoning effort level (e.g. "(high)") next to the model name
+- /session rename auto-generates a session name from conversation history when called without a name argument
+- Remove --alt-screen flag and alt_screen setting; alt screen is now always enabled
+- OSC 8 hyperlinks are now clickable in VS Code terminals
+- PowerShell /flag arguments (e.g., /all, /enum-devices) are no longer mistakenly treated as file paths
+- Trusted folder access prompts no longer appear incorrectly on Windows OneDrive paths and case-insensitive filesystems
+- Status line payload includes session_name field alongside session_id
+- @ file picker no longer shows .git directory contents
+- Scroll position stays in place when the terminal is resized
+- /yolo path permissions persist after using /clear to start a new session
+- Emoji characters are selected and highlighted correctly in terminal text selection
+- Sessions with active work are no longer cleaned up by the stale session reaper
+- Resume session restores the previously selected custom agent
+- CLI no longer crashes with out-of-memory errors when running shell commands that produce high-volume output
+- Pressing Escape multiple times during autopilot cancellation no longer leaves the session stuck
+- Read .claude/settings.json and .claude/settings.local.json as additional repo config sources
+- Model picker opens in full-screen view with inline reasoning effort adjustment using ← / → arrow keys
+- OTEL hook executions are now recorded as span events instead of child spans, reducing trace clutter
+- User prompt appears in the conversation immediately after pressing Enter
+- /allow-all (/yolo) now supports on, off, and show subcommands to enable, disable, or check allow-all mode
+- Ctrl+Y in plan mode opens the most recent research report when no plan exists yet
+
 ## 1.0.11 - 2026-03-23
 
 - Ensure models appear in picker correctly, display model names where possible

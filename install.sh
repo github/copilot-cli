@@ -54,7 +54,7 @@ elif [ "${VERSION}" = "prerelease" ]; then
     echo "Error: git is required to install prerelease versions" >&2
     exit 1
   fi
-  VERSION="$(git ls-remote --tags "$GIT_REMOTE" | tail -1 | awk -F/ '{print $NF}')"
+  VERSION="$(git ls-remote --tags --sort "version:refname" "$GIT_REMOTE" | tail -1 | awk -F/ '{print $NF}')"
   if [ -z "$VERSION" ]; then
     echo "Error: Could not determine prerelease version" >&2
     exit 1
@@ -75,6 +75,7 @@ echo "Downloading from: $DOWNLOAD_URL"
 
 # Download and extract with error handling
 TMP_DIR="$(mktemp -d)"
+trap 'rm -rf -- "$TMP_DIR"' EXIT
 TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
 if command -v curl >/dev/null 2>&1; then
   curl -fsSL "${CURL_AUTH[@]}" "$DOWNLOAD_URL" -o "$TMP_TARBALL"
@@ -82,7 +83,6 @@ elif command -v wget >/dev/null 2>&1; then
   wget -qO "$TMP_TARBALL" "${WGET_AUTH[@]}" "$DOWNLOAD_URL"
 else
   echo "Error: Neither curl nor wget found. Please install one of them."
-  rm -rf "$TMP_DIR"
   exit 1
 fi
 
@@ -101,7 +101,6 @@ if [ "$CHECKSUMS_AVAILABLE" = true ]; then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
       exit 1
     fi
   elif command -v shasum >/dev/null 2>&1; then
@@ -109,7 +108,6 @@ if [ "$CHECKSUMS_AVAILABLE" = true ]; then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
-      rm -rf "$TMP_DIR"
       exit 1
     fi
   else
@@ -120,7 +118,6 @@ fi
 # Check that the file is a valid tarball
 if ! tar -tzf "$TMP_TARBALL" >/dev/null 2>&1; then
   echo "Error: Downloaded file is not a valid tarball or is corrupted." >&2
-  rm -rf "$TMP_DIR"
   exit 1
 fi
 
@@ -144,7 +141,6 @@ fi
 tar -xz -C "$INSTALL_DIR" -f "$TMP_TARBALL"
 chmod +x "$INSTALL_DIR/copilot"
 echo "✓ GitHub Copilot CLI installed to $INSTALL_DIR/copilot"
-rm -rf "$TMP_DIR"
 
 # Check if installed binary is accessible
 if ! command -v copilot >/dev/null 2>&1; then
@@ -152,7 +148,8 @@ if ! command -v copilot >/dev/null 2>&1; then
   echo "Notice: $INSTALL_DIR is not in your PATH"
 
   # Detect shell profile file for PATH
-  case "$(basename "${SHELL:-/bin/sh}")" in
+  CURRENT_SHELL="$(basename "${SHELL:-/bin/sh}")"
+  case "$CURRENT_SHELL" in
     zsh) RC_FILE="${ZDOTDIR:-$HOME}/.zprofile" ;;
     bash)
       if [ -f "$HOME/.bash_profile" ]; then
@@ -163,8 +160,14 @@ if ! command -v copilot >/dev/null 2>&1; then
         RC_FILE="$HOME/.profile"
       fi
       ;;
+    fish) RC_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/fish/conf.d/copilot.fish" ;;
     *) RC_FILE="$HOME/.profile" ;;
   esac
+
+  PATH_LINE="export PATH=\"$INSTALL_DIR:\$PATH\""
+  if [ "$CURRENT_SHELL" = "fish" ]; then
+    PATH_LINE="fish_add_path \"$INSTALL_DIR\""
+  fi
 
   # Prompt user to add to shell rc file (only if interactive)
   if [ -t 0 ] || [ -e /dev/tty ]; then
@@ -172,20 +175,21 @@ if ! command -v copilot >/dev/null 2>&1; then
     printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
     if read -r REPLY </dev/tty 2>/dev/null; then
       if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
-        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$RC_FILE"
-        echo "✓ Added PATH export to $RC_FILE"
+        mkdir -p "$(dirname "$RC_FILE")"
+        echo "$PATH_LINE" >> "$RC_FILE"
+        echo "✓ Added PATH configuration to $RC_FILE"
         echo "  Restart your shell or run: source $RC_FILE"
       fi
     fi
   else
     echo ""
     echo "To add $INSTALL_DIR to your PATH permanently, add this to $RC_FILE:"
-    echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
+    echo "  $PATH_LINE"
   fi
 
   echo ""
   echo "Installation complete! To get started, run:"
-  echo "  export PATH=\"$INSTALL_DIR:\$PATH\" && copilot help"
+  echo "  $PATH_LINE && copilot help"
 else
   echo ""
   echo "Installation complete! Run 'copilot help' to get started."
