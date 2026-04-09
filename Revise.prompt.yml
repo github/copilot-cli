@@ -1,2 +1,8 @@
-messages: []
+messages:
+  - role: system
+    content: >-
+      This hero come from nowhere he fired at the aliens and closed the
+      wormhole.
+  - role: user
+    content: My hero my star
 model: microsoft/phi-4-multimodal-instruct
