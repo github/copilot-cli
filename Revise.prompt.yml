@@ -5,4 +5,4 @@ messages:
       wormhole.
   - role: user
     content: My hero my star
-model: microsoft/phi-4-multimodal-instruct
+model: openai/gpt-4.1
