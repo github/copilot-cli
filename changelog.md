@@ -1,3 +1,7 @@
+## 1.0.35 - 2026-04-21
+
+- `install.sh` now automatically cleans up older direct-install copies of `copilot` after a successful install, preserving the selected CLI, active-session binaries, package-managed installs, and runtime caches; set `NO_CLEANUP=true` to opt out
+
 ## 1.0.34 - 2026-04-20
 
 - Rate limit error message now says "session rate limit" instead of "global rate limit"

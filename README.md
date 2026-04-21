@@ -63,6 +63,46 @@ For example, to install version `v0.0.369` to a custom directory:
 curl -fsSL https://gh.io/copilot-install | VERSION="v0.0.369" PREFIX="$HOME/custom" bash
 ```
 
+After a successful install, the script automatically removes older
+direct-install copies that are safe to delete. To skip automatic cleanup:
+
+```bash
+curl -fsSL https://gh.io/copilot-install | NO_CLEANUP=true bash
+```
+
+Run cleanup without downloading or installing a new binary:
+
+```bash
+curl -fsSL https://gh.io/copilot-install | CLEANUP_ONLY=true bash
+```
+
+Cleanup-only mode uses the currently selected `copilot` on your `PATH` as the
+keep target, so `copilot` must already resolve in your shell.
+
+Preview cleanup decisions without deleting anything:
+
+```bash
+curl -fsSL https://gh.io/copilot-install | CLEANUP_ONLY=true DRY_RUN=true VERBOSE=true bash
+```
+
+If you are running a local copy of the script instead of piping it, the same
+cleanup controls are also available as flags:
+
+```bash
+bash install.sh --cleanup-only --dry-run --verbose
+```
+
+Cleanup only removes standalone `copilot` binaries that look like
+install-script-owned direct installs. It always keeps the currently selected
+CLI, skips binaries backing active sessions, and does not delete package-managed
+installs or runtime caches such as `copilot-sdk-*`.
+
+Use the owning tool to remove package-managed installs instead:
+
+- npm: `npm uninstall -g @github/copilot`
+- Homebrew: `brew uninstall copilot-cli`
+- WinGet: `winget uninstall GitHub.Copilot`
+
 Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
 
 ```bash
