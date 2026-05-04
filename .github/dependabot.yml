@@ -49,4 +49,4 @@ updates:
       interval: "weekly"
     labels:
       - "docker"
-      - "dependencies"
+      - "dependencies" 
