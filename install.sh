@@ -72,8 +72,14 @@ elif command -v wget >/dev/null 2>&1; then
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
-  if command -v sha256sum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && sha256sum -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
+  CHECKSUM_FILE="copilot-${PLATFORM}-${ARCH}.tar.gz"
+  CHECKSUM_LINE="$(awk -v file="$CHECKSUM_FILE" '$2 == file || $2 == "*" file { print; exit }' "$TMP_CHECKSUMS")"
+  if [ -z "$CHECKSUM_LINE" ]; then
+    echo "Error: No checksum entry found for $CHECKSUM_FILE." >&2
+    rm -rf "$TMP_DIR"
+    exit 1
+  elif command -v sha256sum >/dev/null 2>&1; then
+    if printf '%s\n' "$CHECKSUM_LINE" | (cd "$TMP_DIR" && sha256sum -c - >/dev/null 2>&1); then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
@@ -81,7 +87,7 @@ if [ "$CHECKSUMS_AVAILABLE" = true ]; then
       exit 1
     fi
   elif command -v shasum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && shasum -a 256 -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
+    if printf '%s\n' "$CHECKSUM_LINE" | (cd "$TMP_DIR" && shasum -a 256 -c - >/dev/null 2>&1); then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
