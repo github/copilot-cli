@@ -1,3 +1,29 @@
+## 1.0.44 - 2026-05-08
+
+- Path completion in /add-dir no longer flickers or gets intercepted by @ and # pickers
+- Slash commands can now appear mid-input, and multiple skills can be invoked in a single message
+- userPromptSubmitted hooks can now handle requests directly, bypassing the LLM and returning a response without making a model call
+- Faster /user list and /user switch for multi-account users
+- Add optional `prerelease` argument to `copilot update` and `/update` to fetch the latest prerelease build
+- Shell commands via ! prefix work correctly with all shell configurations
+- Shell aliases and rc file settings now work in ! commands
+- Quota display correctly shows remaining usage for Free users instead of always showing 100% used
+- Tool permissions granted in autopilot mode are preserved after /clear
+- Effort level applies correctly when switching models via the /model picker
+- Pressing Ctrl+C while a permission prompt is pending no longer causes the CLI to hang
+- Project info remains visible in slash command picker when no results match
+- Invalid URL entries in settings.json no longer crash CLI startup and are skipped with a warning
+- Timeline shows the resolved model for rubber-duck sub-agents (e.g. Rubber-duck(claude-opus-4.7))
+
+## 1.0.43 - 2026-05-06
+
+- Add username toggle to /statusline picker to display the active account in the footer
+- Auto mode uses server-side model routing for improved real-time model selection
+- Resume prompt shows correct session name when multiple sessions are active
+- Protect against RCE from malicious bare repositories nested inside a project
+- MCP server child processes (e.g. started via npx or uvx) are now fully terminated when a session ends
+- Show download progress when running the update command
+
 ## 1.0.42 - 2026-05-06
 
 - MCP server failure warning now suggests a directly runnable `/mcp show` command when the server name contains whitespace
