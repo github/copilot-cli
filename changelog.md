@@ -1,3 +1,13 @@
+## 1.0.45 - 2026-05-11
+
+- Add /autopilot slash command to toggle between interactive and autopilot modes
+- Fall back to Windows PowerShell (powershell.exe) when PowerShell 7+ (pwsh) is not available on Windows
+- OpenTelemetry output aligns with GenAI semantic conventions: MCP tool calls now use standard tool_call spans, and a new gen_ai.client.operation.duration metric tracks tool execution time
+- Sessions with extension permission prompts can be resumed without a "Session file is corrupted" error
+- agentStop hook now fires correctly when the agent stops via task_complete
+- CLI starts faster on terminals with limited OSC color query support, shaving up to ~1.5s off startup time.
+- Add /fork command to fork the current session into a new independent session
+
 ## 1.0.44 - 2026-05-08
 
 - Path completion in /add-dir no longer flickers or gets intercepted by @ and # pickers
