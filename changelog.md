@@ -1,3 +1,11 @@
+## 1.0.46 - 2026-05-12
+
+- Display a warning when the CLI version is deprecated and premium model access may be lost
+- PowerShell starts correctly when pwsh is installed as a .NET global tool shim
+- Long lines in diff view wrap at terminal width instead of being truncated
+- Read-only gh CLI commands (list, view, status, diff, etc.) are auto-approved without prompting for user confirmation
+- Sessions no longer crash mid-turn with ERR_HTTP2_INVALID_SESSION errors
+
 ## 1.0.45 - 2026-05-11
 
 - Add /autopilot slash command to toggle between interactive and autopilot modes
