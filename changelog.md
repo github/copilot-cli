@@ -1,3 +1,10 @@
+## 1.0.47 - 2026-05-13
+
+- /fork accepts an optional name and forked sessions display their origin in the sessions dialog
+- Copilot Max subscribers see the correct models available to their subscription tier
+- Support j/k keys for up/down navigation in the /diff view
+- --resume supports Copilot cloud agent sessions where the agent hasn't pushed any changes to its branch
+
 ## 1.0.46 - 2026-05-12
 
 - Display a warning when the CLI version is deprecated and premium model access may be lost
