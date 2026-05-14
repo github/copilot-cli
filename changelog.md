@@ -1,3 +1,15 @@
+## 1.0.48 - 2026-05-14
+
+- Model picker displays actual token prices instead of dot indicators for token-based billing users
+- Instruction files with unquoted glob patterns in applyTo frontmatter (e.g. applyTo: \*_/_.ts) are now applied correctly
+- Input text with CJK characters or emoji renders without blank gaps between lines
+- /context shows correct token limits for all models instead of always showing 128k
+- Auto-disable the built-in github-mcp-server in Azure DevOps-only workspaces when running in prompt/headless mode, matching interactive mode behavior
+- Terminal cursor positions correctly on the input field instead of on decorative elements like the selected tab
+- ACP clients receive updated config options when the active model is changed
+- /ask dialog no longer prompts for follow-up replies it cannot receive
+- Skill content injected to the model no longer includes YAML frontmatter metadata
+
 ## 1.0.47 - 2026-05-13
 
 - /fork accepts an optional name and forked sessions display their origin in the sessions dialog
