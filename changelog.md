@@ -1,3 +1,47 @@
+## 1.0.49 - 2026-05-18
+
+- postToolUse hook additionalContext is now injected as a system message for the model instead of being silently discarded
+- Mouse clicks in the prompt correctly position cursor when input contains wide characters (CJK, emoji)
+- Add /chronicle search subcommand to search all session content by keyword or topic
+- /user switch reuses the fetched user list and shows a loading spinner on first open
+- MCP servers using static OAuth clients correctly persist registration for token refreshes
+- Add support for running the CLI on Alpine Linux (musl libc)
+- Add /exit print option to print the session to the terminal before exiting
+- Add /rubber-duck command to get an independent critique of the agent's current work
+- Add /session id subcommand to display the current session ID and copy it to the clipboard
+- Add `auth.redirectPort` config option for MCP servers to pin the OAuth callback to a fixed port
+- Add /memory on|off|show slash command to enable, disable, or view memory status (persistent)
+- Add `copilot plugin update --all` to update all installed plugins at once
+- Add `/rubber-duck` command to invoke the rubber duck agent for an independent critique (experimental)
+- Input prompt collapses to a single line when empty and grows naturally as you type
+- File diffs are correctly reported to ACP clients for all edit tool types
+- Repo hooks in `.github/hooks/` now load in prompt mode (`-p`) when the folder is already trusted
+- Fix extra line in timeline entries
+- Box drawing and block characters render correctly on Windows terminals not using UTF-8 code page
+- MCP server configurations with no `args` field are now accepted and treated as an empty args list
+- Document attachment paths are included in context so the agent can reference pasted file paths, including Windows Copy as path inputs
+- MCP stdio servers now display type as 'stdio' instead of 'local' for consistency
+- Progress bar indicator now displays correctly in tmux sessions
+- Experimental slash commands are now annotated with "(experimental)" in the help dialog and command picker
+- Auto-update downloads the smaller platform-specific package instead of the universal one when available
+- Auto-link GitHub issue and PR references (owner/repo#number) in assistant responses
+- Prompt mode (-p) automatically loads workspace MCP sources when the current folder is already trusted
+- Experimental: /mcp search command to search and install MCP servers from registry
+- Experimental: Tool search with deferred loading for MCP and external tools
+- Add "None" reasoning effort option to disable model reasoning in the reasoning effort picker
+- Add COPILOT_PLUGIN_DIR_ONLY environment variable to disable automatic plugin discovery, enabling deterministic plugin sets when using --plugin-dir
+- Copying text from the scroll view joins soft-wrapped lines without extra newlines or indentation
+- Cursor positioning in input fields works correctly with wide characters (CJK, emoji)
+- Hooks (preToolUse, postToolUse, subagentStart, subagentStop) now fire correctly for sub-agent tool calls
+- Plugins loaded via --plugin-dir now correctly register their agents as available task(agent_type=...) subagents in prompt mode
+- Memory storage correctly limits available scopes when no repository context is present
+- --plugin-dir and --additional-mcp-config now work in --server / --headless mode
+- Content-filtered model responses now display an explanation instead of a blank assistant turn
+- PromptFrame UI now renders inside tmux when the outer terminal is ghostty, WezTerm, or kitty (detected via `tmux list-clients`).
+- MCP OAuth token lookups are correctly scoped to the active session
+- Memory permission prompts now name who can see a stored memory: user scope or the specific `owner/repo` for repository scope. Timeline entries also show the scope (`(for user)` / `(shared with repository collaborators)`).
+- Reduce PowerShell syntax errors on Windows by avoiding && chaining instructions when using legacy PowerShell 5.x
+
 ## 1.0.48 - 2026-05-14
 
 - Model picker displays actual token prices instead of dot indicators for token-based billing users
