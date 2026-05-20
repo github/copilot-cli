@@ -1,3 +1,33 @@
+## 1.0.51 - 2026-05-20
+
+- `--session-id=<id>` resumes known sessions or tasks, and starts new sessions with a specific UUID
+- /remote commands now respect organization remote control and view from cloud policy and show a clear error when disabled
+- /remote command can now be used while the agent is working
+- Customizable status line in the terminal footer displays session info such as model, context window, git branch, and more
+- MCP tool loading at startup is faster for users with many HTTP-based MCP servers
+- Settings file no longer accumulates unrelated config keys when settings are updated
+- Add /security-review slash command to review code changes for security vulnerabilities
+- Add preMcpToolCall hook for hook providers to control outgoing MCP request metadata
+- Add /chronicle cost-tips subcommand for personalized token usage and cost reduction recommendations
+- MCP servers using OAuth stay connected when authentication was performed in a separate session
+- GFM tables and blockquotes inside list items render correctly without a floating top border
+- Experimental mode indicator now appears persistently in the app header instead of as a one-time notification
+- Loading indicator color matches the active mode (plan, autopilot, shell)
+- Session naming works correctly for usage-based billing users
+- Pressing Enter on a highlighted subcommand completion inserts the selection instead of submitting the partial command
+- Use default release notes when publishing a release with no changelog entries
+- Editor launched with Ctrl+G no longer steals keystrokes or requires double keypresses
+- `/memory show` displays documentation links for learning about and managing Copilot Memory
+- Add `terminalProgress` setting to enable or disable OSC 9;4 terminal progress indicators
+- postToolUse hooks can now inject additionalContext into successful tool results
+- Only show remote session startup failure when remote mode is explicitly requested via --remote or enabled in user configuration
+- Shell tool calls succeed even when the model omits the `description` parameter
+- Ensure input token usage includes cached, update token formatting to clarify
+- Login prompt more clearly warns when token storage falls back to insecure plain text config file
+- GitHub MCP web search tool is available immediately without requiring tool search
+- Secret scanning now covers commit messages and PR descriptions, redacting secrets before they are published
+- Input area grows responsively with terminal height instead of capping at 3 lines
+
 ## 1.0.49 - 2026-05-18
 
 - postToolUse hook additionalContext is now injected as a system message for the model instead of being silently discarded
