@@ -1,3 +1,36 @@
+## 1.0.52 - 2026-05-23
+
+- Non-interactive subcommands (plugin list, mcp list, help, version) no longer consume stdin
+- Add vertical scrollbar with mouse drag support to the main conversation view
+- Switching to Autopilot mode no longer triggers unexpected permission prompts for tool, path, or URL access
+- copilot --continue from a session's saved directory now refreshes the saved branch and git context instead of leaving them stale
+- Kill command safety filter no longer rejects valid commands that contain shell redirection like `kill -0 <PID> 2>/dev/null`.
+- Sessions now resume in their saved working directory; pass -C <dir> to override. Flags whose values are relative paths (e.g. --attachment, --log-dir) resolve from the saved cwd.
+- Context window tier selection (default ~200K vs 1M tokens) is now enforced end-to-end, so picking a tier actually constrains compaction, truncation, and token display
+- AI Credits usage correctly displays after sessions using the Responses API
+- Rendering no longer stutters when using tmux on Cygwin or mintty
+- Slash command picker keeps (experimental) and (staff) labels orange when the row is selected
+- Reasoning tokens display as a parenthetical on output token count in the token usage summary
+- Sessions containing events with non-URL strings in URL/URI fields resume without a 'Session file is corrupted' error
+- Requests that time out due to an HTTP/2 upload stall automatically retry over HTTP/1.1
+- Sessions no longer fail to load on Windows when a process exits with a high-bit exit code (e.g., .NET unhandled exceptions)
+- Timeline entry connector color matches surrounding elements when expanded
+- Gray background bar no longer appears behind user messages on terminals without truecolor support
+- Status line command supports plain shell commands in addition to executable script paths
+- Automatically prune old process log files from ~/.copilot/logs/ at startup to prevent unbounded disk growth
+- Polish /statusline picker with cleaner item descriptions and better spacing
+- Picker checkboxes now use a single-cell ▣/▢ glyph for tighter, more consistent rows across pickers
+- Custom agents support opt-in deferred tool loading via `deferred-tool-loading` in agent frontmatter, enabling tool-search discovery for agents with large tool lists
+- Exit summary displays `AI Credits` label with correct spacing before the value
+- /restart and /update preserve the current session ID after restarting
+- Legacy nested `oauth.clientId` and `oauth.callbackPort` keys in MCP server configs are now migrated to the supported `oauthClientId` and `auth.redirectPort` keys instead of being silently dropped
+- MCP OAuth re-authentication honors the configured redirectPort
+- PowerShell division operator no longer triggers false 'Allow directory access' prompts on Windows
+- /compact accepts optional focus instructions to shape the compaction summary
+- General-purpose subagents use GPT-5.4 or GPT-5.5 when available
+- /usage shows quota progress bars for session and weekly limits
+- AI credits error messages updated with clearer language and a Manage budget link
+
 ## 1.0.51 - 2026-05-20
 
 - `--session-id=<id>` resumes known sessions or tasks, and starts new sessions with a specific UUID
