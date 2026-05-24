@@ -1,3 +1,7 @@
+## 1.0.54 - 2026-05-24
+
+Fixes and changes
+
 ## 1.0.53 - 2026-05-24
 
 - Multiline prompts display fully without content clipping or selection offset
