@@ -1,3 +1,9 @@
+## 1.0.53 - 2026-05-24
+
+- Multiline prompts display fully without content clipping or selection offset
+- /skills picker now correctly honors --config-dir when saving skill preferences
+- Bash shell sessions no longer hang when PS0 or PROMPT_COMMAND is set in the environment
+
 ## 1.0.52 - 2026-05-23
 
 - Non-interactive subcommands (plugin list, mcp list, help, version) no longer consume stdin
