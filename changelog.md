@@ -1,3 +1,52 @@
+## 1.0.55 - 2026-05-28
+
+- Free and Student plan users on token-based billing are restricted to Auto model selection, with an explanation shown in the model picker
+- Report Claude thinking (reasoning) tokens in session usage summaries
+- Add support for Claude Opus 4.8
+- Loading spinner no longer hangs forever when launching in an untrusted folder
+- MCP server configuration form saves the latest typed value when pressing Ctrl+S
+- Show per-MCP-server token usage in /mcp and break out MCP tool tokens in /context
+- Custom agents and skills are now discovered recursively in subdirectories
+- Add `permissions.disableBypassPermissionsMode` setting to prevent enabling allow-all/yolo mode
+- Update model selection behavior for select subscription plans
+- The exit_plan_mode tool is only offered to the model while the session is in plan mode
+- Native binary crash (e.g. SIGSEGV) now falls through to the JavaScript fallback instead of silently exiting
+- Add /autopilot <objective> to keep autopilot focused, with /goal as an alias
+- Detect PowerShell 7 correctly when pwsh.exe is installed as a Microsoft Store App Execution Alias
+- Sessions with zero-sized CAPI billing batches resume correctly
+- Cell-based terminal renderer is now enabled for all users by default
+- Show a warning when remote controlled sessions are disabled by organization policy
+- Extension log files are now captured per extension and surfaced in the extensions_manage tool to help diagnose failures
+- Project extensions in .github/extensions are now discovered in non-git (folder-backed) workspaces
+- Allow /statusline and /theme commands to run while the agent is executing
+- MCP configuration now opens in its own dedicated screen, with scrollable server and tool lists when content exceeds the visible area
+- Hook progress streaming shows real-time status messages from long-running hooks in the timeline
+- pluginDirectories on session.create and session.resume RPC: SDK clients can mount Open Plugins-format directories per session.
+- Delete remote sessions directly from the session picker
+- Schedule manager hint bar text no longer wraps over dialog borders when entries are added
+- `copilot update` and `copilot version` authenticate release API requests to avoid rate limit errors in shared-NAT environments
+- Diff view keyboard shortcut hints display correctly when toggling between unstaged and branch diff modes
+- Clipboard paste works correctly on Wayland compositors that do not support wlr-data-control (e.g. GNOME/Mutter)
+- Interactive shell tool preserves parent terminal color settings so diff tools and other programs render with full color
+- Canvas tools with optional object input schemas open correctly without validation errors
+- Extension subprocesses no longer fail with "Invalid command format" when forked from an older CLI version
+- Settings migration preserves user data when legacy snake_case keys exist from older CLI versions
+- Support owner/repo#ref syntax when adding plugins from the marketplace
+- Feedback dialog and /skills help text use Copilot-consistent log paths and terminology
+- Progress indicators integrate natively with tmux 3.6b pane progress state
+- --plugin-dir skills now take precedence over personal-home (~/.copilot, ~/.agents) skills with the same name. Order is now project > plugin-dir > personal > custom.
+- Show a helpful message when remote controlled sessions are disabled by organization policy
+- Reasoning token count now shown in session token summary for all users
+- Terminal bell no longer sounds on turn completion unless explicitly enabled via config
+- /resume picker no longer shows blank rows for sessions closed before sending a message
+- Aborting a session no longer leaves the UI stuck in a Cancelling state when Task tool agents are running
+- vote_memory tool calls are throttled per response and per interaction to prevent runaway voting bursts
+- Upward auto-scroll now engages when dragging mouse selection past the top of the timeline
+- Clipboard correctly copies CJK and supplementary-plane Unicode characters on Windows
+- Increase selection background contrast across all color themes for better visibility
+- /env now shows loaded extensions with their status and source
+- Extensions launch correctly when the CLI runs as a single-executable application (SEA)
+
 ## 1.0.54 - 2026-05-24
 
 Fixes and changes
