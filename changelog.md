@@ -1,3 +1,27 @@
+## 1.0.56 - 2026-05-29
+
+- Free and Student users can select models other than Auto in the model picker
+- ThemePicker side-by-side layout fits within a 120-column terminal without wrapping
+- Model picker shows accurate total context window size per pricing tier
+- Add `builtInAgents.rubberDuck` setting to enable or disable the rubber duck agent via `copilot config`
+- Extended key reporting works correctly in tmux when Kitty keyboard protocol is unavailable
+- Config and settings files are written atomically to prevent data loss when multiple CLI processes run concurrently
+- BYOK provider configuration now applies correctly to ACP sessions
+- MCP tools that return both human-readable `content` text and a `structuredContent` payload now surface both to the agent instead of dropping either side. When the text is the literal JSON serialization (per MCP spec §5.2.6) it is deduplicated; otherwise the two are concatenated.
+- Fix /context small-token legend formatting and free-space grid rounding
+- Reasoning effort picker respects model capabilities — options not supported by the model are no longer shown
+- File paths in /env output display with correct formatting
+- Reasoning text always displays above the assistant response in the conversation timeline
+- Assistant responses render without single-word orphan lines in the terminal timeline
+- Diff view uses a continuous scroll layout with sticky file and hunk headers, full terminal width, and theme-aware colors
+- web_fetch tool prefers markdown content when available, using HTTP content negotiation for cleaner results from documentation sites
+- Cursor stays at correct position after pasting text that contains tab characters
+- Code review agent now uses the same model as the current session instead of a fixed default
+- When gh CLI is on PATH, GitHub MCP server now omits redundant gh-replaceable tools by default, reducing token usage
+- Context window tier selection now persists durably in session events and survives SDK-only resume paths so tier-derived limits are reapplied to request, compaction, and truncation logic without app-level repair
+- Remote session URL correctly uses the repository owner/name instead of literal 'copilot'
+- Trusted folder confirmation message clarifies that permissions may be remembered for the session
+
 ## 1.0.55 - 2026-05-28
 
 - Free and Student plan users on token-based billing are restricted to Auto model selection, with an explanation shown in the model picker
