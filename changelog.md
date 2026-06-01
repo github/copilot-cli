@@ -1,3 +1,37 @@
+## 1.0.57 - 2026-06-01
+
+- Actionable error message shown when GitHub API rate limit is hit during `copilot update`
+- Plugin slash commands (/plugin install, uninstall, update, marketplace add/remove/browse) now show immediate feedback while the operation is in progress
+- Canceling a running shell command (Ctrl+C on a !command, or aborting an agent command — including in sandboxed and background-promoted shells) now terminates the whole process tree instead of leaving orphaned processes running
+- Canvas providers can return file:// URLs in open results for local file previews
+- Symlinked directories appear in /cwd completion suggestions
+- In Azure DevOps-only repositories, the built-in GitHub MCP server now exposes only the web_search tool instead of being fully disabled
+- Quota footer shows remaining requests as a rounded percentage
+- /lsp show, /lsp test, and /lsp reload correctly discover project LSP config when the CLI is launched from a subdirectory
+- MCP server timeout configuration is preserved after tools list changes
+- /skills add and /skills remove correctly handle paths wrapped in quotes (e.g., from Windows Explorer "Copy as path")
+- Running `copilot` with an unquoted multi-word prompt now shows a helpful "quote your prompt" hint instead of a raw commander error
+- Default networking transport is now HTTP/1.1, improving reliability on some network paths. Opt into HTTP/2 with COPILOT_ENABLE_HTTP2=1.
+- Plugins auto-installed from repository settings no longer leak into user global config
+- Grep tool correctly handles tsx and jsx as file type filters
+- COPILOT_HOME is honored for the server discovery registry directory
+- Click a diff line with the mouse to select it in diff mode
+- Ctrl+C and other modified keys work correctly inside tmux
+- @-mention file search matches files regardless of query letter casing
+- `copilot plugin marketplace list` now honors repo-level `extraKnownMarketplaces` settings from `.github/copilot/settings.json`
+- Queued prompts in the footer are capped to a single line, preventing them from pushing session messages off screen
+- MCP servers configured with npx --registry are no longer incorrectly blocked by policy
+- Session no longer hangs indefinitely after an error occurs during internal event processing
+- Installed plugins no longer include the .git directory from the plugin source repository
+- New reasoning after tool calls appears at the bottom of the timeline instead of above earlier output
+- Pasting text copied from a browser, editor, or terminal no longer leaves a stray empty line, broken box-drawing lines, or a misplaced cursor in the prompt
+- preToolUse hook errors now deny the tool call instead of silently allowing execution
+- Session resume works correctly after a crash that left partial data in the session log
+- High-contrast diff backgrounds use darker colors to improve text readability
+- Add showTipsOnStartup setting to control whether startup tips are shown
+- Surface the underlying reason (e.g. GitHub API rate limit) when SDK auth-token validation fails, instead of the misleading "Session was not created with authentication info or custom provider" message.
+- /diff defaults to branch diff when there are no unstaged changes
+
 ## 1.0.56 - 2026-05-29
 
 - Free and Student users can select models other than Auto in the model picker
@@ -1878,7 +1912,7 @@ To commemorate GitHub Copilot CLI reaching general availability last week, we're
 - Enabled non-interactive GHE logins by respecting the `GH_HOST` environment variable for PAT and `gh` authentication modes (fixes https://github.com/github/copilot-cli/issues/296)
 - Improved debug log collection convenience by adding a persistent `log_level` option in `~/.copilot/config`. Possible values: `["none", "error", "warning", "info", "debug", "all", "default"]`
 - Added debug logging when calls to `/model` result in Copilot API errors. This should help us diagnose some policy/model access edge cases like https://github.com/github/copilot-cli/issues/268 and https://github.com/github/copilot-cli/issues/116
-- Added `gradlew` to the list of commands whose subcommands can be whitelisted (fixes https://github.com/github/copilot-cli/issues/217#issuecomment-3393844685)
+- Added `gradlew` to the list of commands whose subcommands can be allowlisted (fixes https://github.com/github/copilot-cli/issues/217#issuecomment-3393844685)
 - Fixed a bug where sessions could enter a stuck state after a failed MCP tool call (fixes https://github.com/github/copilot-cli/issues/312)
 - Made the output of `--help` text more concise
 
