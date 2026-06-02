@@ -1,7 +1,34 @@
-## 1.0.58 - 2026-06-02
+## 1.0.59 - 2026-06-02
 
 - Actionable error message shown when GitHub API rate limit is hit during `copilot update`
 - Add /rubber-duck command for adversarial feedback on code and designs
+- Plugin slash commands (/plugin install, uninstall, update, marketplace add/remove/browse) now show immediate feedback while the operation is in progress
+- Canceling a running shell command (Ctrl+C on a !command, or aborting an agent command — including in sandboxed and background-promoted shells) now terminates the whole process tree instead of leaving orphaned processes running
+- Canvas providers can return file:// URLs in open results for local file previews
+- Symlinked directories appear in /cwd completion suggestions
+- In Azure DevOps-only repositories, the built-in GitHub MCP server now exposes only the web_search tool instead of being fully disabled
+- Quota footer shows remaining requests as a rounded percentage
+- /lsp show, /lsp test, and /lsp reload correctly discover project LSP config when the CLI is launched from a subdirectory
+- MCP server timeout configuration is preserved after tools list changes
+- /skills add and /skills remove correctly handle paths wrapped in quotes (e.g., from Windows Explorer "Copy as path")
+- Running `copilot` with an unquoted multi-word prompt now shows a helpful "quote your prompt" hint instead of a raw commander error
+- Default networking transport is now HTTP/1.1, improving reliability on some network paths. Opt into HTTP/2 with COPILOT_ENABLE_HTTP2=1.
+- Plugins auto-installed from repository settings no longer leak into user global config
+- Grep tool correctly handles tsx and jsx as file type filters
+- Add the /voice command to dictate prompts using local speech-to-text models
+- COPILOT_HOME is honored for the server discovery registry directory
+
+## 1.0.58 - 2026-06-02
+
+- Rubber Duck is now enabled by default
+- Remote JSON RPC is now enabled by default
+- Experimental schedule prompts with `/every` and `/after`
+- Experimental new GitHub TUI theme
+- Experimental new UI with easy access to issues, pull requests, and gists
+
+## 1.0.57 - 2026-06-01
+
+- Actionable error message shown when GitHub API rate limit is hit during `copilot update`
 - Plugin slash commands (/plugin install, uninstall, update, marketplace add/remove/browse) now show immediate feedback while the operation is in progress
 - Canceling a running shell command (Ctrl+C on a !command, or aborting an agent command — including in sandboxed and background-promoted shells) now terminates the whole process tree instead of leaving orphaned processes running
 - Canvas providers can return file:// URLs in open results for local file previews
