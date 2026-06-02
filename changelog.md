@@ -1,6 +1,7 @@
-## 1.0.57 - 2026-06-01
+## 1.0.58 - 2026-06-02
 
 - Actionable error message shown when GitHub API rate limit is hit during `copilot update`
+- Add /rubber-duck command for adversarial feedback on code and designs
 - Plugin slash commands (/plugin install, uninstall, update, marketplace add/remove/browse) now show immediate feedback while the operation is in progress
 - Canceling a running shell command (Ctrl+C on a !command, or aborting an agent command — including in sandboxed and background-promoted shells) now terminates the whole process tree instead of leaving orphaned processes running
 - Canvas providers can return file:// URLs in open results for local file previews
