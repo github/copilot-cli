@@ -1,22 +1,64 @@
-## 1.0.59 - 2026-06-02
+## 1.0.60 - 2026-06-05
 
-- Actionable error message shown when GitHub API rate limit is hit during `copilot update`
-- Add /rubber-duck command for adversarial feedback on code and designs
-- Plugin slash commands (/plugin install, uninstall, update, marketplace add/remove/browse) now show immediate feedback while the operation is in progress
-- Canceling a running shell command (Ctrl+C on a !command, or aborting an agent command — including in sandboxed and background-promoted shells) now terminates the whole process tree instead of leaving orphaned processes running
-- Canvas providers can return file:// URLs in open results for local file previews
-- Symlinked directories appear in /cwd completion suggestions
-- In Azure DevOps-only repositories, the built-in GitHub MCP server now exposes only the web_search tool instead of being fully disabled
-- Quota footer shows remaining requests as a rounded percentage
-- /lsp show, /lsp test, and /lsp reload correctly discover project LSP config when the CLI is launched from a subdirectory
-- MCP server timeout configuration is preserved after tools list changes
-- /skills add and /skills remove correctly handle paths wrapped in quotes (e.g., from Windows Explorer "Copy as path")
-- Running `copilot` with an unquoted multi-word prompt now shows a helpful "quote your prompt" hint instead of a raw commander error
-- Default networking transport is now HTTP/1.1, improving reliability on some network paths. Opt into HTTP/2 with COPILOT_ENABLE_HTTP2=1.
-- Plugins auto-installed from repository settings no longer leak into user global config
-- Grep tool correctly handles tsx and jsx as file type filters
-- Add the /voice command to dictate prompts using local speech-to-text models
-- COPILOT_HOME is honored for the server discovery registry directory
+- Tab completes `..` parent traversal in slash-command path arguments instead of switching tabs
+- Add the max reasoning effort level for Anthropic models and make all effort levels available on every plan
+- Screen no longer stays blank after waking from sleep inside a terminal multiplexer
+- Input fields render background color correctly inside highlighted frames
+- Cursor renders in the correct position in plan approval and review feedback prompts
+- Worktree directory uses a flat name when PR branch contains slashes (e.g. `cli/foo` → `.worktrees/cli-foo`)
+- Queue hint correctly shows ctrl+enter instead of ctrl+q when kitty keyboard protocol is active
+- Status line progressively stacks across rows at narrow terminal widths instead of truncating elements beyond recognition
+- Clipboard operations on X11 no longer corrupt the terminal display
+- Add `builtInAgents.rubberDuckAutoInvoke` setting to control automatic rubber duck agent invocation (disabled by default)
+- On Windows, executables are no longer discovered in the working directory when invoking by bare name (e.g. `git`). Add the working directory to `PATH` to enable discovery.
+- Interactive shell commands no longer hang when producing large amounts of output
+- MCP tools glyph in /context legend displays at the correct size
+- Skill and slash command picker rows correctly display multi-line descriptions as a single line
+- IDE picker now hides entries whose editor connection has gone away, so selecting one no longer fails with a connection error, and appends a process id to entries that share the same editor and folder so git worktrees of the same repo can be told apart
+- Model picker fits within small terminal windows and mouse scroll works in the picker
+- Show cache write tokens alongside cache read tokens in /usage display
+- Repurpose ctrl+s to stash and pop the current prompt (Claude Code parity); the slash-command picker is still available by typing /
+- /context separates Custom Instructions from the system prompt and cross-references per-server MCP tool token costs with /mcp
+- Add `billing` help topic with an overview of AI credit usage features
+- Add vim-style navigation keys (g, G, Ctrl+D, Ctrl+U) to the /diff view
+- Show the Mission Control sharing status of synced sessions in the /session info view
+- Add -r as a shorthand for --resume
+- LSP server config accepts `bash`, `powershell`, and `cwd` keys; command launch default cwd stays project-root unless `cwd` is set, and `cwd` expansion now supports plugin vars like `PLUGIN_ROOT` while shell launches keep hook-matching cwd/env behavior
+- Rewind picker shows working-tree diff stats (+added −removed) at each checkpoint
+- Create a git worktree for a pull request directly from the pull requests screen
+- Remaining requests percentage no longer shows a negative value for over-limit users
+- Extension permission prompts respect --yolo and pre-approved locations on startup
+- Custom agent instructions are no longer duplicated each turn, reducing context window usage
+- Linux sandbox no longer fails when allowedHosts or blockedHosts are configured
+- Session completion signal (terminal beep, autopilot continuation) now waits for background shell commands to finish
+- Cmd+Backspace deletes the line before the cursor on macOS prompt input
+- web_fetch blocks loopback, private, and cloud metadata addresses and no longer silently follows redirects
+- Trusted folders and other config keys are no longer dropped when experiment assignments are cached concurrently
+- Rewind no longer deletes ignored files when rolling back to a previous snapshot
+- ACP allow_all config option correctly applies unrestricted permissions for tools, paths, and URLs
+- --available-tools, --excluded-tools, and --reasoning-effort flags apply correctly in ACP mode
+- LSP workspace/configuration response returns the correct number of entries, preventing strict servers like ty from panicking
+- Extensions linked via directory symlinks are now discovered and loaded correctly
+- Typing "help" at the prompt opens the quick-help overlay instead of sending it as a chat message
+- Wide characters (e.g. CJK) render correctly in the terminal diff view without visual corruption
+- Folder trust persists across git worktrees without re-prompting
+- Force-removing a marketplace no longer causes its plugins to reinstall on next launch
+- MCP OAuth re-authentication no longer fails with an address-in-use error when a login is already in progress
+- Repository plugin overrides no longer change globally enabled plugin settings
+- MCP allowlist now matches npm scoped servers whose registry entry drops the leading @ from the package identifier
+- MCP servers registered via Azure API Center are no longer incorrectly blocked by the allowlist
+- Local MCP servers sharing a serialized token broker (e.g. M365) reliably start instead of intermittently failing
+- Prompt for approval before running commands that set dynamic-loader or git-config env vars (e.g. LD_PRELOAD, GIT_EXTERNAL_DIFF)
+- MCP tools added or removed by a server mid-turn are now available immediately in the same turn
+- BYOK file attachments larger than 5 MiB now send successfully via OpenAI Responses provider
+- The /init suggestion is no longer shown when running outside a git repository
+- Show session link in /session info table when remote exporting or steering
+- /env command now shows hook counts and source provenance for active hooks
+- Add missing keyboard shortcuts to /help content (?, ctrl+q, ctrl+r, ctrl+z, ctrl+y, shift+enter)
+- Auto-link bare #number issue and PR references to the current git repository
+- Error message for --cloud without experimental mode explains how to enable /experimental
+- /tasks detail view shows the latest prompt after sending a follow-up to a background agent
+- Enforce bypass permissions policy for --allow-all-tools, --allow-all-paths, and --allow-all-urls flags
 
 ## 1.0.58 - 2026-06-02
 
