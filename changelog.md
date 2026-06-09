@@ -1,3 +1,45 @@
+## 1.0.61 - 2026-06-09
+
+- Polish /agents picker and Create New Agent wizard with consistent borders, headers, and styled inputs
+- Fixed a bug where resuming a session could leave the screen blank
+- Add /settings interactive dialog to browse and edit all user settings in one place
+- Resuming a local session with memory disabled no longer crashes the UI to a blank screen
+- /after and /every commands now appear in the /experimental slash command list
+- Auto-load MCP servers from .github/mcp.json workspace config file
+- /env output hides internal hooks and shows full file paths for hook sources
+- Prevent crashes from malformed UTF-8, oversized string buffers, and terminal disconnect errors
+- Add support for Claude Fable 5 model
+- Gemini models work correctly with MCP tools that use nullable schema types
+- Number-key selection in pickers (e.g. /agent) works for items 10 and beyond
+- GitHub issue and PR references inside existing links no longer create broken nested autolinks
+- Bash tool correctly handles multi-byte UTF-8 characters (em dash, curly quotes, etc.) in command input
+- Symlinked directories now appear in @-file picker suggestions
+- MCP OAuth re-authentication correctly uses the saved OAuth client ID for remote servers
+- Pasted images no longer leak into the main prompt after a permission dialog closes
+- Press '/' in the /agent picker to filter agents by name
+- Configure home tab bar visibility, order, and hidden tabs via the `tabs` setting in settings.json
+- grep and glob tools correctly handle single path arguments, preventing missed search results
+- Hook progress status lines marked as temporary collapse in place instead of accumulating in the conversation timeline
+- /fork shows a "Creating fork..." progress notification while the fork is being created
+- /mcp search works correctly with external registries
+- Use natural language with /every and /after to schedule tasks using cron expressions, calendar times, or relative durations
+- Light theme secondary background color is now rendered correctly
+- Search bar match count stays inside the prompt frame
+- GitHub theme adapts to light terminals with an authentic GitHub Primer light color palette
+- Add mTLS and private-CA support for OTLP telemetry export over HTTPS
+- Fixed false positives in shell command validation that could block harmless commands containing words like "kill" in string literals or embedded documents (heredocs).
+- Add full screen scrollbar
+- Grep searches in large monorepos use an indexed search engine for significantly faster results
+- `/sessions` now navigates to the Sessions tab instead of opening an overlay
+- Add http/protobuf OTLP HTTP export via standard OTel protocol env vars
+- Prompt mode surfaces model-load errors on stderr instead of exiting silently
+- Add /worktree command (aliased /move) to create a new git worktree and switch into it, moving any uncommitted changes along
+- Plugin install enforces managed marketplace policy even when settings cannot be fetched due to network errors
+- `/help` now lists `$HOME/.copilot/instructions/**/*.instructions.md` alongside the other user-level instruction locations
+- Colors render correctly in WSL and tmux sessions instead of falling back to a degraded palette
+- Exit shell mode by pressing Esc or Ctrl+C on an empty prompt, in addition to Backspace
+- Add `beepOnSchedule` setting to disable completion beeps for scheduled `/every` and `/after` runs
+
 ## 1.0.60 - 2026-06-05
 
 - Tab completes `..` parent traversal in slash-command path arguments instead of switching tabs
