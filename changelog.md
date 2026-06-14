@@ -1,3 +1,56 @@
+## 1.0.62 - 2026-06-13
+
+- Ask and elicitation dialogs now scroll together with the timeline instead of taking over the screen, so a tall dialog no longer hides the agent's output — scroll up to read earlier output, then back down to the dialog
+- Keep blank lines between reasoning summary sections
+- Show user-typed colon terms in the search chip
+- Plugins can now ship extensions, making them installable via the plugin marketplace
+- Add content search, match highlighting, and n/N navigation in diff view
+- Add /app slash command to open the GitHub app or a browser fallback
+- Configure subagent model, reasoning effort, and context tier via user settings or the /subagents (also /agents) picker
+- PowerShell redirect paths no longer trigger content-exclusion refusals
+- WebSocket transport closes cleanly outside the Tokio runtime
+- Shell tool errors now explain when a shell ID was stopped, completed, or reclaimed
+- Voice runtime download dialog no longer reopens in a loop after an install failure
+- Make the MCP server config form easier to use with a picker-based flow
+- Show 'YOLO' (allow all) indicator in the footer and add allow-all state to custom statusLine.command
+- Press `/` on the Issues or Pull Requests tab to search GitHub with server-side filtering
+- Add session-scoped extensions and canvases
+- Allow SDK clients to configure session memory through session.create and session.resume
+- Automatically authenticate through corporate forward proxies using Kerberos/Negotiate (SPNEGO)
+- Add file tree sidebar and inline comment editor to the /diff view
+- Honor max_output_tokens for BYOK Responses providers
+- MCP server names with dots and slashes map to valid Responses API namespaces
+- Editor commands like `code-insiders --wait` launch correctly on Windows
+- Load skills from symlinked directories outside the configured root
+- Recover gracefully from oversized inline images instead of failing the turn
+- An image attachment rejected because vision is disabled by policy or unsupported by the current model no longer poisons the rest of the session. The image is stripped from conversation history after the 400 so subsequent prompts succeed.
+- Shells promoted to background from /tasks keep running after the turn ends
+- Hide internal disabled tool messages from background helper agents
+- Sandbox tool loads correctly when mxc-sdk is provided by the host environment
+- Custom agents in nested .github/agents and .claude/agents directories are now discovered when the session is started from a subdirectory of the repository root
+- Approving a tool permission prompt no longer causes a second prompt for the same tool call
+- View tool prompts now correctly state the 20KB truncation limit instead of 50KB
+- Keep workspace MCP servers from restarting in a loop
+- Keep custom agents on their configured model when using BYOK providers
+- Recover from temporary content policy errors without restarting the session
+- Autopilot continues cleanly in relay sessions and /plan shows the short prompt
+- Git commands no longer flash a console window on Windows
+- Claude-format plugin `preToolUse` and `permissionRequest` hooks now fire correctly for tool matchers like `Bash`, `Read`, and `*`, and Claude-format hook payloads carry the Claude tool name (`Bash` rather than `bash`)
+- Terminal colors update live when the active theme changes mid-session
+- Streamed assistant text no longer intermittently duplicates in the timeline
+- grep skips missing search paths and continues with valid results instead of failing
+- Remote MCP OAuth servers start only once per matching config instead of restarting for each subagent
+- Nested subagents respect concurrency limits without blocking terminal input
+- Plugin install works when the marketplace ref is a fully-qualified tag (e.g. refs/tags/v2.1.0)
+- Press W to create a worktree from the expanded issue or pull request details view
+- /every and /after can now schedule slash commands (e.g. /every 1d /chronicle standup)
+- Model picker opens to the tab containing the currently selected model
+- Shell commands run via lightweight process spawning instead of a pseudo-terminal; interactive input via write_bash is no longer supported
+- Improve color contrast in GitHub themes to meet WCAG AA accessibility standards
+- Show descriptions for ACP session config options
+- Speed up branch and HEAD detection in warm sessions
+- Light theme secondary background color is now rendered correctly
+
 ## 1.0.61 - 2026-06-09
 
 - Polish /agents picker and Create New Agent wizard with consistent borders, headers, and styled inputs
