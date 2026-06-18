@@ -7,7 +7,7 @@ const cases = JSON.parse(fs.readFileSync('tests/plan-review-fallback-cases.json'
 describe('parsePlanReviewOptions (prototype)', () => {
   for (const c of cases) {
     it(c.name, () => {
-      const out = parsePlanReviewOptions(c.input);
+      const out = parsePlanReviewOptions(c.input, undefined, { enableFallback: true });
       // Compare labels and ids length-wise
       assert.equal(out.length, c.expected.length, `expected ${c.expected.length} items, got ${out.length}`);
       for (let i = 0; i < c.expected.length; i++) {

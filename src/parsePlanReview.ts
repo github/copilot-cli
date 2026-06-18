@@ -69,15 +69,51 @@ function tryParseYamlCandidate(candidate: string): MenuItem[] | null {
   return null;
 }
 
-export function parsePlanReviewOptions(text: string, metadata?: any): MenuItem[] {
+export type ParseOptions = { enableFallback?: boolean };
+
+function sanitizeId(rawId: string): string {
+  return String(rawId)
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^a-zA-Z0-9_\-:\.]/g, '')
+    .slice(0, 50);
+}
+
+function sanitizeLabel(rawLabel: string): string {
+  if (!rawLabel) return '';
+  // remove control characters and collapse whitespace
+  const cleaned = String(rawLabel).replace(/[\x00-\x1F\x7F]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return cleaned.slice(0, 200);
+}
+
+function sanitizeMenuItem(item: MenuItem): MenuItem {
+  return {
+    id: sanitizeId(item.id || item.label || 'item'),
+    label: sanitizeLabel(item.label || item.id || ''),
+    description: sanitizeLabel(item.description || ''),
+    recommended: !!item.recommended,
+  };
+}
+
+export function parsePlanReviewOptions(text: string, metadata?: any, options?: ParseOptions): MenuItem[] {
+  const enabled = Boolean(options?.enableFallback || process.env.COPILOT_PLAN_FALLBACK === '1' || process.env.NODE_ENV === 'test');
+
   // 1) If metadata contains tool/function call structured actions, prefer that
   if (metadata && metadata.function_call && metadata.function_call.arguments) {
     try {
       const args = JSON.parse(metadata.function_call.arguments);
-      if (Array.isArray(args)) return (args as any[]).map((it, idx) => normalizeMenuItem(it, idx));
+      if (Array.isArray(args)) return (args as any[]).map((it, idx) => sanitizeMenuItem(normalizeMenuItem(it, idx)));
     } catch {
       // ignore and fallthrough
     }
+  }
+
+  if (!enabled) {
+    // Feature-flag off: don't attempt heuristic parsing; return minimal safe fallback
+    return [
+      { id: 'accept', label: 'Accept plan', description: 'Apply the plan as-is' },
+      { id: 'request_changes', label: 'Request changes', description: 'Ask the model for updates' },
+    ];
   }
 
   // 2) Extract fenced code blocks (json/yaml/none)
@@ -87,10 +123,10 @@ export function parsePlanReviewOptions(text: string, metadata?: any): MenuItem[]
     const candidate = m[1].trim();
     // try JSON
     const j = tryParseJsonCandidate(candidate);
-    if (j && j.length) return j;
+    if (j && j.length) return j.map(sanitizeMenuItem);
     // try YAML
     const y = tryParseYamlCandidate(candidate);
-    if (y && y.length) return y;
+    if (y && y.length) return y.map(sanitizeMenuItem);
   }
 
   // 3) Try to find inline JSON arrays/objects anywhere
@@ -98,7 +134,7 @@ export function parsePlanReviewOptions(text: string, metadata?: any): MenuItem[]
   while ((m = inlineJsonRegex.exec(text)) !== null) {
     const candidate = m[1];
     const parsed = tryParseJsonCandidate(candidate);
-    if (parsed && parsed.length) return parsed;
+    if (parsed && parsed.length) return parsed.map(sanitizeMenuItem);
   }
 
   // 4) Try to find YAML-like blocks without fences (look for lines starting with ---)
@@ -106,7 +142,7 @@ export function parsePlanReviewOptions(text: string, metadata?: any): MenuItem[]
   while ((m = yamlDocRegex.exec(text)) !== null) {
     const candidate = m[1];
     const y = tryParseYamlCandidate(candidate);
-    if (y && y.length) return y;
+    if (y && y.length) return y.map(sanitizeMenuItem);
   }
 
   // 5) Numbered list heuristic with stronger id extraction
@@ -116,7 +152,7 @@ export function parsePlanReviewOptions(text: string, metadata?: any): MenuItem[]
     const numMatch = line.match(/^\s*(\d+)\.\s*(.+)$/);
     if (numMatch) {
       const raw = numMatch[2].trim();
-      numbered.push(normalizeMenuItem(raw, numbered.length));
+      numbered.push(sanitizeMenuItem(normalizeMenuItem(raw, numbered.length)));
     }
   }
   if (numbered.length) return numbered;
@@ -126,15 +162,15 @@ export function parsePlanReviewOptions(text: string, metadata?: any): MenuItem[]
   for (const line of lines) {
     const b = line.match(/^\s*[-*+]\s+(.+)$/);
     if (b) {
-      bullets.push(normalizeMenuItem(b[1].trim(), bullets.length));
+      bullets.push(sanitizeMenuItem(normalizeMenuItem(b[1].trim(), bullets.length)));
     }
   }
   if (bullets.length) return bullets;
 
   // 7) Minimal fallback: Accept / Request changes
   return [
-    { id: 'accept', label: 'Accept plan', description: 'Apply the plan as-is' },
-    { id: 'request_changes', label: 'Request changes', description: 'Ask the model for updates' },
+    sanitizeMenuItem({ id: 'accept', label: 'Accept plan' }),
+    sanitizeMenuItem({ id: 'request_changes', label: 'Request changes' }),
   ];
 }
 
