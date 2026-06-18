@@ -6,6 +6,7 @@
     "test": "mocha -r ts-node/register tests/**/*.test.ts --reporter spec"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.0.0",
     "mocha": "^10.2.0",
@@ -14,5 +15,8 @@
   },
   "dependencies": {
     "js-yaml": "^4.2.0"
+  },
+  "overrides": {
+    "serialize-javascript": "7.0.6"
   }
 }
