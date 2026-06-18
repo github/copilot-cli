@@ -1,0 +1,22 @@
+[
+  {
+    "name": "json_code_block",
+    "input": "Here are options:\n```json\n[{\"id\":\"accept\",\"label\":\"Accept\"},{\"id\":\"reject\",\"label\":\"Reject\"}]\n```",
+    "expected": [{"id":"accept","label":"Accept"},{"id":"reject","label":"Reject"}]
+  },
+  {
+    "name": "numbered_list",
+    "input": "1. Accept the plan\n2. Request changes\n3. Ask for clarification",
+    "expected": [{"id":"1","label":"Accept the plan"},{"id":"2","label":"Request changes"},{"id":"3","label":"Ask for clarification"}]
+  },
+  {
+    "name": "bulleted_list",
+    "input": "- Accept\n- Request changes\n- Do nothing",
+    "expected": [{"id":"1","label":"Accept"},{"id":"2","label":"Request changes"},{"id":"3","label":"Do nothing"}]
+  },
+  {
+    "name": "malformed_json_fallback",
+    "input": "```json\n[ {\"id\":\"accept\", \"label\": \"Accept\"  \n```\n1. Fallback A\n2. Fallback B",
+    "expected": [{"id":"1","label":"Fallback A"},{"id":"2","label":"Fallback B"}]
+  }
+]
