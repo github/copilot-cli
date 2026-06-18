@@ -36,16 +36,20 @@ function normalizeMenuItem(raw: any, idx: number): MenuItem {
   return { id: String(idx + 1), label: String(raw) };
 }
 
+const MAX_CANDIDATE_LENGTH = 50 * 1024; // 50 KB
+const MAX_MENU_ITEMS = 50;
+
 function tryParseJsonCandidate(candidate: string): MenuItem[] | null {
+  if (!candidate || candidate.length > MAX_CANDIDATE_LENGTH) return null;
   try {
     const parsed = JSON.parse(candidate);
     if (Array.isArray(parsed)) {
-      return parsed.map((it: any, idx: number) => normalizeMenuItem(it, idx));
+      return parsed.slice(0, MAX_MENU_ITEMS).map((it: any, idx: number) => normalizeMenuItem(it, idx));
     }
     if (parsed && typeof parsed === 'object') {
       const obj = parsed as any;
-      if (Array.isArray(obj.items)) return obj.items.map((it: any, idx: number) => normalizeMenuItem(it, idx));
-      return Object.keys(obj).map((k, i) => normalizeMenuItem({ id: k, label: obj[k] }, i));
+      if (Array.isArray(obj.items)) return obj.items.slice(0, MAX_MENU_ITEMS).map((it: any, idx: number) => normalizeMenuItem(it, idx));
+      return Object.keys(obj).slice(0, MAX_MENU_ITEMS).map((k, i) => normalizeMenuItem({ id: k, label: obj[k] }, i));
     }
   } catch (e) {
     return null;
@@ -54,14 +58,16 @@ function tryParseJsonCandidate(candidate: string): MenuItem[] | null {
 }
 
 function tryParseYamlCandidate(candidate: string): MenuItem[] | null {
+  if (!candidate || candidate.length > MAX_CANDIDATE_LENGTH) return null;
   try {
-    const parsed = YAML.load(candidate);
-    if (Array.isArray(parsed)) return parsed.map((it: any, idx: number) => normalizeMenuItem(it, idx));
+    // Use JSON_SCHEMA to avoid arbitrary type constructions/tags
+    const parsed = YAML.load(candidate, { schema: (YAML as any).JSON_SCHEMA });
+    if (Array.isArray(parsed)) return (parsed as any[]).slice(0, MAX_MENU_ITEMS).map((it: any, idx: number) => normalizeMenuItem(it, idx));
     if (parsed && typeof parsed === 'object') {
       const obj: any = parsed as any;
-      if (Array.isArray(obj.items)) return obj.items.map((it: any, idx: number) => normalizeMenuItem(it, idx));
+      if (Array.isArray(obj.items)) return obj.items.slice(0, MAX_MENU_ITEMS).map((it: any, idx: number) => normalizeMenuItem(it, idx));
       // map keys
-      return Object.keys(obj).map((k, i) => normalizeMenuItem({ id: k, label: obj[k] }, i));
+      return Object.keys(obj).slice(0, MAX_MENU_ITEMS).map((k, i) => normalizeMenuItem({ id: k, label: obj[k] }, i));
     }
   } catch (e) {
     return null;
