@@ -1,3 +1,26 @@
+## 1.0.63 - 2026-06-15
+
+- Blocked image attachments now explain what to do — enable vision via the "Editor preview features" policy, switch to a vision-capable model, or try a different image — instead of showing a confusing error.
+- Options in `--help` output sort alphabetically, including options that have two long flags
+- Auth validation errors (e.g., VPN or IP allowlist failures) are now shown in the sign-in banner with guidance to check network access
+- Show fork-based pull requests in /pr and the branch PR badge
+- Resume remote sessions when the local and remote repository names differ only by case
+- Show the spill file path when read_bash output is too large
+- Include recent local sessions in /chronicle standup
+- Restore /responses WebSocket connections
+- Retry transient 401 auth failures in HMAC and OAuth modes
+- Press w in /diff to hide whitespace-only changes
+- Add deferTools option to MCP server config to keep a server's tools always available, even when tool search is enabled
+- Agent mode is tracked per session, so it no longer carries over when you create, clear, or switch sessions
+- Pressing Enter opens the highlighted issue details
+- Plan review menus work on strict OpenAI-compatible backends
+- Prevent Windows crashes when the native runtime addon loads in a corrupted host process heap
+- Recover from unreadable native document attachments by falling back to file-path uploads
+- Keep reverse search aligned in the input footer while you search command history
+- PostToolUse hook matchers (e.g. `Edit|Write`) are now honored instead of silently dropped, so formatters and linters run only after the tools they target
+- Improve reliability of OpenAI, Anthropic, and Azure OpenAI requests
+- Experimental: /rewind no longer requires git and restores only the files Copilot changed (leaving your own edits intact), with a conversation-only or conversation + files choice
+
 ## 1.0.62 - 2026-06-13
 
 - Ask and elicitation dialogs now scroll together with the timeline instead of taking over the screen, so a tall dialog no longer hides the agent's output — scroll up to read earlier output, then back down to the dialog
