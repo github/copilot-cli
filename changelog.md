@@ -1,3 +1,130 @@
+## 1.0.64 - 2026-06-23
+
+- Path access prompt shows resolved symlink targets so you can see exactly what access is being granted
+- Show the pay-as-you-go additional usage budget at launch, refresh it after a request is rejected for hitting the additional spend limit, and show a friendly message when the additional usage limit is reached
+- Add websocket responses support for BYOK OpenAI-compatible providers
+- Resumed sessions reproduce the original attached-file references even if those files later change on disk, avoiding prompt-cache resets
+- Free-text search terms containing colons (e.g. `CLI:`) now return correct results in Issues and Pull requests search instead of being misread as invalid qualifiers by GitHub
+- Support static OAuth client overrides, including client secrets, for MCP server authentication
+- Preserve keystrokes typed while the CLI is still loading
+- Add an option to bypass the sandbox for shell commands
+- Add mouse click and double-click selection to paginated lists
+- Link PR and issue references in markdown tables
+- Use the GitHub theme by default and enable home tabs and prompt frame for all users
+- Keep terminal output aligned after terminal resizes
+- Content exclusion no longer blocks every file when the rules service is unreachable (offline or a transient network error). Access is allowed until rules can be fetched and retried in the background, matching the editor's behavior.
+- Configure the rubber-duck subagent in /subagents, including a complementary model strategy that picks an opposite-family model
+- /diff shows a session diff of Copilot's changes in non-git folders
+- Set an HTTP(S) proxy with a user setting
+- Resume sessions by name even when the name contains spaces
+- Hide unsupported slash commands in remote-hosted sessions
+- Add a setting to hide the conversation scrollbar
+- Add inline image rendering in the CLI
+- Add argument-hint frontmatter support for skills
+- OpenTelemetry: chat spans after a successful compaction carry gen_ai.conversation.compacted=true, and the summary is emitted as a CompactionPart in gen_ai.input.messages
+- PowerShell cmdlets (Select-String, Where-Object, ForEach-Object) no longer trigger spurious directory access prompts
+- Non-interactive prompt output now stays at column 1
+- Clear queued tool images when vision is disabled
+- Changing the model now waits until the new model is applied
+- Treat 2>/dev/null redirects as read-only in shell safety prompts
+- Normalize edited text to LF when opening prompts in an external editor
+- Skip computer-use consent prompts in full allow-all sessions
+- Remote export keeps running after /clear and /session info keeps the task URL
+- Keep the cursor on the adjacent session after deleting one in the session selector
+- Use the correct Linux libc target when resolving and auto-updating SEA packages on musl hosts
+- Allow required multi-select prompts to submit an empty selection when minItems is not set
+- Keep the home session timeline visible after attaching and restoring
+- The /settings search field supports readline editing keys and cursor movement
+- OpenTelemetry GenAI spans now emit `gen_ai.usage.cache_read.input_tokens`, `gen_ai.usage.cache_creation.input_tokens`, and `gen_ai.usage.reasoning.output_tokens` per the GenAI semantic conventions spec (previously used incorrect underscore-separated names)
+- Fix mouse wheel scrolling being broken in the terminal after the CLI exits by tearing down terminal modes in reverse order (mouse tracking is now disabled before leaving the alt screen)
+- Fix the /rewind file-restore confirmation dialog being clipped at the bottom when it opens above a scrolled timeline; it now shows at full height once the file list loads
+- Show --remote-export and --no-remote-export in --help output
+- Wrap expanded compact timeline shell entries so long commands and descriptions stay visible
+- Make links in markdown tables clickable
+- Show per-model token totals in /usage and speed up large history scans
+- OpenTelemetry GenAI chat spans emit `gen_ai.request.reasoning.level` for the configured reasoning effort
+- Autopilot mode now returns to interactive mode after the agent calls task_complete, so you aren't left in autopilot for your next prompt
+- Add /branch as an alias for /fork, matching Claude Code's command naming
+- Experimental: adds a `--worktree [name]` (`-w`) flag (enable with `/experimental`) that creates or reuses a git worktree under `<repo>.worktrees/` and starts the session inside it
+- Add tab completion for /agent names
+- Add model family aliases like opus, sonnet, haiku, gpt, and gemini in the model setting
+- Add Ctrl+Backspace binding in /terminal-setup for Windows Terminal
+- Add SDK support for host-provided OAuth tokens for remote MCP servers
+- Experimental: in the compact timeline, click a tool-call or reasoning row to expand or collapse just that entry (like ctrl+o / ctrl+t for one row), with a subtle highlight on the row under the mouse
+- Apply MCP org policy when sessions create or reload MCP servers
+- Fixed completed background command output being unavailable when requested later
+- Keep task companion tools available to custom agents that use the task or agent alias
+- Custom agents using a tools wildcard '\*' now respect deferredToolLoading opt-in switch
+- Respect tmux color detection in WSL sessions
+- Respect `deferTools` on MCP servers configured in custom agent frontmatter
+- Ctrl+Q enqueues a prompt while a completion picker is open
+- Sessions tab row label updates immediately when a session is renamed
+- --continue and --resume select the most recent session for the current repository
+- Shell session starts correctly when a nix-provided bash is first in PATH
+- Marketplace plugins that declare MCP servers in marketplace.json now authenticate correctly with OAuth
+- Content exclusion no longer blocks shell commands on command names or phantom paths
+- Lone surrogates no longer break session resume or truncate prompts
+- Expand Windows home-directory paths in slash-command completion
+- Keep truncated tool output previews valid UTF-8
+- CLI auto-updater downloads the correct musl Linux package on Alpine systems
+- Copy the full last assistant turn, including multi-block responses
+- Load workspace MCP servers in trusted server-mode sessions
+- Stacked diffs use the same file order as the file tree
+- Make /pr status and web confirmations link to the PR's repository
+- Restore later file changes when rewinding to a turn without a snapshot
+- Run queued ! shell commands locally instead of sending them to the agent
+- Scheduled prompts manager dialog shrinks to fit its entries
+- Keep the @-file picker populated when file search hits a symlink loop
+- Display cache-write pricing for models that omit it
+- Allow /update to restart sessions started with copilot -r
+- Prevent pickers and dialogs from shifting or clipping as content loads
+- Only render double tildes as strikethrough in markdown
+- Allow /allow-all to work in relay sessions
+- Restore clickable PR and issue links in compact timeline markdown
+- Repo-scoped plugins no longer leak into global config across projects
+- Keep /model working on resumed sessions after signing in
+- PowerShell script blocks and interpolated `$()` sub-expressions no longer trigger content-exclusion refusals
+- Exit message always shows the session ID in the resume command instead of the friendly name
+- Wait for the remote sandbox to start before opening the cloud session
+- Autopilot mode now auto-handles elicitation, ask_user, sampling, and permission prompts (including on launch with --autopilot and during continuation turns) instead of surfacing dialogs to the user
+- Newly spawned sessions appear at the bottom of their group in the agents tab
+- Attached images and PDFs persist across session resume even if the source file is later changed or deleted
+- Allow disabling task and explore built-in subagents
+- Session resume stays responsive while large histories load
+- Code search and worktree listing are faster
+- Use plain text labels instead of decorative emoji in CLI output
+- Syntax-highlight shell commands in the timeline
+- Preserve open canvas instances across reconnects and restarts
+- Forward typed rejection feedback from preToolUse prompts to the model
+- Show statusline picker checkboxes in green for enabled items and gray for disabled items
+- Show shell timeline rows with a yellow $ prompt and Shell label
+- Add a Folder column to the resume picker to show each session's working directory
+- Automatically follow your system light and dark mode changes
+- Use semantic mascot theme colors in the CLI banner
+- Let footer dialogs scroll with the timeline in unified view
+- Click filenames in /diff tree to jump to that file's first change
+- Render inline code with themed chip styling in Markdown
+- Show installed plugin MCP servers in `mcp` commands
+- Remove terminal-reported color scheme support
+- Add /diagnose command to analyze session logs
+- Add /mcp registry installation for browsing and installing MCP servers
+- Make `/security-review` available to all users without --experimental
+- Discover MCP servers provided by installed plugins
+- Add CSV output support for MCP tools
+- Add /loop alias for the /every command
+- Remove bogus Ctrl+Enter VS Code keybinding created by old /terminal-setup
+- Images returned by tools stay visible to the model across later turns and after resuming a session
+- Preserve Markdown blockquotes in /share exports
+- Filter long streamed results correctly when content exclusion is enabled
+- Show a friendly message when additional usage limit is reached
+- Search tools handle Windows-style glob patterns correctly
+- Prevent kill self-protection from flagging quoted pipes and paths ending in kill
+- Azure CLI, PowerShell, and Developer CLI credentials work again for Azure auth
+- Slash-command picker name column widened from 25 to 35 characters so fewer long skill names are truncated
+- Wrap long lines in /diff view so content no longer truncates
+- Improve /diff hotkey labels for branch, whitespace, and tree navigation
+- Remove the legacy intent-reporting tool from the CLI
+
 ## 1.0.63 - 2026-06-15
 
 - Blocked image attachments now explain what to do — enable vision via the "Editor preview features" policy, switch to a vision-capable model, or try a different image — instead of showing a confusing error.
