@@ -1,3 +1,28 @@
+## 1.0.65 - 2026-06-24
+
+- /cd now persists the working directory so resuming a session returns to it, and discovers custom agents in the new directory
+- Commands with slash-prefixed string arguments (e.g. --body "/azp run") no longer trigger spurious filesystem permission prompts
+- Fullscreen timeline stays anchored when older content is trimmed
+- Resume open canvases automatically after restarting the CLI
+- Add an opt-in status bar item showing CI check status (passing/running/failing) for the current branch
+- Add a `copilot skill` subcommand (and a `/skill` alias for `/skills`) to list, add, and remove skills from a file, URL, or directory
+- Prevent the GitHub background from flashing on startup with non-GitHub themes
+- Prevent brief console windows from flashing on Windows when the agent runs hook commands or resolves command paths
+- Include userPromptSubmitted hook additionalContext in the model-facing prompt
+- Keep Windows paths intact when adding stdio MCP servers
+- Stop MCP shutdown from waiting on in-flight server connects
+- Restart the CLI without shutdown timeouts
+- Remove syntax highlighting from shell commands in the timeline
+- Keep custom-agent subagent model selections when using BYOK providers
+- Parse /every schedules on the session's main model
+- Render inline images reliably in tmux
+- The ask_user freeform option wraps text and keeps the cursor aligned
+- Save custom status line commands in /settings
+- Show the streaming byte count separately from the cancel hint
+- Handle wakeup misfires with a graceful message when no self-paced schedule is active
+- Silent MCP OAuth refresh reuses the granted scope so reconnects stay signed in
+- Up/down history and Ctrl+R reverse search now include past shell commands while in normal mode, so you can recall and re-run a shell command without first typing ! to enter shell mode
+
 ## 1.0.64 - 2026-06-23
 
 - Path access prompt shows resolved symlink targets so you can see exactly what access is being granted
