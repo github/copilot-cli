@@ -1,1 +1,5 @@
-{}
+{
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ]
+}
