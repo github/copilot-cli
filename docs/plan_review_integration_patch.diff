@@ -1,0 +1,52 @@
+*** Begin Patch
+*** Update File: PATH/TO/PLAN_APPROVAL_FILE.ts
+@@
+-import { buildMenuFromFunctionCall } from './menu-builder';
++import { buildMenuFromFunctionCall } from './menu-builder';
++import parsePlanReviewOptions from '../../src/parsePlanReview';
+@@
+-export function buildPlanApprovalMenu(response: AssistantResponse): MenuItem[] {
+-  // existing flow: prefer structured function_call/tool metadata
+-  if (response.metadata && response.metadata.function_call && response.metadata.function_call.arguments) {
+-    try {
+-      const args = JSON.parse(response.metadata.function_call.arguments);
+-      return buildMenuFromFunctionCall(args);
+-    } catch (e) {
+-      // fall through to text parsing
+-    }
+-  }
+-
+-  // Fallback: parse assistant text for simple enumerated choices
+-  return textBasedMenuParser(response.text);
+-}
++export function buildPlanApprovalMenu(response: AssistantResponse): MenuItem[] {
++  // Prefer structured function_call metadata when present.
++  if (response.metadata && response.metadata.function_call && response.metadata.function_call.arguments) {
++    try {
++      const args = JSON.parse(response.metadata.function_call.arguments);
++      // Existing helper may already convert this into MenuItem[], reuse if available
++      const fromFunc = buildMenuFromFunctionCall(args);
++      if (fromFunc && fromFunc.length) return fromFunc;
++    } catch (e) {
++      // ignore and continue to text parsing fallback
++    }
++  }
++
++  // Robust fallback: parse the assistant text using the JSON-first then bullets heuristic.
++  // This handles strict OpenAI-compatible backends that don't provide function_call/tool metadata.
++  const menuItems = parsePlanReviewOptions(response.text, response.metadata);
++  if (menuItems && menuItems.length) return menuItems;
++
++  // As a last resort, keep the minimal previous fallback behavior (Accept / Request changes)
++  return [
++    { id: 'accept', label: 'Accept plan', description: 'Apply the plan as-is' },
++    { id: 'request_changes', label: 'Request changes', description: 'Ask the model for updates' },
++  ];
++}
+*** End Patch
+
+Notes:
+- Replace PATH/TO/PLAN_APPROVAL_FILE.ts with the actual file path in the codebase where the plan approval menu is built.
+- Ensure relative import path to src/parsePlanReview is correct; adjust as needed.
+- If the codebase is in Go or another language, apply the same algorithm: prefer structured metadata, then parse JSON/YAML code blocks, then numbered/bulleted lists, then minimal fallback.
+- Add unit tests to the file's existing test suite using tests/plan-review-fallback-cases.json as vectors.

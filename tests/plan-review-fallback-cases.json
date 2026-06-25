@@ -1,0 +1,32 @@
+[
+  {
+    "name": "json_code_block",
+    "input": "Here are options:\n```json\n[{\"id\":\"accept\",\"label\":\"Accept\"},{\"id\":\"reject\",\"label\":\"Reject\"}]\n```",
+    "expected": [{"id":"accept","label":"Accept"},{"id":"reject","label":"Reject"}]
+  },
+  {
+    "name": "numbered_list",
+    "input": "1. Accept the plan\n2. Request changes\n3. Ask for clarification",
+    "expected": [{"id":"1","label":"Accept the plan"},{"id":"2","label":"Request changes"},{"id":"3","label":"Ask for clarification"}]
+  },
+  {
+    "name": "bulleted_list",
+    "input": "- Accept\n- Request changes\n- Do nothing",
+    "expected": [{"id":"1","label":"Accept"},{"id":"2","label":"Request changes"},{"id":"3","label":"Do nothing"}]
+  },
+  {
+    "name": "malformed_json_fallback",
+    "input": "```json\n[ {\"id\":\"accept\", \"label\": \"Accept\"  \n```\n1. Fallback A\n2. Fallback B",
+    "expected": [{"id":"1","label":"Fallback A"},{"id":"2","label":"Fallback B"}]
+  },
+  {
+    "name": "yaml_code_block",
+    "input": "Options:\n```yaml\n- id: accept\n  label: Accept plan\n- id: changes\n  label: Request changes\n```",
+    "expected": [{"id":"accept","label":"Accept plan"},{"id":"changes","label":"Request changes"}]
+  },
+  {
+    "name": "id_extraction_complex",
+    "input": "1. [accept] Apply the plan (recommended)\n2. [request_changes] Ask for updates",
+    "expected": [{"id":"accept","label":"Apply the plan (recommended)"},{"id":"request_changes","label":"Ask for updates"}]
+  }
+]
