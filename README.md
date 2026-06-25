@@ -56,12 +56,17 @@ Set `PREFIX` to install to `$PREFIX/bin/` directory. Defaults to `/usr/local`
 when run as root or `$HOME/.local` when run as a non-root user.
 
 Set `VERSION` to install a specific version. Defaults to the latest version.
+Set `VERSION=prerelease` to install the latest prerelease build.
 
 For example, to install version `v0.0.369` to a custom directory:
 
 ```bash
 curl -fsSL https://gh.io/copilot-install | VERSION="v0.0.369" PREFIX="$HOME/custom" bash
 ```
+
+If the install location is not already in your `PATH`, the script prompts you to
+add it to your shell profile. The install script does not modify your shell
+configuration unless you explicitly confirm it.
 
 Install with [Homebrew](https://formulae.brew.sh/cask/copilot-cli) (macOS and Linux):
 
@@ -93,6 +98,41 @@ npm install -g @github/copilot
 
 ```bash
 npm install -g @github/copilot@prerelease
+```
+
+### Uninstallation
+
+If you installed with the install script on macOS or Linux, uninstall with:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main/uninstall.sh | bash
+```
+
+Or:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main/uninstall.sh | bash
+```
+
+Use `| sudo bash` to remove `/usr/local/bin/copilot`, or set `PREFIX` to remove
+`$PREFIX/bin/copilot`.
+
+The uninstall script only removes the installed `copilot` binary. If you
+previously added the install directory to your `PATH`, remove that shell profile
+entry manually if you no longer want it.
+
+If you installed with another package manager, uninstall with the same tool:
+
+```bash
+brew uninstall copilot-cli
+```
+
+```bash
+winget uninstall GitHub.Copilot
+```
+
+```bash
+npm uninstall -g @github/copilot
 ```
 
 
