@@ -1,3 +1,15 @@
+## 1.0.67 - 2026-06-30
+
+- Disabling the sandbox for the rest of the session now takes effect immediately, so shell and search commands stop re-prompting to bypass it mid-turn
+- Subagent sessions keep parent tool restrictions
+- Show warnings and errors when host custom agents fail to load
+- Require session limits to be at least 30 AI credits
+- Add Claude Sonnet 5 as a supported model
+- Allow tool calls to continue when hooks time out
+- Ctrl+Q now enqueues the highlighted slash-command argument completion
+- MCP OAuth against Microsoft Entra servers behind a tenant vanity domain (e.g. Copilot Studio) no longer fails to refresh or re-authenticate (AADSTS9010010 / AADSTS90023)
+- Prompt mode exit summary shows a resume hint to continue the session
+
 ## 1.0.66 - 2026-06-30
 
 - Use a non-blinking block cursor during interactive sessions, restoring your terminal's default cursor on exit
