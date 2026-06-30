@@ -1,3 +1,108 @@
+## 1.0.66 - 2026-06-30
+
+- Use a non-blinking block cursor during interactive sessions, restoring your terminal's default cursor on exit
+- Add support for Claude Opus 4.8 Fast and deprecate Claude Opus 4.6 Fast
+- MCP add/edit form accepts HTTP-style `Key: value` headers
+- Keep LSP servers from starting twice during startup
+- Avoid blocking commands that contain Windows-style path fragments
+- Let Copilot read output from and stop detached background shell commands
+- Large output handling now respects custom output directories and a disable setting
+- Prevent PR description generation from crashing on empty assistant responses
+- Render the timeline as a compact "highlight reel" with single-line tool and reasoning rows for all users
+- Add @ file and # GitHub ref completions in relay sessions
+- Show the correct session age when filesystem birthtime is missing
+- Prevent duplicate final assistant messages for GPT models
+- Terminal title updates work in more terminals
+- Show a (sandboxed) badge on compact Search timeline entries
+- Git commands work in sandboxed linked worktrees
+- Show the current pull request link as a status-line item
+- Show quota snapshots for WebSocket Responses requests
+- Show accurate Anthropic reasoning token counts
+- Let grep and glob retry blocked searches after sandbox approval
+- Format terminal titles with the session title and GitHub Copilot suffix
+- Skip synchronized output under tmux to avoid mouse pointer flicker
+- Session limits now apply across the current conversation, reset on /clear, and use the sessionLimits option key.
+- Hide excluded built-in agents from agent selection
+- BYOK sessions using Anthropic models no longer hit HTTP 400 errors from adaptive-thinking mismatches — neither from injecting adaptive thinking on models that don't support it, nor from sending standard thinking to models that require adaptive. Thinking-mode selection for dual-mode models is unchanged.
+- Allow skills with the same name from different plugins to coexist
+- Let integrations read and write CLI user settings
+- View LSP server logs in /lsp logs and read_agent
+- Prompt to install gh CLI when it is missing in GitHub repositories
+- Add GitHub attachment variants to prompt rendering
+- Extension toggles preserve the selected mode
+- Return to the prompt after cancelling attached shell commands
+- Keep background git status checks from disrupting concurrent git commands
+- Recover corrupted session history on load
+- Preserve newlines in /after and /every scheduled prompts
+- Keep multi-line /worktree tasks intact when starting them
+- Make /cd path completion keep Enter, Escape, and Tab behavior in sync
+- Keep session-store searches and context lookups responsive
+- Show desktop notifications on macOS from the CLI
+- Paste WSL images when Windows env vars are unavailable
+- Keep selection on the adjacent task after removing one
+- read_agent since_turn: 0 now correctly returns all turns including turn 0
+- Filter non-JSON stdout lines from MCP servers during startup
+- Perform tokenizer warmup in parallel on a background thread for better startup performance
+- Show submit times next to user prompts in the timeline
+- Improve /share to manage synced session visibility
+- Expand @-style imports in AGENTS.md, CLAUDE.md, and Copilot instruction files
+- Make /pr auto keep working through CI, review, and merge queue
+- Clicking to expand a compact timeline entry holds it in place and reveals its content downward
+- Configure subagent concurrency and depth limits in /settings (usage-based billing users)
+- Add `/chronicle skills review` for reviewing proposed draft skill changes, with options to accept, reject, or defer each draft
+- Add desktop notifications for attention prompts and idle sessions
+- Make /share use Mission Control links for session sharing
+- Snapshot creation retries transient HEAD lookup failures instead of crashing
+- Keep `/chronicle reindex` responsive and show progress in the timeline
+- Return to the last open GitHub issue, pull request, or gist view when switching tabs
+- Resolve package argument placeholders when installing MCP registry entries
+- Keep queued messages from getting stuck behind background work
+- Retry managed settings fetch after transient connection-pool errors
+- Stop showing broken-pipe errors when a sandboxed MCP server exits mid-request
+- Properly recover MCP host-delegated connections when OAuth tokens expire or need broader scopes
+- CLI git checks skip optional locks so status and branch lookups keep working in busy repositories
+- Collapse multi-line sub-items into one inline line in compact timeline rows
+- Inline hook settings now handle nested Claude-style hook groups correctly
+- Keep the CLI responsive during secret filtering
+- Search inputs match queries that have leading or trailing whitespace
+- Keep idle agents available after you cancel a turn
+- Show sandbox-bypass warnings and label bypassed commands
+- /pr auto now starts a self-paced loop that fixes one thing per run and paces itself around CI to drive the PR to green; /pr automerge keeps going until the PR is merged. Manage or stop it from /loop or /every.
+- Enable /rename in remote-hosted (cloud and relay) sessions
+- Add toggle to enable or disable MCP servers in the CLI from MCP list view
+- Add experimental response limits controls to CLI settings
+- Let managed settings configure OpenTelemetry export
+- MCP tools on OAuth-authenticated remote servers now recover automatically after a mid-session token expiry, matching the existing OIDC retry behaviour. A 401 during a tool call triggers a non-interactive reconnect, and servers needing interactive re-auth are retried at the start of the next turn.
+- Add persisted dynamicRetrieval setting (and --dynamic-retrieval skills=<on|off> flag) to enable or disable embeddings-based retrieval of skills
+- Let custom agents set reasoning effort in their definitions
+- Pass a task to /worktree (e.g. 'fix the login redirect') to name the branch for that task and run the sentence as the first prompt in the new worktree
+- Added runtime telemetry for the MCP host token-injection OAuth flow, recording when an OAuth broadcast is emitted to the host and how the host responds (token or cancelled) with response latency
+- Show merge status for each pull request in the Pull requests tab, and refresh the cached statuses on demand by pressing r
+- Fix a soft hang where the CLI stopped responding to input if a startup prompt (folder trust, screen reader, or Copilot free signup) opened while a non-Main home tab was focused
+- Guide the agent to format cross-repository issue/PR references as owner/repo#number (reserving bare #number for the current repo) so they don't mislink to the current repository
+- Keep /restart working when shutdown teardown takes too long
+- Copy text to the clipboard on WSL when cmd.exe is not on PATH
+- COPILOT_HOME and --config-dir stop loading skills from ~/.agents/skills
+- Keep per-extension disabled selections when switching extension mode in /extensions
+- Copying wrapped text from the scroll view keeps spacing correct
+- Voice mode turns itself off when the engine fails to start at boot
+- Quit cleanly with Ctrl+D during startup before authentication completes
+- Keep framed user messages from clipping trailing characters at the right edge
+- Inline images stop writing to the shell after exit
+- Display descriptions for slash command subcommands
+- Refresh MCP server headers automatically after authentication changes
+- LSP commands and tools resolve project configs and server paths more reliably
+- Add --allow-all-mcp-server-instructions to optionally include instructions from all MCP servers in system prompts
+- Auto-accept opt-in MCP consent prompts in --yolo sessions while still showing system permission prompts
+- Use the full terminal height in full-screen views
+- Use clearer icons for shell and search timeline entries
+- Match the terminal text color to the GitHub theme canvas
+- Show the active agent mode in the working footer text
+- /worktree keeps a valid branch name exactly as typed, e.g. feature/JIRA-123, instead of flattening it to a slug like feature-jira-123
+- With no argument, /worktree names the branch from your uncommitted changes and recent conversation using your active model instead of a fixed small one
+- Consolidate color palette settings under /settings theme
+- Store CLI settings and session state more reliably
+
 ## 1.0.65 - 2026-06-24
 
 - /cd now persists the working directory so resuming a session returns to it, and discovers custom agents in the new directory
