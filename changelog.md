@@ -1,3 +1,36 @@
+## 1.0.68 - 2026-07-01
+
+- Add support for the kimi-k2.7-code model
+- The focused field in the /mcp config form is marked with a "❯ " chevron, not color alone
+- Keep IDE tools available during transient IDE disconnects, returning a clear error while disconnected and recovering automatically when the IDE reconnects
+- Tab completion shows slash command aliases inline (e.g. /pr automerge|agentmerge)
+- Stop hooks from erroring and denying every tool when a session's working directory or git worktree has been deleted
+- Keep the footer model status in sync when reasoning effort or context tier changes
+- Avoid duplicate skill and command parse errors from symlinked scan roots
+- Update the Sessions sidebar branch after /cd and /worktree
+- Find agents and instructions under Win32 extended-length paths on Windows
+- Show descriptions for slash-command input choices
+- Prevent terminal corruption when copying selected timeline text on macOS
+- Fold symlinked sandbox paths into a single row
+- Browse, resume, and switch between sessions from the agents screen
+- Code review retries transient git failures when gathering changes
+- Skip malformed plugin manifests and keep loading valid plugins
+- Show plan budget details in the statusline and /usage for supported plans
+- Render Thai and Devanagari text correctly in clipped output
+- Keep file edits and patches within the sandbox filesystem policy
+- Preserve wrapped OSC 8 hyperlink IDs in terminal output
+- Let device-managed settings override server-managed settings
+- Keep embedded /skill tokens in skill prompt context
+- Let git commands work from repo subdirectories in the sandbox
+- PowerShell variable references no longer trigger content-policy refusals
+- Tell the agent when the working directory changes between turns so it uses the new directory for commands and relative paths
+- Default to a steady vertical-bar cursor in interactive sessions
+- Disable cursor blinking at startup without changing cursor shape
+- Reject sandbox path edits that conflict with symlinks in other lists
+- Keep the status line visible when the slash-command picker opens
+- Custom agents keep their tool filters in nested subagents
+- Preserve multibyte characters (emoji, accents, non-Latin text) in the /diagnose session log excerpt
+
 ## 1.0.67 - 2026-06-30
 
 - Disabling the sandbox for the rest of the session now takes effect immediately, so shell and search commands stop re-prompting to bypass it mid-turn
