@@ -1,0 +1,64 @@
+# @title AI prompt cell
+
+import ipywidgets as widgets
+from IPython.display import display, HTML, Markdown,clear_output
+from google.colab import ai
+
+dropdown = widgets.Dropdown(
+        options=[],
+            layout={'width': 'auto'}
+)
+
+def update_model_list(new_options):
+    dropdown.options = new_options
+    update_model_list(ai.list_models())
+
+    text_input = widgets.Textarea(
+            placeholder='Ask me anything....',
+                layout={'width': 'auto', 'height': '100px'},
+    )
+
+    button = widgets.Button(
+            description='Submit Text',
+                disabled=False,
+                    tooltip='Click to submit the text',
+                        icon='check'
+    )
+
+    output_area = widgets.Output(
+             layout={'width': 'auto', 'max_height': '300px','overflow_y': 'scroll'}
+    )
+
+    def on_button_clicked(b):
+        with output_area:
+                output_area.clear_output(wait=False)
+                        accumulated_content = ""
+                                for new_chunk in ai.generate_text(prompt=text_input.value, model_name=dropdown.value, stream=True):
+                                            if new_chunk is None:
+                                                            continue
+                                                                        accumulated_content += new_chunk
+                                                                                    clear_output(wait=True)
+                                                                                                display(Markdown(accumulated_content))
+
+                                                                                                button.on_click(on_button_clicked)
+                                                                                                vbox = widgets.GridBox([dropdown, text_input, button, output_area])
+
+                                                                                                display(HTML("""
+                                                                                                <style>
+                                                                                                .widget-dropdown select {
+                                                                                                        font-size: 18px;
+                                                                                                            font-family: "Arial", sans-serif;
+                                                                                                }
+                                                                                                .widget-textarea textarea {
+                                                                                                        font-size: 18px;
+                                                                                                            font-family: "Arial", sans-serif;
+                                                                                                }
+                                                                                                </style>
+                                                                                                """))
+                                                                                                display(vbox)
+                                                                                                }
+                                                                                                }))
+    )
+    )
+    )
+)
