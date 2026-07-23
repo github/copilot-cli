@@ -95,6 +95,39 @@ npm install -g @github/copilot
 npm install -g @github/copilot@prerelease
 ```
 
+#### WSL2 clipboard workaround
+
+On affected WSL2 installations, `/copy` and other clipboard actions can fail
+with `clip.exe exited with code 1` because the `cmd.exe` wrapper incorrectly
+quotes the Windows `clip.exe` path. See
+[issue #3534](https://github.com/github/copilot-cli/issues/3534). The issue was
+still reproducible in version `1.0.74-3`.
+
+Until a source fix ships, the following idempotent workaround patches the
+latest downloaded CLI bundle and keeps a backup. Restart Copilot CLI after
+running it, and re-run it after each `/update`.
+
+```bash
+case "$(uname -m)" in
+  aarch64|arm64) platform="linux-arm64" ;;
+  x86_64|amd64) platform="linux-x64" ;;
+  *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+pkg_root="$HOME/.cache/copilot/pkg/$platform"
+test -d "$pkg_root" || { echo "No Copilot CLI package found" >&2; exit 1; }
+version="$(find "$pkg_root" -mindepth 1 -maxdepth 1 -type d \
+  -printf '%f\n' | sort -V | tail -n 1)"
+test -n "$version" || { echo "No Copilot CLI package found" >&2; exit 1; }
+
+for file in "$pkg_root/$version/app.js" "$pkg_root/$version/sdk/index.js"; do
+  test -f "$file" || continue
+  if grep -Fq 'chcp 65001 >nul & "${e}"' "$file"; then
+    cp "$file" "$file.bak-clipfix"
+    sed -i 's|chcp 65001 >nul & "${e}"|chcp 65001 >nul \& ${e}|g' "$file"
+  fi
+done
+```
 
 ### Launching the CLI
 
