@@ -1,3 +1,7 @@
+## 1.0.75 - 2026-07-24
+
+- Add support for Claude Opus 5
+
 ## 1.0.74 - 2026-07-23
 
 - Typing `?` while the /search bar is open enters it as text instead of opening quick help
