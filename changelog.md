@@ -1,3 +1,11 @@
+## 1.0.77 - 2026-07-30
+
+- Unconditional autopilot approval now disables sandbox for the current session when bypass is allowed
+- Ctrl+G opens your editor to edit ask_user freeform answers without closing the prompt
+- Add a browser-based (web) OAuth login flow, now the default for `copilot login` on local interactive terminals (device code remains the default on remote/headless terminals). Use `--web-flow`/`--device-code` to force a mode, or pick one in the interactive `/login` command
+- Support enforcing managed sandbox policy via macOS and Windows native MDM settings
+- Allow reasoning effort to be omitted so the server can select the default
+
 ## 1.0.76 - 2026-07-29
 
 - Add enable/disable controls in /plugins for plugins, instructions, agents, LSP servers, and hooks
