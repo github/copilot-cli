@@ -1,3 +1,39 @@
+## 1.0.76 - 2026-07-29
+
+- Add enable/disable controls in /plugins for plugins, instructions, agents, LSP servers, and hooks
+- Add support for the grok-4.5 model
+- Sandbox denied paths are enforced for relative and symlinked entries on macOS and Linux (Windows cannot deny per path)
+- Unsent prompt text now stays with the session it was typed for (for the rest of the CLI session) instead of following you to the session you switch to
+- Resuming a session now restores its autopilot or plan mode instead of reverting to interactive, so the autopilot-only `task_complete` tool stays available and the mode matches the session you left
+- URL permission prompts now keep their sandbox-bypass warning and the model's reason when a host integration rebuilds the prompt, so an elevated fetch is no longer shown as an ordinary one
+- When an update is auto-downloaded, the notification suggests /restart and drops the warning color
+- /diff scrolls and syntax-highlights large multi-file diffs faster
+- Split-view sidebar: hover-to-focus is now off by default (opt in with `sidebar.hoverFocus`), the active session card is accented by default (opt out with `sidebar.accentActiveSession`), and the closed-state `open sidebar` hint always renders in the neutral hint color
+- `web_fetch` now follows HTTP redirects instead of failing, asking permission for the redirect target when it is on a different origin and showing where the redirect came from
+- Add a directable queue manager (staff) to reorder, edit, remove, repeat, and immediately send queued messages
+- New Sessions sidebar for managing multiple concurrent sessions: switch between them, spawn new ones, and see their status at a glance. Turn it on with experimental mode (`/experimental on`).
+- Enterprise administrators can enforce a restrictive sandbox floor: managed settings tighten (but never loosen) the user's sandbox policy, and the `/sandbox` dialog surfaces the org-configured managed values with locked fields and managed filesystem paths so admins can confirm what is enforced.
+- Sessions no longer fail every turn with "Holder terminated during creation" after a subagent finishes
+- Startup tips only suggest /init in repositories that don't already have Copilot instructions
+- A `userPromptSubmitted` hook returning a non-string value for `modifiedPrompt`, `modifiedTransformedPrompt`, or a handled `responseContent` no longer corrupts the session; the value is ignored, a type-only warning naming the field is logged, an empty-string replacement is rejected instead of blanking the model-facing content, a hook that sets `handled` without a usable `responseContent` is now diagnosed instead of silently falling through to the model, and a `null` `additionalContext` is treated as absent instead of being injected as the literal text `null`; hook output is also bounded at 10 MiB per invocation, so an HTTP or command hook returning an unbounded response can no longer exhaust memory or leave an oversized session behind
+- Show recent shell output for large commands that write to a file
+- The /instructions picker now respects --no-custom-instructions.
+- Render inline images in Rio terminals that support Kitty graphics
+- Sandboxed searches now offer an immediate bypass prompt and avoid duplicate bypass prompts.
+- Voice mode pauses playing media before recording and resumes it afterward, where supported (macOS and Windows)
+- Show the number of active scheduled prompts in the footer
+- Add /limits predict to suggest a session AI-credit limit from similar sessions.
+- Add configurable timed refreshes for custom status-line commands
+- Queued messages list no longer shows a blank row or inflated count, and Ctrl+C removes your own newest queued message
+- Changing the `mouse` setting mid-session now takes effect immediately, from both `/settings mouse on|off` and the `/settings` dialog, instead of being saved but ignored until the CLI restarted
+- web_fetch routes through the configured sandbox proxy when outbound is allowed, and denies egress when network.allowOutbound is false (a proxy no longer overrides the user's outbound policy); when a proxied fetch fails it warns that curl/wget share the same proxy, and suggests requestSandboxBypass only when the sandbox proxy itself is unreachable
+- Improve subagent delegation for small tasks and parallel work
+- Queue mid-turn /model changes and apply them after the current response finishes
+- Restore the early warning when unreclaimable system and tool context nears the limit, before automatic compaction is blocked
+- Session working directory no longer reverts to the original checkout shortly after `/worktree` switches into a new worktree
+- MCP tools load faster from definition-scoped snapshots, with process-wide and per-server cache opt-outs.
+- Autopilot stays selected after task_complete by default; set stayInAutopilot to false to return to interactive mode after each task
+
 ## 1.0.75 - 2026-07-24
 
 - Add support for Claude Opus 5
