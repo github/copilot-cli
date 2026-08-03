@@ -1,3 +1,33 @@
+## 1.0.78 - 2026-08-03
+
+- Timeline headers show how long each tool call took, right-aligned and ticking live while it runs (for calls of at least 5 seconds). On by default — disable with `/settings showToolDurations`.
+- First-party plugins automatically update to the latest version at session start
+- Add the experimental /new-worktree command to create a new worktree and start a new conversation in it
+- Copilot login now defaults to the browser flow for local desktop subprocesses without a TTY, including IDE integrations, while remote and headless environments continue using device code
+- Interactive shell shortcut now launches on Enter and shows an inline hint when "$" is armed
+- Extension slash commands run their handler exactly once per invocation when several extensions are loaded
+- Inline images no longer render with their first row repeated down the whole picture after the timeline scrolls
+- A run whose prompt is piped over stdin now treats its `sessionEnd` hook the same way `-p` does: the hook fires once per completed agent turn with `reason` `complete` (or `error` if the turn failed), instead of once at shutdown with `user_exit`. As with `-p`, a piped run that exits before completing a turn fires no `sessionEnd` hook
+- Split-view sidebar: the red close confirmation now reads `x again to close` (or `x again to exit CLI` on the last session) instead of `x close`, so a second press is clearly what closes
+- Expose token usage in ACP prompt results and live usage_update notifications
+- Added a forceRemoteSettingsRefresh managed setting that requires a fresh managed-settings fetch on startup
+- Disabling the sandbox from a bypass prompt applies only to that session; new sessions start sandboxed again
+- Managed settings now fall back to the persistent cache whenever a server-managed settings fetch fails for any reason (network error, a non-success HTTP status, or a malformed/unparseable response), and fail open — starting without the unconfirmed server restriction rather than the prior fail-closed behavior — when no usable cached policy is available
+- When the sandbox blocks a shell command and bypass is allowed, CLI offers to re-run it outside the sandbox without asking the model
+- /rewind no longer requires git and restores only the files Copilot changed, skipping any file whose contents no longer match what Copilot last wrote, with a conversation-only or conversation + files choice
+- Add /permissions to switch between approval modes.
+- ACP mode supports closing sessions with the closeSession request.
+- Ctrl+Q now enqueues the highlighted mid-text skill completion instead of the partial token
+- Switching sessions no longer restarts MCP servers or rebuilds hook state, so a turn running in another session is never halted with a stale-hook error
+- Refresh deferred MCP tools after OAuth authentication
+- New sandbox setting `allowDevToolCaches` (on by default): grants sandboxed builds access to toolchain caches, registries, and installs so builds work without extra setup. Set false to opt out.
+- Honor explicit GitHub MCP toolset/tool config: keep gh-overlap tools and stop steering to the gh CLI when you opt in
+- Warn on startup about unknown top-level keys in user settings.json (e.g. a misspelled setting) instead of silently ignoring them
+- Shell completion for --model now suggests auto and supported model names
+- Render long session transcripts progressively to keep scrolling responsive
+- Resuming a long session is dramatically faster and far lighter on memory, because its history is now read once at startup (in parallel, across CPU cores) instead of being re-read in full for every check the CLI runs before it can paint. In our benchmark a 230MB, 74k-event transcript came back in well under a second instead of about ten, at roughly a quarter of the peak memory; the exact gain depends on your machine's core count and disk
+- The /allow-all auto safety-judge model is no longer user-configurable; the judge model is now selected automatically.
+
 ## 1.0.77 - 2026-07-30
 
 - Unconditional autopilot approval now disables sandbox for the current session when bypass is allowed
