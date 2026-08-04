@@ -175,9 +175,13 @@ if ! command -v copilot >/dev/null 2>&1; then
     printf "Would you like to add it to %s? [y/N] " "$RC_FILE"
     if read -r REPLY </dev/tty 2>/dev/null; then
       if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
-        mkdir -p "$(dirname "$RC_FILE")"
-        echo "$PATH_LINE" >> "$RC_FILE"
-        echo "✓ Added PATH configuration to $RC_FILE"
+        if grep -qxF -- "$PATH_LINE" "$RC_FILE" 2>/dev/null; then
+          echo "✓ PATH configuration already in $RC_FILE"
+        elif mkdir -p "$(dirname "$RC_FILE")" && echo "$PATH_LINE" >> "$RC_FILE"; then
+          echo "✓ Added PATH configuration to $RC_FILE"
+        else
+          echo "✗ Failed to update $RC_FILE (check permissions)" >&2
+        fi
         echo "  Restart your shell or run: source $RC_FILE"
       fi
     fi
