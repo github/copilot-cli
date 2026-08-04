@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 [Security] Running pre-commit secret scanning..."
+npm run secretlint || {
+  echo "⛔ Secretlint detected possible secrets. Commit aborted." >&2
+  exit 1
+}
+
