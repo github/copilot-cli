@@ -324,7 +324,7 @@ export declare const rewards: import("drizzle-orm/sqlite-core").SQLiteTableWithC
             tableName: "rewards";
             dataType: "string";
             columnType: "SQLiteText";
-            data: "manual" | "referral_active" | "referral_onboarding" | "milestone";
+            data: "referral_active" | "referral_onboarding" | "milestone" | "manual";
             driverParam: string;
             notNull: true;
             hasDefault: false;

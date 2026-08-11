@@ -10,12 +10,12 @@
     "build": "tsc",
     "dev": "tsx watch src/bin/evodron.ts",
     "start": "node dist/bin/evodron.js",
-    "test": "vitest run",
+    "test": "vitest run src",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@evodron/shared": "*",
-    "chalk": "^5.3.0",
+    "chalk": "^4.1.2",
     "commander": "^12.0.0",
     "dotenv": "^16.4.5",
     "node-fetch": "^3.3.2"

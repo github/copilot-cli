@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, type AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
 
 // ─── users ────────────────────────────────────────────────────────────────────
 
@@ -8,7 +8,7 @@ export const users = sqliteTable('users', {
   username: text('username').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   referralCode: text('referral_code').notNull().unique(),
-  referredBy: text('referred_by').references(() => users.id),
+  referredBy: text('referred_by').references((): AnySQLiteColumn => users.id),
   credits: integer('credits').notNull().default(0),
   level: text('level', { enum: ['bronze', 'silver', 'gold'] }).notNull().default('bronze'),
   isAdmin: integer('is_admin', { mode: 'boolean' }).notNull().default(false),

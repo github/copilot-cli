@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspace=@evodron/shared && npm run build --workspace=@evodron/db && npm run build --workspace=@evodron/api && npm run build --workspace=@evodron/cli",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "dev:api": "npm run dev --workspace=packages/api",

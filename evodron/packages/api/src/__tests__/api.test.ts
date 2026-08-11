@@ -32,6 +32,10 @@ beforeAll(async () => {
     `CREATE TABLE IF NOT EXISTS abuse_flags (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, reason TEXT NOT NULL, detail TEXT, resolved_at TEXT, flagged_at TEXT NOT NULL)`,
     `CREATE TABLE IF NOT EXISTS ip_registry (id TEXT PRIMARY KEY, ip_hash TEXT NOT NULL, user_id TEXT NOT NULL, seen_at TEXT NOT NULL)`,
     `CREATE TABLE IF NOT EXISTS refresh_tokens (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, token_hash TEXT NOT NULL UNIQUE, expires_at TEXT NOT NULL, created_at TEXT NOT NULL, revoked_at TEXT)`,
+    `INSERT OR IGNORE INTO reward_rules (id, name, trigger, credits, active, description, updated_at) VALUES
+      ('rule-referrer', 'referral_active_referrer', 'referral_active', 100, 1, 'Credits awarded to the referrer when a referee reaches active status', '${new Date().toISOString()}'),
+      ('rule-onboarding', 'referral_onboarding_referee', 'referral_onboarding', 50, 1, 'Onboarding credits awarded to a referred user', '${new Date().toISOString()}'),
+      ('rule-milestone', 'milestone_10_sessions', 'milestone_10_sessions', 25, 1, 'Bonus credits for completing 10 sessions', '${new Date().toISOString()}')`,
   ];
 
   db.transaction(() => {

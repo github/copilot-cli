@@ -29,8 +29,8 @@ export async function adminRoutes(app: FastifyInstance) {
   app.post(
     '/abuse-flags/:id/resolve',
     { preHandler: [authenticateAdmin] },
-    async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const { id } = req.params;
+    async (req: FastifyRequest, reply: FastifyReply) => {
+      const { id } = req.params as { id: string };
 
       await db
         .update(schema.abuseFlags)
@@ -46,8 +46,8 @@ export async function adminRoutes(app: FastifyInstance) {
   app.post(
     '/users/:id/ban',
     { preHandler: [authenticateAdmin] },
-    async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const { id } = req.params;
+    async (req: FastifyRequest, reply: FastifyReply) => {
+      const { id } = req.params as { id: string };
       const timestamp = now();
 
       await db
@@ -83,8 +83,8 @@ export async function adminRoutes(app: FastifyInstance) {
   app.patch(
     '/reward-rules/:id',
     { preHandler: [authenticateAdmin] },
-    async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const { id } = req.params;
+    async (req: FastifyRequest, reply: FastifyReply) => {
+      const { id } = req.params as { id: string };
       const body = req.body as { credits?: number; active?: boolean; description?: string };
       const timestamp = now();
 
