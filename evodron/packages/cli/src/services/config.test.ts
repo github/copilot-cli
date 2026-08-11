@@ -9,13 +9,19 @@ function createTempConfigDir(): string {
 }
 
 describe('CLI config service', () => {
+  const createdDirs: string[] = [];
+
   afterEach(() => {
     delete process.env['EVODRON_CONFIG_DIR'];
     delete process.env['EVODRON_API_URL'];
+    for (const dir of createdDirs.splice(0)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('saves and loads credentials from the configured directory', () => {
     const dir = createTempConfigDir();
+    createdDirs.push(dir);
     process.env['EVODRON_CONFIG_DIR'] = dir;
 
     saveConfig({
@@ -35,6 +41,7 @@ describe('CLI config service', () => {
 
   it('prefers the saved API URL over the environment fallback', () => {
     const dir = createTempConfigDir();
+    createdDirs.push(dir);
     process.env['EVODRON_CONFIG_DIR'] = dir;
     process.env['EVODRON_API_URL'] = 'http://env.example.test';
 
@@ -45,6 +52,7 @@ describe('CLI config service', () => {
 
   it('clears the persisted config file', () => {
     const dir = createTempConfigDir();
+    createdDirs.push(dir);
     process.env['EVODRON_CONFIG_DIR'] = dir;
 
     saveConfig({ accessToken: 'token' });

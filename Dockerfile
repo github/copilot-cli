@@ -39,4 +39,4 @@ EXPOSE 3000
 
 USER node
 
-CMD ["sh", "-c", "npm run db:migrate && npm run db:seed && npm run start --workspace=@evodron/api"]
+CMD ["sh", "-c", "npm run db:migrate && npm run start --workspace=@evodron/api"]

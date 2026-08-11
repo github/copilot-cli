@@ -26,11 +26,11 @@ export async function adminRoutes(app: FastifyInstance) {
 
   // ── POST /admin/abuse-flags/:id/resolve ───────────────────────────────────
 
-  app.post(
+  app.post<{ Params: { id: string } }>(
     '/abuse-flags/:id/resolve',
     { preHandler: [authenticateAdmin] },
-    async (req: FastifyRequest, reply: FastifyReply) => {
-      const { id } = req.params as { id: string };
+    async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const { id } = req.params;
 
       await db
         .update(schema.abuseFlags)
@@ -43,11 +43,11 @@ export async function adminRoutes(app: FastifyInstance) {
 
   // ── POST /admin/users/:id/ban ─────────────────────────────────────────────
 
-  app.post(
+  app.post<{ Params: { id: string } }>(
     '/users/:id/ban',
     { preHandler: [authenticateAdmin] },
-    async (req: FastifyRequest, reply: FastifyReply) => {
-      const { id } = req.params as { id: string };
+    async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const { id } = req.params;
       const timestamp = now();
 
       await db
@@ -80,11 +80,11 @@ export async function adminRoutes(app: FastifyInstance) {
 
   // ── PATCH /admin/reward-rules/:id ─────────────────────────────────────────
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     '/reward-rules/:id',
     { preHandler: [authenticateAdmin] },
-    async (req: FastifyRequest, reply: FastifyReply) => {
-      const { id } = req.params as { id: string };
+    async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const { id } = req.params;
       const body = req.body as { credits?: number; active?: boolean; description?: string };
       const timestamp = now();
 
