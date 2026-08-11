@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evodron — Bienvenue</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="logo">Evodron</h1>
+      <nav>
+        <a href="/dashboard.html" id="nav-dashboard" class="btn btn-secondary hidden">Mon espace</a>
+        <a href="/register.html" id="nav-register" class="btn btn-primary">S'inscrire</a>
+        <a href="/login.html"    id="nav-login"    class="btn btn-ghost">Se connecter</a>
+        <button id="nav-logout" class="btn btn-ghost hidden">Déconnexion</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container hero">
+    <section class="hero-content">
+      <h2>Bienvenue sur Evodron</h2>
+      <p>Invitez vos amis, collectez des récompenses, et grandissez ensemble.</p>
+      <a href="/register.html" class="btn btn-primary btn-large">Créer un compte</a>
+      <a href="/referral.html" class="btn btn-ghost btn-large">Découvrir le programme de parrainage</a>
+    </section>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('evodron_token');
+    if (token) {
+      document.getElementById('nav-dashboard').classList.remove('hidden');
+      document.getElementById('nav-logout').classList.remove('hidden');
+      document.getElementById('nav-register').classList.add('hidden');
+      document.getElementById('nav-login').classList.add('hidden');
+    }
+    document.getElementById('nav-logout').addEventListener('click', () => {
+      localStorage.removeItem('evodron_token');
+      location.reload();
+    });
+  </script>
+</body>
+</html>
