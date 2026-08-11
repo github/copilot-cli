@@ -38,7 +38,8 @@ evodron/
 │       └── referral.js     # /api/referral (link, stats, rewards, activate-use)
 └── tests/
     ├── referral.test.js    # Tests flux de parrainage
-    └── anti-abuse.test.js  # Tests anti-fraude
+    ├── anti-abuse.test.js  # Tests anti-fraude
+    └── health.test.js      # Tests endpoint /api/health
 ```
 
 ## Prérequis
@@ -102,7 +103,7 @@ Tous les tests utilisent une base SQLite en mémoire (`DB_PATH=:memory:`). Aucun
 
 ### Authentification JWT
 
-Passer le token dans le header `Authorization: ****** ou dans un cookie `token`.
+Passer le token JWT via le header HTTP `Authorization` (schéma `Bearer`) ou dans un cookie nommé `token`.
 
 ## Variables d'environnement
 

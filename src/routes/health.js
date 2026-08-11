@@ -2,6 +2,7 @@
 
 const express = require('express');
 const { getDb } = require('../db/database');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ const router = express.Router();
  * Returns the application health status.
  * No authentication required — used by load balancers and monitoring.
  */
-router.get('/', (req, res) => {
+router.get('/', apiLimiter, (req, res) => {
   const status = { status: 'ok', version: process.env.npm_package_version || '1.0.0', timestamp: new Date().toISOString() };
 
   try {
