@@ -88,7 +88,6 @@ export function registerRunCommand(program: Command): void {
 }
 
 function findCopilotCli(): string | null {
-  const candidates = ['ghcs', 'gh-copilot', 'gh copilot'];
   const { execSync } = require('child_process') as typeof import('child_process');
 
   for (const bin of ['ghcs', 'gh']) {

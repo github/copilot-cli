@@ -98,7 +98,7 @@ export async function referralRoutes(app: FastifyInstance) {
           code: user.referralCode,
           link: `${base}/ref/${user.referralCode}`,
           totalReferrals: allReferrals.length,
-          activeReferrals: allReferrals.filter((r) => r.status !== 'pending').length,
+          activeReferrals: allReferrals.filter((r) => r.status === 'active' || r.status === 'rewarded').length,
           pendingReferrals: allReferrals.filter((r) => r.status === 'pending').length,
           totalCreditsEarned,
           referrals: referralEntries,

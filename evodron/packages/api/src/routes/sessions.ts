@@ -178,7 +178,7 @@ async function checkMilestones(
     await db
       .select({ id: schema.sessions.id })
       .from(schema.sessions)
-      .where(eq(schema.sessions.userId, userId))
+      .where(and(eq(schema.sessions.userId, userId), isNotNull(schema.sessions.endedAt)))
       .all()
   ).length;
 

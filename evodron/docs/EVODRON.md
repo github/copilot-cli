@@ -154,7 +154,6 @@ See `.env.example` for all available variables.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `EVODRON_JWT_SECRET` | Yes | JWT signing secret (32+ chars) |
-| `EVODRON_REFRESH_SECRET` | Yes | Refresh token secret |
 | `EVODRON_DB_URL` | Yes | SQLite path or PostgreSQL URL |
 | `EVODRON_API_URL` | CLI | API URL (used by CLI) |
 | `EVODRON_REFERRAL_BASE_URL` | No | Base URL for referral links |
