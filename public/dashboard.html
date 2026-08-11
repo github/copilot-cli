@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evodron — Mon espace</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Evodron</a>
+      <nav>
+        <button id="nav-logout" class="btn btn-ghost">Déconnexion</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container dashboard">
+    <h2 id="welcome-msg">Mon espace</h2>
+
+    <!-- ─── REFERRAL SECTION ─────────────────────────────────────────── -->
+    <section class="card referral-card" id="referral-section">
+      <h3>🎁 Programme Evodron</h3>
+
+      <!-- Invite -->
+      <div class="referral-invite">
+        <h4>👤 Invitez un ami</h4>
+        <div class="referral-link-row">
+          <span class="referral-link-label">🔗 Votre lien de parrainage :</span>
+          <code id="referral-link-display" class="referral-link-value">Chargement…</code>
+          <button id="copy-btn" class="btn btn-secondary btn-sm" title="Copier le lien">
+            📋 Copier le lien
+          </button>
+        </div>
+        <div id="copy-feedback" class="copy-feedback hidden">✅ Lien copié !</div>
+      </div>
+
+      <hr />
+
+      <!-- Stats -->
+      <div class="referral-stats">
+        <h4>📊 Statistiques</h4>
+        <ul class="stats-list">
+          <li>Invitations envoyées : <strong id="stat-invitations">—</strong></li>
+          <li>Inscriptions : <strong id="stat-signups">—</strong></li>
+          <li>Utilisateurs ayant commencé à utiliser Evodron : <strong id="stat-active">—</strong></li>
+          <li>Récompenses obtenues : <strong id="stat-rewarded">—</strong></li>
+        </ul>
+      </div>
+
+      <hr />
+
+      <!-- Rewards -->
+      <div class="referral-rewards">
+        <h4>🎁 Récompenses</h4>
+        <div id="rewards-available">
+          <p class="muted">Chargement des récompenses…</p>
+        </div>
+        <details>
+          <summary>Voir l'historique complet</summary>
+          <div id="rewards-history">Chargement…</div>
+        </details>
+      </div>
+
+      <div class="referral-cta">
+        <a href="/referral.html" class="btn btn-ghost btn-sm">ℹ️ Conditions du programme</a>
+      </div>
+    </section>
+
+    <!-- Demo: trigger first-use activation (simulate meaningful action) -->
+    <section class="card">
+      <h3>🚀 Simuler une première utilisation</h3>
+      <p class="muted">
+        En situation réelle, cette action est déclenchée automatiquement après votre première
+        utilisation active d'Evodron. Elle active votre parrainage et débloque les récompenses.
+      </p>
+      <button id="activate-btn" class="btn btn-primary">Activer mon compte</button>
+      <div id="activate-msg" class="alert hidden"></div>
+    </section>
+  </main>
+
+  <script src="/js/referral.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evodron — Inscription</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Evodron</a>
+    </div>
+  </header>
+
+  <main class="container form-page">
+    <div class="card form-card">
+      <h2>Créer un compte</h2>
+      <div id="form-error" class="alert alert-error hidden"></div>
+      <div id="form-success" class="alert alert-success hidden"></div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="username">Nom d'utilisateur</label>
+          <input type="text" id="username" name="username" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" />
+        </div>
+        <div class="form-group">
+          <label for="referral_code">Code de parrainage (optionnel)</label>
+          <input type="text" id="referral_code" name="referral_code" placeholder="Ex : ABC12345" autocomplete="off" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">S'inscrire</button>
+      </form>
+      <p class="form-footer">Déjà inscrit ? <a href="/login.html">Se connecter</a></p>
+    </div>
+  </main>
+
+  <script>
+    // Pre-fill referral code from URL ?ref=
+    const params = new URLSearchParams(location.search);
+    if (params.get('ref')) {
+      document.getElementById('referral_code').value = params.get('ref');
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl   = document.getElementById('form-error');
+      const successEl = document.getElementById('form-success');
+      errorEl.classList.add('hidden');
+      successEl.classList.add('hidden');
+
+      const body = {
+        email:         document.getElementById('email').value,
+        username:      document.getElementById('username').value,
+        password:      document.getElementById('password').value,
+        referral_code: document.getElementById('referral_code').value || undefined,
+      };
+
+      try {
+        const res  = await fetch('/api/auth/register', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = data.error || 'Une erreur est survenue.';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+        localStorage.setItem('evodron_token', data.token);
+        successEl.textContent = 'Compte créé avec succès ! Redirection…';
+        successEl.classList.remove('hidden');
+        setTimeout(() => location.href = '/dashboard.html', 1200);
+      } catch {
+        errorEl.textContent = 'Erreur réseau. Veuillez réessayer.';
+        errorEl.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

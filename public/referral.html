@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evodron — Programme de Parrainage</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Evodron</a>
+      <nav>
+        <a href="/dashboard.html" class="btn btn-secondary">Mon espace</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container referral-info-page">
+    <h2>Programme de Parrainage Evodron</h2>
+    <p class="lead">
+      Invitez vos amis à rejoindre Evodron et recevez des récompenses lorsqu'ils commencent à utiliser la plateforme.
+    </p>
+
+    <!-- How it works -->
+    <section class="card">
+      <h3>🔄 Comment ça fonctionne ?</h3>
+      <ol class="steps">
+        <li>
+          <strong>Partagez votre lien unique</strong><br />
+          Connectez-vous à votre espace et copiez votre lien de parrainage personnel.
+        </li>
+        <li>
+          <strong>Votre ami s'inscrit via votre lien</strong><br />
+          Il reçoit automatiquement un avantage de bienvenue sur son compte Evodron.
+        </li>
+        <li>
+          <strong>Il commence à utiliser Evodron</strong><br />
+          Dès sa première utilisation active, vous recevez votre récompense de parrain.
+        </li>
+      </ol>
+    </section>
+
+    <!-- Rewards -->
+    <section class="card" id="program-rewards">
+      <h3>🎁 Récompenses</h3>
+      <div id="reward-info">Chargement des conditions…</div>
+    </section>
+
+    <!-- Conditions -->
+    <section class="card">
+      <h3>📋 Conditions du programme</h3>
+      <ul id="program-conditions" class="conditions-list">
+        <li>Chargement…</li>
+      </ul>
+      <p class="muted legal-note">
+        Les récompenses Evodron sont des avantages au sein de la plateforme. Elles ne constituent pas
+        de l'argent réel et ne peuvent pas être échangées contre de la monnaie. Evodron se réserve le
+        droit de modifier ou d'interrompre le programme à tout moment, conformément aux conditions
+        générales d'utilisation.
+      </p>
+    </section>
+
+    <div class="cta-row">
+      <a href="/register.html" class="btn btn-primary btn-large">Créer un compte</a>
+      <a href="/dashboard.html" class="btn btn-secondary btn-large">Mon lien de parrainage</a>
+    </div>
+  </main>
+
+  <script>
+    (async () => {
+      try {
+        const res  = await fetch('/api/referral/program-info');
+        const data = await res.json();
+
+        // Rewards section
+        const rewardInfo = document.getElementById('reward-info');
+        const parts = [];
+        if (data.welcome_bonus) {
+          parts.push(`<p>🎁 <strong>Bonus de bienvenue filleul :</strong> ${data.welcome_bonus.amount} ${data.welcome_bonus.type.replace(/_/g,' ')}</p>`);
+        }
+        if (data.referrer_reward) {
+          parts.push(`<p>🏆 <strong>Récompense parrain :</strong> ${data.referrer_reward.amount} ${data.referrer_reward.type.replace(/_/g,' ')} — créditée après la première utilisation active de votre filleul.</p>`);
+        }
+        rewardInfo.innerHTML = parts.length ? parts.join('') : '<p>Aucune récompense active actuellement.</p>';
+
+        // Conditions
+        const condList = document.getElementById('program-conditions');
+        condList.innerHTML = data.conditions.map(c => `<li>${c}</li>`).join('');
+      } catch {
+        document.getElementById('reward-info').textContent = 'Impossible de charger les conditions du programme.';
+      }
+    })();
+  </script>
+</body>
+</html>

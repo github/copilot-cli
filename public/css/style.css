@@ -1,0 +1,184 @@
+/* ── Evodron Referral — Stylesheet ───────────────────────────────────── */
+
+:root {
+  --color-bg:         #0f1117;
+  --color-surface:    #1a1d27;
+  --color-border:     #2a2d3a;
+  --color-primary:    #6e56cf;
+  --color-primary-h:  #7d68d8;
+  --color-success:    #22c55e;
+  --color-error:      #ef4444;
+  --color-text:       #e2e8f0;
+  --color-muted:      #8892a4;
+  --radius:           10px;
+  --font:             'Segoe UI', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Layout ── */
+.container { max-width: 820px; margin: 0 auto; padding: 0 1.25rem; }
+
+/* ── Header ── */
+.site-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: .75rem 0;
+}
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-header nav { display: flex; gap: .5rem; align-items: center; }
+.logo { font-size: 1.25rem; font-weight: 700; color: var(--color-text); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, opacity .15s;
+  text-decoration: none;
+}
+.btn-primary  { background: var(--color-primary); color: #fff; }
+.btn-primary:hover  { background: var(--color-primary-h); }
+.btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+.btn-secondary:hover { background: var(--color-border); }
+.btn-ghost  { background: transparent; color: var(--color-muted); border: 1px solid var(--color-border); }
+.btn-ghost:hover { color: var(--color-text); }
+.btn-large  { padding: .7rem 1.6rem; font-size: 1rem; }
+.btn-block  { width: 100%; justify-content: center; }
+.btn-sm     { padding: .3rem .7rem; font-size: .8rem; }
+
+/* ── Hero ── */
+.hero { padding: 5rem 0 3rem; text-align: center; }
+.hero h2 { font-size: 2.2rem; margin-bottom: 1rem; }
+.hero p  { color: var(--color-muted); font-size: 1.1rem; margin-bottom: 2rem; }
+.hero-content { display: flex; flex-direction: column; align-items: center; gap: .75rem; }
+
+/* ── Cards ── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.card h3 { font-size: 1.1rem; margin-bottom: 1rem; }
+.card h4 { font-size: .95rem; color: var(--color-muted); margin-bottom: .75rem; }
+
+/* ── Forms ── */
+.form-page { padding: 3rem 0; display: flex; justify-content: center; }
+.form-card  { width: 100%; max-width: 440px; }
+.form-card h2 { margin-bottom: 1.5rem; text-align: center; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: .3rem; font-size: .875rem; color: var(--color-muted); }
+.form-group input {
+  width: 100%;
+  padding: .55rem .75rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--color-text);
+  font-size: .95rem;
+}
+.form-group input:focus { outline: 2px solid var(--color-primary); border-color: transparent; }
+.form-footer { text-align: center; margin-top: 1rem; color: var(--color-muted); font-size: .875rem; }
+
+/* ── Alerts ── */
+.alert {
+  padding: .65rem 1rem;
+  border-radius: var(--radius);
+  font-size: .875rem;
+  margin-bottom: .75rem;
+}
+.alert-error   { background: #2d1a1a; color: var(--color-error);   border: 1px solid #6b1d1d; }
+.alert-success { background: #0f2d1a; color: var(--color-success); border: 1px solid #1a6b3a; }
+.hidden { display: none !important; }
+
+/* ── Dashboard ── */
+.dashboard { padding: 2rem 0; }
+.dashboard h2 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+
+/* ── Referral Section ── */
+.referral-invite { margin-bottom: 1.25rem; }
+.referral-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .4rem;
+}
+.referral-link-label { color: var(--color-muted); font-size: .875rem; white-space: nowrap; }
+.referral-link-value {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: .3rem .65rem;
+  font-size: .85rem;
+  word-break: break-all;
+  flex: 1;
+}
+.copy-feedback { margin-top: .4rem; font-size: .8rem; color: var(--color-success); }
+
+.referral-stats { margin-bottom: 1.25rem; }
+.stats-list { list-style: none; display: flex; flex-direction: column; gap: .3rem; }
+.stats-list li { color: var(--color-muted); font-size: .9rem; }
+.stats-list li strong { color: var(--color-text); }
+
+.referral-rewards { margin-bottom: 1rem; }
+.reward-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: #1e1a3a;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  padding: .4rem .8rem;
+  font-size: .875rem;
+  color: var(--color-primary);
+  margin: .25rem .25rem 0 0;
+}
+.reward-badge.claimed { opacity: .45; border-color: var(--color-border); color: var(--color-muted); }
+
+details { margin-top: .75rem; }
+details summary { cursor: pointer; color: var(--color-primary); font-size: .875rem; }
+#rewards-history { margin-top: .5rem; }
+
+.referral-cta { margin-top: 1rem; }
+
+/* ── Referral info page ── */
+.referral-info-page { padding: 2.5rem 0; }
+.referral-info-page h2 { font-size: 1.75rem; margin-bottom: .75rem; }
+.lead { color: var(--color-muted); font-size: 1rem; margin-bottom: 1.5rem; }
+.steps { padding-left: 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+.steps li { font-size: .95rem; }
+.conditions-list { padding-left: 1.25rem; display: flex; flex-direction: column; gap: .5rem; }
+.conditions-list li { font-size: .9rem; color: var(--color-muted); }
+.legal-note { margin-top: 1rem; font-size: .8rem; color: var(--color-muted); font-style: italic; }
+.cta-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+/* ── Muted text ── */
+.muted { color: var(--color-muted); font-size: .875rem; }
+
+/* ── Divider ── */
+hr { border: none; border-top: 1px solid var(--color-border); margin: 1.25rem 0; }
