@@ -1,7 +1,7 @@
 {
-  "name": "evodron-referral",
+  "name": "evodron",
   "version": "1.0.0",
-  "description": "Evodron Referral Program — backend and frontend",
+  "description": "Evodron — Plateforme de parrainage (backend Node.js/Express + SQLite)",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -13,6 +13,7 @@
     "better-sqlite3": "^9.4.3",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
+    "express-rate-limit": "^8.6.2",
     "jsonwebtoken": "^9.0.2",
     "nanoid": "^3.3.7"
   },

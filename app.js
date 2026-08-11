@@ -6,6 +6,8 @@ const path         = require('path');
 
 const authRoutes     = require('./src/routes/auth');
 const referralRoutes = require('./src/routes/referral');
+const healthRoutes   = require('./src/routes/health');
+const { authLimiter, apiLimiter } = require('./src/middleware/rateLimiter');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -18,9 +20,12 @@ app.use(cookieParser());
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Health check (no rate limit)
+app.use('/api/health', healthRoutes);
+
 // API routes
-app.use('/api/auth',     authRoutes);
-app.use('/api/referral', referralRoutes);
+app.use('/api/auth',     authLimiter, authRoutes);
+app.use('/api/referral', apiLimiter,  referralRoutes);
 
 // Catch-all: serve index.html for client-side navigation
 app.get('*', (req, res) => {
