@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "lib": ["ES2020"],
     "outDir": "dist",
     "rootDir": "src",
@@ -9,9 +10,8 @@
     "esModuleInterop": true,
     "declaration": true,
     "sourceMap": true,
-    "paths": {
-      "@evodron/shared": ["../shared/src"]
-    }
+    "types": ["node"],
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

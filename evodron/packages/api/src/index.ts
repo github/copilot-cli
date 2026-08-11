@@ -11,10 +11,11 @@ import { referralRoutes } from './routes/referrals';
 import { rewardRoutes } from './routes/rewards';
 import { statsRoutes } from './routes/stats';
 import { adminRoutes } from './routes/admin';
-import { getDb } from '@evodron/db';
+import { getDb, schema } from '@evodron/db';
 
 const PORT = parseInt(process.env['EVODRON_API_PORT'] ?? '3000', 10);
 const HOST = process.env['EVODRON_API_HOST'] ?? '0.0.0.0';
+const BODY_LIMIT = parseInt(process.env['EVODRON_BODY_LIMIT_BYTES'] ?? '1048576', 10);
 
 export async function buildApp() {
   const app = Fastify({
@@ -22,12 +23,18 @@ export async function buildApp() {
       level: process.env['LOG_LEVEL'] ?? 'info',
     },
     trustProxy: true,
+    bodyLimit: BODY_LIMIT,
   });
 
   // ── Plugins ──────────────────────────────────────────────────────────────
 
+  const corsOrigin = process.env['EVODRON_CORS_ORIGIN'];
+  const allowedOrigins = corsOrigin
+    ? corsOrigin.split(',').map((origin) => origin.trim()).filter(Boolean)
+    : null;
+
   await app.register(cors, {
-    origin: true,
+    origin: allowedOrigins ?? true,
     credentials: true,
   });
 
@@ -68,7 +75,40 @@ export async function buildApp() {
 
   // ── Health check ─────────────────────────────────────────────────────────
 
-  app.get('/health', async () => ({ status: 'ok', service: 'evodron-api' }));
+  app.get('/health', async (_request, reply) => {
+    const status = {
+      status: 'ok',
+      service: 'evodron-api',
+      version: process.env['npm_package_version'] ?? '0.1.0',
+      db: 'ok',
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      await db.select({ id: schema.users.id }).from(schema.users).limit(1).all();
+    } catch {
+      status.status = 'degraded';
+      status.db = 'error';
+    }
+
+    return reply.code(status.status === 'ok' ? 200 : 503).send(status);
+  });
+
+  app.setNotFoundHandler((_request, reply) => {
+    return reply.code(404).send({ success: false, error: 'Route not found', code: 'NOT_FOUND' });
+  });
+
+  app.setErrorHandler((error, _request, reply) => {
+    app.log.error(error);
+
+    if (reply.sent) return;
+
+    if ((error as { validation?: unknown }).validation) {
+      return reply.code(400).send({ success: false, error: 'Invalid input', code: 'VALIDATION_ERROR' });
+    }
+
+    return reply.code(500).send({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
+  });
 
   return app;
 }

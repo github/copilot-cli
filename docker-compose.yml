@@ -1,18 +1,23 @@
 services:
-  app:
+  api:
     build: .
     ports:
       - "3000:3000"
     environment:
-      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required}
-      - JWT_EXPIRY=${JWT_EXPIRY:-7d}
-      - APP_URL=${APP_URL:-http://localhost:3000}
+      - EVODRON_JWT_SECRET=${EVODRON_JWT_SECRET:?EVODRON_JWT_SECRET is required}
+      - EVODRON_API_HOST=0.0.0.0
+      - EVODRON_API_PORT=3000
+      - EVODRON_DB_URL=file:/data/evodron.db
+      - EVODRON_API_URL=${EVODRON_API_URL:-http://localhost:3000}
+      - EVODRON_REFERRAL_BASE_URL=${EVODRON_REFERRAL_BASE_URL:-http://localhost:3000}
+      - EVODRON_REWARD_MIN_SESSIONS=${EVODRON_REWARD_MIN_SESSIONS:-3}
       - NODE_ENV=${NODE_ENV:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     volumes:
       - evodron_data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
       interval: 30s
       timeout: 5s
       retries: 3

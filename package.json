@@ -1,24 +1,20 @@
 {
-  "name": "evodron",
+  "name": "evodron-repository",
   "version": "1.0.0",
-  "description": "Evodron — Plateforme de parrainage (backend Node.js/Express + SQLite)",
-  "main": "app.js",
+  "description": "Repository entrypoint for the EVODRON platform workspace",
+  "private": true,
   "scripts": {
-    "start": "node app.js",
-    "dev": "node app.js",
-    "test": "jest --testPathPattern=tests/"
+    "setup": "cd evodron && npm ci && npm run build && npm run db:migrate && npm run db:seed",
+    "build": "cd evodron && npm run build",
+    "test": "cd evodron && npm test",
+    "lint": "cd evodron && npm run lint",
+    "dev:api": "cd evodron && npm run dev:api",
+    "dev:cli": "cd evodron && npm run dev:cli",
+    "db:migrate": "cd evodron && npm run db:migrate",
+    "db:seed": "cd evodron && npm run db:seed",
+    "start": "cd evodron && npm run start --workspace=@evodron/api"
   },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^9.4.3",
-    "cookie-parser": "^1.4.6",
-    "express": "^4.18.2",
-    "express-rate-limit": "^8.6.2",
-    "jsonwebtoken": "^9.0.2",
-    "nanoid": "^3.3.7"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0",
-    "supertest": "^6.3.4"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

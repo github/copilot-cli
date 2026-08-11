@@ -7,7 +7,7 @@ export async function authenticate(
   try {
     await request.jwtVerify();
   } catch {
-    reply.code(401).send({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' });
+    return reply.code(401).send({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' });
   }
 }
 
@@ -19,9 +19,9 @@ export async function authenticateAdmin(
     await request.jwtVerify();
     const payload = request.user as { isAdmin?: boolean };
     if (!payload.isAdmin) {
-      reply.code(403).send({ success: false, error: 'Forbidden', code: 'FORBIDDEN' });
+      return reply.code(403).send({ success: false, error: 'Forbidden', code: 'FORBIDDEN' });
     }
   } catch {
-    reply.code(401).send({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' });
+    return reply.code(401).send({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' });
   }
 }

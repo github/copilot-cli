@@ -91,6 +91,10 @@ const migrations = [
   `CREATE INDEX IF NOT EXISTS idx_abuse_flags_user ON abuse_flags(user_id)`,
   `CREATE INDEX IF NOT EXISTS idx_ip_registry_hash ON ip_registry(ip_hash)`,
   `CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id)`,
+  `INSERT OR IGNORE INTO reward_rules (id, name, trigger, credits, active, description, updated_at) VALUES
+    ('rule-referrer', 'referral_active_referrer', 'referral_active', 100, 1, 'Credits awarded to the referrer when a referee reaches active status', datetime('now')),
+    ('rule-onboarding', 'referral_onboarding_referee', 'referral_onboarding', 50, 1, 'Onboarding credits awarded to a new user who joined via referral', datetime('now')),
+    ('rule-milestone-10', 'milestone_10_sessions', 'milestone_10_sessions', 25, 1, 'Bonus credits for completing 10 sessions', datetime('now'))`,
 ];
 
 db.transaction(() => {
