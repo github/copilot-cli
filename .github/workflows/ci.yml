@@ -24,6 +24,10 @@ jobs:
         working-directory: evodron
         run: npm ci
 
+      - name: Build dependencies
+        working-directory: evodron
+        run: npm run build -w @evodron/shared -w @evodron/db
+
       - name: Lint workspace
         working-directory: evodron
         run: npm run lint
