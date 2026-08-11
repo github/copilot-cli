@@ -1,0 +1,33 @@
+{
+  "name": "@evodron/api",
+  "version": "0.1.0",
+  "description": "EVODRON REST API",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@evodron/db": "*",
+    "@evodron/shared": "*",
+    "@fastify/cors": "^10.1.0",
+    "@fastify/jwt": "^10.2.1",
+    "@fastify/rate-limit": "^10.3.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.45.2",
+    "fastify": "^5.9.0",
+    "nanoid": "^5.0.4",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.11.25",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^4.1.10"
+  }
+}

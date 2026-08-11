@@ -1,0 +1,29 @@
+{
+  "name": "evodron",
+  "version": "0.1.0",
+  "description": "EVODRON — AI-powered developer platform built around the GitHub Copilot CLI",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=packages/api",
+    "dev:cli": "npm run dev --workspace=packages/cli",
+    "db:migrate": "npm run migrate --workspace=packages/db",
+    "db:seed": "npm run seed --workspace=packages/db"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "evodron",
+    "ai",
+    "cli",
+    "developer-tools"
+  ],
+  "author": "EVODRON",
+  "license": "UNLICENSED"
+}
