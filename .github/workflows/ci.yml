@@ -21,11 +21,21 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        working-directory: evodron
         run: npm ci
+
+      - name: Lint workspace
+        working-directory: evodron
+        run: npm run lint
 
       - name: Run tests
         env:
-          JWT_SECRET: test-secret-ci
-          DB_PATH: ":memory:"
+          EVODRON_JWT_SECRET: test-secret-ci-secret-ci-secret-ci
+          EVODRON_DB_URL: file:/tmp/evodron-ci.db
           NODE_ENV: test
+        working-directory: evodron
         run: npm test
+
+      - name: Build workspace
+        working-directory: evodron
+        run: npm run build

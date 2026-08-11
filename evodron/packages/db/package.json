@@ -6,8 +6,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "migrate": "tsx src/migrate.ts",
-    "seed": "tsx src/seed.ts"
+    "migrate": "node dist/migrate.js",
+    "seed": "node dist/seed.js",
+    "dev:migrate": "tsx src/migrate.ts",
+    "dev:seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "better-sqlite3": "^9.4.3",
