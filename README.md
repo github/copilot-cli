@@ -138,6 +138,58 @@ Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premi
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
+## 🤖 Custom Agents
+
+You can define custom agents as Markdown files with YAML frontmatter (for example, `.agent.md` files). Each agent is configured with a small set of frontmatter fields:
+
+```yaml
+---
+name: deep-reviewer
+description: Thorough code review agent that catches subtle bugs
+model: claude-sonnet-4.5
+---
+
+You are a meticulous code reviewer...
+```
+
+| Field         | Required | Description                                                                                     |
+| ------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `name`        | Yes      | Unique identifier used to invoke the agent (for example, `copilot --agent=deep-reviewer`).      |
+| `description` | Yes      | Short summary shown when listing available agents.                                              |
+| `model`       | No       | Pins the model used by this agent (for example, `claude-sonnet-4.5`). When omitted, the agent inherits the session model. |
+
+### Reasoning effort (`effort`)
+
+> **Preview / proposed:** Runtime support for the `effort` field is tracked in [github/copilot-cli#2904](https://github.com/github/copilot-cli/issues/2904). Add it to your agent frontmatter now so it takes effect once supported.
+
+To set a reasoning-effort level that applies only to a specific agent, add a dedicated `effort` frontmatter field, parallel to `model`:
+
+```yaml
+---
+name: deep-reviewer
+description: Thorough code review agent that catches subtle bugs
+model: claude-sonnet-4.5
+effort: high
+---
+
+You are a meticulous code reviewer...
+```
+
+```yaml
+---
+name: quick-lookup
+description: Fast codebase explorer for simple questions
+model: claude-haiku-4.5
+effort: low
+---
+
+You are a fast, lightweight exploration agent...
+```
+
+**Values:** `low`, `medium` (default, matches global behavior), `high`, `xhigh`.
+
+**Precedence:** An agent's `effort` field overrides both the global `effortLevel` user config and the `--effort` / `--reasoning-effort` CLI flag for that specific agent invocation. When unset, the agent inherits the session-level effort (current behavior, no breaking change). Models that do not support a given effort level clamp to the nearest supported level, consistent with how `--effort` behaves today.
+
 ## 🔧 Configuring LSP Servers
 
 GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence. This feature provides intelligent code features like go-to-definition, hover information, and diagnostics.
