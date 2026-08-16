@@ -1,3 +1,155 @@
+## 1.0.80 - 2026-08-14
+
+- Update model configurations
+
+## 1.0.79 - 2026-08-10
+
+- The /sandbox configuration dialog shows where sandbox settings are stored in settings.json
+- Add support for enterprise allow-auto-only policy so /allow-all auto works while full allow-all remains blocked.
+- Allow enterprise-managed sandbox policy to enforce a proxy URL while credentials remain user-controlled
+- A tool directory inside your workspace that is on PATH (.venv/bin, node_modules/.bin, an in-repo GOPATH) no longer turns that part of the workspace read-only in the sandbox
+- The /sandbox configuration dialog groups the git, gh, and (on macOS) keychain settings under a new Auth tab, and the settings keys moved from `sandbox.gitAuth`/`sandbox.ghAuth` to `sandbox.auth.git`/`sandbox.auth.gh`. There is no migration: the old keys are ignored in settings files, and SDK requests that still send them are rejected as invalid rather than ignored
+- Added a `worktreeBaseRef` setting that controls whether `/worktree`, `/worktree new`, and `--worktree` start from HEAD or the remote default branch. All three now default to HEAD; previously `--worktree` started from the remote default branch.
+- Model picker groups models into Recent, Recommended, New, and other sections, and Shift+Tab switches grouping views.
+- Large monorepos now use tgrep ([trigram-indexed grep for fast regex search in large codebases](https://github.com/microsoft/tgrep)) instead of ripgrep
+- Agent Plugins spec plugins can now ship extensions under a com.github.copilot/extensions/ directory
+- Add support for the kimi-k3 model
+- Combine `--plan` with `--mode autopilot` to plan first and then implement without waiting for approval
+- The `/app` command now opens the current session in the GitHub Copilot desktop app instead of landing on Home with the wrong folder (requires GitHub Copilot app 1.1.3 or later)
+- On macOS, a sandbox read-only path nested inside a writable one now stays read-only instead of inheriting the write permission from the wider path
+- On macOS, sandboxed commands can use UNIX-domain sockets again, so tools that talk over a local IPC pipe (tsx, vite, esbuild, jest workers) no longer fail with `listen EPERM`
+- Sandboxed commands work when the working directory lives on a Windows Dev Drive
+- `/theme` now only shows its deprecation notice for a valid color mode, so a mistyped mode no longer suggests an invalid command or hides the notice from your next valid `/theme`.
+- Sandboxed git now authenticates to Azure DevOps, GitHub Enterprise Server, GitLab, and other non-GitHub remotes you have stored HTTPS credentials for
+- Ask user multi-select prompts include an Other option for free-text answers
+- Improve teleported subagent /tasks navigation with nested tree browsing, current/all and finished-task filters, and a live timeline you can steer
+- A rare internal delay no longer prints a diagnostic warning on top of the interactive UI
+- A failed session-history load no longer leaves the timeline permanently empty: the failure was silently discarded, so the transcript stayed blank for the rest of the session with nothing logged. It is now retried, and reported in the transcript and the log if it still fails
+- Resuming a long session no longer collapses the timeline's scroll range while history renders in the background: entries that had not finished rendering were published as if they did not exist, so the scrollbar and scroll position jumped until the background render caught up
+- Manage multiple concurrent sessions from the Sessions tab and sidebar
+- Sandboxed wrapper builds (make and friends) get the dev tool caches their recipes need, based on the build manifests in the working directory
+- Prompt pinning is off by default; set pinnedPrompts to true to enable it.
+- Sandboxed commands can reach the network again on recent Windows builds, where every outbound connection was blocked even with outbound access enabled and no proxy configured
+- Plugin custom agents honor deferred-tool-loading frontmatter
+- Use `/worktree new` to start a new session in a new worktree
+- A sandbox that cannot start an MCP server now fails in seconds instead of stalling the session, and sandbox startup failures for both MCP and language servers now say the sandbox was at fault and how to fix or opt out of it
+- Login links are clickable during web and device-code sign-in
+- Pin the current prompt one row higher, in the row the tab bar already reserves, so it keeps the shape of the prompt it copies while costing the timeline one row less
+- Leave the pinned prompt off by default on terminals under 30 rows, where it would crowd the output; set pinnedPrompts explicitly to override at any size
+- Compute /context attribution against the Auto-resolved model so token totals are accurate for Free/Student users
+- Disabling an extension no longer breaks elicitation, canvases, or tool permission prompts for other extensions
+- A prompt stashed with ctrl+s now stays with the session it was typed for, so switching away and back and pressing ctrl+s restores it instead of finding it gone
+- On Linux, searches and most shell commands blocked by the sandbox now offer to re-run outside it
+- BREAKING: the sandbox setting `allowDevToolCaches` is renamed `allowDevToolAccess`, since it grants dev-tool config and registries too, not just caches. The old key is no longer read and is ignored silently, so an existing `false` opt-out reverts to the default (on). Rename it in settings.json and in any managed/MDM policy.
+- Add /sandbox policy to show effective sandbox paths, denials, and network access
+- Queue prompts, shell commands, and supported slash commands in local sessions to run in order after the current task finishes
+- Set "autoUpdate": true on an extraKnownMarketplaces entry in your user settings to auto-update its plugins at session start
+- /sandbox tags inactive settings as (disabled) and explains why they are locked, and documents dev tool caches in copilot help sandbox
+- Show "pending · ctrl+c to cancel" for in-flight steering prompts
+- Make /model session-scoped by default, and use /config model to set defaults for future sessions.
+- Pin the current prompt as a single line instead of a three-row framed block, so it reads as chrome and returns rows to the timeline; with the tab bar on it sits directly below the tabs and costs the timeline nothing
+
+## 1.0.78 - 2026-08-03
+
+- Timeline headers show how long each tool call took, right-aligned and ticking live while it runs (for calls of at least 5 seconds). On by default — disable with `/settings showToolDurations`.
+- First-party plugins automatically update to the latest version at session start
+- Add the experimental /new-worktree command to create a new worktree and start a new conversation in it
+- Copilot login now defaults to the browser flow for local desktop subprocesses without a TTY, including IDE integrations, while remote and headless environments continue using device code
+- Interactive shell shortcut now launches on Enter and shows an inline hint when "$" is armed
+- Extension slash commands run their handler exactly once per invocation when several extensions are loaded
+- Inline images no longer render with their first row repeated down the whole picture after the timeline scrolls
+- A run whose prompt is piped over stdin now treats its `sessionEnd` hook the same way `-p` does: the hook fires once per completed agent turn with `reason` `complete` (or `error` if the turn failed), instead of once at shutdown with `user_exit`. As with `-p`, a piped run that exits before completing a turn fires no `sessionEnd` hook
+- Split-view sidebar: the red close confirmation now reads `x again to close` (or `x again to exit CLI` on the last session) instead of `x close`, so a second press is clearly what closes
+- Expose token usage in ACP prompt results and live usage_update notifications
+- Added a forceRemoteSettingsRefresh managed setting that requires a fresh managed-settings fetch on startup
+- Disabling the sandbox from a bypass prompt applies only to that session; new sessions start sandboxed again
+- Managed settings now fall back to the persistent cache whenever a server-managed settings fetch fails for any reason (network error, a non-success HTTP status, or a malformed/unparseable response), and fail open — starting without the unconfirmed server restriction rather than the prior fail-closed behavior — when no usable cached policy is available
+- When the sandbox blocks a shell command and bypass is allowed, CLI offers to re-run it outside the sandbox without asking the model
+- /rewind no longer requires git and restores only the files Copilot changed, skipping any file whose contents no longer match what Copilot last wrote, with a conversation-only or conversation + files choice
+- Add /permissions to switch between approval modes.
+- ACP mode supports closing sessions with the closeSession request.
+- Ctrl+Q now enqueues the highlighted mid-text skill completion instead of the partial token
+- Switching sessions no longer restarts MCP servers or rebuilds hook state, so a turn running in another session is never halted with a stale-hook error
+- Refresh deferred MCP tools after OAuth authentication
+- New sandbox setting `allowDevToolCaches` (on by default): grants sandboxed builds access to toolchain caches, registries, and installs so builds work without extra setup. Set false to opt out.
+- Honor explicit GitHub MCP toolset/tool config: keep gh-overlap tools and stop steering to the gh CLI when you opt in
+- Warn on startup about unknown top-level keys in user settings.json (e.g. a misspelled setting) instead of silently ignoring them
+- Shell completion for --model now suggests auto and supported model names
+- Render long session transcripts progressively to keep scrolling responsive
+- Resuming a long session is dramatically faster and far lighter on memory, because its history is now read once at startup (in parallel, across CPU cores) instead of being re-read in full for every check the CLI runs before it can paint. In our benchmark a 230MB, 74k-event transcript came back in well under a second instead of about ten, at roughly a quarter of the peak memory; the exact gain depends on your machine's core count and disk
+- The /allow-all auto safety-judge model is no longer user-configurable; the judge model is now selected automatically.
+
+## 1.0.77 - 2026-07-30
+
+- Unconditional autopilot approval now disables sandbox for the current session when bypass is allowed
+- Ctrl+G opens your editor to edit ask_user freeform answers without closing the prompt
+- Add a browser-based (web) OAuth login flow, now the default for `copilot login` on local interactive terminals (device code remains the default on remote/headless terminals). Use `--web-flow`/`--device-code` to force a mode, or pick one in the interactive `/login` command
+- Support enforcing managed sandbox policy via macOS and Windows native MDM settings
+- Allow reasoning effort to be omitted so the server can select the default
+
+## 1.0.76 - 2026-07-29
+
+- Add enable/disable controls in /plugins for plugins, instructions, agents, LSP servers, and hooks
+- Add support for the grok-4.5 model
+- Sandbox denied paths are enforced for relative and symlinked entries on macOS and Linux (Windows cannot deny per path)
+- Unsent prompt text now stays with the session it was typed for (for the rest of the CLI session) instead of following you to the session you switch to
+- Resuming a session now restores its autopilot or plan mode instead of reverting to interactive, so the autopilot-only `task_complete` tool stays available and the mode matches the session you left
+- URL permission prompts now keep their sandbox-bypass warning and the model's reason when a host integration rebuilds the prompt, so an elevated fetch is no longer shown as an ordinary one
+- When an update is auto-downloaded, the notification suggests /restart and drops the warning color
+- /diff scrolls and syntax-highlights large multi-file diffs faster
+- Split-view sidebar: hover-to-focus is now off by default (opt in with `sidebar.hoverFocus`), the active session card is accented by default (opt out with `sidebar.accentActiveSession`), and the closed-state `open sidebar` hint always renders in the neutral hint color
+- `web_fetch` now follows HTTP redirects instead of failing, asking permission for the redirect target when it is on a different origin and showing where the redirect came from
+- Add a directable queue manager (staff) to reorder, edit, remove, repeat, and immediately send queued messages
+- New Sessions sidebar for managing multiple concurrent sessions: switch between them, spawn new ones, and see their status at a glance. Turn it on with experimental mode (`/experimental on`).
+- Enterprise administrators can enforce a restrictive sandbox floor: managed settings tighten (but never loosen) the user's sandbox policy, and the `/sandbox` dialog surfaces the org-configured managed values with locked fields and managed filesystem paths so admins can confirm what is enforced.
+- Sessions no longer fail every turn with "Holder terminated during creation" after a subagent finishes
+- Startup tips only suggest /init in repositories that don't already have Copilot instructions
+- A `userPromptSubmitted` hook returning a non-string value for `modifiedPrompt`, `modifiedTransformedPrompt`, or a handled `responseContent` no longer corrupts the session; the value is ignored, a type-only warning naming the field is logged, an empty-string replacement is rejected instead of blanking the model-facing content, a hook that sets `handled` without a usable `responseContent` is now diagnosed instead of silently falling through to the model, and a `null` `additionalContext` is treated as absent instead of being injected as the literal text `null`; hook output is also bounded at 10 MiB per invocation, so an HTTP or command hook returning an unbounded response can no longer exhaust memory or leave an oversized session behind
+- Show recent shell output for large commands that write to a file
+- The /instructions picker now respects --no-custom-instructions.
+- Render inline images in Rio terminals that support Kitty graphics
+- Sandboxed searches now offer an immediate bypass prompt and avoid duplicate bypass prompts.
+- Voice mode pauses playing media before recording and resumes it afterward, where supported (macOS and Windows)
+- Show the number of active scheduled prompts in the footer
+- Add /limits predict to suggest a session AI-credit limit from similar sessions.
+- Add configurable timed refreshes for custom status-line commands
+- Queued messages list no longer shows a blank row or inflated count, and Ctrl+C removes your own newest queued message
+- Changing the `mouse` setting mid-session now takes effect immediately, from both `/settings mouse on|off` and the `/settings` dialog, instead of being saved but ignored until the CLI restarted
+- web_fetch routes through the configured sandbox proxy when outbound is allowed, and denies egress when network.allowOutbound is false (a proxy no longer overrides the user's outbound policy); when a proxied fetch fails it warns that curl/wget share the same proxy, and suggests requestSandboxBypass only when the sandbox proxy itself is unreachable
+- Improve subagent delegation for small tasks and parallel work
+- Queue mid-turn /model changes and apply them after the current response finishes
+- Restore the early warning when unreclaimable system and tool context nears the limit, before automatic compaction is blocked
+- Session working directory no longer reverts to the original checkout shortly after `/worktree` switches into a new worktree
+- MCP tools load faster from definition-scoped snapshots, with process-wide and per-server cache opt-outs.
+- Autopilot stays selected after task_complete by default; set stayInAutopilot to false to return to interactive mode after each task
+
+## 1.0.75 - 2026-07-24
+
+- Add support for Claude Opus 5
+
+## 1.0.74 - 2026-07-23
+
+- Typing `?` while the /search bar is open enters it as text instead of opening quick help
+- Add support for Open Plugin Spec v1 plugin manifests and mcp.json configuration
+- IDE integration reconnects reliably when the CLI reloads MCP servers or changes directory
+- Multi-turn subagent timelines show every prompt and response in the correct order after reopening /tasks
+- Subagent timelines identify whether prompts came from the main agent or another subagent
+- Show a first-run splash to opt into the default sandbox
+- Adding support for gemini-3.6-flash
+- The `/mcp add` and `/mcp edit` wizard now preserves `=` characters in environment variable values (such as base64 padding), so secrets and tokens are stored correctly.
+- Remote session uploads stop retrying permanent Mission Control 400/404 responses
+- Show Tab in /settings footer to switch scope tabs
+- Downscale oversized tool-result images so CAPI Responses requests continue
+- When multiplexing sessions, a session's open dialog no longer leaks into another session; eligible pickers reopen when you switch back
+- The `$` interactive shell shortcut now opens a shell even while the agent is working
+- Fully honor the skill disable-model-invocation flag
+- Warn when a participating language server reports a different symbol than the one requested
+- Steering interrupts shell output waits without stopping the running command
+- Increase the Responses request size limit
+- Plan mode now allows session-folder planning artifacts while still blocking clear file mutations outside the session folder.
+- Add `/model plan` (or `/model --plan`) to pick a model used while in plan mode; pass a model id, `off` to clear, or no id to open the picker. Reverts to the session model when you leave plan mode.
+- Resume search matches session titles even when whitespace differs
+
 ## 1.0.73 - 2026-07-20
 
 - Anthropic subagents continue working when additional directories are configured

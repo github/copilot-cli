@@ -1,0 +1,100 @@
+name: Close invalid PR writer
+
+on:
+  workflow_run:
+    workflows: [Close issue/PR on adding invalid label]
+    types: [completed]
+  # pull_request does not run for conflicted PRs, so reconcile from the trusted default branch.
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  close-invalid-pr-from-workflow-run:
+    if: >
+      github.repository == 'github/copilot-cli' &&
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pull-requests: write
+    concurrency:
+      group: close-invalid-pr-${{ github.event.workflow_run.pull_requests[0].number || github.run_id }}
+      cancel-in-progress: false
+    steps:
+      - name: Close invalid PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+
+          trusted_workflow_id="$(gh api "repos/$GH_REPO/actions/workflows/close-invalid.yml" --jq .id)"
+          workflow_run="$(gh api "repos/$GH_REPO/actions/runs/$WORKFLOW_RUN_ID")"
+
+          if [ "$(jq -r .workflow_id <<<"$workflow_run")" != "$trusted_workflow_id" ] ||
+            [ "$(jq -r .event <<<"$workflow_run")" != "pull_request" ] ||
+            [ "$(jq -r .repository.full_name <<<"$workflow_run")" != "$GH_REPO" ]; then
+            echo "Workflow run is not a trusted pull_request run from $GH_REPO; skipping."
+            exit 0
+          fi
+
+          if [ "$(jq '.pull_requests | length' <<<"$workflow_run")" -ne 1 ]; then
+            echo "Workflow run is not associated with exactly one PR; skipping."
+            exit 0
+          fi
+
+          pr_number="$(jq -r .pull_requests[0].number <<<"$workflow_run")"
+          run_head_sha="$(jq -r .head_sha <<<"$workflow_run")"
+          run_head_repo="$(jq -r '.head_repository.full_name // empty' <<<"$workflow_run")"
+          pr="$(gh api "repos/$GH_REPO/pulls/$pr_number")"
+
+          if [ -z "$run_head_repo" ] ||
+            [ "$(jq -r .base.repo.full_name <<<"$pr")" != "$GH_REPO" ] ||
+            [ "$(jq -r '.head.repo.full_name // empty' <<<"$pr")" != "$run_head_repo" ] ||
+            [ "$(jq -r .head.sha <<<"$pr")" != "$run_head_sha" ]; then
+            echo "PR #$pr_number no longer matches the workflow run head; skipping."
+            exit 0
+          fi
+
+          if [ "$(jq -r .state <<<"$pr")" != "open" ] ||
+            ! jq -e 'any(.labels[]?; .name == "invalid")' >/dev/null <<<"$pr"; then
+            echo "PR #$pr_number is not open with the invalid label; skipping."
+            exit 0
+          fi
+
+          gh api -X PATCH "repos/$GH_REPO/pulls/$pr_number" -f state=closed
+
+  reconcile-invalid-prs:
+    if: >
+      github.repository == 'github/copilot-cli' &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    concurrency:
+      group: close-invalid-pr-reconciliation
+      cancel-in-progress: false
+    steps:
+      - name: Close open PRs with the invalid label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          gh api --paginate "repos/$GH_REPO/pulls?state=open&per_page=100" \
+            --jq '.[] | select(any(.labels[]?; .name == "invalid")) | .number' |
+            while read -r pr_number; do
+              pr="$(gh api "repos/$GH_REPO/pulls/$pr_number")"
+
+              if [ "$(jq -r .state <<<"$pr")" = "open" ] &&
+                jq -e 'any(.labels[]?; .name == "invalid")' >/dev/null <<<"$pr"; then
+                gh api -X PATCH "repos/$GH_REPO/pulls/$pr_number" -f state=closed
+              fi
+            done
