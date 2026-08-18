@@ -24,9 +24,9 @@ jobs:
       pull-requests: write
     concurrency:
       group: close-invalid-pr-${{ github.event.workflow_run.pull_requests[0].number || github.run_id }}
-      cancel-in-progress: false
-    steps:
-      - name: Close invalid PR
+      cancel-in-progress: true
+    
+       name: Close invalid PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -79,9 +79,9 @@ jobs:
       pull-requests: write
     concurrency:
       group: close-invalid-pr-reconciliation
-      cancel-in-progress: false
+      cancel-in-progress: true 
     steps:
-      - name: Close open PRs with the invalid label
+       name: Close open PRs with the invalid label
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
