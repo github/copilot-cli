@@ -1,45 +1,107 @@
+## 1.0.81 - 2026-08-27
+
+- The plugins dashboard is available to everyone: run `/plugin`, `/mcp`, or `/skills`. Set `PLUGINS_DASHBOARD=false` to opt out of it and the `copilot plugins` command.
+- Ship MCP 2026-07-28 support to CLI, SDK, IDE, and in-memory clients
+- Hooks can now receive the current OpenTelemetry trace context and emit correlated spans: inputs gain `traceparent` (plus `tracestate` when the span has vendor state); command hooks also get env vars.
+- Windows: remote MCP servers protected by Microsoft Entra ID can now sign in through the OS authentication broker (WAM), usually with no prompt at all. Other platforms, `--device-code`, and machines without the broker library keep the existing browser flow.
+- Add xhigh reasoning effort support for Grok 4.6
+- Startup now offers to restore sessions that were still open when their CLI went away, so a crash or a machine restart no longer means reopening each terminal by hand
+- models.list now includes service-published infoMessages and warningMessages per model
+- Add `copilot app` to open the GitHub Copilot app in the current directory
+- Add defaultMode and defaultPermissionMode settings to choose startup mode and approval behavior for new interactive sessions
+- Add --with-token to copilot login to read an auth token from stdin
+- Add support for Gemini 3.7 Flash
+- Add Ctrl+E in /sandbox to open settings.json in your editor
+- Add per-agent usage metrics to --usage-output-file JSON output
+- Repeated read_agent calls now consistently return the full turn history unless since_turn is provided
+- Hook lifecycle events (`hook.start`/`hook.end`) from hooks inside a subagent are now recorded on that subagent's session and re-emitted on its parent, instead of being dropped on an internal session.
+- Repeatedly resuming the same session no longer crashes while telemetry is being replaced
+- An MCP server blocked by an enterprise policy now shows as blocked in /mcp instead of spinning as pending forever
+- Fixed an indefinite "Loading…/Resuming…" hang at startup when a repository plugin activates a contributed extension (or another extension reload races the initial load), which previously left the environment stuck on "still waiting on extensions"
+- Vim mode badge stays visible beside the activity indicator during turns
+- The startup status finishes after extension configuration during plugin reconciliation
+- Signing out of an account now clears its cached enterprise managed settings, so signing back in generally re-fetches the policy rather than re-applying the one cached before sign-out
+- An enterprise managed-settings policy is no longer rejected when `permissions.disableBypassPermissionsMode` carries an unrecognized value; it is now logged and enforced as `disable`.
+- Sandboxed builds on Windows create their scratch caches on first run, so cargo, go, Gradle, and ccache work without a warm cache
+- On macOS and Linux, shell commands resolve the same tools a bash login shell does, including project environments activated from a profile
+- Canvas windows open and refresh in the background instead of stealing focus from your terminal
+- A prompt sent while the agent is working no longer leaves a second copy of itself stuck as `(pending)` at the bottom of the transcript after it has been answered
+- Turning allow-all off from an ACP client now reaches the permission engine whenever there is a runtime override or auto-approval to revoke, so the setting can no longer report success while permissions stay enabled (a baseline granted by --allow-all-\* launch flags is still deliberately left intact)
+- A failed tool call no longer stacks its `(MCP: server)` label one character per line down the timeline — the label and the error now share the row, with the longer side truncating
+- Agents, skills and MCP servers contributed by installed plugins are no longer dropped in non-interactive (-p) runs, so --agent <plugin>:<agent> works headlessly without --plugin-dir
+- Typing `$` and pressing Enter opens the interactive shell again, instead of clearing the prompt and doing nothing
+- The prompt frame now renders in terminals it previously skipped, such as foot and alacritty, instead of a fixed list
+- A prompt queued while the agent is working stays visible instead of vanishing when you send another one
+- The sessions sidebar's keyboard cursor is visible again, and selected rows in the Select family, the diff viewer and custom picker rows now pair the selection fill with the text color derived for it.
+- Keys sent to an unfocused terminal pane are no longer dropped: Enter and other keystrokes are handled even after a terminal focus-out report, so tmux and agent multiplexers can drive a background pane
+- Compact the autopilot goal panel to its identity row on a short terminal (a paused goal keeps its resume note), with ctrl+x → g to expand or collapse it by hand
+- Render the autopilot goal panel as a pinned prompt frame, drop its progress bar for the exact todo count, fold the subagent hint into the row it toggles, and keep its metrics on a narrow pane
+- Resume large sessions faster by showing recent history first while older messages load.
+- `x` is now the delete key everywhere: /sandbox config, /settings, /mcp, the sessions dialog and the diff comments summary move off `d`
+- Auto mode now adapts model selection as your task evolves during a conversation
+- /plugin now flags installed plugins and marketplaces that have a newer version upstream, and offers an Update action to pull it
+- Show your last prompt as the inferred objective in the Autopilot status panel
+- When --no-sandbox is ignored because enterprise policy could not be determined, the notice now says so, and no longer points at an administrator, instead of claiming a policy requires the sandbox. The unsupported-host warning says the same rather than contradicting it.
+- Show model data retention warnings with links in the /model picker
+- Path-sourced plugins in a local (directory-source) marketplace now load live from their real directory, so editing one takes effect on `/restart` or a new session — no `/plugin update`
+- Skills and custom agents are discovered from directories added with --add-dir
+- Use Ctrl+Space to toggle voice dictation.
+- A session sandboxed by an enterprise managed policy now says so on the timeline, including when the policy arrives mid-session, instead of leaving the footer's sandbox chip as the only hint that commands are being restricted
+- forceRemoteSettingsRefresh now fails closed: when set, the cached managed-settings policy is never served or used as a fetch-failure fallback (skipping both the 1h fast path and the 24h stale fallback), so a failed startup fetch blocks on the unconfirmed policy instead of reverting to a possibly-stale cached one. Concretely, until a fresh policy is fetched the session applies the restrictive undetermined-policy posture: non-default MCP servers are blocked, bypass-permissions mode cannot be enabled, and policy-gated plugin install/update mutations are blocked
+- ACP clients receive subagent IDs, raw event subscriptions, and live title, mode, command, and plan updates
+- Show each user instruction file separately in /instructions
+- Managed settings now win per entry for enabledPlugins and extraKnownMarketplaces, so a plugin or marketplace your organization pins can't be overridden locally
+- Use x to remove scheduled /every and /after prompts in Schedule Manager
+- Update model configurations
+- Removed the `PLUGINS_DASHBOARD` opt-out and the legacy skills picker it kept alive. `/skills`, bare `/mcp`, and `/mcp show` (with no server name) always open the dashboard; `/mcp config` still opens the dedicated MCP wizard.
+- Removed `/plugins`; its resources moved to `/plugin`, `/mcp` and `/skills`, with `/subagents` and `/instructions` for agents and instructions.
+- Enabling and disabling hooks and LSP servers is temporarily unavailable: those toggles existed only in the `/plugins` dashboard that this release removes.
+
+## 1.0.80 - 2026-08-14
+
+- Update model configurations
+
 ## 1.0.79 - 2026-08-10
 
-- The /sandbox configuration dialog shows where sandbox settings are stored in settings.json
 - Add support for enterprise allow-auto-only policy so /allow-all auto works while full allow-all remains blocked.
 - Allow enterprise-managed sandbox policy to enforce a proxy URL while credentials remain user-controlled
-- A tool directory inside your workspace that is on PATH (.venv/bin, node_modules/.bin, an in-repo GOPATH) no longer turns that part of the workspace read-only in the sandbox
-- The /sandbox configuration dialog groups the git, gh, and (on macOS) keychain settings under a new Auth tab, and the settings keys moved from `sandbox.gitAuth`/`sandbox.ghAuth` to `sandbox.auth.git`/`sandbox.auth.gh`. There is no migration: the old keys are ignored in settings files, and SDK requests that still send them are rejected as invalid rather than ignored
-- Added a `worktreeBaseRef` setting that controls whether `/worktree`, `/worktree new`, and `--worktree` start from HEAD or the remote default branch. All three now default to HEAD; previously `--worktree` started from the remote default branch.
-- Model picker groups models into Recent, Recommended, New, and other sections, and Shift+Tab switches grouping views.
-- Large monorepos now use tgrep ([trigram-indexed grep for fast regex search in large codebases](https://github.com/microsoft/tgrep)) instead of ripgrep
 - Agent Plugins spec plugins can now ship extensions under a com.github.copilot/extensions/ directory
 - Add support for the kimi-k3 model
 - Combine `--plan` with `--mode autopilot` to plan first and then implement without waiting for approval
+- Manage multiple concurrent sessions from the Sessions tab and sidebar
+- Add /sandbox policy to show effective sandbox paths, denials, and network access
+- Queue prompts, shell commands, and supported slash commands in local sessions to run in order after the current task finishes
+- Set "autoUpdate": true on an extraKnownMarketplaces entry in your user settings to auto-update its plugins at session start
+- A tool directory inside your workspace that is on PATH (.venv/bin, node_modules/.bin, an in-repo GOPATH) no longer turns that part of the workspace read-only in the sandbox
 - The `/app` command now opens the current session in the GitHub Copilot desktop app instead of landing on Home with the wrong folder (requires GitHub Copilot app 1.1.3 or later)
 - On macOS, a sandbox read-only path nested inside a writable one now stays read-only instead of inheriting the write permission from the wider path
 - On macOS, sandboxed commands can use UNIX-domain sockets again, so tools that talk over a local IPC pipe (tsx, vite, esbuild, jest workers) no longer fail with `listen EPERM`
 - Sandboxed commands work when the working directory lives on a Windows Dev Drive
 - `/theme` now only shows its deprecation notice for a valid color mode, so a mistyped mode no longer suggests an invalid command or hides the notice from your next valid `/theme`.
 - Sandboxed git now authenticates to Azure DevOps, GitHub Enterprise Server, GitLab, and other non-GitHub remotes you have stored HTTPS credentials for
-- Ask user multi-select prompts include an Other option for free-text answers
-- Improve teleported subagent /tasks navigation with nested tree browsing, current/all and finished-task filters, and a live timeline you can steer
 - A rare internal delay no longer prints a diagnostic warning on top of the interactive UI
 - A failed session-history load no longer leaves the timeline permanently empty: the failure was silently discarded, so the transcript stayed blank for the rest of the session with nothing logged. It is now retried, and reported in the transcript and the log if it still fails
 - Resuming a long session no longer collapses the timeline's scroll range while history renders in the background: entries that had not finished rendering were published as if they did not exist, so the scrollbar and scroll position jumped until the background render caught up
-- Manage multiple concurrent sessions from the Sessions tab and sidebar
 - Sandboxed wrapper builds (make and friends) get the dev tool caches their recipes need, based on the build manifests in the working directory
-- Prompt pinning is off by default; set pinnedPrompts to true to enable it.
 - Sandboxed commands can reach the network again on recent Windows builds, where every outbound connection was blocked even with outbound access enabled and no proxy configured
 - Plugin custom agents honor deferred-tool-loading frontmatter
-- Use `/worktree new` to start a new session in a new worktree
 - A sandbox that cannot start an MCP server now fails in seconds instead of stalling the session, and sandbox startup failures for both MCP and language servers now say the sandbox was at fault and how to fix or opt out of it
 - Login links are clickable during web and device-code sign-in
-- Pin the current prompt one row higher, in the row the tab bar already reserves, so it keeps the shape of the prompt it copies while costing the timeline one row less
-- Leave the pinned prompt off by default on terminals under 30 rows, where it would crowd the output; set pinnedPrompts explicitly to override at any size
 - Compute /context attribution against the Auto-resolved model so token totals are accurate for Free/Student users
 - Disabling an extension no longer breaks elicitation, canvases, or tool permission prompts for other extensions
 - A prompt stashed with ctrl+s now stays with the session it was typed for, so switching away and back and pressing ctrl+s restores it instead of finding it gone
 - On Linux, searches and most shell commands blocked by the sandbox now offer to re-run outside it
+- The /sandbox configuration dialog shows where sandbox settings are stored in settings.json
+- The /sandbox configuration dialog groups the git, gh, and (on macOS) keychain settings under a new Auth tab, and the settings keys moved from `sandbox.gitAuth`/`sandbox.ghAuth` to `sandbox.auth.git`/`sandbox.auth.gh`. There is no migration: the old keys are ignored in settings files, and SDK requests that still send them are rejected as invalid rather than ignored
+- Added a `worktreeBaseRef` setting that controls whether `/worktree`, `/worktree new`, and `--worktree` start from HEAD or the remote default branch. All three now default to HEAD; previously `--worktree` started from the remote default branch.
+- Model picker groups models into Recent, Recommended, New, and other sections, and Shift+Tab switches grouping views.
+- Large monorepos now use tgrep ([trigram-indexed grep for fast regex search in large codebases](https://github.com/microsoft/tgrep)) instead of ripgrep
+- Ask user multi-select prompts include an Other option for free-text answers
+- Improve teleported subagent /tasks navigation with nested tree browsing, current/all and finished-task filters, and a live timeline you can steer
+- Prompt pinning is off by default; set pinnedPrompts to true to enable it.
+- Use `/worktree new` to start a new session in a new worktree
+- Pin the current prompt one row higher, in the row the tab bar already reserves, so it keeps the shape of the prompt it copies while costing the timeline one row less
 - BREAKING: the sandbox setting `allowDevToolCaches` is renamed `allowDevToolAccess`, since it grants dev-tool config and registries too, not just caches. The old key is no longer read and is ignored silently, so an existing `false` opt-out reverts to the default (on). Rename it in settings.json and in any managed/MDM policy.
-- Add /sandbox policy to show effective sandbox paths, denials, and network access
-- Queue prompts, shell commands, and supported slash commands in local sessions to run in order after the current task finishes
-- Set "autoUpdate": true on an extraKnownMarketplaces entry in your user settings to auto-update its plugins at session start
 - /sandbox tags inactive settings as (disabled) and explains why they are locked, and documents dev tool caches in copilot help sandbox
 - Show "pending · ctrl+c to cancel" for in-flight steering prompts
 - Make /model session-scoped by default, and use /config model to set defaults for future sessions.
@@ -57,7 +119,7 @@
 - A run whose prompt is piped over stdin now treats its `sessionEnd` hook the same way `-p` does: the hook fires once per completed agent turn with `reason` `complete` (or `error` if the turn failed), instead of once at shutdown with `user_exit`. As with `-p`, a piped run that exits before completing a turn fires no `sessionEnd` hook
 - Split-view sidebar: the red close confirmation now reads `x again to close` (or `x again to exit CLI` on the last session) instead of `x close`, so a second press is clearly what closes
 - Expose token usage in ACP prompt results and live usage_update notifications
-- Added a forceRemoteSettingsRefresh managed setting that requires a fresh managed-settings fetch on startup
+- Added a forceRemoteSettingsRefresh managed setting that requires a fresh managed-settings fetch on startup; when the setting is in effect and that refresh cannot be confirmed, plugin mutations and read-only marketplace operations alike (including `plugins marketplace` list, browse, and refresh) fail closed rather than proceeding without the server-managed policy
 - Disabling the sandbox from a bypass prompt applies only to that session; new sessions start sandboxed again
 - Managed settings now fall back to the persistent cache whenever a server-managed settings fetch fails for any reason (network error, a non-success HTTP status, or a malformed/unparseable response), and fail open — starting without the unconfirmed server restriction rather than the prior fail-closed behavior — when no usable cached policy is available
 - When the sandbox blocks a shell command and bypass is allowed, CLI offers to re-run it outside the sandbox without asking the model
