@@ -132,8 +132,15 @@ the HTTP responses transport instead:
 export COPILOT_CLI_DISABLE_WEBSOCKET_RESPONSES=true
 ```
 
-This is the environment equivalent of the SDK's `capi.enableWebSocketResponses`
-session option.
+On Windows, using PowerShell:
+
+```powershell
+$env:COPILOT_CLI_DISABLE_WEBSOCKET_RESPONSES = "true"
+```
+
+Setting this to `true` has the same effect as setting the SDK's
+`capi.enableWebSocketResponses` session option to `false`. The two have opposite
+polarity, so enabling this variable disables the WebSocket transport.
 
 ### Experimental Mode
 
