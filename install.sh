@@ -12,7 +12,8 @@ set -e
 echo "Installing GitHub Copilot CLI..."
 
 # Detect platform
-case "$(uname -s || echo "")" in
+OS="$(uname -s || echo "")"
+case "$OS" in
   Darwin*) PLATFORM="darwin" ;;
   Linux*) PLATFORM="linux" ;;
   CYGWIN*|MINGW*|MSYS*)
@@ -25,7 +26,7 @@ case "$(uname -s || echo "")" in
       exit 1
     fi
     ;;
-  *) echo "Error: Unsupported operating system $(uname -s)" >&2 ; exit 1 ;;
+  *) echo "Error: Unsupported operating system $OS" >&2 ; exit 1 ;;
 esac
 
 # Detect architecture
