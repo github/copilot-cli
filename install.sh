@@ -15,7 +15,7 @@ echo "Installing GitHub Copilot CLI..."
 case "$(uname -s || echo "")" in
   Darwin*) PLATFORM="darwin" ;;
   Linux*) PLATFORM="linux" ;;
-  *)
+  CYGWIN*|MINGW*|MSYS*)
     if command -v winget >/dev/null 2>&1; then
       echo "Windows detected. Installing via winget..."
       winget install GitHub.Copilot
@@ -25,6 +25,7 @@ case "$(uname -s || echo "")" in
       exit 1
     fi
     ;;
+  *) echo "Error: Unsupported operating system $(uname -s)" >&2 ; exit 1 ;;
 esac
 
 # Detect architecture
