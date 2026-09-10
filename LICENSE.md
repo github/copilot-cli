@@ -31,5 +31,6 @@ TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL GITHUB OR ITS LICENSOR
 7. Termination
 This License terminates automatically if you fail to comply with its terms. Upon termination, you must cease all use and distribution of the Software.
 
-8. Notice Regarding GitHub Services (Informational Only)
-Use of the Software may require access to GitHub services and is subject to the applicable GitHub Terms of Service and GitHub Copilot terms. This License governs only rights related to the Software and does not grant any rights to access or use GitHub services.
+8. Third-Party Services. 
+The Software may enable access to or interaction with services provided by GitHub, Microsoft, or other third parties. Access to a service may require a separate account, subscription, license, authorization, or other entitlement. Your use of each service is subject to the terms, agreements, and privacy notices applicable to that service and your relationship with the relevant service provider.  
+For example, if you access the Software using a Microsoft 365 account or entitlement, the Microsoft 365 services made available through the Software—including any applicable data-access or AI-inference services—are provided under, and subject to, the Microsoft Product Terms and the agreement under which you or your organization obtained the applicable Microsoft 365 subscription. This License governs only your rights to use the Software and does not grant any right to access or use Microsoft 365 services or other third-party services.
