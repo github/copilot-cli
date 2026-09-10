@@ -10,7 +10,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9.1.0
         with:
           stale-issue-label: 'stale, triage' # The label that will be added to the issues when automatically marked as stale
           start-date: '2025-01-01T00:00:00Z' # Skip stale action for issues created before it
