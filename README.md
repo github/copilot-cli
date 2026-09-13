@@ -138,6 +138,13 @@ Each time you submit a prompt to GitHub Copilot CLI, your monthly quota of premi
 
 For more information about how to use the GitHub Copilot CLI, see [our official documentation](https://docs.github.com/copilot/concepts/agents/about-copilot-cli).
 
+## Experimental extension example
+
+The optional [next-action extension example](./examples/next-best-action/README.md)
+explores model-generated follow-up prompts in the current session. It requires a
+CLI build exposing the experimental extension SDK and must be installed separately.
+It is not native Tab completion or an automatic post-autopilot menu.
+
 ## 🔧 Configuring LSP Servers
 
 GitHub Copilot CLI supports Language Server Protocol (LSP) for enhanced code intelligence. This feature provides intelligent code features like go-to-definition, hover information, and diagnostics.
