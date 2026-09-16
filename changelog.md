@@ -1,3 +1,118 @@
+## 1.0.85 - 2026-09-16
+
+- Vim mode is now available to everyone. Turn it on with `/vim` or by setting `editorMode` to `vim` for modal editing in the composer, with the current mode shown while you type.
+- Add /settings options to opt in to context management tools for agents and subagents
+- Set transcriptView to "concise" to group tool activity into expandable work summaries.
+- Add /config to open a sidebar configuration screen in the CLI
+- Add /sandbox Network host allow/deny rules without replacing your configured upstream proxy
+- Add session and memory import commands for the semantic JSONL interchange format
+- Add `copilot instruction list` and `copilot lsp list`, replacing `copilot plugins list --kind instruction` and `--kind lsp`
+- Add `--json` to `copilot plugin list`, `copilot plugin marketplace list` and `copilot plugin marketplace browse`
+- Add `enable` and `disable` to `copilot plugin`, `copilot mcp` and `copilot skill`, replacing `copilot plugins enable/disable --plugin|--mcp|--skill`
+- Add support for GPT-6 Astra
+- Managed sandbox sessions can now be disabled for the rest of the session from an approved bypass prompt.
+- --add-dir rejects non-directory and inaccessible paths uniformly and aborts startup before session initialization
+- Streamer mode masks internal model names in /model, the footer, and startup diagnostics without restarting model initialization on toggles
+- Fixed the one-command sandbox bypass on Windows: when the sandbox container refuses a policy-blocked write for want of a privilege, approving the bypass now runs the command instead of stopping after the permissive retry, so it no longer takes disabling the sandbox for the whole session
+- Respect terminal color themes even when palettes are incomplete
+- Failed new-session handoffs stop unused clients from polling and preserve the current session, schedules, and unsent prompt.
+- Earlier messages remain visible when switching back to a background session with frequent hooks.
+- End and Ctrl+E move the cursor to the true end of a wrapped line, so typing or Ctrl+K no longer edits one character early inside a long word or URL. On such a line the landing spot is the wrap boundary, so pressing End or Ctrl+E again advances to the end of the next visual row
+- `--share=~/notes.md` now writes the exported session to your home directory instead of creating a folder named `~` in the current directory
+- Modified chords such as Ctrl+X, Alt+X or capital X no longer trigger the /tasks letter shortcuts; only unmodified a, f, x, r, b, j and k respond. Enter, Escape, the arrow keys and Ctrl+G / Ctrl+P / Ctrl+N are unaffected
+- Scheduled prompts show an error when they fail at runtime
+- CLI retries image prompts without images when providers reject image-limit requests
+- Authenticated model lists refresh after startup auth hydration
+- MCP servers no longer fail to load when the CLI is connected to a running IDE. The in-process IDE bridge was rejected by config validation, which failed the plugin reload and restricted the session
+- `copilot init` now removes the `.github` directory it created when the run exits without writing an instructions file.
+- MCP turns continue even if tool list refresh fails after a tool change
+- MCP servers keep correct workspace source labels after trusting a folder
+- An editor or shell that leaves mouse tracking on no longer leaves your terminal reporting clicks, during the session or after the CLI exits
+- The /permissions picker marks Allow all when --allow-all-tools, --allow-all-paths and --allow-all-urls are all set
+- Resumed sessions show completed reasoning as Thought instead of Thinking…
+- copilot --help describes the --no-\* options again, and --no-auto-update says it runs the version bundled in the binary. --no-auto-login and --no-sandbox stay supported but remain hidden from help, as they were before the clap port
+- Restore keyboard input and screen output on macOS and Linux when you return from an external editor that reset the terminal
+- Model lists refresh after signing in, switching accounts, or signing out
+- Fixed the thinking shape sent to Claude models classified as adaptive-only: they now stay adaptive instead of failing (turning thinking off lowers reasoning effort instead), and reasoning effort is capped at high whenever thinking is disabled
+- Run sessionEnd hooks when /clear closes an interactive session
+- Plugin agents expand ${PLUGIN_ROOT} placeholders in mcp-servers frontmatter
+- Skills from directories added with --add-dir are no longer missing when a skills load races the directory registration
+- A relative `--additional-mcp-config @<file>` path now resolves against the session working directory under `--resume=<id>` and `--worktree` instead of the launch directory, and `~/` expands.
+- Windows sandbox denials of loopback and local network access prompt to re-run the command outside the sandbox
+- Approved sandbox retries are labeled sandbox relaxed while network policy stays enforced, or sandbox bypassed when fully unsandboxed; failed bypasses explain that host permissions still apply
+- Cancelling an MCP tool call now notifies the MCP server and cleanly ends the turn.
+- Scrolling the wheel with mouse capture off no longer walks backwards through prompt history in terminals that report DEC private mode 1007 (alternate scroll), such as Ghostty
+- MCP OAuth requests additional scopes when needed and retries the tool call
+- Changing reasoning effort now takes effect before the next logical request in an active turn, while retries keep their original effort
+- Automatic compaction now saves a checkpoint that appears in /session checkpoints
+- Windows CLI artifacts run without requiring the Visual C++ Redistributable
+- Keep terminal theme colors consistent at startup and during live appearance changes
+- Interactive mode submits startup prompts even when model discovery is still loading.
+- MCP tools with boolean property or array-item schemas work with Gemini instead of causing a 400 error
+- An enterprise-managed sandbox policy delivered by MDM or a managed settings file no longer discards sandbox.allowBypass, so bypass prompts and /sandbox disable work as the policy intends
+- The managed sandbox startup notice no longer says sandboxing can't be turned off when your organization's policy allows a session opt-out; it names /sandbox disable instead
+- Viewing or attaching an image in a format the model cannot read, such as BMP or TIFF, no longer leaves the session unable to send any further message; the image is now reported as an unsupported format that you can convert to PNG, JPEG, WebP or GIF
+- The YOLO status indicator reflects the active session after switching sessions
+- Computer Use now stays in sync across /computer and whole-plugin /plugin toggles.
+- Pressing Enter in the Sessions tab now foregrounds the highlighted session, even when a background refresh rebuilds the list at that moment, instead of sometimes opening a different session
+- Indexed search on Windows prevents new disk-space leaks when updating indexes
+- Keep long /ask responses visible after generation completes
+- When session history is truncated or compacted just as a turn finishes, the "Working" indicator now clears instead of staying up for the rest of the session
+- COPILOT_ALLOW_ALL no longer refuses to start the CLI on values such as 1, 0, yes or an empty string, and falsey values now disable automatic tool approval instead of enabling it
+- Subagent launches honor explicit model, reasoning effort, and context tier preferences from applicable global and custom instructions
+- A failed command whose EPERM or EACCES diagnostic names a sandbox-blocked path now offers to run outside the sandbox, even when the command line never named that path
+- A write blocked by a read-only sandbox path, and a Node or Go network failure blocked by the sandbox, are now recognized as sandbox denials instead of surfacing as raw errors
+- Report in-memory MCP servers as memory instead of local in copilot mcp list
+- /compact no longer reports an empty model response when a valid summary was returned
+- Streaming responses preserve message chunk ordering before final output.
+- Retry responses keep the correct streamed message and reasoning after mid-stream model failures
+- Workspace .mcp.json servers load correctly after trusting a folder on startup
+- When image-heavy requests exceed model limits, user-provided images are prioritized over tool-generated images, newer messages are kept first, and the CLI reports any removals.
+- Plugin-contributed agents discovered by the CLI can now be selected and run.
+- Fixed same-turn MCP tool-list refresh after received change notifications, including modern subscription-based servers.
+- The remote session timeline entry now advertises ctrl+o to show or hide the QR code, matching the key that actually toggles it
+- Show when sandboxing is only enabled for the current session in /sandbox status and settings.
+- Interactive --yolo startup remains available before authentication when no managed policy evidence is present
+- Indexed search shows when enabled, works on Windows ReFS volumes, supports explicit cloud-sync overrides, and keeps refreshing on Linux when native file watches are exhausted.
+- /copy includes task completion messages when available
+- OAuth-authenticated MCP servers connect reliably during session startup
+- `ctrl+h` no longer deletes a whole word in tmux, screen, and remote sessions that carry a Windows Terminal `WT_SESSION` from elsewhere. As an accepted tradeoff, `ctrl+backspace` now deletes a single character in those sessions — including a genuinely local Windows tmux or screen pane — where `ctrl+w` still deletes a word
+- MCP servers now see the same copilot-cli client identity when you add a server and when a session connects, carrying the shipped CLI version instead of 0.0.0
+- Interactive mode starts and submits the initial prompt when using --auth-token-env
+- Use /settings taskbarPresence false to disable Windows taskbar session status. Loader-managed sessions restart immediately; standalone sessions require a manual restart.
+- Pressing Escape once cancels MCP inference approval prompts once
+- MCP reload summary shows servers still starting after timeout
+- Initial prompts start immediately for Entra-authenticated sessions while token refresh runs in the background.
+- Choosing approve-for-location now persists tool approval to avoid repeat prompts
+- Large sessions resume without freezing the interface during context token counting
+- Configured hooks keep running after an extension restarts instead of silently stopping and later denying every tool call; the extension's own callback hooks resume once it re-registers
+- The `allowManagedHooksOnly` policy now also blocks extension-registered `preToolUse`, `postToolUse` and `postToolUseFailure` callbacks, which previously bypassed the managed-only lockdown that every other hook event already applied
+- A PowerShell write the sandbox blocks offers to run the command outside the sandbox
+- When you have more than one GitHub account in your credential store, a sandboxed gh command now acts as the account gh is logged in as instead of an arbitrary one.
+- The `/rubber-duck` command is hidden after a model refresh removes its compatible critic
+- Sandboxed runs now use relocated developer-tool caches from env vars and tool config files
+- On Windows, a sandboxed command that runs git without naming it — a hook, a build tool, or an npm install that clones over HTTPS — no longer dies inside the credential helper's MSYS2 shell.
+- Reduce metadata scanning time for large local session histories, with increased thread and memory use
+- Pause and resume Agent Factory runs from the /factories dialog
+- Apply managed Edit and Write rules to recognized native shell redirections and supported in-place sed operations
+- Show active scheduled prompts in the CLI footer by default
+- Use /worktree, /move, and --worktree without enabling experimental mode
+- Make /collect-debug-logs and --collect-debug-logs available to all users
+- /sandbox disable turns the sandbox off for the current session when your organization's policy allows bypass
+- Shell completions are generated from the same grammar the CLI parses with, so `copilot <TAB>` offers root flags alongside subcommands and each subcommand offers only its own options
+- Command-line parsing moved from Commander to a Rust grammar; error and help wording changed, `copilot login --host` now works, and `--max-autopilot-continues` no longer accepts scientific notation
+- Show /sandbox filesystem paths as absolute paths; typing ~/path still expands to your home directory
+- Move the /sandbox Filesystem paths into their own list, opened from a Paths row
+- Show trust status, tier, and eligibility details for online resource catalogue results
+- /usage shows per-model AI Credit consumption in usage breakdowns
+- Improve /sandbox guidance and show /sandbox policy in command help
+- On supported Windows sandbox policies, interactive shell commands now record blocked accesses. One approved escalation retries with file and process restrictions recording instead of blocking while network policy remains active, then falls back to the disclosed full bypass only if still blocked
+- Speed up startup when resuming an existing local session by its exact UUID with `--resume`
+- Replace `copilot plugins install --skill [--scope project]` with `copilot skill add [--project]`; the `--scope` spelling is gone
+- Remove the cross-kind `--kind`, `--scope`, `--mcp` and `--skill` flags from `copilot plugins`; use `copilot mcp` and `copilot skill`
+- `copilot plugins list --json` now emits a flat array of plugins instead of the cross-kind `{ plugins, errors }` object; scripts reading `.plugins` must be updated
+- `copilot plugins list` is now an alias of `copilot plugin list` and reports only plugins, no longer MCP servers, skills, instructions or LSP servers
+
 ## 1.0.83 - 2026-09-04
 
 - Show running Copilot sessions in the Windows 11 taskbar with live hover status cards
