@@ -1,3 +1,13 @@
+## 1.0.86 - 2026-09-17
+
+- Custom agents can opt into repository instruction files (AGENTS.md, copilot-instructions.md, CLAUDE.md) by setting `include-custom-instructions: true` in their frontmatter.
+- Resuming an active session without plugin-directory, discovery, or working-directory overrides preserves marketplace plugins and skills after reload. Configuration read or validation failures no longer discard active plugins; missing-file and intentional-removal behavior is unchanged.
+- /sandbox policy now reports local-network access using your configured setting
+- The status row now says it is waiting for background shells, instead of "Working", when a turn ends while an attached background shell such as a dev server is still running.
+- Resume sessions even when transcript files contain recoverable corruption
+- Expanded reasoning text in the compact timeline is no longer dimmed, so it is as readable as the rest of the timeline.
+- Autopilot stops after accepted task completion instead of continuing unexpectedly
+
 ## 1.0.85 - 2026-09-16
 
 - Vim mode is now available to everyone. Turn it on with `/vim` or by setting `editorMode` to `vim` for modal editing in the composer, with the current mode shown while you type.
