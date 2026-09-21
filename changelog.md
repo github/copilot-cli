@@ -1,3 +1,31 @@
+## 1.0.87 - 2026-09-21
+
+- Add user and managed startup defaults for the Auto routing tier, including strict and user-overridable organization policy
+- Consecutive steering prompts in the same mode combine into one pending message. Press Up in an empty chat input to take it back for editing, including pasted text and attachments. The recall hint appears in the pending message. Ctrl+C stops the running turn instead of removing pending prompts one at a time. Ctrl+Q queued prompts remain separate. Use Ctrl+P to browse history without withdrawing prompts. Available for local sessions; commands and prompts already being processed cannot be recalled.
+- A `worktreePathTemplate` setting decides where `/worktree`, `/move`, `/new` and `--worktree` create worktrees. Set for example `~/src/worktrees/{repo}/{branch}`; `{repoPath}`, `{repo}`, `{branch}` and `{branchSlug}` are supported. Unset keeps the current layout, `<repo>.worktrees/` with slashes in the branch name flattened to dashes.
+- Number-key selection in the question dialog works for choices 10 and beyond
+- Sandbox proxies work on Windows, and a proxy with a username and password works on every platform
+- `/keep-alive` (and `/caffeinate`) no longer reports that sleep is prevented when the sleep inhibitor exits immediately on startup instead of acquiring the lock (e.g. no session bus on WSL/containers/headless); it now reports the failure.
+- Prompt mode exits successfully when a child task fails but the parent recovers.
+- Resume very large local sessions and continue with new prompts reliably.
+- Keep --yolo enabled after startup policy checks for authenticated unmanaged sessions
+- Empty strictKnownMarketplaces allowlists now hide and block built-in plugin marketplaces.
+- Mouse-selected text is visibly highlighted in /help and /mcp show screens
+- Tear down the processes an internal git command started when it times out, so a slow repository status check no longer leaves them running and consuming memory.
+- MCP auth status warnings stay accurate during reconnects and startup refreshes
+- Pull request badge and GitHub status tabs remain available after auth or branch refreshes
+- A failing MCP server no longer removes other servers' tools
+- `copilot mcp list` and `copilot mcp get` now report the built-in `github-mcp-server` when you are signed in, instead of showing it only in the interactive `/mcp` view
+- MCP servers that advertise list-change capabilities but do not implement subscriptions now connect instead of failing
+- Extension permission handlers approve subagent tool requests without leaving duplicate CLI prompts
+- Secrets exported in the launching shell are no longer written to debug logs when a session is created or resumed
+- Managed plugin commands load organization marketplace policy with environment, GitHub CLI, broker, and persisted authentication
+- Session resume no longer hangs while reconnecting MCP servers
+- Configure per-server MCP slow-connection warning thresholds with slowConnectionThresholdMs
+- Show live elapsed time for execution subagents in timeline entries
+- Enable the rubber-duck agent for every model family and for low-cost-tier session models
+- Reduce allocation overhead when repainting blank terminal areas.
+
 ## 1.0.86 - 2026-09-17
 
 - Custom agents can opt into repository instruction files (AGENTS.md, copilot-instructions.md, CLAUDE.md) by setting `include-custom-instructions: true` in their frontmatter.
