@@ -1,3 +1,31 @@
+## 1.0.88 - 2026-09-22
+
+- Add optional OSC 777 terminal notifications for direct Ghostty and WezTerm sessions.
+- Text selection now works in bottom-anchored dialogs, including login device codes
+- Preserve /allow-all during managed-settings refresh failures, and remember exact session approvals for missing paths without granting their parent directory; exact grants are visible in /list-dirs and cleared by /reset-allowed-tools
+- Sandboxed network denials from proxy tunnel failures now show bypass guidance
+- Custom-agent startup now distinguishes model-list load failures from an empty catalog, preventing false unavailable warnings and silent required-agent deselection
+- Pressing Enter in freeform ask_user prompts adds a new line; submit with Ctrl+Enter or Ctrl+S as a fallback
+- A custom agent's `reasoning-effort` now applies when the agent is selected, instead of only its model. An explicit `--reasoning-effort` still wins, and a level the selected model does not offer is reported and left unapplied
+- Deferred MCP tools whose registered name needed sanitizing or shortening are now listed under that name, so tool search can find them, and deferred MCP tools with no resolvable server name are now listed with the other tools instead of being left out of the reminder
+- Prompt mode now warns when it stops waiting for background tasks and explains how to change the timeout limit.
+- Resuming sessions no longer stalls when MCP permission prompts are pending
+- MCP tools recover more reliably from transient listing, connection, and OAuth failures
+- Hook commands without an explicit `cwd` again run in the project root instead of the session's current directory, so repo-relative hook scripts still resolve from a subdirectory.
+- Enterprise managed settings now apply to sessions opened in ACP mode (`copilot --acp`), by AHP hosts (`copilot --ahp-host`), and by the published `--server` session, which previously ran with no managed MCP, permission, or plugin policy.
+- GitHub MCP scope escalation now uses the CLI OAuth app's registered /callback redirect URI
+- Agents from a plugin mounted with --plugin-dir now appear in server-mode sessions
+- Session and subagent start hooks combine successful additional-context contributions within the hook-output limit
+- Cached MCP tools stay scoped to environment-resolved server addresses and headers
+- Session resume preserves pending conversation events when saving fails and explains that retrying is safe
+- Support namespaced custom skills and ignored skill directories during skill discovery
+- MCP and plugin views show server display names and plugin descriptions for clearer status.
+- Resuming large local sessions keeps transcript memory bounded for smoother CLI performance.
+- Prompt to update GitHub authorization when Connectors need reauthorization
+- Indexed search supports glob filtering and --files listings with accurate ripgrep fallback behavior.
+- Run /fork during active turns to branch work without waiting.
+- In the Sessions tab, rows you can dismiss now take x then x again to confirm: a local session is permanently deleted, while a session backed by a server is only closed and its conversation is left on the server. The footer says which of the two the highlighted row will do, and shows no x hint for rows that cannot be dismissed.
+
 ## 1.0.87 - 2026-09-21
 
 - Add user and managed startup defaults for the Auto routing tier, including strict and user-overridable organization policy
