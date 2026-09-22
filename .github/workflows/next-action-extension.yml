@@ -1,0 +1,33 @@
+name: Test next-action extension example
+
+on:
+  pull_request:
+    paths:
+      - 'examples/next-best-action/**'
+      - '.github/workflows/next-action-extension.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'examples/next-best-action/**'
+      - '.github/workflows/next-action-extension.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22', '24']
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run dependency-free tests
+        working-directory: examples/next-best-action
+        run: npm test
