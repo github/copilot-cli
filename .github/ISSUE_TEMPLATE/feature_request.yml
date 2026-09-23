@@ -9,7 +9,7 @@ body:
       value: |
         <br />
         Thank you for taking the time to suggest a feature! Please answer each question below to the best of your ability; it is okay to leave questions blank if you have to.
-  - type: input
+  - type: textarea
     id: title
     attributes:
       label: Describe the feature or problem you'd like to solve
