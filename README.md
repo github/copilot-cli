@@ -8,7 +8,6 @@ See [our official documentation](https://docs.github.com/copilot/concepts/agents
 
 ![Image of the splash screen for the Copilot CLI](https://github.com/user-attachments/assets/f40aa23d-09dd-499e-9457-1d57d3368887)
 
-
 ## 🚀 Introduction and Overview
 
 We're bringing the power of GitHub Copilot coding agent directly to your terminal. With GitHub Copilot CLI, you can work locally and synchronously with an AI agent that understands your code and GitHub context.
