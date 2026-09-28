@@ -1,3 +1,41 @@
+## 1.0.89 - 2026-09-28
+
+- Left-clicking supported ask_user and elicitation form inputs focuses them and places the cursor at the clicked position
+- Add support for Claude Code rule files in .claude/rules as custom instructions
+- Sessions in the sidebar show a blue dot when they finished a turn you have not opened yet
+- Auto suggests a routing tier and lets you switch with a shortcut or click
+- Auto shows a quick feedback prompt after switching away to a manually selected model
+- MCP pre-registered OAuth clients honor configured oauthScopes.
+- In local sessions, Esc Esc in an empty chat input takes back a prompt whose turn the model has not started answering and removes it from the conversation
+- Add GPT-6 Sol and GPT-6 Luna to the model picker when available
+- Adding support for claude-opus-5.5
+- Shell output no longer shows trailing command completion metadata.
+- Timeline output stops auto-following while text selection is active
+- server/tool and server/\* tool filters now match MCP tool names that contain a slash
+- Queue exit commands while an agent response is still running
+- Extensions no longer fail to load under enterprise managed settings while managed MCP policy is still being applied
+- Fixed Git failures in applications launched from CLI shells when empty environment variables are dropped, on Git 2.36 or newer.
+- Sessions sidebar saves opened and closed tabs as they change, rather than only on exit
+- Agent shell commands in sandbox can access session files and logs
+- Fix Auto tier selection to cycle correctly in /model and remove the unsupported Fast profile; a previously stored, exported, or resumed Fast preference now falls back to Balance instead of routing on it
+- Run wrapped gh and git commands, such as `timeout 60 gh ...`, correctly in sandboxed sessions
+- ACP sessions stay connected when clients pause reading large responses
+- Gemini models no longer fail every request with 400 invalid request body when an MCP server exposes a tool whose schema puts a type or properties beside anyOf, such as a nullable discriminated union
+- GitHub MCP tools connect correctly on first CLI startup after sign-in
+- Ask-user forms keep custom Other answers separate across questions
+- MCP config loading keeps valid workspace servers when sibling entries are invalid
+- Delete old sessions succeeds when run directly in the CLI
+- Claude requests above attachment size limits now recover automatically before sending.
+- Listing shells shows running shells first, so a shell still running in the background is no longer hidden behind a long list of finished ones
+- View tool honors line ranges when providers send flattened view_range arguments
+- In local sessions, Up in an empty chat input recalls the pending message and leaves queued prompts in the queue
+- PR creation now follows repository pull request templates, preserving required sections and checklist structure.
+- Configure automatic indexed search activation with TGREP_FILE_COUNT_THRESHOLD
+- Direct plugin installs can now be enabled and disabled. One already recorded as disabled now stops loading; re-enable it with copilot plugin enable
+- Sandboxed commands on supported Windows versions can access localhost when Local network access is on
+- Autocomplete model IDs in /model and /model plan argument pickers
+- Show managed Connector consent progress with a copyable authorization URL during connect and reconnect.
+
 ## 1.0.88 - 2026-09-22
 
 - Add optional OSC 777 terminal notifications for direct Ghostty and WezTerm sessions.
