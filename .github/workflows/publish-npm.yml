@@ -1,0 +1,48 @@
+name: Publish npm packages from release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published GitHub release tag to recover (for example v1.0.89)
+        required: true
+        type: string
+
+concurrency:
+  group: copilot-cli-npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'github/copilot-cli' &&
+      (github.event_name == 'release' ||
+       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # Never check out the release tag: it can contain different workflow/script code.
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+      - name: Ensure npm supports OIDC trusted publishing
+        run: |
+          npm install --global npm@11.19.0
+          node -e 'if (Number(process.versions.node.split(".")[0]) < 24) process.exit(1)'
+          node -e 'const [major, minor, patch] = require("child_process").execFileSync("npm", ["--version"], {encoding:"utf8"}).trim().split(".").map(Number); if (major < 11 || (major === 11 && (minor < 5 || (minor === 5 && patch < 1)))) process.exit(1)'
+      - name: Publish release tarballs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+          RELEASE_ID: ${{ github.event.release.id }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: node script/publish-npm-release.mjs "$RELEASE_TAG"
