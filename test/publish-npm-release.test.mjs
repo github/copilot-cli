@@ -26,7 +26,7 @@ function fixture(version = "1.2.3-4") {
   for (const platform of [...platforms, null]) {
     const [suffix, os, cpu, libc] = platform ?? [];
     const name = `@github/copilot${suffix ? `-${suffix}` : ""}`;
-    const filename = `github-copilot-${version}${suffix ? `-${suffix}` : ""}.tgz`;
+    const filename = `npm-github-copilot-${version}${suffix ? `-${suffix}` : ""}.tgz`;
     const source = join(root, filename);
     const packageDir = join(root, "work", "package");
     mkdirSync(packageDir, { recursive: true });
@@ -54,6 +54,15 @@ function fixture(version = "1.2.3-4") {
   };
 }
 
+function attachLegacyTarballs(f) {
+  const launcher = f.release.assets.find((asset) => asset.name === `npm-github-copilot-${f.release.tag_name.slice(1)}.tgz`);
+  for (const platform of [...platforms.map(([suffix]) => `-${suffix}`), ""]) {
+    const name = `github-copilot-${f.release.tag_name.slice(1)}${platform}.tgz`;
+    cpSync(join(f.root, launcher.name), join(f.root, name));
+    f.release.assets.push({ ...launcher, name });
+  }
+}
+
 async function exercise(options = {}) {
   const f = fixture(options.version);
   const published = [];
@@ -64,7 +73,8 @@ async function exercise(options = {}) {
     const run = (tool, args) => {
       if (tool === "gh" && args[0] === "api") return JSON.stringify(f.release);
       if (tool === "gh" && args[0] === "release") {
-        for (const asset of f.release.assets) {
+        assert.equal(args[args.indexOf("--pattern") + 1], "npm-github-copilot-*.tgz");
+        for (const asset of f.release.assets.filter((entry) => entry.name.startsWith("npm-github-copilot-") && entry.name.endsWith(".tgz"))) {
           const source = join(f.root, asset.name);
           cpSync(source, join(args.at(-1), asset.name));
         }
@@ -98,7 +108,43 @@ test("publishes all eight platforms before launcher with prerelease tag", async 
   const { published } = await exercise({ eventId: "1234", eventPrerelease: "true" });
   assert.equal(published.length, 9);
   assert.ok(published.every((args) => args[args.indexOf("--tag") + 1] === "prerelease"));
-  assert.match(published.at(-1)[1], /github-copilot-1\.2\.3-4\.tgz$/);
+  assert.match(published.at(-1)[1], /npm-github-copilot-1\.2\.3-4\.tgz$/);
+});
+
+test("ignores the nine old launcher-manifest tarballs and publishes only the new npm packages", async () => {
+  const { published } = await exercise({ mutate: attachLegacyTarballs });
+  assert.equal(published.length, 9);
+  assert.ok(published.every((args) => args[1].split("/").at(-1).startsWith("npm-github-copilot-")));
+});
+
+test("rejects an old release with only the nine legacy tarballs, including manual recovery", async () => {
+  await assert.rejects(exercise({
+    mutate: (f) => {
+      attachLegacyTarballs(f);
+      f.release.assets = f.release.assets.filter((asset) => !asset.name.startsWith("npm-github-copilot-"));
+    },
+  }), (error) => {
+    assert.match(error.message, /nine expected npm tarballs/);
+    assert.deepEqual(error.published, []);
+    return true;
+  });
+});
+
+test("rejects a new platform asset whose manifest is actually the old launcher", async () => {
+  await assert.rejects(exercise({
+    mutate: (f) => {
+      attachLegacyTarballs(f);
+      const platformAsset = f.release.assets.find((asset) => asset.name === "npm-github-copilot-1.2.3-4-linux-x64.tgz");
+      const launcher = f.release.assets.find((asset) => asset.name === "npm-github-copilot-1.2.3-4.tgz");
+      cpSync(join(f.root, launcher.name), join(f.root, platformAsset.name));
+      platformAsset.size = launcher.size;
+      platformAsset.digest = launcher.digest;
+    },
+  }), (error) => {
+    assert.match(error.message, /Package identity or repository mismatch for @github\/copilot-linux-x64/);
+    assert.deepEqual(error.published, []);
+    return true;
+  });
 });
 
 test("a matching existing package is skipped on a partial rerun", async () => {
@@ -131,7 +177,7 @@ test("rejects a registry integrity mismatch before any publish", async () => {
 });
 
 test("rejects invalid launcher dependencies and platform metadata before publishing", async () => {
-  for (const filename of ["github-copilot-1.2.3-4.tgz", "github-copilot-1.2.3-4-linuxmusl-x64.tgz"]) {
+  for (const filename of ["npm-github-copilot-1.2.3-4.tgz", "npm-github-copilot-1.2.3-4-linuxmusl-x64.tgz"]) {
     await assert.rejects(exercise({
       mutate: (f) => {
         const work = join(f.root, "work");
@@ -166,6 +212,7 @@ test("rejects incomplete assets and incorrect digests before any publish", async
     (f) => { f.release.assets.pop(); },
     (f) => { f.release.assets[0].digest = `sha256:${"0".repeat(64)}`; },
     (f) => { f.release.assets[0].name = "unexpected.tgz"; },
+    (f) => { f.release.assets.push({ ...f.release.assets[0], name: "npm-github-copilot-1.2.3-4-unknown.tgz" }); },
   ]) {
     await assert.rejects(exercise({ mutate }), (error) => {
       assert.deepEqual(error.published, []);

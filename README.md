@@ -98,13 +98,17 @@ npm install -g @github/copilot@prerelease
 ### npm release publishing
 
 The [npm release workflow](.github/workflows/publish-npm.yml) runs when a GitHub
-release is **published**. It downloads the nine already-built npm `.tgz` release
-assets and validates their names, SHA-256 digests, package identities, versions,
-platform metadata, and launcher dependencies before publishing anything. It does
-not build from or execute release-tag code. Run the workflow manually on `main`
-with the exact published `release_tag` (for example `v1.0.89`) to recover a
-missed or failed release event. Matching versions are skipped only when their
-npm `dist.integrity` matches the release tarball. Older releases use a
+release is **published**. It downloads only the nine already-built npm assets:
+`npm-github-copilot-${VERSION}.tgz` and
+`npm-github-copilot-${VERSION}-${PLATFORM}.tgz` for each of the eight supported
+platforms. It ignores the older `github-copilot-*.tgz` launcher tarballs and
+validates the nine new assets' names, SHA-256 digests, package identities,
+versions, platform metadata, and launcher dependencies before publishing
+anything. It does not build from or execute release-tag code. Run the workflow
+manually on `main` with the exact published `release_tag` to recover a missed
+or failed release event; releases without all nine new npm assets are rejected
+even on manual recovery. Matching versions are skipped only when their npm
+`dist.integrity` matches the release tarball. Older releases use a
 version-specific `release-<version>` npm tag if `latest` or `prerelease` has
 advanced, so recovery never intentionally downgrades those channels. A version
 already on npm with a missing/stale channel tag fails closed: npm OIDC cannot
@@ -125,11 +129,10 @@ no `NPM_TOKEN` or `NODE_AUTH_TOKEN`. The runtime repository must continue its
 existing publishing until this workflow is merged **and all nine npm trusted
 publishers are configured**; only then should its npm publication be cut over.
 Its internal Azure feed publication and ancillary release tasks remain separate.
-The release assets must actually contain nine publishable packages: as of
-September 29, 2026, the platform-named assets in `v1.0.90-4` still contain
-the `@github/copilot` launcher manifest rather than platform package manifests.
-This workflow will reject those assets; the release artifact producer must
-correct them before the npm cutover.
+The release artifact producer must attach the nine actual npm package tarballs
+under the new `npm-github-copilot-` names before cutover. Older releases such as
+`v1.0.90-4` contain only the legacy launcher-manifest tarballs and cannot be
+recovered through this workflow.
 
 
 ### Launching the CLI

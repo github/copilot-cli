@@ -18,6 +18,7 @@ const platforms = [
 ];
 const repository = "github/copilot-cli";
 const packageName = (platform) => `@github/copilot${platform ? `-${platform}` : ""}`;
+const assetName = (version, platform) => `npm-github-copilot-${version}${platform ? `-${platform}` : ""}.tgz`;
 
 export function validateRelease(release, tag, eventId, eventPrerelease) {
   const match = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9]|[1-9]\d*))?$/.exec(tag);
@@ -35,10 +36,10 @@ export function validateRelease(release, tag, eventId, eventPrerelease) {
     throw new Error(`Prerelease flag for ${tag} differs from the triggering event`);
   }
   const version = tag.slice(1);
-  const names = platforms.map(([platform]) => `github-copilot-${version}-${platform}.tgz`);
-  names.push(`github-copilot-${version}.tgz`);
+  const names = platforms.map(([platform]) => assetName(version, platform));
+  names.push(assetName(version));
   const expected = new Set(names);
-  const assets = release.assets.filter((asset) => asset.name.endsWith(".tgz"));
+  const assets = release.assets.filter((asset) => asset.name.startsWith("npm-github-copilot-") && asset.name.endsWith(".tgz"));
   if (assets.length !== expected.size || assets.some((asset) => !expected.has(asset.name)) ||
       new Set(assets.map((asset) => asset.name)).size !== expected.size) {
     throw new Error(`Release ${tag} must contain exactly the nine expected npm tarballs`);
@@ -111,7 +112,7 @@ export async function publishRelease(tag, {
   const { version, prerelease, assets } = validateRelease(release, tag, eventId, eventPrerelease);
   const temp = mkdtempSync(join(tmpdir(), "copilot-npm-release-"));
   try {
-    run("gh", ["release", "download", tag, "--repo", repository, "--pattern", "github-copilot-*.tgz", "--dir", temp]);
+    run("gh", ["release", "download", tag, "--repo", repository, "--pattern", "npm-github-copilot-*.tgz", "--dir", temp]);
     const downloaded = readdirSync(temp);
     if (downloaded.length !== assets.length || assets.some((asset) => !downloaded.includes(asset.name))) {
       throw new Error(`Downloaded npm tarballs do not match release ${tag}`);
@@ -120,8 +121,8 @@ export async function publishRelease(tag, {
     for (const platform of [...platforms, null]) {
       const suffix = platform?.[0];
       const name = packageName(suffix);
-      const file = join(temp, `github-copilot-${version}${suffix ? `-${suffix}` : ""}.tgz`);
-      const asset = assets.find((entry) => entry.name === `github-copilot-${version}${suffix ? `-${suffix}` : ""}.tgz`);
+      const file = join(temp, assetName(version, suffix));
+      const asset = assets.find((entry) => entry.name === assetName(version, suffix));
       const bytes = readFileSync(file);
       if (statSync(file).size !== asset.size ||
           `sha256:${createHash("sha256").update(bytes).digest("hex")}` !== asset.digest) {
