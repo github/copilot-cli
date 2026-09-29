@@ -25,6 +25,14 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - name: Require completed npm publisher cutover
+        env:
+          CUTOVER_COMPLETE: ${{ vars.CLI_NPM_RELEASE_CUTOVER_COMPLETE }}
+        run: |
+          if [ "$CUTOVER_COMPLETE" != "true" ]; then
+            echo "Set CLI_NPM_RELEASE_CUTOVER_COMPLETE only after retiring and draining the runtime npm publisher." >&2
+            exit 1
+          fi
       # Never check out the release tag: it can contain different workflow/script code.
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:

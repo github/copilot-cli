@@ -159,7 +159,7 @@ export async function publishRelease(tag, {
         console.log(`Already published ${item.name}@${version} (integrity matches)`);
         continue;
       }
-      // Re-check immediately before publishing; a concurrent external publisher must not move a newer tag back.
+      // Re-check for sequential changes; cross-repository publishers must be retired at cutover.
       const existing = await lookup(item.name, version);
       if (existing) {
         if (existing.dist?.integrity !== item.integrity) {
