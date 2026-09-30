@@ -1,3 +1,22 @@
+## 1.0.90 - 2026-09-30
+
+- Add support for GPT-6.1 Sol in model selection
+- Add --mcp-github-auth to scope GitHub account auth to approved MCP server origins
+- Add session-scoped read-only directory approvals to path access prompts
+- Permission prompts remain answerable after resuming interrupted sessions.
+- Auto-approval now takes into account messages you type while the agent is working, as it already did for prompts sent while it was idle
+- Compaction now returns a summary even when instructions ask for tool use.
+- Copying selected text on Wayland now finishes as soon as wl-copy accepts it, instead of timing out and falling back to the in-process clipboard that can print "Somebody else owns the clipboard now" over the UI
+- A narrow Sessions sidebar drops keyboard hints that do not fit instead of cutting one off mid-word
+- MCP tools recover after transient discovery failures without restarting the session; unchanged catalogs remain available during recovery.
+- "No supported model available" is no longer shown on launch or in the model picker when a configured provider already supplies a model
+- MCP tool calls complete even when servers keep sending progress updates after responding
+- A fresh launch no longer prints "Failed to read model provider attribution" errors while it signs in
+- MCP OAuth sign-in to servers such as Datadog reuses a still-valid cached token
+- Withdrawn running prompts stay removed after session resume
+- Click anywhere on expanded tool calls in compact timeline to collapse them
+- Holding Space and Ctrl+X V explain when voice mode is off or still getting ready
+
 ## 1.0.89 - 2026-09-28
 
 - Left-clicking supported ask_user and elicitation form inputs focuses them and places the cursor at the clicked position
