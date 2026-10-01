@@ -1,3 +1,13 @@
+## 1.0.91 - 2026-10-01
+
+- Add `copilot sandbox ca` commands to check, create, trust, rotate, and remove proxy CA trust, including unattended Windows setup; `/sandbox ca install` becomes `create` and `trust`
+- Session timelines now clear busy status after interrupted turns finish.
+- Sandboxed commands run on Windows versions without filesystem enumeration support, with a warning that PowerShell's current location may be wrong
+- Footer text selection stays on the same visible line when the footer grows or shrinks.
+- Offer sandbox network bypass for Node/npm EACCES socket denials on Windows
+- CLI shutdown flushes pending telemetry before exit, with a bounded delay when telemetry is still initializing.
+- Complete, statically analyzable read-only shell pipelines can now enter execution-evidence review, while incomplete or unbound pipelines require explicit approval.
+
 ## 1.0.90 - 2026-09-30
 
 - Add support for GPT-6.1 Sol in model selection
