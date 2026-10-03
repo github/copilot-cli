@@ -1,36 +1,42 @@
 name: Close issue/PR on adding invalid label
 
-# **What it does**: This action closes issues that are labeled as invalid in the repo.
+# **What it does**: This action closes invalid issues and signals invalid PRs to a trusted writer.
 
 on:
   issues:
     types: [labeled]
-  pull_request_target:
+  pull_request:
     types: [labeled]
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
+permissions: {}
 
 jobs:
-  close-on-adding-invalid-label:
-    if:
-      github.repository == 'github/copilot-cli' && github.event.label.name ==
-      'invalid'
+  close-issue-on-adding-invalid-label:
+    if: >
+      github.repository == 'github/copilot-cli' &&
+      github.event_name == 'issues' &&
+      github.event.label.name == 'invalid'
     runs-on: ubuntu-latest
-
+    permissions:
+      issues: write
     steps:
       - name: Close issue
-        if: ${{ github.event_name == 'issues' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          URL: ${{ github.event.issue.html_url }}
-        run: gh issue close $URL
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh api -X PATCH "repos/$GH_REPOSITORY/issues/$ISSUE_NUMBER" -f state=closed
 
-      - name: Close PR
-        if: ${{ github.event_name == 'pull_request_target' }}
+  signal-invalid-pr-label:
+    if: >
+      github.repository == 'github/copilot-cli' &&
+      github.event_name == 'pull_request' &&
+      github.event.label.name == 'invalid'
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Record invalid PR label signal
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr close $URL
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "Invalid label signal for PR #$PR_NUMBER"
