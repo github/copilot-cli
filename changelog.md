@@ -1,3 +1,47 @@
+## 1.0.92 - 2026-10-05
+
+- Add `copilot config` subcommands to list, read, set, and remove settings.
+- Add a pre-conversation Ctrl+E environment picker to switch between local and cloud runs
+- Entra-protected MCP servers can silently renew access-token-only credentials.
+- Legacy HTTP+SSE MCP connections no longer hang indefinitely when a message POST is never acknowledged; the acknowledgement is bounded by the server's configured timeout
+- Voice runtime install errors name why the download from nuget.org failed, not only the fallback feed's 401
+- Compaction keeps your latest prompt when requests exceed context limits
+- Large Anthropic requests rejected by provider size limits now retry after downscaling images or removing attachments
+- Custom agent model entries keep model-bound reasoning effort only when that model is selected
+- Shell tool calls now stream live stdout and stderr output reliably in the timeline
+- Usage reporting preserves provider-reported reasoning token totals when available
+- Sessions no longer slow to a crawl for minutes after the agent writes a very large file in one step
+- Sandboxed shells now withhold ambient GITHUB_TOKEN unless explicitly configured.
+- Plan usage reflects the current billing period after quota resets
+- Custom agents launched through ACP task calls now resolve and run correctly
+- Remote session resume now uses your configured GitHub auth for --resume and --connect
+- Entra sign-in falls back to browser auth when no broker is available and shows a manual URL when auto-open fails
+- `copilot sandbox ca` commands now respect `--config-dir` (including with `-C`).
+- Search commands avoid sandbox bypass prompts when access is already granted
+- Sandboxed uv commands can write to the uv cache by default when dev tool access is enabled
+- pnpm commands run in sandboxed sessions without lock-file permission errors
+- Pressing `n` repeatedly in the Sessions tab reliably creates each new session
+- Reverse search updates results when command history finishes loading at startup
+- MCP tools recover within the same turn when server instructions change
+- Changing experimental mode with /experimental or /settings takes effect after restart even when launched with an opposing experimental flag
+- Keyboard, paste, and mouse input now stay ordered and responsive during rapid interaction.
+- Sandboxed shell commands offer a network bypass prompt whenever the proxy blocks a destination
+- Sandboxed scripts that run Git now authenticate with masked credentials and SSH remote rewrites
+- Sub-agents keep working after you replace your GitHub authentication credentials
+- Sandboxed commands on Windows write temporary files to the granted temp directory, so tools that rename a temp file into place work
+- Prompt-mode sessions fire a single sessionEnd hook after Stop-hook continuations complete
+- Reconnect to remote MCP servers after idle Streamable HTTP sessions expire
+- Messaging a running background agent now steers its active turn at the next processing opportunity.
+- Context rollovers keep your latest requests in the recovery context.
+- Hide the automatic sandbox CA setup prompt on Windows accounts that cannot self-elevate
+- Copilot no longer describes a subagent as configured when the current session cannot run it. Previously a session that could not use rubber-duck still reported it as set up in /subagents, and asking for it failed instead of being skipped cleanly.
+- MCP tools continue working after OAuth reauthentication when tool definitions are unchanged
+- Select which account to use after Microsoft Entra sign-in, and let /logout sign out those OAuth sessions.
+- Improve first-run startup by extracting the bundled CLI package in a child process
+- Improve startup responsiveness when connecting many MCP servers at once
+- Canvas actions can now return images to the model in invoke_canvas_action.
+- Remove retired models from the model picker and supported CLI selections
+
 ## 1.0.91 - 2026-10-01
 
 - Add `copilot sandbox ca` commands to check, create, trust, rotate, and remove proxy CA trust, including unattended Windows setup; `/sandbox ca install` becomes `create` and `trust`
