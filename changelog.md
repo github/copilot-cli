@@ -1,3 +1,19 @@
+## 1.0.93 - 2026-10-07
+
+- Add enterprise permissions.limitTo to enforce managed domain boundaries for network requests
+- Run safe /user commands immediately during active turns, reject unsafe remote commands during active turns without opening dialogs, and queue commands advertised by relay hosts
+- Plugin skill commands stay available after reloading enabled plugins
+- Sandbox local-network allowlists now include localhost and loopback hosts.
+- GitHub.com Connector users can expand GitHub CLI permissions in place and retry connections without switching sign-in methods.
+- Honor --context long_context at startup and show accurate context allowance in /context
+- Connecting a Connector without the required GitHub scope now prompts to update your authorization instead of failing with an authentication error
+- Warmed language servers stay running across LSP requests when sandboxing is disabled
+- Clicking a truncated compact shell command expands it
+- Command sandboxing is available to all users via /sandbox and --sandbox.
+- MCP server configuration changes apply between turns without restarting the session.
+- Model picker updates the recommended list to prioritize GPT-6.1 Sol, GPT-6 Astra/Luna, and Claude 5.5 models.
+- Read user settings only from ~/.copilot/settings.json; user-setting keys in ~/.copilot/config.json are ignored.
+
 ## 1.0.92 - 2026-10-05
 
 - Add `copilot config` subcommands to list, read, set, and remove settings.
