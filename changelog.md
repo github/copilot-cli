@@ -1,3 +1,14 @@
+## 1.0.94 - 2026-10-08
+
+- Add Claude Haiku 5.5 to model selection and --model completions
+- copilot mcp add recovers cleanly after interrupted MCP config initialization
+- MCP enable/disable now works before server discovery without starting MCP servers
+- Assisted permissions send visible shell code to the permission judge instead of requiring unnecessary manual approval
+- Show a policy warning when startup bypass-permission flags are suppressed by managed settings
+- Clicking a Sessions sidebar row now reliably switches sessions during split-view reconciliation
+- Show update guidance when managed settings request a newer CLI version without blocking normal prompts
+- Managed policy can disable Assisted Permissions and keep sessions in Manual Approval mode.
+
 ## 1.0.93 - 2026-10-07
 
 - Add enterprise permissions.limitTo to enforce managed domain boundaries for network requests
