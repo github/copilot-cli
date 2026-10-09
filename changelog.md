@@ -1,3 +1,10 @@
+## 1.0.95 - 2026-10-09
+
+- Use native Microsoft Entra broker authentication on macOS when available, with browser fallback.
+- copilot config supports sandbox credential injectHosts keys, with key completion in Bash, Zsh, and Fish.
+- --context now applies to new and resumed ACP sessions instead of silently using the default or previously saved context tier
+- Managed plugin setup retries hourly or after policy changes instead of on every message failure
+
 ## 1.0.94 - 2026-10-08
 
 - Add Claude Haiku 5.5 to model selection and --model completions
