@@ -95,6 +95,56 @@ npm install -g @github/copilot
 npm install -g @github/copilot@prerelease
 ```
 
+### npm release publishing
+
+The [npm release workflow](.github/workflows/publish-npm.yml) runs when a GitHub
+release is **published**. It downloads only the nine already-built npm assets:
+`npm-github-copilot-${VERSION}.tgz` and
+`npm-github-copilot-${VERSION}-${PLATFORM}.tgz` for each of the eight supported
+platforms. It ignores the older `github-copilot-*.tgz` launcher tarballs and
+validates the nine new assets' names, SHA-256 digests, package identities,
+versions, platform metadata, and launcher dependencies before publishing
+anything. It does not build from or execute release-tag code. Run the workflow
+manually on `main` with the exact published `release_tag` to recover a missed
+or failed release event; releases without all nine new npm assets are rejected
+even on manual recovery. Matching versions are skipped only when their npm
+`dist.integrity` matches the release tarball. Older releases use a
+version-specific `release-<version>` npm tag if `latest` or `prerelease` has
+advanced, so recovery never intentionally downgrades those channels. A version
+already on npm with a missing/stale channel tag fails closed: npm OIDC cannot
+perform `npm dist-tag add`, so an npm administrator must repair that tag
+separately. The npm dist-tag recheck cannot prevent a concurrent publisher
+from advancing a tag between the read and `npm publish --tag`; the cutover
+requires exclusive ownership of these packages' channel tags.
+
+**Required setup before cutover:** On npmjs.com, configure an npm trusted
+publisher **with `npm publish` permission** for each of the nine packages:
+`@github/copilot`, `@github/copilot-darwin-arm64`,
+`@github/copilot-darwin-x64`, `@github/copilot-linux-arm64`,
+`@github/copilot-linux-x64`, `@github/copilot-linuxmusl-arm64`,
+`@github/copilot-linuxmusl-x64`, `@github/copilot-win32-arm64`, and
+`@github/copilot-win32-x64`. Set organization/user to `github`, repository to
+`copilot-cli`, and workflow filename to **`publish-npm.yml`** (the exact
+repository is `github/copilot-cli`); leave environment unset. Use GitHub-hosted
+runners. The workflow uses Node 24, npm >= 11.5.1 and `id-token: write`, with
+no `NPM_TOKEN` or `NODE_AUTH_TOKEN`. The runtime repository must continue its
+existing publishing until this workflow is merged **and all nine npm trusted
+publishers are configured**. At cutover, disable the old runtime
+`publish-cli.yml` workflow, wait for all its in-progress and queued runs to
+finish, then merge the runtime workflow change. Retire any other publisher
+of these nine packages and prohibit reruns of older runtime release runs.
+Only then set the `CLI_NPM_RELEASE_CUTOVER_COMPLETE` repository Actions
+variable to `true` in `github/copilot-cli` and re-enable the updated runtime
+workflow. Without this variable the new workflow fails before any npm
+publish, including manual recovery. If an external publisher is restarted,
+unset the variable before publishing another release; a dist-tag read is
+not a concurrency lock.
+Its internal Azure feed publication and ancillary release tasks remain separate.
+The release artifact producer must attach the nine actual npm package tarballs
+under the new `npm-github-copilot-` names before cutover. Older releases such as
+`v1.0.90-4` contain only the legacy launcher-manifest tarballs and cannot be
+recovered through this workflow.
+
 
 ### Launching the CLI
 
