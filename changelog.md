@@ -1,3 +1,15 @@
+## 1.0.96 - 2026-10-12
+
+- Interactive sandbox settings suggest possible environment secrets and let you add masking hosts before saving.
+- Make model IDs in /model and /config model case-insensitive and save canonical IDs
+- Keep /allow-all available during startup while enterprise policy is still resolving
+- /add-dir grants sandbox access to added directories for the current session
+- /user list shows the authentication source for each signed-in account
+- Show retry progress messages before recovered responses after transient model failures
+- Model completions no longer show an authentication warning when an account-owned catalog is unavailable while signed out
+- Interactive sessions in git repositories reach the input prompt sooner
+- Timeline now shows whether you, Assisted Permissions, policy, or unattended fallback made each permission decision.
+
 ## 1.0.95 - 2026-10-09
 
 - Use native Microsoft Entra broker authentication on macOS when available, with browser fallback.
