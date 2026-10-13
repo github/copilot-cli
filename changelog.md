@@ -1,3 +1,31 @@
+## 1.0.97 - 2026-10-13
+
+- Add agent-scoped declarative hooks for custom agents
+- Remote plugin marketplace and plugin fetches retry once with your signed-in GitHub token after HTTPS auth fails.
+- Streamed responses behind TLS-intercepting proxies complete when close_notify is omitted
+- Fix parsing of GitHub SCP remotes with absolute paths so repository owner and name resolve correctly
+- Discover all custom agents even when repositories define more than 100 or nest agent files deeply.
+- Autopilot denies a preToolUse hook's "ask" decision instead of stopping on a permission dialog nobody is watching
+- Keep Windows taskbar agent icons grouped across CLI updates by using a stable icon path
+- Keep saved settings such as dismissed prompts, trusted folders and sign-ins when one entry in config.json is invalid, instead of resetting them on every launch
+- In /config, managed permission rules are read-only and hidden unless set by your organization.
+- Show billed AI Credits in /usage for token-billed sessions, including after resume
+- File reads using a view_range that is not exactly two elements, such as a lone start line, now show their line range and line count in the timeline, and session exports no longer contain the literal text undefined
+- Dragging to select text in the transcript no longer occasionally highlights and copies the row below the pointer.
+- Power BI and Bluebird MCP servers accept their published resource scopes during sign-in
+- Redact secrets safely in --output-format json output while preserving valid variable references
+- Resuming suspended sessions now reports interrupted tool calls and avoids replaying canceled writes.
+- Synchronous /task JSON output now includes failed child error and lifecycle events before completion.
+- Explicit GitHub MCP tool and toolset selections use the correct endpoint, so requested write tools stay available.
+- Cached MCP tool calls recheck their definition when a concurrent tool-list refresh changes the catalog.
+- Skills and custom agents from --plugin-dir plugins now reach autocomplete and invocation instead of going missing.
+- Fixed resumed sessions rebuilding plugin hooks from the wrong plugin list, so hooks from repository-local marketplace plugins now keep running after `--resume`, and hooks from plugins your configuration disabled no longer come back
+- Keep /user switch new-session choices visible after account checks in short terminals
+- Unavailable permission recovery attempts are now tracked per request, so unrelated calls no longer consume each other's retry budget.
+- Background-shell wait status no longer animates when no foreground work is running
+- Emergency memory relief in long sessions can now bypass its cooldown before V8 aborts, so a session that would have been killed by a JavaScript heap out of memory crash may survive with compacted history instead
+- Inline images render by default on supported terminals without enabling experimental mode. Use `/settings inlineImages false` to turn them off
+
 ## 1.0.96 - 2026-10-12
 
 - Interactive sandbox settings suggest possible environment secrets and let you add masking hosts before saving.
