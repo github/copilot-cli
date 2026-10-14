@@ -1,3 +1,12 @@
+## 1.0.98 - 2026-10-14
+
+- Add support for Gemini 4 Argon
+- Command hooks complete reliably even when child-exit signals are lost under Node
+- MCP status and /mcp commands stay synced to the active session after split-view session switches
+- Resuming a session now respects abandoned pending-permission work and continues only active permission requests.
+- Keep ordinary characters typed while the input box is still coming up at startup, instead of dropping them
+- Expand /ask answers with Ctrl+E, copy the entire answer with Ctrl+Y, and reopen the last usable completed answer in the session with /ask or /btw.
+
 ## 1.0.97 - 2026-10-13
 
 - Add agent-scoped declarative hooks for custom agents
