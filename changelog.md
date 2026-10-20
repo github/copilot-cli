@@ -1,3 +1,36 @@
+## 1.0.101 - 2026-10-20
+
+- Add native structured output for dynamic workflow subagents on supported models
+- Add assistedApprovalInstructions setting to guide Assisted Permissions confirmation decisions
+- Shell commands that create and then enter a directory now request path approval instead of being denied early.
+- Headless and SDK sessions without an OAuth handler skip MCP connections when saved tokens require sign-in, while renewable grants still connect.
+- macOS sandboxed commands can connect directly to localhost TCP services when local access is enabled and no host filters apply.
+- Local models and loopback providers in providers.json no longer block Auto, your saved model or the default model when signed in to Copilot
+- Explicit Entra MCP sign-in now recovers from rejected cached tokens by continuing to interactive sign-in.
+- Switching only reasoning effort no longer forces compaction in over-budget sessions.
+- Copy keys now reliably copy mouse selections even when pressed immediately after dragging.
+- Cancel abandoned Microsoft sign-in flows so retries start cleanly
+- Configured MCP inventory reads no longer fail when startup state is unchanged
+- Google models now avoid repeated request rewrites when screenshot-heavy sessions exceed image limits, reducing extra token usage.
+- Install Team-assigned plugins from Team-defined GitHub marketplaces
+- Extension capability requests use explicit approval instead of the Assisted judge
+- Shared MCP auth errors point to your client's sign-in settings; CLI authentication warnings still show /mcp auth.
+- Switching from GPT models to Gemini no longer fails when earlier turns include custom tool calls
+- Google model requests now respect registry image limits to avoid image-count request failures
+- The first prompt no longer hangs silently when no model is selected at startup; the CLI now asks you to pick one with /model and keeps your prompt
+- /usage now shows just the model name for BYOK and other rows without a provider label instead of "Unknown provider"
+- Cancelling an admission-gated prompt now re-enables Enter without requiring extra typing while background work continues.
+- Model picker marks your administrator-managed model as the default when it is available
+- Preserve MCP PNG images that include ICC color profiles instead of omitting them
+- Windows shell commands start reliably in restored sessions and clean up orphaned child processes
+- Switching to HydraFusion compacts only when the routed model actually needs it
+- CLI model lists refresh after endpoint updates instead of staying stale or empty
+- Windows taskbar icon staging avoids concurrent temp-file collisions so icon presence remains stable across launches.
+- Resuming a session shows the conversation sooner without waiting for placeholder environment setup
+- Starting a session with sandboxed MCP servers now avoids unnecessary restarts and responds faster.
+- Allow /config and /settings to set and unset showReasoning
+- Permission approval prompts explain escalation causes and show a request-specific diagnosis command
+
 ## 1.0.100 - 2026-10-19
 
 - Add --disable-client-telemetry flag to turn off client telemetry uploads from the CLI
