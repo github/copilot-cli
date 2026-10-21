@@ -1,3 +1,14 @@
+## 1.0.102 - 2026-10-21
+
+- Prompt mode now honors managed Auto model selection for -p and piped stdin runs
+- Subagents honor custom and MCP tool approvals, avoiding duplicate permission prompts and allowing inherited workflows to run
+- Plugin marketplaces accept git-subdir sources and long plugin descriptions
+- Fish shell completion works when aliases include option aliases like --effort
+- Chats no longer get blocked by organization plugin preparation while sending messages
+- Long-running sandboxed commands continue running reliably past 10 seconds
+- Replies cut off by a provider overload error retry with backoff and show the provider's message and request ID
+- Sandboxed network traffic now honors NO_PROXY and ALL_PROXY when inheriting host proxy settings
+
 ## 1.0.101 - 2026-10-20
 
 - Add native structured output for dynamic workflow subagents on supported models
