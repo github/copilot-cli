@@ -1,3 +1,18 @@
+## 1.0.103 - 2026-10-22
+
+- Clicking a completed response code block copies its original code when enabled.
+- ACP sessions now honor saved sandbox settings and --sandbox/--no-sandbox flags, including on resume.
+- Cloud replies keep full text when the CLI reconnects after a dropped connection
+- Sessions browser shows a session's recorded title instead of a generic Session N fallback when available
+- Model-specific default Responses verbosity now applies correctly for GPT-5 models unless session verbosity is explicitly set
+- Allow dnx commands to use existing .NET and NuGet sandbox grants when developer-tool access is enabled
+- Windows dev-tool shims like npm.cmd now receive the same sandbox grants as npm.
+- Gemini tool calls now avoid 400 schema validation errors for nullable and enum fields
+- Resume sessions under mandatory managed model defaults without rejecting saved preferences
+- Hash mention suggestions refresh automatically when the GitHub client becomes ready
+- Reuse cached local MCP tool snapshots across registered Git worktrees in one repository
+- Improve remote launch options with clearer hosting/connection flags and retire legacy --remote/--no-remote startup flags
+
 ## 1.0.102 - 2026-10-21
 
 - Prompt mode now honors managed Auto model selection for -p and piped stdin runs
