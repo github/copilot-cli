@@ -1,3 +1,10 @@
+## 1.0.104 - 2026-10-27
+
+- Managed model "fusion" now starts sessions on Auto and applies fusionTier settings
+- Interactive and SDK Autopilot sessions keep waiting for attached background tasks instead of stopping after COPILOT_TASK_WAIT_TIMEOUT_SECONDS; `-p --autopilot` still honors it
+- When a saved Auto preference is no longer available, Auto falls back to its default preference instead of failing each turn
+- Assisted Permissions are available without enabling experimental mode.
+
 ## 1.0.103 - 2026-10-22
 
 - Clicking a completed response code block copies its original code when enabled.
