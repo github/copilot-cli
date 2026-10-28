@@ -121,6 +121,27 @@ Launch `copilot` in a folder that contains code you want to work with.
 
 By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command to choose from other available models, including Claude Sonnet 4 and GPT-5.
 
+#### Falling back to the HTTP responses transport
+
+Models that advertise a WebSocket responses endpoint use it by default. If your
+network blocks WebSocket connections, or a session starts failing with
+`400 input item ID does not belong to this connection`, set this variable to use
+the HTTP responses transport instead:
+
+```bash
+export COPILOT_CLI_DISABLE_WEBSOCKET_RESPONSES=true
+```
+
+On Windows, using PowerShell:
+
+```powershell
+$env:COPILOT_CLI_DISABLE_WEBSOCKET_RESPONSES = "true"
+```
+
+Setting this to `true` has the same effect as setting the SDK's
+`capi.enableWebSocketResponses` session option to `false`. The two have opposite
+polarity, so enabling this variable disables the WebSocket transport.
+
 ### Experimental Mode
 
 Experimental mode enables access to new features that are still in development. You can activate experimental mode by:
