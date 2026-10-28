@@ -1,3 +1,7 @@
+## 1.0.105 - 2026-10-27
+
+- Selecting Copilot Fusion High or Max in /model now works from long-context sessions
+
 ## 1.0.104 - 2026-10-27
 
 - Managed model "fusion" now starts sessions on Auto and applies fusionTier settings
