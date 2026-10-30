@@ -1,0 +1,337 @@
+name: Publish container image from release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published GitHub release tag to publish (for example v1.0.105)
+        required: true
+        type: string
+      dry_run:
+        description: Build and smoke test the image without pushing it
+        type: boolean
+        default: false
+
+permissions: {}
+
+# One publisher at a time, so two runs can never race to move the latest or
+# prerelease tags. A run waiting behind another one is replaced by a newer
+# waiting run; dispatch this workflow with the release tag to publish a
+# release that was replaced. Dry runs push nothing, so they have their own group.
+concurrency:
+  group: copilot-cli-container-publish${{ inputs.dry_run && '-dry-run' || '' }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Validate release
+    if: >-
+      github.repository == 'github/copilot-cli' &&
+      (github.event_name == 'release' ||
+       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
+    # Every job pins ubuntu-24.04 instead of ubuntu-latest, so the amd64 and
+    # arm64 builds stay on the same OS release when the latest label migrates.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      prerelease: ${{ steps.release.outputs.prerelease }}
+      image: ${{ steps.release.outputs.image }}
+      source_sha: ${{ steps.release.outputs.source_sha }}
+    steps:
+      - name: Validate the release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+          RELEASE_ID: ${{ github.event.release.id }}
+        run: |
+          set -euo pipefail
+
+          tag_re='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*))?$'
+          if [[ ! "$RELEASE_TAG" =~ $tag_re ]]; then
+            printf '::error::Release tag must look like vX.Y.Z or vX.Y.Z-N (got %q).\n' "$RELEASE_TAG"
+            exit 1
+          fi
+          version="${RELEASE_TAG#v}"
+          prerelease=false
+          if [[ "$version" == *-* ]]; then
+            prerelease=true
+          fi
+
+          if ! release="$(gh api "repos/github/copilot-cli/releases/tags/$RELEASE_TAG")"; then
+            echo "::error::Could not read the $RELEASE_TAG release of github/copilot-cli."
+            exit 1
+          fi
+          if ! jq -e --arg tag "$RELEASE_TAG" --argjson prerelease "$prerelease" '
+              .tag_name == $tag and .draft == false and .published_at != null and .prerelease == $prerelease
+            ' <<<"$release" >/dev/null; then
+            echo "::error::$RELEASE_TAG is not a published release whose prerelease flag matches its version."
+            exit 1
+          fi
+          if [ -n "$RELEASE_ID" ] && [ "$(jq -r .id <<<"$release")" != "$RELEASE_ID" ]; then
+            echo "::error::The $RELEASE_TAG release changed after this run was triggered."
+            exit 1
+          fi
+          for asset in copilot-linux-x64.tar.gz copilot-linux-arm64.tar.gz SHA256SUMS.txt; do
+            if ! jq -e --arg name "$asset" '
+                [.assets[] | select(.name == $name and .state == "uploaded" and .size > 0)] | length == 1
+              ' <<<"$release" >/dev/null; then
+              echo "::error::The $RELEASE_TAG release has no fully uploaded $asset."
+              exit 1
+            fi
+          done
+
+          source_sha="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+          if [[ ! "$source_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Could not resolve the tip of main."
+            exit 1
+          fi
+
+          {
+            echo "version=$version"
+            echo "prerelease=$prerelease"
+            echo "image=ghcr.io/${GITHUB_REPOSITORY,,}"
+            echo "source_sha=$source_sha"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.arch }}
+    needs: resolve
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    env:
+      IMAGE: ${{ needs.resolve.outputs.image }}
+      VERSION: ${{ needs.resolve.outputs.version }}
+      # Keeps per-build summaries and *.dockerbuild artifacts off the run page.
+      DOCKER_BUILD_SUMMARY: false
+    steps:
+      # Never check out the release tag: it can contain different workflow/script code.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.resolve.outputs.source_sha }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build the image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: container/Dockerfile
+          platforms: ${{ matrix.platform }}
+          build-args: COPILOT_VERSION=${{ needs.resolve.outputs.version }}
+          tags: copilot-cli:test
+          load: true
+          provenance: false
+          sbom: false
+      - name: Smoke test the image
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: python3 container/smoke_test.py copilot-cli:test --version "$VERSION" --platform "$PLATFORM"
+      - name: Log in to GHCR
+        if: ${{ !inputs.dry_run }}
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      # The inputs are identical to the tested build, so this reuses its cached
+      # layers; the next step proves that.
+      - name: Push the image by digest
+        id: push
+        if: ${{ !inputs.dry_run }}
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: container/Dockerfile
+          platforms: ${{ matrix.platform }}
+          build-args: COPILOT_VERSION=${{ needs.resolve.outputs.version }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ needs.resolve.outputs.source_sha }}
+          outputs: type=image,name=${{ needs.resolve.outputs.image }},push-by-digest=true,name-canonical=true,push=true
+          provenance: false
+          sbom: false
+      - name: Verify the pushed image is the tested image
+        if: ${{ !inputs.dry_run }}
+        env:
+          ARCH: ${{ matrix.arch }}
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          set -euo pipefail
+          tested="$(docker image inspect copilot-cli:test --format '{{json .RootFS.Layers}}' | jq -c .)"
+          pushed="$(docker buildx imagetools inspect "$IMAGE@$DIGEST" --format '{{json .Image}}' | jq -c .rootfs.diff_ids)"
+          if [ "$tested" != "$pushed" ]; then
+            echo "::error::$IMAGE@$DIGEST does not have the layers of the image that passed the smoke test."
+            exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/digests"
+          echo "$DIGEST" > "$RUNNER_TEMP/digests/$ARCH"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !inputs.dry_run }}
+        with:
+          name: digests-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/${{ matrix.arch }}
+          if-no-files-found: error
+          # Re-running a failed publish job reads these digests, and a run can be re-run for 30 days.
+          retention-days: 30
+          overwrite: true
+
+  publish:
+    name: Publish multi-platform image
+    needs: [resolve, build]
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      packages: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    env:
+      IMAGE: ${{ needs.resolve.outputs.image }}
+      VERSION: ${{ needs.resolve.outputs.version }}
+      PRERELEASE: ${{ needs.resolve.outputs.prerelease }}
+      SOURCE_SHA: ${{ needs.resolve.outputs.source_sha }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: digests-*
+          path: ${{ runner.temp }}/digests
+          merge-multiple: true
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Create and tag the multi-platform image
+        id: index
+        run: |
+          set -euo pipefail
+
+          version_re='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*))?$'
+          digest_re='^sha256:[0-9a-f]{64}$'
+
+          # Sorts X.Y.Z[-N] versions; a release is newer than its own prereleases.
+          version_key() {
+            local core="${1%%-*}" pre=2147483647
+            if [[ "$1" == *-* ]]; then
+              pre="${1#*-}"
+            fi
+            echo "$core.$pre"
+          }
+          version_lt() {
+            local -a a b
+            local i
+            IFS=. read -r -a a <<<"$(version_key "$1")"
+            IFS=. read -r -a b <<<"$(version_key "$2")"
+            for i in 0 1 2 3; do
+              if (( 10#${a[i]} < 10#${b[i]} )); then return 0; fi
+              if (( 10#${a[i]} > 10#${b[i]} )); then return 1; fi
+            done
+            return 1
+          }
+
+          # Prints the version a channel tag points at, or nothing if the tag does not exist yet.
+          channel_version() {
+            local out version
+            if ! out="$(docker buildx imagetools inspect --raw "$IMAGE:$1" 2>&1)"; then
+              if grep -qiE ': not found|manifest[_ ]unknown|name[_ ]unknown' <<<"$out"; then
+                return 0
+              fi
+              echo "::error::Could not read $IMAGE:$1: $out" >&2
+              return 1
+            fi
+            if ! version="$(jq -er '.annotations["org.opencontainers.image.version"] | strings | select(length > 0)' <<<"$out")"; then
+              echo "::error::$IMAGE:$1 exists but its manifest has no non-empty version annotation." >&2
+              return 1
+            fi
+            printf '%s\n' "$version"
+          }
+
+          refs=()
+          for arch in amd64 arm64; do
+            file="$RUNNER_TEMP/digests/$arch"
+            if [ ! -s "$file" ] || [[ ! "$(<"$file")" =~ $digest_re ]]; then
+              echo "::error::The $arch build did not record a valid image digest."
+              exit 1
+            fi
+            refs+=("$IMAGE@$(<"$file")")
+          done
+
+          # The release's own tag is always published. latest follows stable releases and
+          # prerelease follows prereleases, and neither ever moves to an older version.
+          tags=("$VERSION")
+          channel=latest
+          if [ "$PRERELEASE" = true ]; then
+            channel=prerelease
+          fi
+          current="$(channel_version "$channel")"
+          if [ -z "$current" ]; then
+            tags+=("$channel")
+          elif [[ ! "$current" =~ $version_re ]]; then
+            echo "::error::$IMAGE:$channel has an unexpected version annotation '$current'."
+            exit 1
+          elif ! version_lt "$VERSION" "$current"; then
+            tags+=("$channel")
+          else
+            echo "::notice::$IMAGE:$channel stays at $current, which is newer than $VERSION."
+          fi
+
+          config="$(docker buildx imagetools inspect "${refs[0]}" --format '{{json .Image}}')"
+          create_args=(
+            --annotation "index:org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY"
+            --annotation "index:org.opencontainers.image.version=$VERSION"
+            --annotation "index:org.opencontainers.image.revision=$SOURCE_SHA"
+          )
+          for key in title description; do
+            value="$(jq -er --arg key "org.opencontainers.image.$key" '.config.Labels[$key]' <<<"$config")"
+            create_args+=(--annotation "index:org.opencontainers.image.$key=$value")
+          done
+          for tag in "${tags[@]}"; do
+            create_args+=(--tag "$IMAGE:$tag")
+          done
+          docker buildx imagetools create "${create_args[@]}" "${refs[@]}"
+
+          digest="$(docker buildx imagetools inspect "$IMAGE:$VERSION" --format '{{json .Manifest}}' | jq -er .digest)"
+          if [[ ! "$digest" =~ $digest_re ]]; then
+            echo "::error::Could not read the digest of $IMAGE:$VERSION."
+            exit 1
+          fi
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Published \`$IMAGE\`"
+            echo
+            echo "- Digest: \`$digest\`"
+            for tag in "${tags[@]}"; do
+              echo "- Tag: \`$tag\`"
+            done
+            echo
+            echo 'Verify the build provenance:'
+            echo
+            echo '```sh'
+            echo "gh attestation verify oci://$IMAGE@$digest --repo $GITHUB_REPOSITORY"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ needs.resolve.outputs.image }}
+          subject-digest: ${{ steps.index.outputs.digest }}
+          push-to-registry: true
