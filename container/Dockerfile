@@ -49,7 +49,7 @@ RUN useradd --create-home --uid 10001 copilot \
 COPY --chmod=0755 container/entrypoint.sh /usr/local/bin/copilot-server
 COPY LICENSE.md /usr/share/licenses/copilot-cli/LICENSE.md
 
-USER copilot
+USER 10001
 # The image is pinned to one CLI version, so every invocation (including
 # `--entrypoint copilot`) must stay on it instead of self-updating into ~/.copilot.
 ENV HOME=/home/copilot \

@@ -229,6 +229,7 @@ def check_server(target):
         if (rejected.get("error") or {}).get("code") != AUTHENTICATION_FAILED:
             raise Failure("a wrong token should fail with %d, got: %s" % (AUTHENTICATION_FAILED, json.dumps(rejected)))
 
+        ensure_running(name)
         stopped = docker("stop", "--time", "10", name)
         exit_code = docker("inspect", "--format", "{{.State.ExitCode}}", name).stdout.strip()
         if stopped.returncode != 0 or exit_code == "137":
