@@ -123,7 +123,7 @@ By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command
 
 ### Container image
 
-The Copilot CLI is also available as a Docker image that runs the CLI as a headless server for Copilot SDK clients. Images are published to `ghcr.io/github/copilot-cli` for `linux/amd64` and `linux/arm64`. This image is for connecting SDK clients to a server, not for interactive terminal use.
+The Copilot CLI is also available as a container image that runs the CLI as a headless server for Copilot SDK clients. Images are published to `ghcr.io/github/copilot-cli` for `linux/amd64` and `linux/arm64`. This image is for connecting SDK clients to a server, not for interactive terminal use.
 
 Set a connection token and a GitHub token, then start the server:
 
