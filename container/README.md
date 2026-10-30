@@ -66,7 +66,7 @@ Paths in the image:
 - `/home/copilot/workspace` is the working directory. Mount a project here to let the agent work on it.
 - `/home/copilot/.copilot` holds configuration and state. Mount a volume here to keep them across containers.
 
-The container runs as the non-root user `copilot` (uid 10001), so bind mounts must be writable by that user.
+The container runs as the non-root user `copilot` (uid 10001), so bind mounts must be writable by that user. Git is configured to trust only `/home/copilot/workspace`, allowing Git operations on a mounted repository even when its host UID differs. This is an exact-path exception, not a wildcard; mount repositories at the workspace path.
 
 To run another `copilot` command instead of the server, override the entrypoint:
 

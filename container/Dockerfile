@@ -45,7 +45,8 @@ RUN set -eu; \
     rm -rf "${workdir}"
 
 RUN useradd --create-home --uid 10001 copilot \
- && install -d -o copilot -g copilot /home/copilot/workspace /home/copilot/.copilot
+ && install -d -o copilot -g copilot /home/copilot/workspace /home/copilot/.copilot \
+ && git config --system --add safe.directory /home/copilot/workspace
 COPY --chmod=0755 container/entrypoint.sh /usr/local/bin/copilot-server
 COPY LICENSE.md /usr/share/licenses/copilot-cli/LICENSE.md
 

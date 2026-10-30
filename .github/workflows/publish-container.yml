@@ -250,7 +250,7 @@ jobs:
 
           # Prints the version a channel tag points at, or nothing if the tag does not exist yet.
           channel_version() {
-            local out
+            local out version
             if ! out="$(docker buildx imagetools inspect --raw "$IMAGE:$1" 2>&1)"; then
               if grep -qiE ': not found|manifest[_ ]unknown|name[_ ]unknown' <<<"$out"; then
                 return 0
@@ -258,7 +258,11 @@ jobs:
               echo "::error::Could not read $IMAGE:$1: $out" >&2
               return 1
             fi
-            jq -r '.annotations["org.opencontainers.image.version"] // empty' <<<"$out"
+            if ! version="$(jq -er '.annotations["org.opencontainers.image.version"] | strings | select(length > 0)' <<<"$out")"; then
+              echo "::error::$IMAGE:$1 exists but its manifest has no non-empty version annotation." >&2
+              return 1
+            fi
+            printf '%s\n' "$version"
           }
 
           refs=()
