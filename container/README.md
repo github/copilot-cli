@@ -105,7 +105,7 @@ docker build -f container/Dockerfile --build-arg COPILOT_VERSION=1.0.105 -t copi
 python3 container/smoke_test.py copilot-cli:local --version 1.0.105
 ```
 
-The smoke test needs only Python 3 and Docker. It checks the container's configuration and a real client handshake with the running server. Add `--platform linux/arm64` or `--platform linux/amd64` to test a build for another architecture.
+The smoke test needs only Python 3 and Docker. It checks the container's configuration, Git access to a bind-mounted repository owned by the host user, and a real client handshake with the running server. Add `--platform linux/arm64` or `--platform linux/amd64` to test a build for another architecture.
 
 ## Publishing
 
