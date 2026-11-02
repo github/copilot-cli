@@ -58,3 +58,23 @@ def test_signaling_requires_pin_and_can_stop_after_pairing():
     asyncio.run(endpoint(websocket))
 
     assert [response["type"] for response in websocket.responses] == ["error", "paired", "stopped"]
+
+
+def test_server_disables_uvicorn_logging_config_for_frozen_app(monkeypatch):
+    observed = {}
+
+    class FakeServer:
+        def __init__(self, config):
+            observed["log_config"] = config.log_config
+            self.should_exit = False
+
+        async def serve(self):
+            pass
+
+    monkeypatch.setattr("adju_phone_camera.server.uvicorn.Server", FakeServer)
+    server = make_server()
+    server.start("127.0.0.1", 8765)
+    server._thread.join(timeout=2)
+
+    assert not server._thread.is_alive()
+    assert observed["log_config"] is None

@@ -208,6 +208,7 @@ class CameraServer:
             host=host,
             port=port,
             log_level="warning",
+            log_config=None,
             ssl_certfile=str(tls_cert) if tls_cert else None,
             ssl_keyfile=str(tls_key) if tls_key else None,
         )
