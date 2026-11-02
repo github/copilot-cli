@@ -21,46 +21,41 @@ python -m pip install -r requirements.txt
 python main.py
 ```
 
-The desktop app shows a QR code, the current LAN URL, and a six-digit PIN. Scan the QR code on the phone, enter the PIN in the phone page, then choose a camera and resolution and tap **Start camera**. The browser asks for camera permission at that point. On the desktop, the preview shows incoming video and FPS; use **Save screenshot** or **Fullscreen preview** as needed.
+The app automatically creates a private certificate authority and a short-lived HTTPS certificate for the PC's current LAN IP. On first run, it shows:
+
+- An HTTPS QR code for pairing and camera use on port `8765`.
+- A certificate download link over the local network on port `8766`.
+- The CA certificate's SHA-256 fingerprint, which must match the phone certificate before you trust it.
+
+First, install and trust the CA certificate on the phone as described below. Then scan the HTTPS QR code, enter the six-digit PIN from the PC, choose a camera and resolution, and tap **Start camera**. Approve the browser's camera prompt. On the desktop, the preview shows incoming video and FPS; use **Save screenshot** or **Fullscreen preview** as needed. The HTTP listener on port `8766` only serves the public CA certificate; pairing and signaling are available over HTTPS/WSS on port `8765`.
 
 The available video targets are 480p, 720p, and 1080p. Actual resolution and frame rate depend on the phone, browser, Wi-Fi, and operating system. Switch between front and back cameras on the phone page; stop the stream first to change settings.
 
-## Trusted local HTTPS for phone camera access
+## Install and trust the local certificate on the phone
 
-Browsers restrict `navigator.mediaDevices.getUserMedia()` to secure contexts. `localhost` is treated specially when opened on the same device, but a phone opening the PC's LAN IP is not localhost. Do not rely on plain HTTP, and do not bypass certificate warnings.
+The app stores its private CA key only on this PC under `%LOCALAPPDATA%\ADJU PHONE CAMERA\certificates`. It creates a server certificate for the current private LAN IP. Only the public CA certificate is downloadable; the private CA key is never served or bundled. A new server certificate is issued if the LAN IP changes, using the same CA.
 
-One local-only option is [mkcert](https://github.com/FiloSottile/mkcert), which creates a private development CA and a certificate for your PC's LAN IP:
+1. Start the desktop server. On the phone, open the **CA download** link shown by the app, for example `http://192.168.1.20:8766/ca.cer`. This separate HTTP endpoint serves only the public certificate, not the camera page or signaling.
+2. Before installing it, compare the certificate's SHA-256 fingerprint shown in the desktop app with the certificate details on the phone wherever the OS exposes its fingerprint. Only install it if the identity matches and you trust this PC's CA.
+3. Install the downloaded certificate specifically as a **CA/root certificate**, then explicitly enable trust for it:
+   - **Android:** Settings > Security & privacy (names vary) > More security settings > Encryption & credentials > Install a certificate > CA certificate. Confirm the OS trust warning only after checking the fingerprint.
+   - **iPhone/iPad:** Open the downloaded configuration profile in Settings and install it. Then open Settings > General > About > Certificate Trust Settings and enable full trust for this root certificate. Menu names vary by iOS version.
+4. Return to the app and scan its **HTTPS** QR code, such as `https://192.168.1.20:8765/`. The browser must show a secure page without a certificate warning. Enter the pairing PIN, tap **Start camera**, and grant camera permission.
 
-1. Install mkcert on the PC and run `mkcert -install`.
-2. Find the PC's LAN IPv4 address (the desktop app displays it), then create a certificate in a private folder:
-
-   ```powershell
-   mkcert 192.168.1.20
-   ```
-
-   Replace the example address with the actual address. Keep the generated private key private.
-3. Run `mkcert -CAROOT` to find the local CA folder. Transfer only `rootCA.pem` to the phone using a private method such as USB, then install and trust it using the phone's certificate settings. Never transfer `rootCA-key.pem`. Android and iOS require explicit trust configuration; follow the current device instructions for your OS and browser. Do not install a CA you do not control.
-4. Start the app using the generated certificate and key:
-
-   ```powershell
-   python main.py --tls-cert .\192.168.1.20.pem --tls-key .\192.168.1.20-key.pem
-   ```
-
-   Use the same PC IP that appears in the certificate. The desktop QR code will use `https://`.
-
-If you cannot install and trust a local CA on the phone, camera access from that phone browser will not work. Use an organization-approved trusted certificate/domain instead, or test the browser page locally on the PC; do not treat an HTTP LAN address as a working camera workaround. No certificate, CA, or private key is bundled with this app.
+If the phone OS or browser does not allow installing and trusting this private CA, camera access from that phone browser will not work. Use an organization-approved certificate/domain instead. Do not bypass certificate warnings or use plain HTTP as a camera-access workaround. When finished, remove the installed CA profile from the phone's certificate settings if you no longer need it; the private CA key remains on the PC. If you provide a custom TLS certificate with `python main.py --tls-cert CERT.pem --tls-key KEY.pem`, the app does not open its local CA download listener; configure your certificate's CA trust on the phone separately.
 
 ## Windows Firewall and network limits
 
-Allow the app through Windows Defender Firewall on **Private networks only** when prompted. WebRTC uses the selected TCP port for the page/signaling and direct UDP for media. If creating rules manually, run PowerShell as Administrator and restrict access to the Private profile and local subnet:
+Allow the app through Windows Defender Firewall on **Private networks only** when prompted. HTTPS signaling uses TCP port `8765`, the CA certificate download uses TCP port `8766`, and WebRTC media requires direct UDP connectivity. If creating rules manually, run PowerShell as Administrator and restrict access to the Private profile and local subnet:
 
 ```powershell
 $python = (Get-Command python).Source
 New-NetFirewallRule -DisplayName "ADJU PHONE CAMERA signaling" -Direction Inbound -Program $python -Action Allow -Profile Private -Protocol TCP -LocalPort 8765 -RemoteAddress LocalSubnet
+New-NetFirewallRule -DisplayName "ADJU PHONE CAMERA CA download" -Direction Inbound -Program $python -Action Allow -Profile Private -Protocol TCP -LocalPort 8766 -RemoteAddress LocalSubnet
 New-NetFirewallRule -DisplayName "ADJU PHONE CAMERA WebRTC" -Direction Inbound -Program $python -Action Allow -Profile Private -Protocol UDP -RemoteAddress LocalSubnet
 ```
 
-Replace the executable with the packaged app path when using the PyInstaller build, and change `8765` if you chose a different port. Remove these named rules when you no longer need them. This app deliberately has no TURN relay fallback. Do not disable the firewall globally. Guest Wi-Fi, client/AP isolation, VPN policy, or restrictive router/firewall rules may block the phone-to-PC connection. Both devices must be on a network that permits peer-to-peer LAN traffic.
+Replace the executable with the packaged app path when using the PyInstaller build, and adjust both TCP ports if you chose a different port. Remove these named rules when you no longer need them. This app deliberately has no TURN relay fallback. Do not disable the firewall globally. Guest Wi-Fi, client/AP isolation, VPN policy, or restrictive router/firewall rules may block the phone-to-PC connection. Both devices must be on a network that permits peer-to-peer LAN traffic.
 
 ## Build a Windows executable
 

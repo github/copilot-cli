@@ -1,9 +1,16 @@
 import asyncio
+import ssl
+import time
+import urllib.error
+import urllib.request
 from pathlib import Path
+import socket
 from types import SimpleNamespace
 
 from fastapi import WebSocketDisconnect
+import pytest
 
+from adju_phone_camera.certificates import create_local_certificate
 from adju_phone_camera.server import CameraServer
 
 
@@ -78,3 +85,50 @@ def test_server_disables_uvicorn_logging_config_for_frozen_app(monkeypatch):
 
     assert not server._thread.is_alive()
     assert observed["log_config"] is None
+
+
+def _free_port() -> int:
+    with socket.socket() as listener:
+        listener.bind(("127.0.0.1", 0))
+        return listener.getsockname()[1]
+
+
+def test_https_and_http_ca_download_listeners(tmp_path):
+    material = create_local_certificate(tmp_path, "192.168.1.10")
+    https_port = _free_port()
+    ca_port = _free_port()
+    while ca_port == https_port:
+        ca_port = _free_port()
+    server = CameraServer(
+        "123456",
+        WEB_ROOT,
+        lambda _image: None,
+        lambda _status: None,
+        ca_download_path=material.ca_download_path,
+    )
+    server.start(
+        "127.0.0.1",
+        https_port,
+        material.certificate_path,
+        material.private_key_path,
+        ca_port=ca_port,
+    )
+    try:
+        deadline = time.monotonic() + 5
+        while not server.is_ready and server.is_alive and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert server.is_ready, server._startup_error
+
+        with urllib.request.urlopen(f"http://127.0.0.1:{ca_port}/ca.cer", timeout=2) as response:
+            ca_download = response.read()
+        assert ca_download == material.ca_download_path.read_bytes()
+        with pytest.raises(urllib.error.HTTPError) as response:
+            urllib.request.urlopen(f"http://127.0.0.1:{ca_port}/ws", timeout=2)
+        assert response.value.code == 404
+
+        context = ssl.create_default_context(cafile=str(material.ca_certificate_path))
+        with urllib.request.urlopen(f"https://127.0.0.1:{https_port}/", context=context, timeout=2) as response:
+            assert response.status == 200
+            assert "ADJU PHONE CAMERA" in response.read().decode("utf-8")
+    finally:
+        server.stop()

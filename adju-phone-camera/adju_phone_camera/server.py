@@ -13,7 +13,7 @@ from typing import Callable
 import uvicorn
 from aiortc import RTCPeerConnection, RTCSessionDescription, RTCConfiguration
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
 
@@ -48,6 +48,7 @@ class CameraServer:
         web_root: Path,
         on_frame: Callable[[Image.Image], None],
         on_status: Callable[[str], None],
+        ca_download_path: Path | None = None,
     ) -> None:
         if not is_valid_pin(pin):
             raise ValueError("The pairing PIN must contain exactly six digits.")
@@ -55,6 +56,7 @@ class CameraServer:
         self.web_root = web_root
         self.on_frame = on_frame
         self.on_status = on_status
+        self.ca_download_path = ca_download_path
         self.app = FastAPI(openapi_url=None, docs_url=None, redoc_url=None)
         self._limiter = PinAttemptLimiter()
         self._peer_connection: RTCPeerConnection | None = None
@@ -62,6 +64,8 @@ class CameraServer:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: threading.Thread | None = None
         self._server: uvicorn.Server | None = None
+        self._servers: list[uvicorn.Server] = []
+        self._startup_error: str | None = None
         self.app.mount("/static", StaticFiles(directory=self.web_root), name="static")
         self._register_routes()
 
@@ -71,7 +75,7 @@ class CameraServer:
 
     @property
     def is_ready(self) -> bool:
-        return self._server is not None and self._server.started
+        return bool(self._servers) and all(server.started for server in self._servers)
 
     def _register_routes(self) -> None:
         @self.app.get("/")
@@ -191,20 +195,16 @@ class CameraServer:
         if peer is not None:
             await peer.close()
 
-    def start(
+    def _build_uvicorn_server(
         self,
+        app: FastAPI,
         host: str,
         port: int,
         tls_cert: Path | None = None,
         tls_key: Path | None = None,
-    ) -> None:
-        if (tls_cert is None) != (tls_key is None):
-            raise ValueError("Both a TLS certificate and private key are required.")
-        if self._thread is not None and self._thread.is_alive():
-            return
-
+    ) -> uvicorn.Server:
         config = uvicorn.Config(
-            self.app,
+            app,
             host=host,
             port=port,
             log_level="warning",
@@ -212,17 +212,77 @@ class CameraServer:
             ssl_certfile=str(tls_cert) if tls_cert else None,
             ssl_keyfile=str(tls_key) if tls_key else None,
         )
-        server = uvicorn.Server(config)
+        return uvicorn.Server(config)
+
+    def start(
+        self,
+        host: str,
+        port: int,
+        tls_cert: Path | None = None,
+        tls_key: Path | None = None,
+        ca_port: int | None = None,
+    ) -> None:
+        if (tls_cert is None) != (tls_key is None):
+            raise ValueError("Both a TLS certificate and private key are required.")
+        if (self.ca_download_path is None) != (ca_port is None):
+            raise ValueError("A CA download certificate and HTTP port must be provided together.")
+        if self._thread is not None and self._thread.is_alive():
+            return
+        self._startup_error = None
+
+        server = self._build_uvicorn_server(self.app, host, port, tls_cert, tls_key)
         self._server = server
+        self._servers = [server]
+        if ca_port is not None and self.ca_download_path is not None:
+            ca_app = FastAPI(openapi_url=None, docs_url=None, redoc_url=None)
+            certificate_path = self.ca_download_path
+
+            @ca_app.get("/ca.cer")
+            async def download_ca_certificate() -> FileResponse:
+                return FileResponse(
+                    certificate_path,
+                    media_type="application/pkix-cert",
+                    filename="adju-phone-camera-local-ca.cer",
+                )
+
+            @ca_app.get("/")
+            async def ca_setup_info() -> PlainTextResponse:
+                return PlainTextResponse(
+                    "ADJU PHONE CAMERA certificate download only. "
+                    "Install the downloaded CA certificate only after comparing its fingerprint "
+                    "with the desktop app. Pair and use the camera from the HTTPS QR code."
+                )
+
+            self._servers.append(self._build_uvicorn_server(ca_app, host, ca_port))
 
         def serve() -> None:
             self._loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self._loop)
+
+            async def serve_all() -> None:
+                tasks = [asyncio.create_task(current.serve()) for current in self._servers]
+                try:
+                    while not all(current.started for current in self._servers):
+                        for task in tasks:
+                            if task.done():
+                                task.result()
+                                raise RuntimeError(
+                                    "An HTTP or HTTPS listener stopped before it was ready. "
+                                    "Check whether either port is already in use."
+                                )
+                        await asyncio.sleep(0.05)
+                    await asyncio.gather(*tasks)
+                finally:
+                    for current in self._servers:
+                        current.should_exit = True
+                    await asyncio.gather(*tasks, return_exceptions=True)
+
             try:
-                self._loop.run_until_complete(server.serve())
-            except Exception:
-                LOGGER.exception("Local camera server failed")
-                self.on_status("Server error — check port and TLS files")
+                self._loop.run_until_complete(serve_all())
+            except Exception as error:
+                self._startup_error = str(error)
+                LOGGER.exception("Local camera HTTPS or certificate server failed")
+                self.on_status(f"Server error: {error}")
             finally:
                 self._loop.close()
                 self._loop = None
@@ -231,11 +291,11 @@ class CameraServer:
         self._thread.start()
 
     def stop(self) -> None:
-        server = self._server
-        if server is not None:
+        for server in self._servers:
             server.should_exit = True
         thread = self._thread
         if thread is not None and thread.is_alive():
             thread.join(timeout=5)
         self._thread = None
         self._server = None
+        self._servers = []

@@ -11,7 +11,7 @@ from .app import run_app
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Use an Android or iPhone camera as a local PC webcam preview.")
-    parser.add_argument("--port", type=int, default=8765, help="Local web and signaling port (default: 8765)")
+    parser.add_argument("--port", type=int, default=8765, help="Local HTTPS and signaling port (default: 8765)")
     parser.add_argument("--tls-cert", type=Path, help="PEM certificate for trusted local HTTPS")
     parser.add_argument("--tls-key", type=Path, help="PEM private key matching --tls-cert")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
@@ -20,6 +20,8 @@ def main() -> None:
 
     if not 1024 <= args.port <= 65535:
         parser.error("--port must be between 1024 and 65535.")
+    if args.tls_cert is None and args.port == 65535:
+        parser.error("The default local CA download listener needs the port after --port; choose 65534 or lower.")
     if (args.tls_cert is None) != (args.tls_key is None):
         parser.error("--tls-cert and --tls-key must be supplied together.")
     for label, path in (("--tls-cert", args.tls_cert), ("--tls-key", args.tls_key)):

@@ -13,6 +13,7 @@ from PIL import Image, ImageTk
 
 from .pairing import generate_pairing_pin
 from .server import CameraServer, get_lan_ip
+from .certificates import create_local_certificate, default_certificate_directory
 
 
 class CameraApp(ctk.CTk):
@@ -30,8 +31,14 @@ class CameraApp(ctk.CTk):
         ctk.set_default_color_theme("blue")
 
         self.port = port
+        self._managed_certificate = None
+        if tls_cert is None and tls_key is None:
+            self._managed_certificate = create_local_certificate(default_certificate_directory(), get_lan_ip())
+            tls_cert = self._managed_certificate.certificate_path
+            tls_key = self._managed_certificate.private_key_path
         self.tls_cert = tls_cert
         self.tls_key = tls_key
+        self._ca_port = port + 1 if self._managed_certificate else None
         self.pin = generate_pairing_pin()
         self._image_lock = threading.Lock()
         self._latest_frame: Image.Image | None = None
@@ -48,6 +55,9 @@ class CameraApp(ctk.CTk):
             self._web_root(),
             self._receive_frame,
             self._set_status_from_server,
+            ca_download_path=(
+                self._managed_certificate.ca_download_path if self._managed_certificate else None
+            ),
         )
 
         self._build_ui()
@@ -124,6 +134,12 @@ class CameraApp(ctk.CTk):
         self.pin_label.pack(pady=8)
         self.url_label = ctk.CTkLabel(pairing, text="Server is stopped", wraplength=220, justify="center")
         self.url_label.pack(padx=14, pady=8)
+        self.ca_url_label = ctk.CTkLabel(pairing, text="", wraplength=220, justify="center", font=ctk.CTkFont(size=10))
+        self.ca_url_label.pack(padx=10, pady=(0, 3))
+        self.ca_fingerprint_label = ctk.CTkLabel(
+            pairing, text="", wraplength=220, justify="center", font=ctk.CTkFont(size=9)
+        )
+        self.ca_fingerprint_label.pack(padx=10, pady=(0, 5))
         self.fps_label = ctk.CTkLabel(pairing, text="0 FPS")
         self.fps_label.pack(pady=(8, 2))
         ctk.CTkButton(pairing, text="Save screenshot", command=self._save_screenshot).pack(
@@ -135,18 +151,30 @@ class CameraApp(ctk.CTk):
 
         ctk.CTkLabel(
             self,
-            text="Phone camera access requires HTTPS with a trusted certificate on the phone. See project README.",
+            text="Before scanning: download and trust the CA from the link beside the QR, then scan the HTTPS QR and pair using the PIN.",
             text_color=("#8b5a00", "#f0c36d"),
         ).grid(row=3, column=0, padx=22, pady=(2, 14), sticky="w")
 
     def _refresh_access_link(self) -> None:
-        scheme = "https" if self.tls_cert else "http"
         selected_resolution = self.quality_menu.get().removesuffix("p")
-        self._url = f"{scheme}://{get_lan_ip()}:{self.port}/?resolution={selected_resolution}"
+        lan_ip = get_lan_ip()
+        self._url = f"https://{lan_ip}:{self.port}/?resolution={selected_resolution}"
         self.url_label.configure(text=self._url)
         qr = qrcode.make(self._url).convert("RGB")
-        self._qr_photo = ctk.CTkImage(light_image=qr, dark_image=qr, size=(190, 190))
+        self._qr_photo = ctk.CTkImage(light_image=qr, dark_image=qr, size=(150, 150))
         self.qr_label.configure(image=self._qr_photo, text="")
+        if self._managed_certificate:
+            self.ca_url_label.configure(
+                text=f"Before scanning, download the phone CA:\nhttp://{lan_ip}:{self._ca_port}/ca.cer"
+            )
+            self.ca_fingerprint_label.configure(
+                text=f"Compare SHA-256 fingerprint:\n{self._managed_certificate.fingerprint}"
+            )
+        else:
+            self.ca_url_label.configure(
+                text="Install and trust the CA for your HTTPS certificate on the phone first."
+            )
+            self.ca_fingerprint_label.configure(text="")
 
     def _quality_changed(self, _value: str) -> None:
         self._refresh_access_link()
@@ -155,7 +183,13 @@ class CameraApp(ctk.CTk):
         if self._running:
             return
         try:
-            self._server.start("0.0.0.0", self.port, self.tls_cert, self.tls_key)
+            self._server.start(
+                "0.0.0.0",
+                self.port,
+                self.tls_cert,
+                self.tls_key,
+                ca_port=self._ca_port,
+            )
         except (OSError, ValueError) as error:
             messagebox.showerror("Could not start server", str(error))
             return
@@ -173,9 +207,10 @@ class CameraApp(ctk.CTk):
             self.start_button.configure(state="normal")
             self.stop_button.configure(state="disabled")
             self._set_status("Server failed to start")
+            detail = self._server._startup_error or "Check whether the HTTPS and CA download ports are available."
             messagebox.showerror(
                 "Could not start server",
-                "The local server did not start. Check whether another app is using the selected port.",
+                f"The local server did not start.\n\n{detail}",
             )
             return
         if self._server.is_ready:
