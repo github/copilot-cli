@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>ADJU PHONE CAMERA</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">LOCAL CAMERA LINK</p>
+        <h1>ADJU PHONE CAMERA</h1>
+        <p>Pair this phone with your PC to stream video directly over Wi-Fi.</p>
+      </header>
+
+      <section class="card">
+        <p id="status" role="status" aria-live="polite">Connecting to your PC…</p>
+        <form id="pair-form">
+          <label for="pin">Six-digit pairing PIN</label>
+          <input id="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required>
+          <button type="submit" id="pair-button">Pair phone</button>
+        </form>
+
+        <div id="camera-controls" hidden>
+          <label for="resolution">Video resolution</label>
+          <select id="resolution">
+            <option value="480">480p</option>
+            <option value="720" selected>720p</option>
+            <option value="1080">1080p</option>
+          </select>
+          <label for="facing">Camera</label>
+          <select id="facing">
+            <option value="environment" selected>Back camera</option>
+            <option value="user">Front camera</option>
+          </select>
+          <p class="hint">Stop the camera before changing these settings.</p>
+          <button type="button" id="start-button" disabled>Start camera</button>
+          <button type="button" id="stop-button" class="secondary" hidden>Stop camera</button>
+          <video id="local-video" autoplay playsinline muted></video>
+        </div>
+      </section>
+      <p class="privacy">Camera access starts only after you tap Start camera. Video is sent directly to your paired PC; this app does not use a cloud service or external video relay.</p>
+    </main>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
