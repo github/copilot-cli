@@ -22,29 +22,47 @@ records. The directory can also belong to a historical session. There is no
 automatic scan of other sessions.
 
 For development, use `npm start -- --session "<absolute-session-directory>"`.
-Use `node .\dist\cli.js --help` for command-line help.
+Use `node .\dist\cli.js --help` for command-line help. Add `--theme <mode>` to
+match the Copilot CLI `/theme` color mode: `default`, `light`, `dim`,
+`high-contrast`, or `colorblind` (Primer semantic colors; needs a truecolor
+terminal such as Windows Terminal). Minimum size: 80×24.
 
 ## Views and keys
 
-The invocation tree retains finished executions. The result pane shows the
-selected execution's task, original response/error, recorded duration, and last
-activity. The tool pane can display each recorded tool result. Long text is
-loaded from the selected log on demand rather than copied to a new database.
+The layout follows Copilot CLI's own interface: a tab bar, blue query chips, a
+`·`-separated key-hint footer, and a bordered detail dialog. Two views share
+one selection:
+
+- **Graph** (default): a spawn tree. The main session sits on top; agents sit
+  under the agent or session that launched them, and a reused agent's later
+  turn sits under its previous turn. Edge labels show `bg` / `sync` and any
+  recorded wait with its duration (yellow while waiting, dim once finished).
+  Wide trees scroll horizontally to keep the selection visible.
+- **Timeline**: one swimlane per execution, with the main session's model
+  turns on the first lane. Bars are colored by outcome, `╍` marks time spent
+  waiting, `▾` connects a waiting lane to the execution it waited for, and the
+  `now` cursor follows the session. The default window covers the period in
+  which agents ran.
+
+The bottom dialog shows what the selected execution was asked (its task
+prompt), its final message or error, and its recorded relationships. Tool calls
+stay hidden unless you press `t`. Long text is loaded from the selected log on
+demand rather than copied to a new database.
 
 | Key | Action |
 | --- | --- |
-| Up/Down or `k`/`j` | Select an execution |
-| Left/Right or `h`/`l` | Collapse/expand its children |
-| Enter | Toggle collapse |
-| `f` | Cycle all, active, finished views; ancestors remain as context |
-| Tab | Switch between the recorded result and tool log |
-| `[` / `]` | Select previous/next tool |
-| Page Up / Page Down | Scroll details |
-| Home / End | First/last detail page |
+| Up/Down or `k`/`j` | Select the previous/next execution |
+| `g` / `G` | Select the first/last execution |
+| Left/Right or `h`/`l` | Graph: previous/next sibling. Timeline: pan earlier/later |
+| `+` / `-` | Timeline: zoom in/out (beyond the agent window up to the whole session) |
+| Tab | Switch between Graph and Timeline |
+| `f` | Cycle all, active, finished; ancestors remain as dimmed context |
+| `t` | Toggle tool calls / relationships in the detail dialog |
+| Page Up / Page Down | Scroll the selected result |
 | `q` or Escape | Quit and restore the previous terminal screen |
 
-`DONE` means an invocation has a recorded `subagent.completed` or agent-attributed
-`session.task_complete` event. `REPLIED`
+`done` means an invocation has a recorded `subagent.completed` or agent-attributed
+`session.task_complete` event. `replied`
 means a response and turn end were recorded, but lifecycle completion was not.
 Follow-up executions on a reused agent remain separate from its earlier work.
 The finished filter includes replied executions without claiming the agent was
@@ -75,6 +93,9 @@ records produce explicit diagnostics rather than fabricated results.
 - Detected source replacement/truncation rebuilds the view. A trailing record
   without a newline remains buffered until it is complete. Reading stops on a source
   error, with a visible diagnostic and a nonzero exit status on quit.
+- While following a live log, open executions extend to the current time. A
+  recorded `session.shutdown` switches the header to `ended` and stops the clock.
+- Below 100 columns the detail dialog shows only the task and result.
 
 Text from the log is rendered without terminal control sequences. Session
 content stays local: do not copy private transcripts into this repository.
@@ -90,5 +111,6 @@ npm run build
 ```
 
 Tests use synthetic records and temporary files, covering replay/tailing,
-UTF-8 boundaries, source reset, agent/result attribution, explicit waits,
-reused agents, completed-history navigation, filtering, resizing, and scrolling.
+UTF-8 boundaries, source reset, agent/result attribution, recorded wait history,
+reused agents and later turns, graph layout, the Graph/Timeline views,
+filtering, hidden-by-default tool calls, resizing, and result scrolling.

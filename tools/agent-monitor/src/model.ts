@@ -8,6 +8,9 @@ export interface ToolActivity {
 	id: string;
 	name: string;
 	status: 'running' | 'succeeded' | 'failed';
+	startedAt: string;
+	endedAt?: string;
+	detail?: string;
 	output?: ContentRef;
 }
 
@@ -16,8 +19,11 @@ export interface AgentRun {
 	agentId: string;
 	name: string;
 	task: string;
+	agentType?: string;
+	mode?: 'sync' | 'background';
 	parentRunId?: string | null;
 	parentAgentId?: string;
+	previousRunId?: string;
 	launchCallId?: string;
 	status: RunStatus;
 	startedAt?: string;
@@ -25,6 +31,7 @@ export interface AgentRun {
 	lastActivity: string;
 	durationMs?: number;
 	model?: string;
+	prompt?: ContentRef;
 	result?: ContentRef;
 	error?: ContentRef;
 	tools: ToolActivity[];
@@ -40,6 +47,9 @@ interface ToolCall {
 	targetAgentId?: string;
 	wait: boolean;
 	complete: boolean;
+	startedAt: string;
+	completedAt?: string;
+	prompt?: ContentRef;
 	activity?: ToolActivity;
 }
 
@@ -47,15 +57,19 @@ export interface WaitEdge {
 	callId: string;
 	fromRunId: string | null;
 	toAgentId: string;
+	toRunId?: string;
 	kind: 'sync-call' | 'wait';
+	start: string;
+	end?: string;
 }
 
-export interface TreeRow {
-	run: AgentRun;
-	depth: number;
-	hasChildren: boolean;
-	unresolvedParent: boolean;
+export interface MainTurn {
+	start: string;
+	end?: string;
 }
+
+const MAIN_TOOL_LIMIT = 200;
+const DETAIL_KEYS = ['path', 'pattern', 'command', 'query', 'url', 'name', 'agent_id', 'description'];
 
 export const isFinished = (run: AgentRun): boolean =>
 	run.status === 'completed' || run.status === 'failed' || run.status === 'replied';
@@ -64,8 +78,17 @@ export class AgentModel {
 	readonly runs = new Map<string, AgentRun>();
 	readonly warnings = new Set<string>();
 	readonly waits = new Map<string, WaitEdge>();
+	readonly waitLog = new Map<string, WaitEdge>();
+	readonly mainTurns: MainTurn[] = [];
+	readonly mainTools: ToolActivity[] = [];
 	version?: string;
 	sessionId?: string;
+	sessionModel?: string;
+	sessionStart?: string;
+	sessionEnded?: string;
+	lastEventAt?: string;
+	mainPrompt?: ContentRef;
+	mainResult?: ContentRef;
 	private readonly latest = new Map<string, AgentRun>();
 	private readonly launches = new Map<string, AgentRun>();
 	private readonly calls = new Map<string, ToolCall>();
@@ -75,24 +98,40 @@ export class AgentModel {
 		this.runs.clear();
 		this.warnings.clear();
 		this.waits.clear();
+		this.waitLog.clear();
+		this.mainTurns.length = 0;
+		this.mainTools.length = 0;
 		this.latest.clear();
 		this.launches.clear();
 		this.calls.clear();
 		this.seen.clear();
 		this.version = undefined;
 		this.sessionId = undefined;
+		this.sessionModel = undefined;
+		this.sessionStart = undefined;
+		this.sessionEnded = undefined;
+		this.lastEventAt = undefined;
+		this.mainPrompt = undefined;
+		this.mainResult = undefined;
 	}
 
 	apply(record: EventRecord): void {
 		const e = record.event;
 		if (this.seen.has(e.id)) return;
 		this.seen.add(e.id);
+		if (!this.lastEventAt || Date.parse(e.timestamp) > Date.parse(this.lastEventAt)) this.lastEventAt = e.timestamp;
+		this.sessionStart ??= e.timestamp;
 		const d = e.data;
 		switch (e.type) {
 			case 'session.start':
 				this.version = optionalString(d, 'copilotVersion');
 				this.sessionId = optionalString(d, 'sessionId');
+				this.sessionModel = optionalString(d, 'selectedModel');
+				this.sessionStart = e.timestamp;
 				if (this.version !== '1.0.104') this.warnings.add(`Untested CLI event format: ${this.version ?? 'unknown'}`);
+				break;
+			case 'session.shutdown':
+				this.sessionEnded = e.timestamp;
 				break;
 			case 'subagent.started':
 				this.start(e);
@@ -117,14 +156,17 @@ export class AgentModel {
 					if (!current || isFinished(current) || (current.hasActivity && d.delivery === 'idle')) {
 						const run = this.create(e, `message:${e.id}`, e.agentId);
 						run.name = current?.name ?? run.name;
+						run.agentType = current?.agentType;
 						run.parentRunId = current?.parentRunId;
 						run.parentAgentId = current?.parentAgentId;
+						run.previousRunId = current?.id;
 						run.model = current?.model;
-						run.task = optionalString(d, 'content') ?? 'Follow-up input not recorded';
+						run.task = firstLine(optionalString(d, 'content')) ?? 'Follow-up input not recorded';
+						run.prompt = capture(record, 'content');
 						run.startedAt = e.timestamp;
 						run.status = 'running';
 					}
-				}
+				} else this.mainPrompt = capture(record, 'content') ?? this.mainPrompt;
 				break;
 			case 'assistant.turn_start':
 				if (e.agentId) {
@@ -132,6 +174,9 @@ export class AgentModel {
 					run.hasActivity = true;
 					run.lastActivity = e.timestamp;
 					if (!isFinished(run) || run.status === 'replied') run.status = 'running';
+				} else {
+					const last = this.mainTurns.at(-1);
+					if (!last || last.end) this.mainTurns.push({start: e.timestamp});
 				}
 				break;
 			case 'assistant.message':
@@ -143,7 +188,10 @@ export class AgentModel {
 					if (d.phase !== 'thinking' && (!Array.isArray(requests) || requests.length === 0)) {
 						run.result = capture(record, 'content') ?? run.result;
 					}
+				} else if (d.phase !== 'thinking' && (!Array.isArray(d.toolRequests) || d.toolRequests.length === 0)) {
+					this.mainResult = capture(record, 'content') ?? this.mainResult;
 				}
+				if (!e.agentId) this.sessionModel = optionalString(d, 'model') ?? this.sessionModel;
 				break;
 			case 'assistant.turn_end':
 				if (e.agentId) {
@@ -153,6 +201,9 @@ export class AgentModel {
 						run.status = 'replied';
 						run.endedAt = e.timestamp;
 					}
+				} else {
+					const last = this.mainTurns.at(-1);
+					if (last && !last.end) last.end = e.timestamp;
 				}
 				break;
 			case 'session.task_complete':
@@ -165,7 +216,7 @@ export class AgentModel {
 				}
 				break;
 			case 'tool.execution_start':
-				this.toolStart(e);
+				this.toolStart(record);
 				break;
 			case 'tool.execution_complete':
 				this.toolComplete(record);
@@ -184,54 +235,11 @@ export class AgentModel {
 		return run.status;
 	}
 
-	tree(filter: Filter, collapsed: ReadonlySet<string>): TreeRow[] {
-		const included = new Set<string>();
-		for (const run of this.runs.values()) {
-			if (filter === 'all' || (filter === 'finished' ? isFinished(run) : !isFinished(run))) {
-				let node: AgentRun | undefined = run;
-				const ancestors = new Set<string>();
-				while (node && !ancestors.has(node.id)) {
-					ancestors.add(node.id);
-					included.add(node.id);
-					node = node.parentRunId ? this.runs.get(node.parentRunId) : undefined;
-				}
-			}
-		}
-		const children = new Map<string, AgentRun[]>();
-		const roots: AgentRun[] = [];
-		for (const run of this.runs.values()) {
-			if (!included.has(run.id)) continue;
-			if (run.parentRunId && this.runs.has(run.parentRunId)) {
-				const list = children.get(run.parentRunId) ?? [];
-				list.push(run);
-				children.set(run.parentRunId, list);
-			} else roots.push(run);
-		}
-		const rows: TreeRow[] = [];
-		const visited = new Set<string>();
-		const visit = (run: AgentRun, depth: number, unresolved = false): void => {
-			if (visited.has(run.id)) return;
-			visited.add(run.id);
-			const descendants = children.get(run.id) ?? [];
-			rows.push({
-				run, depth, hasChildren: descendants.length > 0,
-				unresolvedParent: unresolved || run.parentRunId === undefined
-					|| Boolean(run.parentRunId && !this.runs.has(run.parentRunId)),
-			});
-			if (!collapsed.has(run.id)) for (const child of descendants) visit(child, depth + 1);
-		};
-		for (const root of roots) visit(root, 0);
-		const reachable = new Set<string>();
-		const mark = (id: string): void => {
-			if (reachable.has(id)) return;
-			reachable.add(id);
-			for (const child of children.get(id) ?? []) mark(child.id);
-		};
-		for (const root of roots) mark(root.id);
-		for (const run of this.runs.values()) {
-			if (included.has(run.id) && !reachable.has(run.id) && !visited.has(run.id)) visit(run, 0, true);
-		}
-		return rows;
+	mainStatus(): 'running' | 'waiting' | 'idle' | 'ended' {
+		if (this.sessionEnded) return 'ended';
+		const last = this.mainTurns.at(-1);
+		if (!last || last.end) return 'idle';
+		return [...this.waits.values()].some(edge => edge.fromRunId === null) ? 'waiting' : 'running';
 	}
 
 	private create(e: SessionEvent, id: string, agentId: string): AgentRun {
@@ -271,6 +279,8 @@ export class AgentModel {
 		const run = this.forLaunch(e, callId);
 		run.name = requiredString(e.data, 'agentDisplayName');
 		run.task = optionalString(e.data, 'agentDescription') ?? 'Task not recorded';
+		run.agentType = optionalString(e.data, 'agentName') ?? run.agentType;
+		if (e.data.executionMode === 'sync' || e.data.executionMode === 'background') run.mode = e.data.executionMode;
 		run.model = optionalString(e.data, 'model') ?? run.model;
 		run.startedAt = e.timestamp;
 		if (run.status === 'unknown') run.status = 'running';
@@ -288,17 +298,21 @@ export class AgentModel {
 		}
 		run.parentRunId = call.ownerRunId;
 		run.parentAgentId = call.ownerAgentId;
-		if (synchronous && !call.complete) {
-			this.waits.set(run.launchCallId!, {
-				callId: run.launchCallId!, fromRunId: call.ownerRunId, toAgentId: run.agentId, kind: 'sync-call',
-			});
+		run.mode ??= synchronous ? 'sync' : 'background';
+		run.prompt ??= call.prompt;
+		if (synchronous) {
+			const edge: WaitEdge = {
+				callId: run.launchCallId!, fromRunId: call.ownerRunId, toAgentId: run.agentId, toRunId: run.id,
+				kind: 'sync-call', start: call.startedAt, end: call.completedAt,
+			};
+			this.waitLog.set(edge.callId, edge);
+			if (!call.complete) this.waits.set(edge.callId, edge);
 		}
 	}
 
-	private toolStart(e: SessionEvent): void {
+	private toolStart(record: EventRecord): void {
+		const e = record.event;
 		const name = requiredString(e.data, 'toolName');
-		const relevant = e.agentId || name === 'task' || name === 'read_agent';
-		if (!relevant) return;
 		const id = requiredString(e.data, 'toolCallId');
 		const args = isObject(e.data.arguments) ? e.data.arguments : {};
 		const owner = e.agentId ? this.current(e) : undefined;
@@ -306,20 +320,27 @@ export class AgentModel {
 			ownerAgentId: e.agentId, ownerRunId: owner?.id ?? null,
 			name, task: optionalString(args, 'description'), background: args.mode === 'background',
 			targetAgentId: optionalString(args, 'agent_id'), wait: args.wait === true, complete: false,
+			startedAt: e.timestamp, prompt: name === 'task' ? capture(record, 'prompt') : undefined,
 		};
+		call.activity = {id, name, status: 'running', startedAt: e.timestamp, detail: toolDetail(args)};
 		if (owner) {
 			owner.hasActivity = true;
 			owner.lastActivity = e.timestamp;
-			call.activity = {id, name, status: 'running'};
 			owner.tools.push(call.activity);
+		} else {
+			this.mainTools.push(call.activity);
+			if (this.mainTools.length > MAIN_TOOL_LIMIT) this.mainTools.shift();
 		}
 		this.calls.set(id, call);
 		const run = this.launches.get(id);
 		if (run && name === 'task') this.link(run, call, !call.background);
 		if (name === 'read_agent' && call.wait && call.targetAgentId) {
-			this.waits.set(id, {
-				callId: id, fromRunId: call.ownerRunId, toAgentId: call.targetAgentId, kind: 'wait',
-			});
+			const edge: WaitEdge = {
+				callId: id, fromRunId: call.ownerRunId, toAgentId: call.targetAgentId,
+				toRunId: this.latest.get(call.targetAgentId)?.id, kind: 'wait', start: e.timestamp,
+			};
+			this.waits.set(id, edge);
+			this.waitLog.set(id, edge);
 		}
 	}
 
@@ -330,9 +351,13 @@ export class AgentModel {
 		if (!call) return;
 		if (typeof d.success !== 'boolean') throw new Error('Tool completion lacks boolean success');
 		call.complete = true;
+		call.completedAt = record.event.timestamp;
 		this.waits.delete(id);
+		const edge = this.waitLog.get(id);
+		if (edge) edge.end = record.event.timestamp;
 		if (call.activity) {
 			call.activity.status = d.success ? 'succeeded' : 'failed';
+			call.activity.endedAt = record.event.timestamp;
 			call.activity.output = capture(record, d.success ? 'result' : 'error') ?? capture(record, 'result');
 		}
 	}
@@ -340,4 +365,17 @@ export class AgentModel {
 
 function eAsObject(e: SessionEvent): Record<string, unknown> {
 	return {agentId: e.agentId};
+}
+
+function firstLine(text: string | undefined): string | undefined {
+	const line = text?.split(/\r?\n/).find(part => part.trim());
+	return line?.trim();
+}
+
+function toolDetail(args: Record<string, unknown>): string | undefined {
+	for (const key of DETAIL_KEYS) {
+		const value = args[key];
+		if (typeof value === 'string' && value.trim()) return firstLine(value);
+	}
+	return undefined;
 }

@@ -20,7 +20,7 @@ export interface EventRecord {
 	location?: RecordLocation;
 }
 
-type TextField = 'content' | 'summary' | 'result' | 'error';
+type TextField = 'content' | 'summary' | 'result' | 'error' | 'prompt';
 
 export interface ContentRef {
 	eventId: string;
@@ -62,6 +62,10 @@ function decode(line: Buffer): SessionEvent {
 }
 
 function textAt(event: SessionEvent, field: TextField): string | undefined {
+	if (field === 'prompt') {
+		const args = event.data.arguments;
+		return isObject(args) && typeof args.prompt === 'string' ? args.prompt : undefined;
+	}
 	if (field === 'result') {
 		if (!isObject(event.data.result)) return undefined;
 		return optionalString(event.data.result, 'detailedContent')

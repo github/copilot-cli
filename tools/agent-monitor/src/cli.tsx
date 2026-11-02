@@ -4,32 +4,36 @@ import {parseArgs} from 'node:util';
 import {render} from 'ink';
 import {LiveApp} from './App.js';
 import {errorMessage} from './events.js';
+import {COLOR_MODES, isColorMode} from './theme.js';
 
 async function main(): Promise<void> {
 	const {values} = parseArgs({
 		options: {
 			session: {type: 'string'},
+			theme: {type: 'string', default: 'default'},
 			help: {type: 'boolean', short: 'h'},
 		},
 		strict: true,
 		allowPositionals: false,
 	});
 	if (values.help) {
-		console.log('Usage: agent-monitor --session <absolute-session-directory>\n'
+		console.log('Usage: agent-monitor --session <absolute-session-directory> [--theme <mode>]\n'
 			+ 'Read-only terminal viewer for that directory\'s events.jsonl.\n'
-			+ 'Keys: q quit, j/k select, h/l fold, f filter, Tab result/tools,\n'
-			+ '      [/] tool selection, PgUp/PgDn or Home/End scroll details.\n'
+			+ `Themes: ${COLOR_MODES.join(', ')} (default: default).\n`
+			+ 'Views: Graph (default) and Timeline; Tab switches.\n'
+			+ 'Keys: j/k select, f filter, t tools, PgUp/PgDn detail, +/- zoom and ←/→ pan (Timeline), q quit.\n'
 			+ 'No CLI configuration changes, network calls, or session writes.');
 		return;
 	}
 	if (!values.session) throw new Error('--session <directory> is required (see --help)');
+	if (!isColorMode(values.theme)) throw new Error(`--theme must be one of: ${COLOR_MODES.join(', ')}`);
 	if (!process.stdin.isTTY || !process.stdout.isTTY) {
 		throw new Error('An interactive terminal is required. Run this command in a separate terminal tab.');
 	}
 	let sourceError: string | undefined;
 	const onError = (message: string): void => { sourceError = message; };
 	const instance = render(
-		<LiveApp file={join(resolve(values.session), 'events.jsonl')} onError={onError}/>,
+		<LiveApp file={join(resolve(values.session), 'events.jsonl')} mode={values.theme} onError={onError}/>,
 		{alternateScreen: true, patchConsole: false},
 	);
 	const terminate = (): void => { instance.unmount(); };

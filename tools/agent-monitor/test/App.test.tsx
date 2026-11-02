@@ -13,92 +13,93 @@ const load = async (ref: ContentRef): Promise<string> => {
 	return ref.inline;
 };
 
+function modelOf(events = fixture()): AgentModel {
+	const model = new AgentModel();
+	for (const event of events) model.apply(event);
+	return model;
+}
+
+function mount(model: AgentModel, width = 120, height = 36) {
+	const clock = (): number => Date.parse(model.lastEventAt!) + 5000;
+	return render(<App model={model} loadContent={load} source="ended" clock={clock} width={width} height={height}/>);
+}
+
 async function frame(view: ReturnType<typeof render>, pattern: RegExp): Promise<string> {
 	for (let attempt = 0; attempt < 100; attempt++) {
-		const output = view.lastFrame() ?? '';
+		const output = stripVTControlCharacters(view.lastFrame() ?? '');
 		if (pattern.test(output)) return output;
 		await setTimeout(10);
 	}
-	assert.match(view.lastFrame() ?? '', pattern);
-	return view.lastFrame()!;
+	assert.match(stripVTControlCharacters(view.lastFrame() ?? ''), pattern);
+	return '';
 }
 
-test('completed results remain selectable and selected history survives new live agents', async t => {
-	const model = new AgentModel();
-	for (const event of fixture()) model.apply(event);
-	const view = render(<App model={model} loadContent={load} source="synthetic" width={110} height={38}/>);
+test('opens on the Graph tab, shows what the selected agent did, and keeps tool calls hidden until t', async t => {
+	const view = mount(modelOf());
 	t.after(() => view.cleanup());
-	await frame(view, /Parent result/);
+	let output = await frame(view, /Main session/);
+	assert.match(output, /Graph\s+Timeline/);
+	assert.match(output, /main session/);
+	for (const name of ['parent', 'child', 'control']) assert.match(output, new RegExp(name));
+	assert.match(output, /sync · waited/);
+	view.stdin.write('j');
+	output = await frame(view, /Parent result/);
+	assert.match(output, /Task for parent/);
+	assert.match(output, /Parent prompt/);
+	assert.match(output, /Relationships/);
+	assert.doesNotMatch(output, /Tools ·/);
+	view.stdin.write('t');
+	output = await frame(view, /Tools · 1/);
+	assert.match(output, /task/);
+	assert.doesNotMatch(output, /Relationships/);
+});
+
+test('Tab switches to Timeline swimlanes with an axis, lanes, recorded waits and the selected history', async t => {
+	const view = mount(modelOf());
+	t.after(() => view.cleanup());
+	await frame(view, /Main session/);
+	view.stdin.write('j');
 	view.stdin.write('j');
 	await frame(view, /Child result/);
 	view.stdin.write('\t');
-	await frame(view, /Tool 0\/0: none/);
-	view.stdin.write('\t');
-	await frame(view, /Child result/);
-	model.apply(record('tool.execution_start', {toolCallId: 'live', toolName: 'task', arguments: {mode: 'background'}}));
-	model.apply(start('live', 'live'));
-	view.rerender(<App model={model} revision={1} loadContent={load} source="synthetic" width={110} height={38}/>);
-	const output = await frame(view, /1 active\/unknown/);
+	const output = await frame(view, /waits for/);
+	assert.match(output, /Agent\s+Type/);
+	assert.match(output, /now/);
+	assert.match(output, /▾/);
 	assert.match(output, /Child result/);
-	assert.match(output, />\s+\. \[DONE\] worker/);
+	for (const name of ['main', 'parent', 'child', 'control']) assert.match(output, new RegExp(`${name}\\s`));
+	view.stdin.write('+');
+	await frame(view, / 2x /);
+});
+
+test('filtering keeps ancestors as context and narrow terminals show a resize message', async t => {
+	const view = mount(modelOf(fixture().slice(0, 15)));
+	t.after(() => view.cleanup());
+	await frame(view, /status: all/);
 	view.stdin.write('f');
-	await frame(view, /filter: active/);
-	assert.doesNotMatch(view.lastFrame()!, /\[DONE\]/);
-	view.stdin.write('f');
-	await frame(view, /filter: finished/);
-	assert.match(view.lastFrame()!, /\[DONE\]/);
+	const output = await frame(view, /status: active/);
+	assert.match(output, /parent/);
+	assert.doesNotMatch(output, /control/);
+	const small = mount(modelOf(), 70, 20);
+	t.after(() => small.cleanup());
+	await frame(small, /Terminal too small/);
 });
 
-test('folding, tool-result inspection, and narrow resize do not lose completed work', async t => {
-	const model = new AgentModel();
-	for (const event of fixture()) model.apply(event);
-	const view = render(<App model={model} loadContent={load} source="synthetic" width={100} height={38}/>);
+test('recorded control sequences are inert and long results scroll inside the inspector', async t => {
+	const model = modelOf([
+		record('session.start', {copilotVersion: '1.0.104', sessionId: 'scroll'}),
+		start('agent', 'agent'),
+		record('assistant.message', {content: '\u001b[2J' + Array.from({length: 40}, (_, i) => `RESULT-LINE-${i}`).join('\n')}, 'agent'),
+		record('subagent.completed', {toolCallId: 'agent'}, 'agent'),
+	]);
+	const view = mount(model);
 	t.after(() => view.cleanup());
-	await frame(view, /Parent result/);
-	view.stdin.write('h');
-	await frame(view, /> \+ \[DONE\]/);
-	assert.doesNotMatch(view.lastFrame()!, /Task for child/);
-	view.stdin.write('\t');
-	await frame(view, /Tool 1\/1: task/);
-	assert.match(view.lastFrame()!, /Child result/);
-	view.rerender(<App model={model} loadContent={load} source="synthetic" width={40} height={18}/>);
-	await setTimeout(50);
-	const output = stripVTControlCharacters(view.lastFrame()!);
-	assert.ok(output.split('\n').every(line => line.length <= 40));
-	view.stdin.write('\t');
-	await frame(view, /Result \|/);
-	view.stdin.write('\u001b[F');
-	await frame(view, /Parent result/);
-});
-
-test('recorded control sequences are inert and long results are scrollable', async t => {
-	const model = new AgentModel();
-	model.apply(start('agent', 'agent'));
-	model.apply(record('assistant.message', {
-		content: '\u001b[2J' + Array.from({length: 80}, (_, index) => `RESULT-LINE-${index}`).join('\n'),
-	}, 'agent'));
-	model.apply(record('subagent.completed', {toolCallId: 'agent'}, 'agent'));
-	const view = render(<App model={model} loadContent={load} source="synthetic" width={90} height={28}/>);
-	t.after(() => view.cleanup());
-	await frame(view, /RESULT-LINE-0/);
-	view.stdin.write('\u001b[F');
-	const output = await frame(view, /RESULT-LINE-79/);
-	assert.doesNotMatch(output, /\u001b\[2J/);
-	assert.doesNotMatch(output, /RESULT-LINE-0\n/);
-	view.stdin.write('\u001b[H');
-	await frame(view, /Task for agent/);
-});
-
-test('a live synchronous wait shows its target and disappears when the call returns', async t => {
-	const model = new AgentModel();
-	const records = fixture();
-	for (const event of records.slice(0, 10)) model.apply(event);
-	const view = render(<App model={model} loadContent={load} source="synthetic" width={110} height={38}/>);
-	t.after(() => view.cleanup());
-	await frame(view, /\[WAITING\] worker -> waits-for: child/);
-	for (const event of records.slice(10)) model.apply(event);
-	view.rerender(<App model={model} revision={1} loadContent={load} source="synthetic" width={110} height={38}/>);
-	await frame(view, /Parent result/);
-	assert.doesNotMatch(view.lastFrame()!, /waits-for: child/);
-	assert.match(view.lastFrame()!, /\[DONE\]/);
+	await frame(view, /Main session/);
+	view.stdin.write('j');
+	let output = await frame(view, /RESULT-LINE-0/);
+	assert.doesNotMatch(view.lastFrame() ?? '', /\u001b\[2J/);
+	assert.match(output, /lines 1-/);
+	view.stdin.write('\u001b[6~');
+	output = await frame(view, /RESULT-LINE-6\b/);
+	assert.doesNotMatch(output, /RESULT-LINE-0\b/);
 });

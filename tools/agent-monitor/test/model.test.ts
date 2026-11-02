@@ -59,17 +59,27 @@ test('event chain order is not dependency data; only explicit blocking waits cre
 	assert.equal(model.runs.size, 1);
 });
 
-test('filtering retains ancestor context, collapse hides descendants, and cyclic input cannot recurse forever', () => {
+test('waits keep recorded history; launch mode, agent type, prompts, follow-up links and main turns are tracked', () => {
 	const model = new AgentModel();
-	for (const event of fixture().slice(0, 12)) model.apply(event);
+	for (const event of fixture()) model.apply(event);
 	const parent = model.runs.get('launch:parent-call')!;
 	const child = model.runs.get('launch:child-call')!;
-	const finished = model.tree('finished', new Set());
-	assert.ok(finished.some(row => row.run === parent));
-	assert.ok(finished.some(row => row.run === child));
-	assert.ok(!model.tree('all', new Set([parent.id])).some(row => row.run === child));
-	parent.parentRunId = child.id;
-	assert.ok(model.tree('all', new Set()).some(row => row.unresolvedParent));
+	const followup = [...model.runs.values()].find(run => run.id.startsWith('message:'))!;
+	assert.equal(parent.mode, 'background');
+	assert.equal(child.mode, 'sync');
+	assert.equal(child.agentType, 'general-purpose');
+	assert.equal(parent.prompt?.inline, 'Parent prompt');
+	assert.equal(followup.previousRunId, 'launch:control-call');
+	assert.equal(followup.prompt?.inline, 'Follow-up task');
+	const wait = model.waitLog.get('child-call')!;
+	assert.equal(wait.fromRunId, parent.id);
+	assert.equal(wait.toRunId, child.id);
+	assert.ok(wait.end && Date.parse(wait.end) > Date.parse(wait.start));
+	assert.equal(model.waits.size, 0);
+	assert.equal(model.mainTurns.length, 1);
+	assert.ok(model.mainTurns[0]!.end);
+	assert.equal(model.mainStatus(), 'idle');
+	assert.equal(model.sessionModel, 'synthetic-model');
 });
 
 test('unsupported agent signals are diagnosed, not fabricated as completion or cancellation', () => {
