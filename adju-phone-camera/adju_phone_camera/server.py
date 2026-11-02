@@ -162,16 +162,20 @@ class CameraServer:
         await self._close_peer()
         peer = RTCPeerConnection(configuration=RTCConfiguration(iceServers=[]))
         self._peer_connection = peer
+        frame_received = False
 
         @peer.on("track")
         async def on_track(track) -> None:
+            nonlocal frame_received
             if track.kind != "video":
                 return
-            self.on_status("Receiving video")
             try:
                 while True:
                     frame = await track.recv()
                     image = frame.to_image().convert("RGB")
+                    if not frame_received:
+                        frame_received = True
+                        self.on_status("Receiving video")
                     self.on_frame(image)
             except Exception:
                 LOGGER.info("Phone video track ended")
@@ -180,7 +184,7 @@ class CameraServer:
         async def on_connection_state_change() -> None:
             state = peer.connectionState
             if state == "connected":
-                self.on_status("Receiving video")
+                self.on_status("Receiving video" if frame_received else "WebRTC connected — waiting for video frames")
             elif state in ("failed", "closed", "disconnected"):
                 self.on_status(f"WebRTC {state}")
 

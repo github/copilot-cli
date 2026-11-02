@@ -57,6 +57,8 @@ New-NetFirewallRule -DisplayName "ADJU PHONE CAMERA WebRTC" -Direction Inbound -
 
 Replace the executable with the packaged app path when using the PyInstaller build, and adjust both TCP ports if you chose a different port. Remove these named rules when you no longer need them. This app deliberately has no TURN relay fallback. Do not disable the firewall globally. Guest Wi-Fi, client/AP isolation, VPN policy, or restrictive router/firewall rules may block the phone-to-PC connection. Both devices must be on a network that permits peer-to-peer LAN traffic.
 
+If the phone shows its camera preview but reports that it is still connecting, the camera permission and local capture have succeeded; the direct WebRTC video path is still negotiating. The PC shows **Phone paired** after PIN authentication and changes to **Receiving video** only after a frame arrives. If it stays at **Phone paired** or shows **WebRTC failed**, confirm the PC's Private-network UDP firewall rule, that the phone is not on guest Wi-Fi, and that both devices are still on the same local network. The phone's “answer received” status means signaling succeeded, not that video is already flowing.
+
 ## Build a Windows executable
 
 From this directory with the virtual environment active:

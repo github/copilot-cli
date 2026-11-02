@@ -46,7 +46,7 @@ function connect() {
         setStatus("Phone paired. Camera remains off until you start it.");
       } else if (message.type === "answer" && peer) {
         await peer.setRemoteDescription({ type: "answer", sdp: message.sdp });
-        setStatus("Camera connected to PC.");
+        setStatus("Answer received. Connecting direct video to the PC…");
       } else if (message.type === "stopped") {
         await closeCamera(false);
         setStatus("Camera stopped. You can start it again when ready.");
@@ -107,8 +107,17 @@ startButton.addEventListener("click", async () => {
     peer = new RTCPeerConnection({ iceServers: [] });
     for (const track of stream.getTracks()) peer.addTrack(track, stream);
     peer.addEventListener("connectionstatechange", () => {
-      if (peer && peer.connectionState === "failed") {
-        setStatus("WebRTC connection failed. Check that the phones share Wi-Fi and UDP is allowed.");
+      if (!peer) return;
+      if (peer.connectionState === "connected") {
+        setStatus("Direct video link connected. Waiting for frames at the PC…");
+      } else if (peer.connectionState === "connecting") {
+        setStatus("Negotiating direct Wi-Fi video…");
+      } else if (peer.connectionState === "disconnected") {
+        setStatus("Direct video link interrupted. Checking the connection…");
+      } else if (peer.connectionState === "failed") {
+        setStatus("Direct video link failed. Check same Wi-Fi and allow UDP through the PC firewall.");
+      } else if (peer.connectionState === "closed") {
+        setStatus("Video connection closed.");
       }
     });
     const offer = await peer.createOffer();

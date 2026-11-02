@@ -107,6 +107,11 @@ def create_local_certificate(directory: Path, lan_ip: str) -> LocalCertificate:
     server_key = ec.generate_private_key(ec.SECP256R1())
     now = datetime.now(timezone.utc)
     subject = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, str(address))])
+    subject_alt_names = [
+        x509.IPAddress(address),
+        x509.IPAddress(ipaddress.ip_address("127.0.0.1")),
+        x509.DNSName("localhost"),
+    ]
     certificate = (
         x509.CertificateBuilder()
         .subject_name(subject)
@@ -116,13 +121,7 @@ def create_local_certificate(directory: Path, lan_ip: str) -> LocalCertificate:
         .not_valid_before(now - timedelta(minutes=5))
         .not_valid_after(now + timedelta(days=90))
         .add_extension(
-            x509.SubjectAlternativeName(
-                [
-                    x509.IPAddress(address),
-                    x509.IPAddress(ipaddress.ip_address("127.0.0.1")),
-                    x509.DNSName("localhost"),
-                ]
-            ),
+            x509.SubjectAlternativeName(subject_alt_names),
             critical=False,
         )
         .add_extension(
@@ -144,6 +143,8 @@ def create_local_certificate(directory: Path, lan_ip: str) -> LocalCertificate:
 
     ca_download = directory / "phone-trust.cer"
     ca_download.write_bytes(ca_certificate.public_bytes(serialization.Encoding.DER))
+    fingerprint = ca_certificate.fingerprint(hashes.SHA256()).hex().upper()
+    fingerprint = ":".join(fingerprint[index : index + 2] for index in range(0, len(fingerprint), 2))
     fingerprint = ca_certificate.fingerprint(hashes.SHA256()).hex().upper()
     fingerprint = ":".join(fingerprint[index : index + 2] for index in range(0, len(fingerprint), 2))
     return LocalCertificate(
