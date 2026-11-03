@@ -32,10 +32,35 @@ records. The directory can also belong to a historical session. There is no
 automatic scan of other sessions.
 
 For development, use `npm start -- --session "<absolute-session-directory>"`.
-Use `node .\dist\cli.js --help` for command-line help. Add `--theme <mode>` to
+Use `node .\dist\cli.js --help` for command-line help. Add `--view timeline` to
+open on the Timeline. Add `--theme <mode>` to
 match the Copilot CLI `/theme` color mode: `default`, `light`, `dim`,
 `high-contrast`, or `colorblind` (Primer semantic colors; needs a truecolor
 terminal such as Windows Terminal). Minimum size: 80×24.
+
+## Open it from Copilot CLI (experimental)
+
+[`extension/`](extension/extension.mjs) is a
+[Copilot CLI extension](https://docs.github.com/en/copilot/tutorials/create-an-extension)
+that adds an `/agent-monitor` command to the session you are working in:
+
+- `/agent-monitor` prints the session's agent tree in the conversation and opens
+  the Graph view beside the CLI.
+- `/agent-monitor timeline` does the same with the Timeline view.
+- `/agent-monitor text` only prints the tree.
+
+The interactive view opens as a Windows Terminal split pane (or a tmux split);
+in other terminals the command prints the line to run in another tab.
+Extensions are an experimental Copilot CLI feature. After `npm run build`, link
+this folder into your Copilot home once:
+
+```powershell
+New-Item -ItemType Junction -Path "$HOME\.copilot\extensions\agent-monitor" -Target "$PWD\extension"
+```
+
+Then start Copilot CLI with `--experimental` (or run `/experimental on`) and use
+`/agent-monitor`. Remove the junction to uninstall. Copilot CLI has no extension
+API for adding tabs to its own tab bar, so the views open beside it.
 
 ## Views and keys
 
@@ -67,7 +92,7 @@ is loaded from the selected log on demand rather than copied to a new database.
 | `g` / `G` | Select the first/last execution |
 | Left/Right or `h`/`l` | Graph: previous/next sibling. Timeline: pan earlier/later |
 | `+` / `-` | Timeline: zoom in/out (beyond the agent window up to the whole session) |
-| Tab | Switch between Graph and Timeline |
+| Tab or `v` | Switch between Graph and Timeline |
 | `f` | Cycle all, active, finished; ancestors remain as dimmed context |
 | `t` | Show tool calls in the detail dialog instead of relationships (below 100 columns: instead of the message) |
 | Page Up / Page Down | Scroll the selected result |
@@ -89,8 +114,9 @@ check; silence or end-of-file does not prove that an agent is dead or finished.
 
 ## Relationships and compatibility
 
-Initial compatibility was verified against Copilot CLI **1.0.104**, using a local
-parallel/nested-agent trace and a same-agent follow-up. The on-disk event format
+Compatibility was verified against Copilot CLI **1.0.104** and **1.0.105**, using
+a local parallel/nested-agent trace, a same-agent follow-up, and a replay of local
+session logs. The on-disk event format
 is version-sensitive, not a supported stable public attachment API. Other CLI
 versions display a compatibility warning; malformed or unsupported relevant
 records produce explicit diagnostics rather than fabricated results.
@@ -134,4 +160,5 @@ Tests use synthetic records and temporary files, covering replay/tailing,
 UTF-8 boundaries, source reset, agent/result attribution, lifecycle routing and
 cancellation, session resume, recorded wait history, reused agents and later
 turns, graph layout and scrolling, the Graph/Timeline views, filtering,
-hidden-by-default tool calls, narrow terminals, and result scrolling.
+hidden-by-default tool calls, narrow terminals, result scrolling, and the
+text summary printed by the extension.

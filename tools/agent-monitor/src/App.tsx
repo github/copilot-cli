@@ -2,7 +2,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {Box, Text, useApp, useInput, useWindowSize} from 'ink';
 import type {Key} from 'ink';
 import {drawChrome, drawInspector, frameLayout, promptRef, resultRef} from './chrome.js';
-import type {DetailTexts, Frame, ViewState} from './chrome.js';
+import type {DetailTexts, Frame, ViewName, ViewState} from './chrome.js';
 import {errorMessage, JsonlReader} from './events.js';
 import type {ContentRef} from './events.js';
 import {drawGraph} from './graph.js';
@@ -25,18 +25,19 @@ interface AppProps {
 	source?: Frame['source'];
 	diagnostic?: string;
 	mode?: ColorMode;
+	view?: ViewName;
 	width?: number;
 	height?: number;
 	clock?: () => number;
 }
 
-export function App({model, loadContent, source = 'following', diagnostic, mode = 'default', width, height, clock = Date.now}: AppProps) {
+export function App({model, loadContent, source = 'following', diagnostic, mode = 'default', view = 'graph', width, height, clock = Date.now}: AppProps) {
 	const size = useWindowSize();
 	const {exit} = useApp();
 	const cols = width ?? size.columns;
 	const rows = height ?? size.rows;
 	const state = useRef<ViewState>({
-		view: 'graph', filter: 'all', selectedId: MAIN, showTools: false, zoom: 1, pan: 0, detailScroll: 0, graphX: 0, graphY: 0, laneTop: 0, span: 0,
+		view, filter: 'all', selectedId: MAIN, showTools: false, zoom: 1, pan: 0, detailScroll: 0, graphX: 0, graphY: 0, laneTop: 0, span: 0,
 	}).current;
 	const [, setTick] = useState(0);
 	const [spin, setSpin] = useState(0);
@@ -98,7 +99,7 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 		const sibling = siblings.indexOf(selected);
 		const pageStep = Math.max(1, frameLayout(cols, rows).box.h - 6);
 		const panStep = Math.max(1, (state.span || now) / 4);
-		if (key.tab) state.view = state.view === 'graph' ? 'timeline' : 'graph';
+		if (key.tab || input === 'v') state.view = state.view === 'graph' ? 'timeline' : 'graph';
 		else if (input === 'j' || key.downArrow) select(index + 1);
 		else if (input === 'k' || key.upArrow) select(index - 1);
 		else if (input === 'g' || key.home) select(0);
@@ -170,7 +171,7 @@ function clamp(value: number, lo: number, hi: number): number {
 	return Math.max(lo, Math.min(hi, value));
 }
 
-export function LiveApp({file, mode, onError}: {file: string; mode: ColorMode; onError: (message: string) => void}) {
+export function LiveApp({file, mode, view, onError}: {file: string; mode: ColorMode; view?: ViewName; onError: (message: string) => void}) {
 	const reader = useMemo(() => new JsonlReader(file), [file]);
 	const model = useMemo(() => new AgentModel(), [file]);
 	const [revision, setRevision] = useState(0);
@@ -204,5 +205,5 @@ export function LiveApp({file, mode, onError}: {file: string; mode: ColorMode; o
 		};
 	}, [reader, model, onError]);
 	const source = stopped ? 'stopped' : model.sessionEnded ? 'ended' : 'following';
-	return <App model={model} revision={revision} loadContent={loadContent} source={source} diagnostic={diagnostic} mode={mode}/>;
+	return <App model={model} revision={revision} loadContent={loadContent} source={source} diagnostic={diagnostic} mode={mode} view={view}/>;
 }

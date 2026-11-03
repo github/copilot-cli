@@ -67,6 +67,8 @@ export interface MainTurn {
 }
 
 const MAIN_TOOL_LIMIT = 200;
+/** CLI versions whose session logs this model was checked against. */
+const TESTED_VERSIONS = ['1.0.104', '1.0.105'];
 const DETAIL_KEYS = ['path', 'pattern', 'command', 'query', 'url', 'name', 'agent_id', 'description'];
 
 export const isFinished = (run: AgentRun): boolean =>
@@ -139,7 +141,7 @@ export class AgentModel {
 				this.sessionId = optionalString(d, 'sessionId');
 				this.sessionModel = optionalString(d, 'selectedModel');
 				this.sessionStart = e.timestamp;
-				if (this.version !== '1.0.104') this.warnings.add(`Untested CLI event format: ${this.version ?? 'unknown'}`);
+				if (!TESTED_VERSIONS.includes(this.version ?? '')) this.warnings.add(`Untested CLI event format: ${this.version ?? 'unknown'}`);
 				break;
 			case 'session.shutdown': {
 				this.sessionEnded = e.timestamp;
