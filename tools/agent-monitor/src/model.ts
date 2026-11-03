@@ -86,6 +86,8 @@ export class AgentModel {
 	readonly mainTurns: MainTurn[] = [];
 	readonly mainTools: ToolActivity[] = [];
 	mainToolCount = 0;
+	/** Counts `reset()` calls, so views can tell a rebuilt source from the one they last displayed. */
+	epoch = 0;
 	version?: string;
 	sessionId?: string;
 	sessionModel?: string;
@@ -101,6 +103,7 @@ export class AgentModel {
 	private readonly repliedThisTurn = new Set<string>();
 
 	reset(): void {
+		this.epoch++;
 		this.runs.clear();
 		this.warnings.clear();
 		this.waits.clear();
@@ -138,9 +141,13 @@ export class AgentModel {
 				this.sessionStart = e.timestamp;
 				if (this.version !== '1.0.104') this.warnings.add(`Untested CLI event format: ${this.version ?? 'unknown'}`);
 				break;
-			case 'session.shutdown':
+			case 'session.shutdown': {
 				this.sessionEnded = e.timestamp;
+				// Work after a later resume starts a new span instead of painting the offline gap as activity.
+				const last = this.mainTurns.at(-1);
+				if (last && !last.end) last.end = e.timestamp;
 				break;
+			}
 			case 'session.resume':
 				this.sessionEnded = undefined;
 				break;
@@ -165,6 +172,8 @@ export class AgentModel {
 				if (e.agentId) {
 					const current = this.latest.get(e.agentId);
 					if (!current || isFinished(current) || (current.hasActivity && d.delivery === 'idle')) {
+						// An idle delivery means the previous execution's turn is over; its outcome was not recorded.
+						if (current && !isFinished(current)) current.status = 'unknown';
 						const run = this.create(e, `message:${e.id}`, e.agentId);
 						run.name = current?.name ?? run.name;
 						run.agentType = current?.agentType;
@@ -256,9 +265,9 @@ export class AgentModel {
 
 	mainStatus(): 'running' | 'waiting' | 'idle' | 'ended' {
 		if (this.sessionEnded) return 'ended';
+		if ([...this.waits.values()].some(edge => edge.fromRunId === null)) return 'waiting';
 		const last = this.mainTurns.at(-1);
-		if (!last || last.end) return 'idle';
-		return [...this.waits.values()].some(edge => edge.fromRunId === null) ? 'waiting' : 'running';
+		return !last || last.end ? 'idle' : 'running';
 	}
 
 	private create(e: SessionEvent, id: string, agentId: string): AgentRun {
@@ -267,6 +276,10 @@ export class AgentModel {
 			lastActivity: e.timestamp, tools: [], hasActivity: false,
 		};
 		this.runs.set(id, run);
+		// Blocking reads recorded before any execution of this agent was known waited on its first execution.
+		if (!this.latest.has(agentId)) {
+			for (const edge of this.waitLog.values()) if (edge.toAgentId === agentId && !edge.toRunId) edge.toRunId = id;
+		}
 		this.latest.set(agentId, run);
 		return run;
 	}

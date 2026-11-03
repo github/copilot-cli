@@ -4,6 +4,7 @@ import {parseArgs} from 'node:util';
 import {render} from 'ink';
 import {LiveApp} from './App.js';
 import {errorMessage} from './events.js';
+import {clean} from './screen.js';
 import {COLOR_MODES, isColorMode} from './theme.js';
 
 async function main(): Promise<void> {
@@ -48,6 +49,7 @@ async function main(): Promise<void> {
 }
 
 void main().catch(error => {
-	console.error(`agent-monitor: ${errorMessage(error)}`);
+	// Source errors can quote log content; strip control sequences before they reach the restored terminal.
+	console.error(`agent-monitor: ${clean(errorMessage(error))}`);
 	process.exitCode = 1;
 });

@@ -7,7 +7,8 @@ import type {Node, Visual} from './tree.js';
 import type {Tone} from './theme.js';
 
 const MUTED: Style = {fg: 'muted'};
-const STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600, 7200, 14400];
+const DAY = 86400;
+const STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 21600, 43200, DAY];
 const BAR: Record<Visual, Tone> = {
 	running: 'accent', waiting: 'accent', done: 'success', failed: 'danger', cancelled: 'muted', replied: 'done',
 	idle: 'muted', ended: 'muted', unknown: 'muted',
@@ -15,8 +16,9 @@ const BAR: Record<Visual, Tone> = {
 const END_MARKS: Visual[] = ['failed', 'cancelled', 'replied'];
 const clamp = (value: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, value));
 
+/** Tick spacing of at least `raw` seconds; beyond a day it grows in whole days so long windows keep few ticks. */
 export function niceStep(raw: number): number {
-	return STEPS.find(step => step >= raw) ?? STEPS.at(-1)!;
+	return STEPS.find(step => step >= raw) ?? Math.ceil(raw / DAY) * DAY;
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0');
@@ -31,7 +33,7 @@ export function tickLabel(seconds: number, step = 60): string {
 		return h ? `${h}:${pad2(m)}:${pad2(s)}` : `${m}:${pad2(s)}`;
 	}
 	if (step < 3600) return h ? `${h}h${pad2(m)}` : `${m}m`;
-	return `${h}h`;
+	return step < DAY ? `${h}h` : `${Math.floor(seconds / DAY)}d`;
 }
 
 const TYPE_SHORT: Record<string, string> = {'general-purpose': 'general'};

@@ -139,14 +139,38 @@ test('tool arguments of unexpected types are ignored instead of stopping the vie
 	assert.equal(model.waits.size, 0);
 });
 
-test('a resumed session is live again after a shutdown', () => {
+test('a resumed session is live again after a shutdown, and the offline gap is not main-session activity', () => {
 	const model = new AgentModel();
 	model.apply(record('session.start', {copilotVersion: '1.0.104', sessionId: 'resume'}));
-	model.apply(record('session.shutdown', {}));
+	model.apply(record('assistant.turn_start', {turnId: '0'}));
+	const shutdown = record('session.shutdown', {});
+	model.apply(shutdown);
 	assert.equal(model.mainStatus(), 'ended');
 	model.apply(record('session.resume', {}));
 	model.apply(record('assistant.turn_start', {turnId: '0'}));
 	assert.equal(model.mainStatus(), 'running');
+	assert.deepEqual(model.mainTurns.map(turn => turn.end), [shutdown.event.timestamp, undefined]);
+});
+
+test('an execution left open by an idle follow-up becomes unknown instead of running forever', () => {
+	const model = new AgentModel();
+	model.apply(start('call', 'a'));
+	model.apply(record('assistant.turn_start', {turnId: '0'}, 'a'));
+	model.apply(record('assistant.message', {content: 'Still checking', phase: 'commentary'}, 'a'));
+	model.apply(record('assistant.turn_end', {turnId: '0'}, 'a'));
+	model.apply(record('user.message', {content: 'Next step', delivery: 'idle'}, 'a'));
+	model.apply(record('subagent.completed', {toolCallId: 'call'}, 'a'));
+	const [first, followup] = [...model.runs.values()];
+	assert.equal(first!.status, 'unknown');
+	assert.equal(followup!.status, 'completed');
+});
+
+test('a blocking read recorded before its target is known marks main waiting and attaches to that first execution', () => {
+	const model = new AgentModel();
+	model.apply(record('tool.execution_start', {toolCallId: 'wait', toolName: 'read_agent', arguments: {agent_id: 'b', wait: true}}));
+	assert.equal(model.mainStatus(), 'waiting');
+	model.apply(start('b-call', 'b'));
+	assert.equal(model.waitLog.get('wait')?.toRunId, 'launch:b-call');
 });
 
 test('reset clears session state so a rewritten log replays from scratch', () => {

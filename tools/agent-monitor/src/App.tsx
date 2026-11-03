@@ -47,21 +47,23 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 	const result = resultRef(model, node);
 	const prompt = promptRef(model, node);
 	const refKey = (ref: ContentRef | undefined): string => ref ? `${ref.eventId}:${ref.field}:${ref.location?.generation ?? ''}` : '';
-	const textKey = `${node.id}|${refKey(result)}|${refKey(prompt)}`;
-	const [loaded, setLoaded] = useState<{key: string; nodeId: string; texts: DetailTexts}>({key: '', nodeId: '', texts: {pending: false}});
+	// Loaded text is only reused for the same execution of the same source: a replaced log reuses execution IDs.
+	const nodeKey = `${model.epoch}|${node.id}`;
+	const textKey = `${nodeKey}|${refKey(result)}|${refKey(prompt)}`;
+	const [loaded, setLoaded] = useState<{nodeKey: string; texts: DetailTexts}>({nodeKey: '', texts: {pending: false}});
 
 	useEffect(() => {
 		let cancelled = false;
 		void Promise.allSettled([result ? loadContent(result) : undefined, prompt ? loadContent(prompt) : undefined]).then(([r, p]) => {
 			if (cancelled) return;
 			setLoaded({
-				key: textKey,
-				nodeId: node.id,
+				nodeKey,
 				texts: {
 					pending: false,
 					result: r.status === 'fulfilled' ? r.value : undefined,
 					error: r.status === 'rejected' ? errorMessage(r.reason) : undefined,
 					prompt: p.status === 'fulfilled' ? p.value : undefined,
+					promptError: p.status === 'rejected' ? errorMessage(p.reason) : undefined,
 				},
 			});
 		});
@@ -135,11 +137,12 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 		return <Text>{`Terminal too small for the agent monitor (need ${MIN_COLS}x${MIN_ROWS}, have ${cols}x${rows}). q: quit`}</Text>;
 	}
 	// A running agent's latest message changes often; keep showing its previous text until the new one is read.
-	const texts: DetailTexts = loaded.key === textKey || loaded.nodeId === node.id ? loaded.texts : {pending: Boolean(result || prompt)};
-	const warnings = [...model.warnings].join('; ');
+	const texts: DetailTexts = loaded.nodeKey === nodeKey ? loaded.texts : {pending: Boolean(result || prompt)};
+	const warnings = [...model.warnings].join('; ') || undefined;
 	const frame: Frame = {
 		model, state, tree, now, spin, cols, rows, source, texts,
-		diagnostic: diagnostic ?? (warnings || undefined),
+		// A stopped source's error comes first; current warnings outrank an informational notice such as a reset.
+		diagnostic: source === 'stopped' ? diagnostic ?? warnings : warnings ?? diagnostic,
 	};
 	const layout = frameLayout(cols, rows);
 	const screen = new Screen(cols, rows);

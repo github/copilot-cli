@@ -4,7 +4,7 @@ import {stripVTControlCharacters} from 'node:util';
 import {test} from 'node:test';
 import {render} from 'ink-testing-library';
 import {App} from '../src/App.js';
-import type {ContentRef} from '../src/events.js';
+import type {ContentRef, EventRecord} from '../src/events.js';
 import {AgentModel} from '../src/model.js';
 import {fixture, record, start} from './fixture.js';
 
@@ -93,10 +93,13 @@ test('filtering keeps ancestors as context and narrow terminals show a resize me
 	await frame(small, /Terminal too small/);
 });
 
-test('recorded control sequences are inert and long results scroll inside the inspector', async t => {
+test('recorded control sequences are inert in every field and long results scroll inside the inspector', async t => {
 	const model = modelOf([
 		record('session.start', {copilotVersion: '1.0.104', sessionId: 'scroll'}),
-		start('agent', 'agent'),
+		record('subagent.started', {
+			toolCallId: 'agent', agentName: 'general-purpose', agentDisplayName: '\u001b[31mred-agent\u001b[0m',
+			agentDescription: 'Task \u001b[1mbold\u001b[0m', executionMode: 'background',
+		}, 'agent'),
 		record('assistant.message', {content: '\u001b[2J' + Array.from({length: 40}, (_, i) => `RESULT-LINE-${i}`).join('\n')}, 'agent'),
 		record('subagent.completed', {toolCallId: 'agent'}, 'agent'),
 	]);
@@ -105,7 +108,9 @@ test('recorded control sequences are inert and long results scroll inside the in
 	await frame(view, /Main session/);
 	view.stdin.write('j');
 	let output = await frame(view, /RESULT-LINE-0/);
-	assert.doesNotMatch(output, /\[2J/);
+	assert.match(output, /red-agent/);
+	assert.match(output, /Task bold/);
+	assert.doesNotMatch(output, /\[(2J|31m|1m|0m)/);
 	assert.match(output, /lines 1-/);
 	view.stdin.write('\u001b[6~');
 	output = await frame(view, /RESULT-LINE-6\b/);
@@ -164,6 +169,46 @@ test('keys that arrive in one input chunk are each applied', async t => {
 	await frame(view, /Main session/);
 	view.stdin.write('jj');
 	await frame(view, /Child result/);
+});
+
+test('read failures for the prompt and the result are reported inside the message column', async t => {
+	const failing = async (): Promise<string> => { throw new Error(`disk read failed ${'x'.repeat(120)}`); };
+	const model = modelOf();
+	const clock = (): number => Date.parse(model.lastEventAt!) + 5000;
+	const view = render(<App model={model} loadContent={failing} source="ended" clock={clock} width={120} height={36}/>);
+	t.after(() => view.cleanup());
+	await frame(view, /Main session/);
+	view.stdin.write('j');
+	const output = await frame(view, /Task  Cannot read recorded prompt: disk read failed/);
+	const error = output.split('\n').find(line => line.includes('Cannot read recorded text'));
+	assert.match(error ?? '', /Cannot read recorded text: disk read failed\s+│.*│/);
+});
+
+test('current warnings outrank an informational source notice', async t => {
+	const model = modelOf([record('session.start', {copilotVersion: '9.9.9', sessionId: 'notice'})]);
+	const clock = (): number => Date.parse(model.lastEventAt!) + 5000;
+	const notice = 'Session log was replaced/truncated; view rebuilt from the new source.';
+	const view = render(<App model={model} loadContent={load} source="following" diagnostic={notice} clock={clock} width={120} height={36}/>);
+	t.after(() => view.cleanup());
+	await frame(view, /Untested CLI event format: 9\.9\.9/);
+});
+
+test('text read from a replaced source is not shown for the rebuilt view', async t => {
+	const rebuilt = (): EventRecord[] => fixture().map(item => item.event.data.content === 'Parent result'
+		? {event: {...item.event, data: {...item.event.data, content: 'Rebuilt result'}}} : item);
+	const loadContent = (ref: ContentRef): Promise<string> => ref.inline === 'Rebuilt result' ? new Promise<string>(() => {}) : load(ref);
+	const model = modelOf();
+	const clock = (): number => Date.parse(model.lastEventAt!) + 5000;
+	const app = (revision: number) => <App model={model} revision={revision} loadContent={loadContent} source="following" clock={clock} width={120} height={36}/>;
+	const view = render(app(0));
+	t.after(() => view.cleanup());
+	await frame(view, /Main session/);
+	view.stdin.write('j');
+	await frame(view, /Parent result/);
+	model.reset();
+	for (const event of rebuilt()) model.apply(event);
+	view.rerender(app(1));
+	assert.doesNotMatch(await frame(view, /Loading recorded text/), /Parent result/);
 });
 
 test('a slow text load for an earlier selection does not replace the current one', async t => {

@@ -28,25 +28,29 @@ interface Cell {
 }
 
 const graphemes = new Intl.Segmenter(undefined, {granularity: 'grapheme'});
+const UNSAFE = /[\u0000-\u001f\u007f-\u009f]/;
 const CONTROL = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g;
 const JUNCTIONS: Record<string, string> = {
 	'1100': '│', '0011': '─', '0101': '┌', '0110': '┐', '1001': '└', '1010': '┘', '1101': '├', '1110': '┤',
 	'0111': '┬', '1011': '┴', '1111': '┼', '0100': '╷', '1000': '╵', '0001': '╶', '0010': '╴',
 };
 
-export const width = (text: string): number => stringWidth(text);
-
 /** Removes terminal control sequences so recorded text cannot move the cursor or restyle the screen. */
 export function clean(text: string): string {
+	if (!UNSAFE.test(text)) return text;
 	return stripVTControlCharacters(text).replace(/\t/g, '  ').replace(CONTROL, '');
 }
 
+/** Display width of text as it will be drawn, i.e. after `clean`. */
+export const width = (text: string): number => stringWidth(clean(text));
+
 export function fit(text: string, max: number): string {
 	if (max <= 0) return '';
-	if (stringWidth(text) <= max) return text;
+	const safe = clean(text);
+	if (stringWidth(safe) <= max) return safe;
 	let out = '';
 	let used = 0;
-	for (const {segment} of graphemes.segment(text)) {
+	for (const {segment} of graphemes.segment(safe)) {
 		const w = stringWidth(segment);
 		if (used + w > max - 1) break;
 		out += segment;
@@ -100,7 +104,7 @@ export function junction(up: boolean, down: boolean, left: boolean, right: boole
 	return JUNCTIONS[`${+up}${+down}${+left}${+right}`] ?? ' ';
 }
 
-/** Fixed-size grid of styled terminal cells; every write is clipped to the grid. */
+/** Fixed-size grid of styled terminal cells; every write is cleaned of control sequences and clipped to the grid. */
 export class Screen {
 	private readonly cells: Cell[][];
 
@@ -114,7 +118,7 @@ export class Screen {
 
 	put(x: number, y: number, text: string, style: Style = {}): number {
 		const row = this.cells[y];
-		for (const {segment} of graphemes.segment(text)) {
+		for (const {segment} of graphemes.segment(clean(text))) {
 			const w = stringWidth(segment);
 			if (w === 0) continue;
 			if (row && x >= 0 && x < this.cols) {
@@ -133,7 +137,7 @@ export class Screen {
 	}
 
 	rput(right: number, y: number, text: string, style: Style = {}): number {
-		return this.put(right - stringWidth(text) + 1, y, text, style);
+		return this.put(right - width(text) + 1, y, text, style);
 	}
 
 	seq(x: number, y: number, parts: readonly Part[]): number {
@@ -147,7 +151,7 @@ export class Screen {
 		for (const [text, style] of parts) {
 			const room = max - used;
 			if (room <= 0) break;
-			const shown = stringWidth(text) > room ? fit(text, room) : text;
+			const shown = fit(text, room);
 			this.put(x + used, y, shown, {...style, ...extra});
 			used += stringWidth(shown);
 		}

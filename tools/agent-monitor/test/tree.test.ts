@@ -4,6 +4,7 @@ import {CARD_H, layoutGraph, levelY} from '../src/graph.js';
 import type {Placed} from '../src/graph.js';
 import {AgentModel} from '../src/model.js';
 import {Screen, width} from '../src/screen.js';
+import {niceStep, tickLabel} from '../src/timeline.js';
 import {buildTree, MAIN, mainSpans, nowSeconds} from '../src/tree.js';
 import {fixture, record, start} from './fixture.js';
 
@@ -47,6 +48,11 @@ test('a wide character cut off by the right edge never widens a screen row', () 
 	scr.put(0, 0, '一二三四五');
 	scr.put(9, 0, '汉');
 	assert.equal(scr.segments()[0]!.reduce((sum, segment) => sum + width(segment.text), 0), 10);
+});
+
+test('timeline ticks stay few for windows spanning several days', () => {
+	for (const days of [3, 30]) assert.ok(days * 86400 / niceStep(days * 86400 / 6) <= 6);
+	assert.equal(tickLabel(2 * 86400, 86400), '2d');
 });
 
 test('graph layout centres parents over their children without overlapping cards', () => {

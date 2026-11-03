@@ -81,6 +81,8 @@ final answer, not progress commentary, but lifecycle completion was not
 recorded. Lifecycle events name an agent's original launch call; they settle
 the agent's open execution and never overwrite an earlier recorded outcome.
 Follow-up executions on a reused agent remain separate from its earlier work.
+If a follow-up arrives while the earlier execution has no recorded outcome, the
+earlier one becomes `unknown` instead of staying `running`.
 The finished filter includes replied executions without claiming the agent was
 terminated. Running/unknown states are **last observed**, not a process-health
 check; silence or end-of-file does not prove that an agent is dead or finished.

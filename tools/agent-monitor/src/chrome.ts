@@ -28,6 +28,7 @@ export interface ViewState {
 
 export interface DetailTexts {
 	prompt?: string;
+	promptError?: string;
 	result?: string;
 	pending: boolean;
 	error?: string;
@@ -225,8 +226,9 @@ export function drawInspector(scr: Screen, frame: Frame, box: Layout['box']): vo
 	scr.rput(x + leftW - 1, top, VISUALS[visual].label, {fg: VISUALS[visual].tone});
 	scr.put(x + 2, top, fit(title, leftW - 4 - width(VISUALS[visual].label)), {fg: 'fg', bold: true});
 	scr.put(x, top + 1, fit(metaLine(frame, node), leftW), MUTED);
-	const prompt = frame.texts.prompt ?? (node.run ? node.run.task : undefined) ?? 'Not recorded';
-	scr.seqFit(x, top + 2, [['Task  ', {fg: 'fg', bold: true}], [prompt.replace(/\s+/g, ' '), MUTED]], leftW);
+	const {promptError} = frame.texts;
+	const prompt = promptError ? `Cannot read recorded prompt: ${promptError}` : frame.texts.prompt ?? (node.run ? node.run.task : undefined) ?? 'Not recorded';
+	scr.seqFit(x, top + 2, [['Task  ', {fg: 'fg', bold: true}], [prompt.replace(/\s+/g, ' '), promptError ? {fg: 'danger'} : MUTED]], leftW);
 	const bodyTop = top + 4;
 	const bodyRows = Math.max(0, rows - 4);
 	if (!split && frame.state.showTools) {
@@ -237,7 +239,7 @@ export function drawInspector(scr: Screen, frame: Frame, box: Layout['box']): vo
 	const [heading, note, headingStyle, empty] = resultHeading(frame, node);
 	let body: string[];
 	if (frame.texts.pending) body = ['Loading recorded text…'];
-	else if (frame.texts.error) body = [`Cannot read recorded text: ${frame.texts.error}`];
+	else if (frame.texts.error) body = wrap(`Cannot read recorded text: ${frame.texts.error}`, leftW);
 	else body = frame.texts.result ? wrapCached(frame.texts.result, leftW) : [empty];
 	const maxScroll = Math.max(0, body.length - bodyRows);
 	frame.state.detailScroll = Math.min(frame.state.detailScroll, maxScroll);

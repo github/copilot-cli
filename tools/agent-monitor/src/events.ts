@@ -146,7 +146,8 @@ export class JsonlReader {
 					}
 					cursor = end + 1;
 				}
-				this.pending = buffer.subarray(cursor);
+				// Copy the unconsumed tail: a subarray would keep a large, already-parsed record's buffer alive.
+				this.pending = cursor === 0 ? buffer : Buffer.from(buffer.subarray(cursor));
 				this.pendingOffset += cursor;
 				this.offset += chunk.length;
 			}

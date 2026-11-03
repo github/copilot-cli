@@ -59,15 +59,29 @@ function matches(run: AgentRun, filter: Filter): boolean {
 
 const startOf = (run: AgentRun): number => Date.parse(run.startedAt ?? run.lastActivity);
 
-/** The agent's first execution; later turns hang off it as siblings so a long conversation does not nest deeper. */
-function firstTurn(model: AgentModel, run: AgentRun): AgentRun {
-	const seen = new Set<string>();
-	let first = run;
-	while (first.previousRunId && !seen.has(first.id)) {
-		seen.add(first.id);
-		const previous = model.runs.get(first.previousRunId);
-		if (!previous) break;
-		first = previous;
+/**
+ * Each execution's first turn: later turns hang off it as siblings so a long conversation does not nest deeper.
+ * Resolved once per build with shared results, because reused agents can have long predecessor chains.
+ */
+function firstTurns(model: AgentModel): Map<string, AgentRun> {
+	const first = new Map<string, AgentRun>();
+	for (const run of model.runs.values()) {
+		const chain: AgentRun[] = [];
+		const onChain = new Set<string>();
+		let cursor = run;
+		let head = first.get(cursor.id);
+		while (!head) {
+			chain.push(cursor);
+			onChain.add(cursor.id);
+			const previous = cursor.previousRunId ? model.runs.get(cursor.previousRunId) : undefined;
+			// A missing predecessor or a cycle ends the chain at the last execution reached.
+			if (!previous || onChain.has(previous.id)) head = cursor;
+			else {
+				cursor = previous;
+				head = first.get(cursor.id);
+			}
+		}
+		for (const member of chain) first.set(member.id, head);
 	}
 	return first;
 }
@@ -76,9 +90,10 @@ function firstTurn(model: AgentModel, run: AgentRun): AgentRun {
 export function buildTree(model: AgentModel, filter: Filter): Tree {
 	const root: Node = {id: MAIN, children: [], edge: 'root', depth: 0, ctx: filter !== 'all'};
 	const parentOf = new Map<string, {id: string; edge: Node['edge']}>();
+	const first = firstTurns(model);
 	for (const run of model.runs.values()) {
-		const first = firstTurn(model, run);
-		if (first !== run) parentOf.set(run.id, {id: first.id, edge: 'turn'});
+		const head = first.get(run.id)!;
+		if (head !== run) parentOf.set(run.id, {id: head.id, edge: 'turn'});
 		else if (run.parentRunId === null) parentOf.set(run.id, {id: MAIN, edge: 'spawn'});
 		else if (run.parentRunId && model.runs.has(run.parentRunId)) parentOf.set(run.id, {id: run.parentRunId, edge: 'spawn'});
 		else parentOf.set(run.id, {id: MAIN, edge: 'orphan'});
