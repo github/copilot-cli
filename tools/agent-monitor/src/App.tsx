@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {Box, Text, useApp, useInput, useWindowSize} from 'ink';
+import type {Key} from 'ink';
 import {drawChrome, drawInspector, frameLayout, promptRef, resultRef} from './chrome.js';
 import type {DetailTexts, Frame, ViewState} from './chrome.js';
 import {errorMessage, JsonlReader} from './events.js';
@@ -81,21 +82,20 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 
 	// A stopped source records nothing new, so time stays at the last observed event instead of following the wall clock.
 	const now = source === 'stopped' ? sessionSeconds(model, model.lastEventAt) : nowSeconds(model, clock());
-	useInput((input, key) => {
-		const order = tree.order;
-		const index = order.findIndex(n => n.id === state.selectedId);
+	/** Applies one key binding; returns false for an unbound key. */
+	const applyKey = (input: string, key: Key): boolean => {
+		const current = buildTree(model, state.filter);
+		const order = current.order;
+		const selected = current.byId.get(state.selectedId) ?? current.root;
+		const index = order.indexOf(selected);
 		const select = (target: number): void => {
 			state.selectedId = order[clamp(target, 0, order.length - 1)]!.id;
 			state.detailScroll = 0;
 		};
-		const siblings = node.parent?.children ?? [node];
-		const sibling = siblings.indexOf(node);
+		const siblings = selected.parent?.children ?? [selected];
+		const sibling = siblings.indexOf(selected);
 		const pageStep = Math.max(1, frameLayout(cols, rows).box.h - 6);
 		const panStep = Math.max(1, (state.span || now) / 4);
-		if (input === 'q' || key.escape) {
-			exit();
-			return;
-		}
 		if (key.tab) state.view = state.view === 'graph' ? 'timeline' : 'graph';
 		else if (input === 'j' || key.downArrow) select(index + 1);
 		else if (input === 'k' || key.upArrow) select(index - 1);
@@ -115,8 +115,20 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 		else if (state.view === 'timeline' && (key.rightArrow || input === 'l')) state.pan -= panStep;
 		else if (state.view === 'graph' && (key.leftArrow || input === 'h') && sibling > 0) state.selectedId = siblings[sibling - 1]!.id;
 		else if (state.view === 'graph' && (key.rightArrow || input === 'l') && sibling < siblings.length - 1) state.selectedId = siblings[sibling + 1]!.id;
-		else return;
-		rerender();
+		else return false;
+		return true;
+	};
+	useInput((input, key) => {
+		// Ink delivers keys that arrive together (a held key during a slow render, buffered input) as one string.
+		let handled = false;
+		for (const char of input.length > 1 ? [...input] : [input]) {
+			if (char === 'q' || key.escape) {
+				exit();
+				return;
+			}
+			handled = applyKey(char, key) || handled;
+		}
+		if (handled) rerender();
 	});
 
 	if (cols < MIN_COLS || rows < MIN_ROWS) {

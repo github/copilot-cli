@@ -158,6 +158,14 @@ test('at 80 columns the header keeps its chips and t shows tool calls in the sin
 	await frame(view, /Tools · 1/);
 });
 
+test('keys that arrive in one input chunk are each applied', async t => {
+	const view = mount(modelOf());
+	t.after(() => view.cleanup());
+	await frame(view, /Main session/);
+	view.stdin.write('jj');
+	await frame(view, /Child result/);
+});
+
 test('a slow text load for an earlier selection does not replace the current one', async t => {
 	let release!: () => void;
 	const gate = new Promise<void>(resolve => { release = resolve; });
