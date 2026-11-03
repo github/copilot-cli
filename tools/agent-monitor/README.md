@@ -4,6 +4,16 @@ Independent, read-only terminal viewer for **one explicitly selected local Copil
 CLI session**. It does not change the built-in `/tasks` interface, load the Copilot
 SDK, resume the session, install hooks, call a model, or write to the source log.
 
+## Screenshots
+
+Captured from a fictional demo session (synthetic events, no real transcript).
+
+![Graph view: the spawn tree with launch modes and recorded wait durations](docs/graph.png)
+
+![Graph view: an agent blocked on the sync agent it launched](docs/graph-waiting.png)
+
+![Timeline view: swimlanes with waits, a later turn and the now cursor](docs/timeline.png)
+
 ## Run on Windows
 
 Requires Node.js 22 or later. In PowerShell:
