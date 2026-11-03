@@ -25,7 +25,6 @@ type TextField = 'content' | 'summary' | 'result' | 'error' | 'prompt';
 export interface ContentRef {
 	eventId: string;
 	field: TextField;
-	preview: string;
 	location?: RecordLocation;
 	inline?: string;
 }
@@ -83,7 +82,6 @@ export function capture(record: EventRecord, field: TextField): ContentRef | und
 	return {
 		eventId: record.event.id,
 		field,
-		preview: text.slice(0, 240),
 		location: record.location,
 		inline: record.location ? undefined : text,
 	};

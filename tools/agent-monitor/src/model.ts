@@ -1,7 +1,7 @@
 import {capture, isObject, optionalString, requiredString} from './events.js';
 import type {ContentRef, EventRecord, SessionEvent} from './events.js';
 
-export type RunStatus = 'unknown' | 'running' | 'completed' | 'failed' | 'replied';
+export type RunStatus = 'unknown' | 'running' | 'completed' | 'failed' | 'cancelled' | 'replied';
 export type Filter = 'all' | 'active' | 'finished';
 
 export interface ToolActivity {
@@ -11,7 +11,6 @@ export interface ToolActivity {
 	startedAt: string;
 	endedAt?: string;
 	detail?: string;
-	output?: ContentRef;
 }
 
 export interface AgentRun {
@@ -29,10 +28,10 @@ export interface AgentRun {
 	startedAt?: string;
 	endedAt?: string;
 	lastActivity: string;
-	durationMs?: number;
 	model?: string;
 	prompt?: ContentRef;
 	result?: ContentRef;
+	latest?: ContentRef;
 	error?: ContentRef;
 	tools: ToolActivity[];
 	hasActivity: boolean;
@@ -42,7 +41,6 @@ interface ToolCall {
 	ownerAgentId?: string;
 	ownerRunId: string | null;
 	name: string;
-	task?: string;
 	background: boolean;
 	targetAgentId?: string;
 	wait: boolean;
@@ -72,7 +70,13 @@ const MAIN_TOOL_LIMIT = 200;
 const DETAIL_KEYS = ['path', 'pattern', 'command', 'query', 'url', 'name', 'agent_id', 'description'];
 
 export const isFinished = (run: AgentRun): boolean =>
-	run.status === 'completed' || run.status === 'failed' || run.status === 'replied';
+	run.status === 'completed' || run.status === 'failed' || run.status === 'cancelled' || run.status === 'replied';
+
+const isOpen = (run: AgentRun): boolean => !isFinished(run) || run.status === 'replied';
+
+/** Phased models also emit progress ("commentary") messages; only phase-less or final-answer replies count as results. */
+const isFinalAnswer = (d: Record<string, unknown>): boolean =>
+	(d.phase === undefined || d.phase === 'final_answer') && (!Array.isArray(d.toolRequests) || d.toolRequests.length === 0);
 
 export class AgentModel {
 	readonly runs = new Map<string, AgentRun>();
@@ -81,6 +85,7 @@ export class AgentModel {
 	readonly waitLog = new Map<string, WaitEdge>();
 	readonly mainTurns: MainTurn[] = [];
 	readonly mainTools: ToolActivity[] = [];
+	mainToolCount = 0;
 	version?: string;
 	sessionId?: string;
 	sessionModel?: string;
@@ -88,11 +93,12 @@ export class AgentModel {
 	sessionEnded?: string;
 	lastEventAt?: string;
 	mainPrompt?: ContentRef;
-	mainResult?: ContentRef;
+	mainLatest?: ContentRef;
 	private readonly latest = new Map<string, AgentRun>();
 	private readonly launches = new Map<string, AgentRun>();
 	private readonly calls = new Map<string, ToolCall>();
 	private readonly seen = new Set<string>();
+	private readonly repliedThisTurn = new Set<string>();
 
 	reset(): void {
 		this.runs.clear();
@@ -101,10 +107,12 @@ export class AgentModel {
 		this.waitLog.clear();
 		this.mainTurns.length = 0;
 		this.mainTools.length = 0;
+		this.mainToolCount = 0;
 		this.latest.clear();
 		this.launches.clear();
 		this.calls.clear();
 		this.seen.clear();
+		this.repliedThisTurn.clear();
 		this.version = undefined;
 		this.sessionId = undefined;
 		this.sessionModel = undefined;
@@ -112,7 +120,7 @@ export class AgentModel {
 		this.sessionEnded = undefined;
 		this.lastEventAt = undefined;
 		this.mainPrompt = undefined;
-		this.mainResult = undefined;
+		this.mainLatest = undefined;
 	}
 
 	apply(record: EventRecord): void {
@@ -133,20 +141,23 @@ export class AgentModel {
 			case 'session.shutdown':
 				this.sessionEnded = e.timestamp;
 				break;
+			case 'session.resume':
+				this.sessionEnded = undefined;
+				break;
 			case 'subagent.started':
 				this.start(e);
 				break;
 			case 'subagent.completed':
 			case 'subagent.failed': {
-				const callId = requiredString(d, 'toolCallId');
-				const run = this.forLaunch(e, callId);
-				run.status = e.type === 'subagent.completed' ? 'completed' : 'failed';
+				const launch = this.forLaunch(e, requiredString(d, 'toolCallId'));
+				// Lifecycle events name the original launch call even when a later turn of the same agent is the one
+				// still open. Recorded outcomes are kept; only the inferred 'replied' state can still be settled.
+				const run = [this.latest.get(launch.agentId), launch].find(candidate => candidate && isOpen(candidate));
+				if (!run) break;
+				run.status = e.type === 'subagent.failed' ? 'failed' : d.cancelled === true ? 'cancelled' : 'completed';
 				run.endedAt = e.timestamp;
 				run.lastActivity = e.timestamp;
 				run.model = optionalString(d, 'model') ?? run.model;
-				if (typeof d.durationMs === 'number' && Number.isFinite(d.durationMs) && d.durationMs >= 0) {
-					run.durationMs = d.durationMs;
-				}
 				if (e.type === 'subagent.failed') run.error = capture(record, 'error');
 				break;
 			}
@@ -173,31 +184,36 @@ export class AgentModel {
 					const run = this.current(e);
 					run.hasActivity = true;
 					run.lastActivity = e.timestamp;
-					if (!isFinished(run) || run.status === 'replied') run.status = 'running';
+					this.repliedThisTurn.delete(run.id);
+					if (run.status === 'replied') run.endedAt = undefined;
+					if (isOpen(run)) run.status = 'running';
 				} else {
 					const last = this.mainTurns.at(-1);
 					if (!last || last.end) this.mainTurns.push({start: e.timestamp});
 				}
 				break;
-			case 'assistant.message':
+			case 'assistant.message': {
+				const content = capture(record, 'content');
 				if (e.agentId) {
 					const run = this.current(e);
 					run.hasActivity = true;
 					run.lastActivity = e.timestamp;
-					const requests = d.toolRequests;
-					if (d.phase !== 'thinking' && (!Array.isArray(requests) || requests.length === 0)) {
-						run.result = capture(record, 'content') ?? run.result;
+					run.latest = content ?? run.latest;
+					if (content && isFinalAnswer(d)) {
+						run.result = content;
+						this.repliedThisTurn.add(run.id);
 					}
-				} else if (d.phase !== 'thinking' && (!Array.isArray(d.toolRequests) || d.toolRequests.length === 0)) {
-					this.mainResult = capture(record, 'content') ?? this.mainResult;
+				} else {
+					this.mainLatest = content ?? this.mainLatest;
+					this.sessionModel = optionalString(d, 'model') ?? this.sessionModel;
 				}
-				if (!e.agentId) this.sessionModel = optionalString(d, 'model') ?? this.sessionModel;
 				break;
+			}
 			case 'assistant.turn_end':
 				if (e.agentId) {
 					const run = this.current(e);
 					run.lastActivity = e.timestamp;
-					if (run.status === 'running' && run.result && !run.tools.some(tool => tool.status === 'running')) {
+					if (run.status === 'running' && this.repliedThisTurn.has(run.id) && !run.tools.some(tool => tool.status === 'running')) {
 						run.status = 'replied';
 						run.endedAt = e.timestamp;
 					}
@@ -209,10 +225,13 @@ export class AgentModel {
 			case 'session.task_complete':
 				if (e.agentId) {
 					const run = this.current(e);
-					run.result = capture(record, 'summary') ?? run.result;
-					run.status = 'completed';
-					run.endedAt = e.timestamp;
 					run.lastActivity = e.timestamp;
+					// Rejected ("continue") or blocked completion requests leave the agent's work open.
+					if (d.outcome === 'completed' || (d.outcome === undefined && d.success !== false)) {
+						run.result = capture(record, 'summary') ?? run.result;
+						run.status = 'completed';
+						run.endedAt = e.timestamp;
+					}
 				}
 				break;
 			case 'tool.execution_start':
@@ -318,8 +337,9 @@ export class AgentModel {
 		const owner = e.agentId ? this.current(e) : undefined;
 		const call: ToolCall = {
 			ownerAgentId: e.agentId, ownerRunId: owner?.id ?? null,
-			name, task: optionalString(args, 'description'), background: args.mode === 'background',
-			targetAgentId: optionalString(args, 'agent_id'), wait: args.wait === true, complete: false,
+			name, background: args.mode === 'background',
+			targetAgentId: name === 'read_agent' && typeof args.agent_id === 'string' ? args.agent_id : undefined,
+			wait: args.wait === true, complete: false,
 			startedAt: e.timestamp, prompt: name === 'task' ? capture(record, 'prompt') : undefined,
 		};
 		call.activity = {id, name, status: 'running', startedAt: e.timestamp, detail: toolDetail(args)};
@@ -328,6 +348,7 @@ export class AgentModel {
 			owner.lastActivity = e.timestamp;
 			owner.tools.push(call.activity);
 		} else {
+			this.mainToolCount++;
 			this.mainTools.push(call.activity);
 			if (this.mainTools.length > MAIN_TOOL_LIMIT) this.mainTools.shift();
 		}
@@ -358,8 +379,9 @@ export class AgentModel {
 		if (call.activity) {
 			call.activity.status = d.success ? 'succeeded' : 'failed';
 			call.activity.endedAt = record.event.timestamp;
-			call.activity.output = capture(record, d.success ? 'result' : 'error') ?? capture(record, 'result');
 		}
+		// Only task calls are looked up again (by a late subagent.started); drop the rest.
+		if (call.name !== 'task') this.calls.delete(id);
 	}
 }
 

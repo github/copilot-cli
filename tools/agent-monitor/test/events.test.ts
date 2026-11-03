@@ -25,12 +25,30 @@ test('incremental replay buffers partial UTF-8/JSONL and reads full results lazi
 	await reader.poll(accept, unexpectedReset);
 	assert.equal(records.length, 1);
 	const ref = capture(records[0]!, 'content')!;
-	assert.ok(ref.preview.length < text.length);
 	assert.equal(ref.inline, undefined);
 	assert.equal(await reader.readContent(ref), text);
 	assert.equal(await reader.poll(accept, unexpectedReset), false);
 	assert.equal(records.length, 1);
 	assert.deepEqual(await readFile(file), bytes);
+});
+
+test('recorded text is read back from later records, across polls and 64 KB read chunks', async t => {
+	const directory = await mkdtemp(join(tmpdir(), 'agent-monitor-offsets-'));
+	t.after(() => rm(directory, {recursive: true}));
+	const file = join(directory, 'events.jsonl');
+	const line = (content: string): Buffer => Buffer.from(JSON.stringify(record('assistant.message', {content}, 'agent').event) + '\n');
+	const big = 'x'.repeat(100 * 1024);
+	const head = Buffer.concat([line('first'), line(big)]);
+	const split = head.length - 10;
+	await writeFile(file, head.subarray(0, split));
+	const reader = new JsonlReader(file);
+	const records: EventRecord[] = [];
+	const accept = (event: EventRecord): void => { records.push(event); };
+	await reader.poll(accept, () => {});
+	await appendFile(file, Buffer.concat([head.subarray(split), line('last')]));
+	await reader.poll(accept, () => {});
+	const texts = await Promise.all(records.map(item => reader.readContent(capture(item, 'content')!)));
+	assert.deepEqual(texts, ['first', big, 'last']);
 });
 
 test('rewriting a log past its old size resets state and invalidates old result references', async t => {

@@ -1,15 +1,18 @@
 import type {Frame, Rect} from './chrome.js';
+import {isFinished} from './model.js';
 import {fit, Screen, width} from './screen.js';
 import type {Part, Style} from './screen.js';
-import {elapsed, formatDuration, glyphPart, isActiveVisual, mainSpans, MAIN, runSpan, visualOf, waitSpan} from './tree.js';
+import {elapsed, formatDuration, glyphPart, isActiveVisual, mainSpans, MAIN, runSpan, VISUALS, visualOf, waitSpan} from './tree.js';
 import type {Node, Visual} from './tree.js';
 import type {Tone} from './theme.js';
 
 const MUTED: Style = {fg: 'muted'};
 const STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600, 7200, 14400];
 const BAR: Record<Visual, Tone> = {
-	running: 'accent', waiting: 'accent', done: 'success', failed: 'danger', replied: 'done', idle: 'muted', ended: 'muted', unknown: 'muted',
+	running: 'accent', waiting: 'accent', done: 'success', failed: 'danger', cancelled: 'muted', replied: 'done',
+	idle: 'muted', ended: 'muted', unknown: 'muted',
 };
+const END_MARKS: Visual[] = ['failed', 'cancelled', 'replied'];
 const clamp = (value: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, value));
 
 export function niceStep(raw: number): number {
@@ -45,22 +48,26 @@ function activityWindow(frame: Frame, total: number): [number, number] {
 	return hi - lo < 1 ? [Math.max(0, hi - 1), hi] : [lo, hi];
 }
 
-function treePrefix(scr: Screen, node: Node, y: number, span: number, base: number): void {
+/** Draws tree connectors left of a lane; deeper levels than `cap` share the last indentation column. */
+function treePrefix(scr: Screen, node: Node, y: number, span: number, base: number, cap: number): void {
 	const line: Style = {fg: 'border'};
 	const isLast = (n: Node): boolean => n.parent?.children.at(-1) === n;
 	const chain: Node[] = [];
 	for (let p = node.parent; p?.parent; p = p.parent) chain.unshift(p);
-	chain.forEach((ancestor, i) => {
+	chain.slice(0, cap - 1).forEach((ancestor, i) => {
 		if (!isLast(ancestor)) for (let r = 0; r < span; r++) scr.put(base + 3 * i, y + r, '│', line);
 	});
-	if (node.depth > 0) {
-		const cx = base + 3 * (node.depth - 1);
+	const depth = Math.min(node.depth, cap);
+	if (depth > 0) {
+		const cx = base + 3 * (depth - 1);
 		const turn = node.edge === 'turn';
 		scr.put(cx, y, isLast(node) ? (turn ? '╰' : '└') : '├', line);
 		scr.put(cx + 1, y, turn ? '┄' : '─', line);
 		if (!isLast(node)) for (let r = 1; r < span; r++) scr.put(cx, y + r, '│', line);
 	}
-	if (node.children.length) for (let r = 1; r < span; r++) scr.put(base + 3 * node.depth, y + r, node.children[0]!.edge === 'turn' ? '┆' : '│', line);
+	if (node.children.length && node.depth < cap) {
+		for (let r = 1; r < span; r++) scr.put(base + 3 * depth, y + r, node.children[0]!.edge === 'turn' ? '┆' : '│', line);
+	}
 }
 
 export function drawTimeline(scr: Screen, frame: Frame, area: Rect, legendY: number): void {
@@ -86,15 +93,18 @@ export function drawTimeline(scr: Screen, frame: Frame, area: Rect, legendY: num
 	scr.rput(durationRight, axisY, 'Time', MUTED);
 	scr.hline(cx, axisY + 1, cw, '─', {fg: 'border'});
 	const nowC = now >= start && now <= end + 1e-9 ? cx + clamp(Math.round((now - start) / spc), 0, cw - 1) : -1;
+	const nowLabel: [number, number] | undefined = nowC >= 0 ? [nowC - 1, nowC + 1] : now > end ? [cx + cw - 5, cx + cw - 1] : undefined;
 	const grid: number[] = [];
 	const step = niceStep((end - start) / 6);
 	for (let t = Math.ceil(start / step) * step; t <= end; t += step) {
 		const c = col(t);
-		if (nowC >= 0 && t > start && Math.abs(nowC - c) < 6) continue;
+		const label = tickLabel(t, step);
+		const lx = c === cx ? c : c - Math.floor(width(label) / 2);
+		// Keep a blank column between a tick label and the "now" marker.
+		if (nowLabel && lx <= nowLabel[1] + 1 && lx + width(label) - 1 >= nowLabel[0] - 1) continue;
 		grid.push(c);
 		scr.put(c, axisY + 1, '┬', {fg: 'border'});
-		const label = tickLabel(t, step);
-		scr.put(c === cx ? c : c - Math.floor(width(label) / 2), axisY, label, MUTED);
+		scr.put(lx, axisY, label, MUTED);
 	}
 	if (nowC >= 0) {
 		scr.put(nowC, axisY + 1, '┬', {fg: 'accent'});
@@ -112,6 +122,8 @@ export function drawTimeline(scr: Screen, frame: Frame, area: Rect, legendY: num
 	const bottom = laneY0 + 2 * shown.length - 1;
 	for (const c of grid) for (let y = laneY0; y <= bottom; y++) scr.put(c, y, '┊', {fg: 'faint'});
 	if (nowC >= 0) for (let y = laneY0; y <= bottom; y++) scr.put(nowC, y, '│', {fg: 'accent', dim: true});
+	const cap = Math.max(1, Math.floor((labelEnd - 19) / 3));
+	const mainOpen = isActiveVisual(model.mainStatus());
 	for (const node of shown) {
 		const y = laneY.get(node.id)!;
 		const visual = visualOf(model, node);
@@ -120,21 +132,22 @@ export function drawTimeline(scr: Screen, frame: Frame, area: Rect, legendY: num
 			scr.put(1, y, '▎', {fg: 'selbar'});
 			scr.fill(2, y, cols - 3, 1, 'sel');
 		}
-		treePrefix(scr, node, y, 2, 3);
-		const gx = 3 + 3 * node.depth;
+		treePrefix(scr, node, y, 2, 3, cap);
+		const gx = 3 + 3 * Math.min(node.depth, cap);
 		const type = node.run ? (node.edge === 'turn' ? 'turn' : TYPE_SHORT[node.run.agentType ?? ''] ?? node.run.agentType ?? 'agent') : 'session';
 		scr.seq(gx, y, [glyphPart(visual, frame.spin, node.ctx)]);
 		scr.rput(labelEnd, y, type, {...MUTED, dim: node.ctx});
 		scr.put(gx + 2, y, fit(node.run ? node.run.name : 'main', labelEnd - width(type) - gx - 3), {fg: selected ? 'accent' : 'fg', bold: true, dim: node.ctx});
-		const segments: Array<[number, number, Tone]> = node.run
-			? [[...runSpan(model, node.run, now), BAR[visual]]]
-			: mainSpans(model, now).map(([a, b]) => [a, b, 'muted' as Tone]);
-		for (const [a, b, tone] of segments) {
+		const spans = node.run ? [] : mainSpans(model, now);
+		const segments: Array<[number, number, Tone, boolean]> = node.run
+			? [[...runSpan(model, node.run, now), BAR[visual], !isFinished(node.run)]]
+			: spans.map(([a, b], i) => [a, b, 'muted', mainOpen && i === spans.length - 1]);
+		for (const [a, b, tone, open] of segments) {
 			if (b < start || a > end) continue;
 			const c0 = col(Math.max(a, start));
 			const c1 = Math.max(c0, colEnd(Math.min(b, end)));
 			for (let c = c0; c <= c1; c++) scr.put(c, y, c1 > c0 && c === c0 && a >= start ? '╺' : '━', {fg: tone, dim: node.ctx});
-			if (c1 > c0 && b <= end && !(node.run && isActiveVisual(visual))) scr.put(c1, y, '╸', {fg: tone, dim: node.ctx});
+			if (c1 > c0 && b <= end && !open) scr.put(c1, y, '╸', {fg: tone, dim: node.ctx});
 		}
 		const key = node.run ? node.run.id : null;
 		for (const edge of model.waitLog.values()) {
@@ -147,8 +160,8 @@ export function drawTimeline(scr: Screen, frame: Frame, area: Rect, legendY: num
 		if (node.run) {
 			const [, b] = runSpan(model, node.run, now);
 			if (visual === 'running' && nowC >= 0) scr.put(nowC, y, '●', {fg: 'accent', dim: node.ctx});
-			if ((visual === 'failed' || visual === 'replied') && b >= start && b <= end && colEnd(b) + 1 < cx + cw) {
-				scr.put(colEnd(b) + 1, y, visual === 'failed' ? '✗' : '↩', {fg: visual === 'failed' ? 'danger' : 'done', dim: node.ctx});
+			if (END_MARKS.includes(visual) && b >= start && b <= end && colEnd(b) + 1 < cx + cw) {
+				scr.put(colEnd(b) + 1, y, VISUALS[visual].glyph, {fg: VISUALS[visual].tone, dim: node.ctx});
 			}
 		}
 		scr.rput(durationRight, y, formatDuration(elapsed(model, node, now)), {fg: isActiveVisual(visual) ? 'fg' : 'muted', dim: node.ctx});
@@ -165,11 +178,11 @@ export function drawTimeline(scr: Screen, frame: Frame, area: Rect, legendY: num
 		scr.put(c, toY - dir, dir > 0 ? '▾' : '▴', style);
 	}
 	const legend: Part[] = [];
-	const items: Array<[string, Tone, string, boolean?]> = [
-		['━━', 'accent', 'running'], ['━━', 'success', 'done'], ['━━', 'danger', 'failed'], ['━━', 'done', 'replied'],
-		['━━', 'muted', 'main turn'], ['╍╍', 'attention', 'waiting'], ['▾', 'attention', 'waits for'], ['│', 'accent', 'now'],
+	const items: Array<[string, Tone, string]> = [
+		['━━', 'accent', 'running'], ['━━', 'success', 'done'], ['━━', 'danger', 'failed'], ['━■', 'muted', 'cancelled'],
+		['━━', 'done', 'replied'], ['━━', 'muted', 'main turn'], ['╍╍', 'attention', 'waiting'], ['▾', 'attention', 'waits for'],
 	];
-	for (const [glyph, tone, label] of items) legend.push([glyph, {fg: tone}], [` ${label}   `, MUTED]);
+	for (const [glyph, tone, label] of items) legend.push([glyph, {fg: tone}], [` ${label}  `, MUTED]);
 	const scale = `${spc < 10 ? spc.toFixed(1) : Math.round(spc)}s / col`;
 	const range = lanes.length > capacity ? `lanes ${top + 1}-${top + shown.length} of ${lanes.length}   ` : '';
 	scr.seqFit(3, legendY, legend, cols - width(range + scale) - 6);

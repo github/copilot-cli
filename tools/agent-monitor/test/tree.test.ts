@@ -3,10 +3,11 @@ import {test} from 'node:test';
 import {CARD_H, layoutGraph, levelY} from '../src/graph.js';
 import type {Placed} from '../src/graph.js';
 import {AgentModel} from '../src/model.js';
+import {Screen, width} from '../src/screen.js';
 import {buildTree, MAIN, mainSpans, nowSeconds} from '../src/tree.js';
-import {fixture, record} from './fixture.js';
+import {fixture, record, start} from './fixture.js';
 
-test('display tree nests spawned agents under launchers, later turns under the previous turn, and filters keep ancestors', () => {
+test('display tree nests spawned agents under launchers, later turns under the first turn, and filters keep ancestors', () => {
 	const model = new AgentModel();
 	const events = fixture();
 	for (const event of events.slice(0, 15)) model.apply(event);
@@ -17,22 +18,35 @@ test('display tree nests spawned agents under launchers, later turns under the p
 	assert.equal(child.ctx, false);
 	assert.equal(buildTree(model, 'active').byId.has('launch:control-call'), false);
 	for (const event of events.slice(15)) model.apply(event);
+	model.apply(record('user.message', {content: 'Second follow-up', delivery: 'idle'}, 'control'));
+	model.apply(record('assistant.turn_start', {turnId: '0'}, 'control'));
 	const tree = buildTree(model, 'all');
-	const followup = tree.order.find(node => node.id.startsWith('message:'))!;
+	const followups = tree.order.filter(node => node.id.startsWith('message:'));
 	assert.equal(tree.byId.get('launch:parent-call')!.parent, tree.root);
-	assert.equal(followup.parent?.id, 'launch:control-call');
-	assert.equal(followup.edge, 'turn');
-	assert.deepEqual(tree.order.map(node => node.depth), [0, 1, 2, 1, 2]);
+	assert.equal(followups.length, 2);
+	for (const followup of followups) {
+		assert.equal(followup.parent?.id, 'launch:control-call');
+		assert.equal(followup.edge, 'turn');
+	}
+	assert.deepEqual(tree.order.map(node => node.depth), [0, 1, 2, 1, 2, 2]);
 });
 
-test('cyclic parent data is re-homed instead of recursing forever', () => {
+test('cyclic launch evidence is re-homed instead of recursing forever', () => {
 	const model = new AgentModel();
-	for (const event of fixture()) model.apply(event);
-	const parent = model.runs.get('launch:parent-call')!;
-	parent.parentRunId = 'launch:child-call';
+	model.apply(record('tool.execution_start', {toolCallId: 'call-a', toolName: 'task', arguments: {mode: 'background'}}, 'b'));
+	model.apply(start('call-a', 'a'));
+	model.apply(record('tool.execution_start', {toolCallId: 'call-b', toolName: 'task', arguments: {mode: 'background'}}, 'a'));
+	model.apply(start('call-b', 'b'));
 	const tree = buildTree(model, 'all');
 	assert.equal(tree.order.length, model.runs.size + 1);
 	assert.ok(tree.order.some(node => node.edge === 'orphan'));
+});
+
+test('a wide character cut off by the right edge never widens a screen row', () => {
+	const scr = new Screen(10, 1);
+	scr.put(0, 0, '一二三四五');
+	scr.put(9, 0, '汉');
+	assert.equal(scr.segments()[0]!.reduce((sum, segment) => sum + width(segment.text), 0), 10);
 });
 
 test('graph layout centres parents over their children without overlapping cards', () => {

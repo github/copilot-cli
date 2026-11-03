@@ -117,14 +117,15 @@ export class Screen {
 		for (const {segment} of graphemes.segment(text)) {
 			const w = stringWidth(segment);
 			if (w === 0) continue;
-			if (row && x >= 0 && x + w <= this.cols) {
+			if (row && x >= 0 && x < this.cols) {
+				// Never leave half of an existing wide character behind.
 				if (row[x]!.ch === '' && x > 0) row[x - 1]!.ch = ' ';
-				const after = row[x + w];
-				if (after && after.ch === '') after.ch = ' ';
-				row[x] = {ch: segment, fg: style.fg, bg: style.bg ?? row[x]!.bg, bold: Boolean(style.bold), dim: Boolean(style.dim)};
-				for (let i = 1; i < w; i++) row[x + i] = {ch: '', fg: style.fg, bg: style.bg ?? row[x + i]!.bg, bold: false, dim: false};
-			} else if (row && x >= 0 && x < this.cols) {
-				row[x] = {...row[x]!, ch: ' '};
+				if (x + w <= this.cols) {
+					const after = row[x + w];
+					if (after && after.ch === '') after.ch = ' ';
+					row[x] = {ch: segment, fg: style.fg, bg: style.bg ?? row[x]!.bg, bold: Boolean(style.bold), dim: Boolean(style.dim)};
+					for (let i = 1; i < w; i++) row[x + i] = {ch: '', fg: style.fg, bg: style.bg ?? row[x + i]!.bg, bold: false, dim: false};
+				} else row[x] = {...row[x]!, ch: ' '};
 			}
 			x += w;
 		}

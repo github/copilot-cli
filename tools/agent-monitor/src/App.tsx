@@ -11,7 +11,7 @@ import {Screen} from './screen.js';
 import {PALETTES} from './theme.js';
 import type {ColorMode} from './theme.js';
 import {drawTimeline} from './timeline.js';
-import {buildTree, MAIN, nowSeconds, visualOf} from './tree.js';
+import {buildTree, MAIN, nowSeconds, sessionSeconds, visualOf} from './tree.js';
 
 export const MIN_COLS = 80;
 export const MIN_ROWS = 24;
@@ -45,8 +45,9 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 	const node = tree.byId.get(state.selectedId)!;
 	const result = resultRef(model, node);
 	const prompt = promptRef(model, node);
-	const textKey = `${node.id}|${result?.eventId ?? ''}|${prompt?.eventId ?? ''}`;
-	const [loaded, setLoaded] = useState<{key: string; texts: DetailTexts}>({key: '', texts: {pending: false}});
+	const refKey = (ref: ContentRef | undefined): string => ref ? `${ref.eventId}:${ref.field}:${ref.location?.generation ?? ''}` : '';
+	const textKey = `${node.id}|${refKey(result)}|${refKey(prompt)}`;
+	const [loaded, setLoaded] = useState<{key: string; nodeId: string; texts: DetailTexts}>({key: '', nodeId: '', texts: {pending: false}});
 
 	useEffect(() => {
 		let cancelled = false;
@@ -54,6 +55,7 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 			if (cancelled) return;
 			setLoaded({
 				key: textKey,
+				nodeId: node.id,
 				texts: {
 					pending: false,
 					result: r.status === 'fulfilled' ? r.value : undefined,
@@ -77,7 +79,8 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 		return () => clearInterval(timer);
 	}, [source]);
 
-	const now = nowSeconds(model, clock());
+	// A stopped source records nothing new, so time stays at the last observed event instead of following the wall clock.
+	const now = source === 'stopped' ? sessionSeconds(model, model.lastEventAt) : nowSeconds(model, clock());
 	useInput((input, key) => {
 		const order = tree.order;
 		const index = order.findIndex(n => n.id === state.selectedId);
@@ -119,7 +122,8 @@ export function App({model, loadContent, source = 'following', diagnostic, mode 
 	if (cols < MIN_COLS || rows < MIN_ROWS) {
 		return <Text>{`Terminal too small for the agent monitor (need ${MIN_COLS}x${MIN_ROWS}, have ${cols}x${rows}). q: quit`}</Text>;
 	}
-	const texts: DetailTexts = loaded.key === textKey ? loaded.texts : {pending: Boolean(result || prompt)};
+	// A running agent's latest message changes often; keep showing its previous text until the new one is read.
+	const texts: DetailTexts = loaded.key === textKey || loaded.nodeId === node.id ? loaded.texts : {pending: Boolean(result || prompt)};
 	const warnings = [...model.warnings].join('; ');
 	const frame: Frame = {
 		model, state, tree, now, spin, cols, rows, source, texts,

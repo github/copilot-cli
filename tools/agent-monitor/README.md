@@ -35,9 +35,11 @@ one selection:
 
 - **Graph** (default): a spawn tree. The main session sits on top; agents sit
   under the agent or session that launched them, and a reused agent's later
-  turn sits under its previous turn. Edge labels show `bg` / `sync` and any
-  recorded wait with its duration (yellow while waiting, dim once finished).
-  Wide trees scroll horizontally to keep the selection visible.
+  turns sit side by side under its first turn. Edge labels show `bg` / `sync`
+  and any recorded wait with its duration (yellow while waiting, dim once
+  finished), naming the waiter when it is not the edge's parent. Cards narrow
+  to fit a wide fan-out; beyond that the graph scrolls horizontally to keep
+  the selection visible.
 - **Timeline**: one swimlane per execution, with the main session's model
   turns on the first lane. Bars are colored by outcome, `╍` marks time spent
   waiting, `▾` connects a waiting lane to the execution it waited for, and the
@@ -45,9 +47,9 @@ one selection:
   which agents ran.
 
 The bottom dialog shows what the selected execution was asked (its task
-prompt), its final message or error, and its recorded relationships. Tool calls
-stay hidden unless you press `t`. Long text is loaded from the selected log on
-demand rather than copied to a new database.
+prompt), its final message or error (the latest message while it runs), and its
+recorded relationships. Tool calls stay hidden unless you press `t`. Long text
+is loaded from the selected log on demand rather than copied to a new database.
 
 | Key | Action |
 | --- | --- |
@@ -57,13 +59,17 @@ demand rather than copied to a new database.
 | `+` / `-` | Timeline: zoom in/out (beyond the agent window up to the whole session) |
 | Tab | Switch between Graph and Timeline |
 | `f` | Cycle all, active, finished; ancestors remain as dimmed context |
-| `t` | Toggle tool calls / relationships in the detail dialog |
+| `t` | Show tool calls in the detail dialog instead of relationships (below 100 columns: instead of the message) |
 | Page Up / Page Down | Scroll the selected result |
 | `q` or Escape | Quit and restore the previous terminal screen |
 
-`done` means an invocation has a recorded `subagent.completed` or agent-attributed
-`session.task_complete` event. `replied`
-means a response and turn end were recorded, but lifecycle completion was not.
+`done` means an invocation has a recorded `subagent.completed` event or an
+accepted agent-attributed `session.task_complete`. `cancelled` means
+`subagent.completed` recorded `cancelled: true` (for example, a superseded run);
+it is not a failure. `replied` means the agent's latest model turn ended with a
+final answer, not progress commentary, but lifecycle completion was not
+recorded. Lifecycle events name an agent's original launch call; they settle
+the agent's open execution and never overwrite an earlier recorded outcome.
 Follow-up executions on a reused agent remain separate from its earlier work.
 The finished filter includes replied executions without claiming the agent was
 terminated. Running/unknown states are **last observed**, not a process-health
@@ -89,13 +95,15 @@ records produce explicit diagnostics rather than fabricated results.
   truncated by Copilot; the viewer cannot reconstruct it.
 - Ephemeral events and unrecorded cancellation/liveness signals cannot be
   recovered from this file. Unknown agent-event types are diagnosed, not
-  interpreted as cancellation or success.
+  interpreted as an outcome.
 - Detected source replacement/truncation rebuilds the view. A trailing record
   without a newline remains buffered until it is complete. Reading stops on a source
-  error, with a visible diagnostic and a nonzero exit status on quit.
+  error, with a visible diagnostic and a nonzero exit status on quit; the clock
+  then stays at the last recorded event.
 - While following a live log, open executions extend to the current time. A
-  recorded `session.shutdown` switches the header to `ended` and stops the clock.
-- Below 100 columns the detail dialog shows only the task and result.
+  recorded `session.shutdown` switches the header to `ended` and stops the clock;
+  a later `session.resume` makes the session live again.
+- Below 100 columns the detail dialog uses one column and omits relationships.
 
 Text from the log is rendered without terminal control sequences. Session
 content stays local: do not copy private transcripts into this repository.
@@ -111,6 +119,7 @@ npm run build
 ```
 
 Tests use synthetic records and temporary files, covering replay/tailing,
-UTF-8 boundaries, source reset, agent/result attribution, recorded wait history,
-reused agents and later turns, graph layout, the Graph/Timeline views,
-filtering, hidden-by-default tool calls, resizing, and result scrolling.
+UTF-8 boundaries, source reset, agent/result attribution, lifecycle routing and
+cancellation, session resume, recorded wait history, reused agents and later
+turns, graph layout and scrolling, the Graph/Timeline views, filtering,
+hidden-by-default tool calls, narrow terminals, and result scrolling.

@@ -5,6 +5,7 @@ import {elapsed, formatDuration, glyphPart, MAIN, nodeType, runLabel, VISUALS, v
 import type {Node, Visual} from './tree.js';
 
 export const CARD_W = 26;
+export const MIN_CARD_W = 18;
 export const ROOT_W = 32;
 export const CARD_H = 5;
 export const ROOT_H = 4;
@@ -26,7 +27,6 @@ export interface GraphLayout {
 }
 
 const MUTED: Style = {fg: 'muted'};
-const cardWidth = (node: Node): number => node.id === MAIN ? ROOT_W : CARD_W;
 const centerOf = (p: Placed): number => p.x + Math.floor(p.w / 2);
 const clamp = (value: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, value));
 
@@ -34,7 +34,8 @@ const clamp = (value: number, lo: number, hi: number): number => Math.max(lo, Ma
 export const levelY = (depth: number): number => depth === 0 ? 0 : ROOT_H + 2 + (depth - 1) * LEVEL;
 
 /** Top-down tidy layout: each subtree gets its own column span and parents sit centred over their children. */
-export function layoutGraph(root: Node): GraphLayout {
+export function layoutGraph(root: Node, cardW = CARD_W): GraphLayout {
+	const cardWidth = (node: Node): number => node.id === MAIN ? ROOT_W : cardW;
 	const spans = new Map<string, number>();
 	const childSpan = (node: Node): number =>
 		node.children.reduce((sum, child) => sum + spans.get(child.id)!, 0) + GAP * Math.max(0, node.children.length - 1);
@@ -65,10 +66,17 @@ export function layoutGraph(root: Node): GraphLayout {
 	return {placed, width: spans.get(root.id)!, height: deepest === 0 ? ROOT_H : levelY(deepest) + CARD_H};
 }
 
+/** Narrows the agent cards (down to MIN_CARD_W) before falling back to horizontal scrolling. */
+export function fitGraph(root: Node, areaW: number): GraphLayout {
+	let layout = layoutGraph(root);
+	for (let w = CARD_W - 2; layout.width > areaW && w >= MIN_CARD_W; w -= 2) layout = layoutGraph(root, w);
+	return layout;
+}
+
 function edgeLabel(frame: Frame, parent: Node, child: Node): [Style, Part[]] {
 	const {model, now} = frame;
 	const parentKey = parent.run ? parent.run.id : null;
-	const waits = [...model.waitLog.values()].filter(edge => edge.toRunId === child.id && (child.edge === 'turn' || edge.fromRunId === parentKey));
+	const waits = [...model.waitLog.values()].filter(edge => edge.toRunId === child.id);
 	const active = waits.some(edge => !edge.end);
 	const parts: Part[] = [];
 	if (child.edge === 'turn') parts.push(['later turn', MUTED]);
@@ -120,7 +128,7 @@ function drawCard(view: Screen, frame: Frame, p: Placed, ox: number, oy: number)
 }
 
 export function drawGraph(scr: Screen, frame: Frame, area: Rect, legendY: number): void {
-	const layout = layoutGraph(frame.tree.root);
+	const layout = fitGraph(frame.tree.root, area.w);
 	const selected = layout.placed.get(frame.state.selectedId) ?? layout.placed.get(MAIN)!;
 	let ox: number;
 	if (layout.width <= area.w) ox = -Math.floor((area.w - layout.width) / 2);
@@ -139,24 +147,41 @@ export function drawGraph(scr: Screen, frame: Frame, area: Rect, legendY: number
 	}
 	const view = new Screen(area.w, area.h);
 	const border: Style = {fg: 'border'};
+	// Edge labels may run right until the next arrow on the same row (children of every parent at one depth share it).
+	const arrows = new Map<number, number[]>();
 	for (const p of layout.placed.values()) {
-		if (!p.node.children.length) continue;
-		const pc = centerOf(p);
+		if (p.node.id === MAIN) continue;
+		const row = arrows.get(p.y - 1) ?? [];
+		row.push(centerOf(p));
+		arrows.set(p.y - 1, row);
+	}
+	for (const row of arrows.values()) row.sort((a, b) => a - b);
+	const right = Math.max(layout.width, ox + area.w);
+	for (const p of layout.placed.values()) {
 		const busY = p.y + p.h;
+		if (!p.node.children.length || busY + 1 < oy || busY >= oy + area.h) continue;
+		const pc = centerOf(p);
 		const centers = p.node.children.map(child => centerOf(layout.placed.get(child.id)!));
+		const drops = new Set(centers);
 		const lo = Math.min(pc, ...centers);
 		const hi = Math.max(pc, ...centers);
-		for (let c = lo; c <= hi; c++) view.put(c - ox, busY - oy, junction(c === pc, centers.includes(c), c > lo, c < hi), border);
+		for (let c = Math.max(lo, ox); c <= Math.min(hi, ox + area.w - 1); c++) {
+			view.put(c - ox, busY - oy, junction(c === pc, drops.has(c), c > lo, c < hi), border);
+		}
+		const row = arrows.get(busY + 1) ?? [];
 		p.node.children.forEach((child, i) => {
 			const cc = centers[i]!;
-			const next = centers[i + 1] ?? cc + CARD_W;
+			const next = row.find(x => x > cc);
+			const room = next === undefined ? right - cc - 2 : next - cc - 3;
 			const [tone, label] = edgeLabel(frame, p.node, child);
 			view.put(cc - ox, busY + 1 - oy, '▾', tone);
-			view.seqFit(cc + 2 - ox, busY + 1 - oy, label, Math.max(0, next - cc - 3));
+			view.seqFit(cc + 2 - ox, busY + 1 - oy, label, Math.max(0, room));
 		});
 	}
-	for (const p of layout.placed.values()) drawCard(view, frame, p, ox, oy);
+	const visible = (p: Placed): boolean => p.x + p.w > ox && p.x < ox + area.w && p.y + p.h > oy && p.y < oy + area.h;
 	for (const p of layout.placed.values()) {
+		if (!visible(p)) continue;
+		drawCard(view, frame, p, ox, oy);
 		if (p.node.children.length) view.put(centerOf(p) - ox, p.y + p.h - 1 - oy, '┬', {fg: p.node.id === frame.state.selectedId ? 'accent' : 'border'});
 	}
 	scr.blit(view, area.x, area.y);

@@ -21,13 +21,14 @@ export interface Tree {
 	byId: Map<string, Node>;
 }
 
-export type Visual = 'running' | 'waiting' | 'done' | 'failed' | 'replied' | 'idle' | 'ended' | 'unknown';
+export type Visual = 'running' | 'waiting' | 'done' | 'failed' | 'cancelled' | 'replied' | 'idle' | 'ended' | 'unknown';
 
 export const VISUALS: Record<Visual, {glyph: string; tone: Tone; label: string}> = {
 	running: {glyph: '◐', tone: 'accent', label: 'running'},
 	waiting: {glyph: '◌', tone: 'attention', label: 'waiting'},
 	done: {glyph: '✓', tone: 'success', label: 'done'},
 	failed: {glyph: '✗', tone: 'danger', label: 'failed'},
+	cancelled: {glyph: '■', tone: 'muted', label: 'cancelled'},
 	replied: {glyph: '↩', tone: 'done', label: 'replied'},
 	idle: {glyph: '○', tone: 'muted', label: 'idle'},
 	ended: {glyph: '○', tone: 'muted', label: 'ended'},
@@ -40,7 +41,8 @@ export function visualOf(model: AgentModel, node: Node): Visual {
 	if (!node.run) return model.mainStatus();
 	const status = model.status(node.run);
 	if (status === 'completed') return 'done';
-	return status === 'running' || status === 'waiting' || status === 'failed' || status === 'replied' ? status : 'unknown';
+	return status === 'running' || status === 'waiting' || status === 'failed' || status === 'cancelled' || status === 'replied'
+		? status : 'unknown';
 }
 
 export function glyphPart(visual: Visual, spin: number, dim = false): Part {
@@ -57,12 +59,26 @@ function matches(run: AgentRun, filter: Filter): boolean {
 
 const startOf = (run: AgentRun): number => Date.parse(run.startedAt ?? run.lastActivity);
 
-/** Builds the display tree: spawned agents under their launcher, later turns under the previous turn. */
+/** The agent's first execution; later turns hang off it as siblings so a long conversation does not nest deeper. */
+function firstTurn(model: AgentModel, run: AgentRun): AgentRun {
+	const seen = new Set<string>();
+	let first = run;
+	while (first.previousRunId && !seen.has(first.id)) {
+		seen.add(first.id);
+		const previous = model.runs.get(first.previousRunId);
+		if (!previous) break;
+		first = previous;
+	}
+	return first;
+}
+
+/** Builds the display tree: spawned agents under their launcher, later turns under the agent's first turn. */
 export function buildTree(model: AgentModel, filter: Filter): Tree {
 	const root: Node = {id: MAIN, children: [], edge: 'root', depth: 0, ctx: filter !== 'all'};
 	const parentOf = new Map<string, {id: string; edge: Node['edge']}>();
 	for (const run of model.runs.values()) {
-		if (run.previousRunId && model.runs.has(run.previousRunId)) parentOf.set(run.id, {id: run.previousRunId, edge: 'turn'});
+		const first = firstTurn(model, run);
+		if (first !== run) parentOf.set(run.id, {id: first.id, edge: 'turn'});
 		else if (run.parentRunId === null) parentOf.set(run.id, {id: MAIN, edge: 'spawn'});
 		else if (run.parentRunId && model.runs.has(run.parentRunId)) parentOf.set(run.id, {id: run.parentRunId, edge: 'spawn'});
 		else parentOf.set(run.id, {id: MAIN, edge: 'orphan'});
@@ -120,13 +136,14 @@ export function nowSeconds(model: AgentModel, nowMs: number): number {
 
 export function runSpan(model: AgentModel, run: AgentRun, now: number): [number, number] {
 	const start = sessionSeconds(model, run.startedAt ?? run.lastActivity);
-	const end = run.endedAt ? sessionSeconds(model, run.endedAt) : isFinished(run) ? sessionSeconds(model, run.lastActivity) : now;
+	// Without a lifecycle status the run is only known to have lasted until its last recorded event.
+	const end = isFinished(run) ? sessionSeconds(model, run.endedAt ?? run.lastActivity)
+		: run.status === 'unknown' ? sessionSeconds(model, run.lastActivity) : now;
 	return [start, Math.max(start, end)];
 }
 
 export function elapsed(model: AgentModel, node: Node, now: number): number {
 	if (!node.run) return now;
-	if (node.run.durationMs !== undefined && node.run.status === 'completed') return node.run.durationMs / 1000;
 	const [start, end] = runSpan(model, node.run, now);
 	return end - start;
 }
