@@ -1,3 +1,85 @@
+## 1.0.108 - 2026-11-09
+
+- Add `sandbox.userPolicy.filesystem.enumeratePaths` in `settings.json` for Windows enumerate-only directory grants
+- Add /index commands and enable managed shared tgrep indexing by default for eligible repositories
+- PDF attachments on Grok 4.7 and Grok 4.6 fall back to file references instead of failing the turn
+- With the sandbox on, a running local MCP server is now restarted after `/cd`, so it follows the new directory's denied paths instead of keeping those of the directory the session left.
+- A file attachment sent through the SDK that points at a named pipe, socket or device is now tagged as an error instead of stalling the turn until something writes to the pipe.
+- The canvas tools now tell the model which instance IDs `open_canvas` accepts, instead of calling them free-form.
+- /model now lists models when Copilot answers the model list request with 421 Misdirected Request, for example after a plan change, by re-resolving your account's endpoint as chat turns already do instead of showing "Error loading model list".
+- Requests to OpenAI-compatible chat-completions providers no longer include an internal message field on skill and tool messages.
+- Ctrl+C now stops a running /compact, as Esc Esc does, instead of only arming the exit hint and quitting the CLI on a second press.
+- The /config help no longer shows literal backticks or uses a model outside the model list as its example.
+- Your defaultMode setting now applies when you close the startup session picker while the session is still loading its model, instead of the session staying in its previous mode.
+- A disabledSkills entry, skills.disable and skills.enable now match a skill name in any letter case, as invoking the skill does, instead of silently doing nothing when the case differs.
+- Creating or resuming an SDK session, or replacing its tools, with two custom tools of the same name is now an error. Before, the model was offered the first definition while some SDKs ran the handler of the last one.
+- Copilot no longer crashes with an unhandled exception at startup when it cannot save its first-launch timestamp, for example because the disk holding the Copilot home directory is full. The failure is logged and startup continues.
+- The Getting started box no longer suggests /init in a folder where you ran /init suppress, in a repository that already has Copilot instructions, or outside a git repository.
+- `copilot help config` now names the `.claude/rules` instruction files and the `.claude/settings.json` repository settings the CLI reads.
+- copilot help input now says that esc esc also stops a running /compact, and that in shell mode a single esc or ctrl+c on an empty prompt leaves shell mode
+- `/help` now describes `ctrl+d` (exits only on an empty prompt, otherwise deletes the next character) and `ctrl+z` on Windows correctly, and lists `ctrl+j`, `ctrl+v`, `ctrl+y` and the voice input keys.
+- copilot help limits now quotes the rate-limit prompt as local sessions show it, "Switch to Copilot Fusion mode?", instead of "Switch to auto mode?".
+- copilot help mcp now says that a directory's .github/mcp.json is ignored when the same directory has a .mcp.json, instead of implying the two files are merged
+- copilot help monitoring now describes the github.copilot.sandbox.operation.count metric as counting every sandbox decision by kind, not only deduplicated posture changes.
+- Pasting an image path again after clearing its `[image: ...]` label with Ctrl+U, Ctrl+K, Ctrl+W or an Up-arrow history recall attaches the image again instead of inserting the plain path.
+- Backspace, an arrow key, Ctrl+U or Shift+Enter pressed right after a paste now acts after the pasted text instead of on the text in front of it.
+- Picking an MCP server type by its number in the add or edit form now moves focus to the next field for that type.
+- /permissions default in Autopilot now asks again how to handle permissions on the next prompt, as /permissions manual does, instead of leaving Autopilot to deny every tool request.
+- A queued `/ask` or `/btw` that runs while another side answer is open now shows that it is still thinking, instead of showing the previous answer as its own finished answer for Ctrl+Y to copy.
+- copilot --resume <name> and /resume <name> now find a session whose name has an accent typed precomposed or decomposed, whichever spelling the session was saved with.
+- In /search, Up, Down and Enter bring a single match back into view after you scroll away, and a shorter terminal no longer leaves the current match off screen.
+- /security-review help now says it reviews the branch diff when the working tree is clean, not only staged and unstaged changes
+- Escape sequences in checkpoint titles, file names, Copilot home paths and generated agent names no longer restyle /session info or the /agent wizard.
+- Long values in `/session info`, such as the log and session file paths, now wrap under their own column instead of back under the label
+- Switching to another session no longer occasionally replaces that session's model with Auto while the model list reloads.
+- `/share` usage no longer implies that `/share` alone exports a markdown file; it shows that a bare path must contain `/`, `.` or `~`.
+- A path or URL route in a prompt, such as /docs/setup.md, no longer loads a skill named after its first segment (docs) as if you had invoked that skill.
+- Subcommands of `/pr`, `/lsp`, `/skills`, `/plugin`, `/user` and `/collect-debug-logs` now match in any letter case, so `/lsp TEST my-server` runs the test instead of showing usage text.
+- Help for `/experimental` and `/theme` now marks `/experimental on|off` and `/theme <mode>` as deprecated and points at `/settings`, and `/mcp disable` is no longer described as temporary: it is saved across sessions.
+- A repository `sessionStart` prompt hook that runs `/clear <prompt>` or `/new` now starts one new session instead of starting another one in every session it creates.
+- The duration shown on a sub-agent no longer counts the time its tool calls spent at permission prompts.
+- The `/subagents` help no longer promises a default subagent model. It now says the command configures each subagent's model and settings and turns subagents on or off.
+- Tab characters in replies, error messages, agent names and other text are now shown as spaces instead of being dropped, so tab-separated words no longer run together.
+- The duration shown on a tool call no longer counts the time spent at its permission prompt, and it does not tick while the prompt is open.
+- The `/update` channel choices now say that picking `stable` or `prerelease` also saves it as your update channel for future updates.
+- Preserve input queued behind a paste when resizing the terminal
+- Memory import reports malformed repository scopes without a false unsupported host error
+- Show a warning when a selected custom agent's configured skills are missing or cannot be loaded
+- Include session start, resume, and model-change events in `-p --output-format json` output
+- Keep built-in agents selected with --agent active when opening /agent or refreshing available agents
+- Interactive CLI sessions pass local MCP server environment values literally; use ${NAME} to reference a host environment variable
+- Allow semantic code search to find renamed repositories when the checkout still uses the old name
+- Use Ctrl+T to show and hide First Pass reasoning when Fusion is selected through a routing profile
+- Keep the selected match in view when opening /search or /find instead of jumping to the bottom of the conversation.
+- Allow the system to sleep again after a background MCP reload finishes when using /keep-alive busy.
+- Keep the footer's plan hint visible when a nonempty plan is available
+- Interactive Autopilot waits for your response to MCP input and consent requests instead of automatically declining them
+- /mcp enable now respects repository settings that disable an MCP server
+- Renaming files with the patch tool now succeeds without requiring changes to their contents
+- File diffs in the concise transcript show terminal escape sequences as visible characters and preserve added and removed line colors
+- Reduce CPU usage during builds in large worktrees when language servers watch for file changes
+- Headless runs now report an error when resuming a session in use by another Copilot process, keeping its history intact.
+- MCP deny rules now block a tool named the way its MCP server advertises it (for example `server(weather.lookup)`), not only its sanitized name, even with --allow-all-tools
+- On Linux, language servers are no longer told that the files in a directory were deleted when the directory is renamed away and straight back.
+- On Linux, language servers are now told when a directory is renamed (the old files deleted, the new ones created) while other directories in the workspace are being created and removed, such as during a package install.
+- A canvas that was open when a session was resumed is now restored even if its extension restarts while the canvas is being reopened, instead of staying unavailable.
+- When a preToolUse hook asks about several parallel tool calls, each call gets its own confirmation again: answering No with feedback to one no longer denies the others without asking.
+- Attaching an empty PDF or Office document no longer fails the turn on models that read documents natively; the empty file is passed as a file reference instead.
+- Connect to an already running /voice server even when its PID file is missing
+- /limits unset now clears session AI credit caps for subsequent requests
+- `/plugin install` from a repository, URL or local path now shows the same deprecation warning that `copilot plugin install` prints.
+- Automatic updates are no longer skipped for a launch when signing in takes more than about a second
+- /changelog <version> can retrieve release notes for versions not bundled with the CLI
+- A turn that ends while the session event log cannot be written now still ends with `session.idle`, so `sendAndWait` no longer times out on a turn that completed.
+- The grep and glob tools now return the matches they found when a file or directory under the search path cannot be read, with a note naming what was skipped, instead of failing with only the permission error.
+- Apply reasoning effort changes made during a tool call to the next model request on supported models, without waiting for another prompt
+- Since 1.0.104, Assisted Permissions judge calls are sent as agent requests and no longer count as separate premium requests
+- Answer questions about Copilot CLI behavior from this build's own documentation and clearly say when docs do not cover a question.
+- Keep successful command output and file diffs collapsed in concise transcript mode until expanded, while keeping running output and failure details visible.
+- Show MCP form validation errors beside inputs, focus the first invalid field, and improve screen-reader labels and cursor positioning
+- Since 1.0.106, Autopilot with Assisted Permissions no longer stops for permission prompts; the agent tries another approach and reports the actions it could not take
+- Managed plugin assignments with state "defaultEnabled" now install and activate plugins by default while preserving user overrides.
+
 ## 1.0.107 - 2026-11-06
 
 - Rex terminals render inline images using Kitty direct placements.
