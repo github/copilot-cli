@@ -142,6 +142,23 @@ Setting this to `true` has the same effect as setting the SDK's
 `capi.enableWebSocketResponses` session option to `false`. The two have opposite
 polarity, so enabling this variable disables the WebSocket transport.
 
+### Container image
+
+The Copilot CLI is also available as a container image that runs the CLI as a headless server for Copilot SDK clients. Images are published to `ghcr.io/github/copilot-cli` for `linux/amd64` and `linux/arm64`. This image is for connecting SDK clients to a server, not for interactive terminal use.
+
+Set a connection token and a GitHub token, then start the server:
+
+```bash
+export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"
+docker run --rm \
+  -p 127.0.0.1:4321:4321 \
+  -e COPILOT_CONNECTION_TOKEN \
+  -e COPILOT_GITHUB_TOKEN \
+  ghcr.io/github/copilot-cli:latest
+```
+
+Set `COPILOT_GITHUB_TOKEN` in your environment before running the command. For version-pinned deployments, use a release tag instead of `latest`. See the [container image guide](./container/README.md) for SDK connection examples, configuration, security considerations, and build instructions.
+
 ### Experimental Mode
 
 Experimental mode enables access to new features that are still in development. You can activate experimental mode by:
