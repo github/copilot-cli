@@ -1,3 +1,164 @@
+## 1.0.109 - 2026-11-10
+
+- Add IPv4/IPv6 CIDR support for sandbox host allow and deny rules in settings.
+- Add support for Claude Fable 5.2 in the model picker under New models
+- copilot help input now says that Backspace at the start of shell input leaves shell mode and keeps the typed text, not only on an empty prompt
+- /subagents keeps its Overridden and Status columns readable on narrow terminals and aligns agent names with wide characters
+- Removing a built-in MCP server with `copilot mcp remove` or `/mcp delete` explains how to disable it instead
+- Selecting a directory next to your home directory in `/cd ~` or `/add-dir ~` uses the correct full path
+- Trusted-folder and worktree confirmations keep Windows path separators
+- Hide empty assistant reply bullets when a response contains only whitespace
+- Choosing "don't ask again" for parallel file operations approves all covered requests without prompting again
+- Make /terminal-setup configure Shift+Enter in the correct location for VS Code, Cursor, and Windsurf on Linux when XDG_CONFIG_HOME is set
+- The footer's AI credits now update as soon as `/compact` finishes instead of after the next turn
+- Prompt mode with --output-format json emits a final result record with an exit status even when a run fails early
+- Rate-limit errors now name the same mode as the switch dialog (Copilot Fusion mode or auto mode) instead of "auto model"
+- In a multi-line prompt, Up and Down now start from the cursor after Left, Right, Backspace, Delete or a similar key that had nothing to act on at the start or end of the text, instead of jumping to the column of the previous Up/Down run
+- Number keys keep working in shell and URL approval dialogs after pressing the number of the "No, and tell Copilot" option and moving back up
+- `/cd .` and `/add-dir .` now keep the current directory in a git repository instead of selecting `.git`; the directory picker lists `./` first and still offers hidden directories below it
+- In ACP mode, a preToolUse hook that answers ask now asks the ACP client to allow or deny the tool call instead of denying it as host policy
+- /voice immediately reports an overly long socket path and how to fix it, instead of waiting before showing a generic error.
+- File move permission prompts show both source and destination paths, and pure renames no longer show an empty diff.
+- Session history keeps every turn when a second window works on a session another window still has open
+- The `beepOnSchedule` setting description now says it controls the beep when a scheduled `/every` or `/after` turn finishes, and only while `beep` is on, instead of a beep when the prompt fires
+- The `companyAnnouncements` setting description now says one message, picked at random, appears in the timeline as a Company announcement notice, not in the startup banner
+- `copilot help config` no longer says turning off `compactPaste` shows every paste in full; pastes over 20 KB are still saved to a workspace file
+- `copilot help config` now names the home screen tabs as they appear, Current and Sessions, instead of Session and Agents
+- The `ctrl+h` entry in the keyboard shortcut help now says it deletes the previous word in local Windows terminals, where the terminal sends the same key for `ctrl+h` and `ctrl+backspace`
+- The `footer.showModelEffort` setting description now says it toggles only the reasoning effort label next to the model name, which always shows, and that the effort shows briefly after it changes when the setting is unset
+- `copilot help config` no longer names staff-only and internal settings, such as `taskbarPresence`, `showTipsOnStartup` and `streamerMode`
+- The `ide.openDiffOnEdit` setting description now says the IDE diff opens for a file edit waiting for your approval, and that accepting or rejecting it answers that prompt, instead of a diff on every edit
+- Text typed after /init now reaches the model as extra guidance for the generated instructions file and appears in the timeline, instead of being silently dropped.
+- The `/init` usage hint now shows `[suppress|<instructions>]`, since text after `/init` guides what it writes, instead of listing only `suppress`
+- The `inlineImages` setting description no longer says images render with Sixel graphics by default; Sixel is used only with experimental features on
+- MCP tool results that return text as a base64 `blob` resource with a text MIME type, such as `text/plain` or `application/json`, now reach the model instead of arriving as an empty result
+- `copilot help providers-env` and `copilot help environment` no longer say `COPILOT_PROVIDER_BEARER_TOKEN` always takes precedence over `COPILOT_PROVIDER_API_KEY`: it does for openai and azure, but anthropic sends both
+- `copilot help providers-env` and `copilot help environment` now say `COPILOT_PROVIDER_MODEL_ID` and `COPILOT_PROVIDER_WIRE_MODEL` default to the `--model` value before `COPILOT_MODEL`, and that the wire model falls back to `COPILOT_PROVIDER_MODEL_ID`
+- `copilot help providers-env` and `copilot help environment` now say `COPILOT_PROVIDER_TRANSPORT=websockets` works only with provider type openai and the responses wire API, instead of implying it works for azure and anthropic too
+- `copilot help providers-env` no longer says COPILOT_PROVIDER_API_KEY_COMMAND output is always sent: it says the command does not run when COPILOT_PROVIDER_BEARER_TOKEN is set, and that a custom credential header's precedence depends on the provider type
+- `copilot help providers-env` and `copilot help environment` now say that `COPILOT_PROVIDER_*` variables take precedence over a saved `providers.json`, unless `COPILOT_PROVIDERS_CONFIG` names the file
+- `copilot help providers-local` now says Copilot looks for Ollama only on this machine, and that an `OLLAMA_HOST` on another machine is ignored
+- Running /research again on the same topic, or on a topic that starts with the same words, now saves a new report instead of trying to write over the earlier one.
+- The `sandbox.auth.git` setting description now says sandboxed git gets a masked credential that the sandbox proxy swaps for the real one only at that HTTPS origin, and that hosts other than GitHub use your own git credential helper, instead of saying the GitHub token is injected
+- The `sandbox.userPolicy.network.proxy.url` setting description now says sandboxed traffic always reaches the configured proxy through the built-in local proxy, which keeps proxy credentials away from sandboxed commands, instead of saying traffic without host rules uses the proxy directly
+- Sessions closed or disposed outside the sessions API no longer stay in memory in the CLI's embedded SDK server
+- A collapsed grep or glob row now counts only the files or lines a search found, not the summary lines of a large result or an appended warning, which made an empty search read "3 files found".
+- The search subagent's semantic_search tool now tells the model it returns up to 5 excerpts from GitHub's code index for the repository, instead of claiming to search the local workspace and return its full contents when small.
+- The `/settings` value column, the footer's model name and the startup warning for an invalid `allowedUrls` or `deniedUrls` entry no longer pass control characters from settings.json to the terminal.
+- The `subagents.maxConcurrency` and `subagents.maxDepth` setting descriptions now say the settings are ignored on Copilot plans without usage-based billing, instead of saying they apply only to usage-based billing users
+- `copilot update --help` no longer calls stable the default update channel: with no channel argument and no `autoUpdatesChannel` setting, a prerelease build stays on prerelease
+- A mistyped server in your own mcp-config.json is now reported at startup and in mcp list, and an mcp-config.json that cannot be used names the file and the real problem.
+- On Windows, memory the runtime frees after a turn, a session resume or a closed session is now returned to the system instead of staying committed to the process
+- copilot workflow run now explains that dynamic workflows need experimental features (or a non-disabled extension mode) and exits with status 2, instead of failing with an internal error
+- Cancelled, denied, or failed memory votes now show "Memory update failed" in the timeline
+- Unquoted prompts get accurate quoting guidance without suggestions that turn CLI options into prompt text.
+- Keep selected skill problems visible while navigating long /skills problem lists
+- Show parser errors for mistyped --prompt/--interactive options, and shell-neutral guidance instead of an unsafe -i suggestion for prompts with shell-sensitive characters
+- Repository settings warnings point to the actual syntax error in files with comments or trailing commas
+- Preserve file names, globs, and links in expanded JSON tool results instead of interpreting them as Markdown
+- Display search patterns and tool errors in the concise transcript without letting escape sequences alter terminal colors or formatting.
+- Preserve settings saved by other sessions when changing nested settings in /settings or /config
+- Pressing Esc after reopening /help over another full-screen view returns to the prompt without leaving the CLI blank and unresponsive
+- MCP dashboard now keeps runtime-only servers read-only on local sessions
+- Warn when a collected debug bundle has missing or empty process logs
+- /rubber-duck is offered on the default model from the start of a session, on Auto once a model has been picked, and after switching to an eligible model with /model
+- Backspace at the start of shell input exits shell mode and keeps the typed text, so a prompt that enters shell mode while editing is no longer stuck there
+- Clear the compaction indicator when background summarization finishes, even while a tool is still running
+- Show an error when a selected or saved model is unavailable instead of silently switching to another model
+- Sandbox denied paths on Linux now block access to developer-tool configuration files inside those paths.
+- Use custom agents added to .github/agents/ during a session without reloading
+- Start sessions faster with --session-id when you have a large local session history
+- Preserve settings changes when another CLI session saves a different setting at the same time
+- Prevent duplicate shell commands from staying pending when parallel sub-agents request approval, including after resuming a session
+- IDE discovery and auto-connect work when the CLI cannot signal the IDE process, including across sandbox boundaries
+- Connect to MCP servers that omit optional discovery cache hints, making their tools available to Copilot
+- MCP servers can use stored secrets in the default profile without requiring --config-dir
+- Resume sessions saved by earlier CLI versions with unreadable code-change line counts
+- Ensure post-checkout hooks run Git commands against the intended repository when using --worktree
+- Ctrl+C dismisses dialogs or exits reverse search without cancelling an ongoing /compact
+- Resume sessions by name with --resume or /resume even when names contain special characters
+- Repository scans skip nested filesystems, avoiding stalled-mount exit delays on Linux when statx is available
+- Built-in file and text searches work on ARM64 Linux systems with 16 KiB or 64 KiB memory pages
+- Canceling the Autopilot confirmation leaves picker-submitted slash commands unexecuted, and confirming runs them only once
+- MCP servers disabled by repository settings now stop when you trust the folder, removing their tools from the session.
+- The /mcp screen respects repository-disabled servers and no longer labels them as session-disabled
+- Show error details when expanding failed search or diagnostics calls with Ctrl+O
+- Continuing from the session credit limit dialog no longer shows a false "Session limit reached" notice.
+- Hide inaccurate context percentages in /context and the footer when Auto uses Copilot Fusion High or Max.
+- Preserve file contents when renaming files with case-only changes or moving them through symlinked directories
+- Markdown session exports keep later transcript entries visible when task summaries, notifications, or handoff summaries contain HTML-like text
+- Pressing Ctrl+C again after stopping a ! shell command shows the exit warning instead of immediately quitting the CLI
+- Make `copilot mcp list` and `copilot mcp get` honor `--additional-mcp-config` and `--plugin-dir`, matching the servers used in a session
+- Stopping a background agent from /tasks also stops attached background shells started by it and its subagents, while leaving detached shells running
+- Plugin hooks, MCP servers, and extensions work when COPILOT_HOME or --config-dir is a relative path
+- Show policy guidance, a settings link, and a request ID when access to the model catalog is denied at startup
+- Keep repository-disabled skills disabled in /skills when trusting a folder for the current session only
+- Esc and Ctrl+C cancel a pending prompt immediately while an MCP server's authentication refresh is still running
+- CLI colors stay in sync when your terminal follows an OS light or dark theme change
+- MCP servers start even when an unrelated setting in config.json has an invalid value
+- Resuming an interactive session with --context now applies the requested context window tier instead of keeping the saved tier
+- Repaint the Windows terminal at the correct size after rapid window resizing
+- Keep images attached when editing text around image labels whose filenames contain `]`
+- Declining folder trust after /new worktree keeps the CLI open in the original folder instead of exiting
+- /rename without a name shows an error when the generated session name cannot be applied
+- Include cross-file edits and references in the first LSP rename or reference search when a language server loads its project lazily
+- Render Markdown in expanded subagent replies and prevent quoted terminal escape sequences from changing their appearance
+- Preserve saved MCP server settings when editing a server overridden by --additional-mcp-config
+- Completed sessions show Done instead of staying stuck on Working in the sidebar after switching sessions
+- MCP allow rules now approve a tool named the way its MCP server advertises it (for example `--allow-tool 'server(weather.lookup)'` or a tool name longer than 64 characters), matching how deny rules already work
+- Preserve long responses in session history and resumed sessions, even if a later continuation fails
+- Recover instruction scoping when malformed frontmatter wraps list values over lines or quotes scoping keys
+- A `sessionStart` or `preToolUse` hook that returns `"additionalContext": null` no longer sends the text `null` to the model; `null` is treated as absent, as it already was for `userPromptSubmitted`
+- The session.usage_info event now reports isInitial as true only for the session's first usage report, as documented, instead of for the first model request of every message.
+- Copying wrapped values from dialogs such as /session info preserves paths without inserting extra line breaks
+- HydraFusion review and repair phases no longer fail instantly when an SDK app resumes the session with the same token while the turn is running.
+- In-session /resume now explains why a cloud history session ID cannot be resumed
+- Progress messages on client-owned background tasks are now capped at the 20 most recent, so a long-running SDK task no longer makes session.tasks.getProgress grow without bound or each progress update slower.
+- Listing models before any session exists no longer keeps failing with 421 Misdirected Request after a plan change; the account's endpoint is re-resolved and the list is retried once.
+- Local models with `persist: true` reuse their running server across runs when the CLI is launched without `HOME` or `COPILOT_HOME`, instead of starting a new server every time
+- /mcp commands that take a server name (enable, disable, get, edit, remove, auth and add) now use the whole name typed after the subcommand, so a mistyped multi-word name reports that the server was not found instead of acting on a server named after its first word.
+- Collapsed grep and glob rows no longer count the lines of the warning about unreadable files as results when part of the searched tree cannot be read.
+- On Linux, language servers are now told about files created in a workspace directory that was deleted and recreated in one quick step, such as a build or code generator regenerating its output directories.
+- Pasted text drops terminal color codes and invisible control characters so the model receives the text shown in the prompt
+- The packaged CLI ignores its embedded Node.js flags, such as --no-warnings, when they are passed back to it as arguments, instead of failing with an unexpected argument error
+- On Linux, a build writing many files into a large workspace no longer keeps a CPU core busy for seconds while language servers are watching files.
+- Ctrl+G in a question from the agent opens your typed or "Other" answer in your editor again, instead of cancelling the question.
+- In /sandbox, a path or host rule that settings.json lists twice now shows as one row, so deleting it no longer leaves the deleted row on screen or makes the next delete remove a different entry.
+- /pr shows every reviewer when a team name contains | or Markdown characters, instead of cutting the Reviews row off at the first |.
+- /lsp test no longer reports working stdio language servers as exiting immediately: the startup check keeps the server's input open while it watches, as a real client does.
+- A repository whose remote uses GitHub's SSH-over-443 host (ssh.github.com) is now recognised as its github.com repository, so the session knows its repository instead of treating the folder as outside GitHub.
+- /keep-alive busy restores sleep prevention on the next turn or session switch if its helper exits while a background session is working.
+- Installing a plugin from a GitHub or git repository that uses Git LFS now downloads only the LFS files inside the plugin's own folder, so an LFS file elsewhere in the repository that the server cannot provide no longer makes the install fail.
+- Selecting a custom agent with /agent no longer fails with "Agent discovery inputs were superseded" when something else refreshes the agent list at the same moment
+- `web_fetch` returns a JSON or plain-text response as the server sent it when `<html` appears near its start, instead of stripping the markup or decoding it with an encoding that a quoted `<meta>` element names
+- Indexed search now deletes the per-repository indexes it left in the cache for repositories and worktrees that no longer exist, including those written before version 1.0.108, which could grow to tens of gigabytes
+- `web_fetch` rejects a negative `start_index` and a `max_length` below 1 with a validation error, instead of reading them from the end of the page past the 20000-character cap or naming continuations that skip the last page
+- Pressing Ctrl+C right after pasting now clears the pasted text along with the rest of the prompt, instead of the paste showing up in the cleared prompt a moment later.
+- Turning a language server on or off no longer erases the settings of other servers disabled by hand with "disabled": true in lsp-config.json, so re-enabling one later no longer breaks every user language server.
+- A device Policy Helper's policy is applied again when a session without a GitHub sign-in is resumed, so settings it locks, such as repository hooks, stay locked
+- Staff settings are saved to your own `~/.copilot/config.json` when the CLI starts without `HOME` or `COPILOT_HOME`, instead of a `.copilot` folder in the working directory
+- When a model provider rejects a request with a generic error such as "invalid request body" or "Bad Request" and one attached image is corrupt, the corrupt image is now omitted and the turn retried with the readable images instead of failing.
+- A prompt queued while the agent is working keeps its place in the queue when a model switch or queued command follows it quickly, so it runs on the model that was selected when it was submitted
+- Subagent rows in the timeline draw the agent type and model as plain text on one line, so escape sequences or line breaks in them no longer restyle the row, turn part of it into a hidden link or split it.
+- Changing directory with /cd from one indexed folder to another no longer leaves indexed search disabled for the rest of the session while the previous folder's index server is still stopping.
+- Adding an OAuth MCP server with /mcp add no longer says "Server Saved" before anything is saved, and if saving the config fails after you sign in, the form now shows why instead of reporting success and losing the server.
+- Changing the screen reader setting in /settings or /config now restarts the CLI or asks for a restart, and starting with --screen-reader offers to remember screen reader mode
+- Sessions no longer fail to start when the environment holds a variable whose name or value is not valid UTF-8; such variables are skipped instead of crashing the CLI.
+- Image and file labels remain whole when navigating or deleting them after an unfinished attachment label in the prompt
+- `copilot instruction list` run from a repository subdirectory lists each plugin rule once instead of twice
+- Interrupted `--worktree` checkouts stay intact, with manual recovery guidance that reminds you to preserve local changes and confirm Git has stopped.
+- Indexed search no longer stops for the rest of a session after one transient shared-index error, such as another process briefly holding the shared index cache
+- Resuming a session now restores its selected custom agent in /resume and prompt mode.
+- Resuming a session with no name from the Sessions sidebar no longer appears to rename it to "Session 1"
+- Keep your latest mode choice when switching sessions, instead of reverting to Plan mode
+- Completed subagent rows in the timeline show the model name instead of a hashed model identifier.
+- After /research, follow-up requests use normal session tool permissions.
+- Sandbox path settings support environment variables while preserving authored expressions in settings and the editor.
+- Use cache-aware background wait timeouts by default in interactive sessions
+- Ask for confirmation before /share or /export follows symlinks when saving local files
+- URL permission prompts let you approve every subdomain for the current session
+- Read-only shell scripts ask for permission less often, while scripts that change git refs or read files through hidden paths now always get reviewed
+
 ## 1.0.108 - 2026-11-09
 
 - Add `sandbox.userPolicy.filesystem.enumeratePaths` in `settings.json` for Windows enumerate-only directory grants
