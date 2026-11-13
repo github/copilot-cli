@@ -1,3 +1,101 @@
+## 1.0.112 - 2026-11-13
+
+- A failed /compact now shows the model provider's error message without an internal host-rethrow prefix
+- A prompt the CLI does not send yet, such as one entered while managed account policy is still loading, keeps its pasted text, so pressing Enter again sends the paste instead of the literal [Paste #N - M lines] placeholder
+- The /plugin manager no longer shows a repository plugin that did not load as enabled, and plugin lists no longer say its directory was not found when its source points outside the marketplace
+- `copilot help sandbox` now says that on macOS, sandbox host rules block direct TCP connections to local ports, such as a build client reaching its daemon; localhost stays reachable only through the local proxy, as HTTP or a CONNECT tunnel from a proxy-aware client
+- `copilot workflow run --help` now lists a Microsoft 365 account among the sign-ins that can run workflows, alongside usage-based billing and a custom model provider (BYOK) while signed out of GitHub
+- The /subagents model picker reopens for the same agent and accepts input after switching away from a session and back
+- Keep on/off states and model picker arrows visible in /subagents settings in narrow terminals
+- Opening a sub-agent's view no longer writes escape sequences or control characters from its task prompt to the terminal
+- /copy keeps its formatting when pasted into Word, Outlook or Teams, and keeps each message of a multi-message response as its own paragraph, table, list or quote
+- Model-switch prompts stay with the session that raised them and reappear when you return to that session
+- /settings list items display every character when typing or viewing saved values on terminals 20 columns wide or narrower
+- Permission prompts and other dialogs at the bottom of the screen no longer stay scrolled down after the terminal gets shorter and then taller again, so the extension environment-variable prompt shows the variable names it lists
+- /feedback warns when the additional logs path contributes no files to the feedback bundle
+- Emoji and other Unicode characters display correctly under the search cursor in the Issues and Pull requests tabs
+- Keep paths and variable names containing emoji or CJK characters correctly truncated and aligned in /sandbox
+- Links with balanced parentheses now open the full URL when clicked in your messages, shell commands, and shell output
+- Session limit dialogs stay with their session, leaving other sessions free for typing when you switch.
+- `copilot mcp get` correctly reports unconfigured server names such as `toString` as not found in text and JSON output
+- Sessions sidebar actions no longer create or switch sessions while the CLI exits, keeping the exit summary's resume commands valid
+- Text and number editors in /settings keep typed values visible inside the dialog on narrow terminals.
+- Tool previews keep emoji intact, display SQL and agent messages as plain text, and keep memory vote previews on one line
+- The @ file picker keeps emoji and accented characters intact and preserves the @ prefix when shortening paths in narrow terminals
+- /lsp logs error summaries fit the available width without splitting emoji, and server messages display as plain text
+- Arrow keys and Tab follow the highlighted action after using j/k or Ctrl+N/Ctrl+P in the /environments add-connection dialog
+- Pasted text stays in the correct position when you press Esc or Ctrl+C immediately after pasting in Vim mode
+- Keep the Sessions tab responsive when queued commands open dialogs such as /login
+- Ctrl+C reliably cancels newly queued prompts without running them or showing a submission failure.
+- Show the welcome header and Getting started box when cancelling the session picker at startup.
+- Prepare organization-required plugins once at startup, avoiding duplicate installations and repeated success or failure notices
+- Tool permission prompts keep their title and selected answer visible in short terminals, with PgUp/PgDn to scroll command or file details
+- MCP system prompt reviews display plain text without allowing terminal controls to restyle, link, or hide content
+- /plugin clears the marketplace update badge and count when a re-check confirms no update is available
+- Untrusted-folder warnings in prompt mode now identify skipped workspace MCP configuration in parent directories and the folder to trust to load it
+- `copilot help environment` documents `COPILOT_MCP_TOOL_CACHE` again, the variable that turns off the MCP tool snapshot cache for every server
+- Agent, code search and IDE tool rows in the timeline show model- and IDE-written text as plain text instead of passing its escape sequences and control characters to the terminal
+- /model plan now refuses extra arguments instead of saving or clearing the plan model without them, and reads PLAN and --plan plan as the plan keyword
+- Question rows in the timeline show the question text while awaiting an answer, after you decline, and when Autopilot answers.
+- Count previously used AI credits toward the session limit when resuming a session
+- Respect .gitattributes binary settings for untracked files in /diff and exclude their contents from added-line counts
+- Show only relevant options in argument error usage lines instead of listing every CLI option
+- Pasting into @ or # mentions and immediately pressing Enter, Tab, or Ctrl+Y no longer selects a file or issue from the previous results
+- Keep the highlighted agent visible in /agent when the list is taller than the terminal
+- Show URL-like names containing Markdown characters in /env without stray backslashes
+- Keep your instructions visible in chat and session history when /pr fix conflicts or /pr fix all opens the merge-strategy picker
+- MCP inspection commands warn when workspace MCP configuration is skipped because the folder is not trusted and explain how to trust it
+- Show your organization's support link in prompt-mode warnings when device policy disables --yolo or --allow-all flags
+- The session picker explains when --connect cannot find a remote session or task, or when the lookup fails
+- Install plugins from repository paths containing @, including scoped package directories
+- Keep the /diff search cursor visible in narrow terminals and show the match count when space allows
+- Keep the highlighted choice visible when navigating long lists in Copilot questions and MCP forms.
+- Opening the Sessions tab or sidebar while the CLI exits keeps the screen visible instead of blanking it
+- Keep the ellipsis visible on truncated session names in the Sessions tab, even in narrow terminals
+- Keep footer paths, branch names, and status text properly fitted when folder or branch names contain wide characters such as Chinese, Japanese, or Korean.
+- /tasks includes sub-agent follow-up run time after resuming a session
+- Running /exit or /quit twice quickly with the Sessions sidebar open exits the CLI instead of leaving a blank, unresponsive terminal
+- Keep goal panel todo counts accurate when returning from full-screen views such as /help or /environments
+- Keep the /settings record editor and typed keys inside the dialog on narrow terminals
+- Hide the unavailable Update action in /plugin for disabled local-marketplace plugins whose folders cannot be found
+- Show MCP server saves queued during an active turn as status messages instead of errors
+- Keep highlighted conversation text readable when its color matches the selection, search match, or hovered row background
+- Long plugin folder paths containing emoji display correctly when shortened in Enable and Disable dialogs
+- Markdown tables in replies fit narrow terminals without splitting borders and rows across lines
+- /env no longer lists instruction files disabled in /instructions as loaded
+- Keep Autopilot objectives and subagent descriptions readable when their text contains terminal escape sequences
+- Changing editorMode with /settings takes effect immediately after toggling /vim
+- Show complete filenames in collapsed Read, Create, and Edit rows when they wrap in narrow terminals
+- Keep /search match counts readable beside long queries and in narrow terminals
+- /help tables stay correctly aligned when resizing the terminal with the Sessions sidebar open
+- Keep highlighted permission prompt answers and typed replies readable on narrow terminals
+- Keep the /model picker's details and keyboard hints displayed correctly after rescanning providers with no search matches
+- Keep retry notices above the reply or final error when switching back to a session that retried in the background
+- Issues and pull requests picked with # include their details when you send or queue a prompt while the agent is working
+- Keep Vim undo and repeat commands scoped to the current draft after sending or queuing a prompt from INSERT mode
+- Keep the prompt responsive after widening a narrow terminal when Left was pressed twice to open the Sessions sidebar
+- Show the full server list and keyboard hints in /mcp auth after loading
+- Keep the command description and exit status visible in collapsed failed Shell rows with long single-line output
+- The built-in GitHub MCP server is no longer available when your organization's policy disables MCP servers
+- Subagents now respect the session-wide AI credit limit set with --max-ai-credits
+- /env displays configured names literally instead of interpreting them as Markdown blocks or emoji shortcodes
+- `copilot mcp remove` and `/mcp delete` now say that a server passed with `--additional-mcp-config` comes from that option and cannot be removed, instead of calling it not found or a built-in server.
+- /subagents keeps the cursor on the subagent you just configured after you press Esc in its settings menu, so Space no longer turns off a different subagent
+- Screen-reader mode names the current /config section correctly on narrow terminals
+- Pasting into /plugin, /skills, and /mcp search preserves text after the cursor, even when the paste ends with an incomplete escape sequence
+- Prompt text displays fully and handles line breaks correctly when pasted after slash commands, typed, edited with Ctrl+G, or recalled from history.
+- The model picker no longer runs past the top or bottom of the screen when its key hints wrap onto more lines, on narrow terminals and beside the docked Sessions sidebar
+- Keep each retry's reasoning with its own answer after an interrupted response
+- The session limit prompt shown before the final model call no longer rounds the used AI credits up to the limit, so it no longer says "Session limit almost reached" beside "used 300 of 300 AI credits"; it shows the same figures as the session limits line in the timeline, such as 299.6 of 300
+- Keyboard navigation and word deletion in the prompt keep image attachments and pasted-text labels intact
+- Rewinding to a message sent while the agent was working now restores the files the agent changed in reply to it
+- Typing /compact again while a compaction is running no longer hides the running compaction's indicator, and Ctrl+C and Esc Esc still stop it
+- A plugin in a local directory marketplace whose catalog path points at a file instead of a folder no longer stops every MCP server from starting; that plugin is skipped with a warning naming it and the path
+- Team plugins install from marketplaces on a specific branch or tag, or in a repository subfolder
+- Improve best-effort startup on macOS Ventura 13.5 or later without expanding official OS support
+- Use each model's recommended context window by default, while preserving explicit context choices
+- /chronicle cost-tips now includes Copilot App sessions, recommends cheaper models and reasoning settings based on your usage, and reports sooner when local usage is available
+
 ## 1.0.111 - 2026-11-13
 
 - Add regular expression support to enterprise-managed Shell, Bash, and PowerShell permission rules
