@@ -30,4 +30,5 @@ body:
       label: Additional context
       description: Add any other context about the feature request here.
       placeholder: |
-        - Screenshots or mockups
+        [![Close invalid PR writer](https://github.com/github/copilot-cli/actions/workflows/close-invalid-pr-writer.yml/badge.svg)](https://github.com/github/copilot-cli/actions/workflows/close-invalid-pr-writer.yml)
+        
