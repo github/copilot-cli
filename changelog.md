@@ -1,3 +1,127 @@
+## 1.0.111 - 2026-11-13
+
+- Add regular expression support to enterprise-managed Shell, Bash, and PowerShell permission rules
+- Add --host-allow-session-creation to let remote clients create sessions on CLI hosts for one launch without changing saved settings
+- Refresh /usage premium request usage so percentages stay current.
+- Prevent duplicate MCP OAuth reconnects and keep servers in needs-auth after canceled authorization
+- Markdown tables containing a wide symbol followed by the text variation selector, such as ⌛︎, render with correctly aligned rows
+- The `footer.showCodeChanges` setting description now says it shows the lines added and removed by Copilot's file edits in this session, not pending changes
+- The `/usage` activity graph now fits narrow terminals by showing fewer weeks, instead of wrapping every day row in two
+- Shell output and custom status lines display correctly when terminal control sequences appear, without applying unintended text styles
+- /rewind with Conversation + files no longer counts, lists or reports as restored a file that later turns had already put back or deleted again
+- Interactive /plugin marketplace commands find repository-local marketplaces when the CLI starts in a subdirectory
+- Keep selection labels readable and rows aligned in /environments when using --screen-reader
+- /skills get without a skill name and the /mcp usage text name the get and remove verbs instead of the retired info and delete
+- /diff shows a clear notice for binary files instead of garbled text or an empty pane
+- The `/usage` activity graph hides its legend in narrow panes to prevent it from wrapping onto extra lines
+- The $ shell shortcut reports launch failures once with a clear reason, including when Ctrl+G opens the editor at the same time.
+- /mcp search installs registry servers with URL variables using the values you enter
+- Custom status lines render terminal colors and formatting correctly, without stray characters after color resets.
+- Hook approval dialogs show control characters in tool names and arguments as visible text instead of hiding or restyling them
+- /session delete-all, /session prune, and /session delete preserve sessions running in the background in the same window
+- Text that fits on one row stays on one row after resizing the terminal
+- In `/workflows`, a run's Agents list no longer runs off the bottom of a short terminal: the selected agent stays on screen, and a long phase title stays on one row
+- copilot plugin enable, disable, update and uninstall now fail and name config.json when it cannot be parsed, instead of reporting success without a change or that the plugin is not installed
+- `--no-color` preserves text styling while disabling colors, even when `FORCE_COLOR` is set
+- Pasted image paths attach correctly when you press Enter immediately after pasting in terminals that mark pasted input
+- Keep the selected /share action visible when navigation keys cannot move the selection in short terminals
+- MCP forms show validation errors immediately for answers edited in an external editor with Ctrl+G
+- Running `copilot --continue` with no previous session shows the welcome header and Getting started box.
+- Keep the Sessions tab responsive when dialogs open during navigation, and show pending dialogs where they can be answered
+- Keep the highlighted confirmation option visible in the Sessions tab and /environments on short terminals
+- Keep the /theme picker's title and border on screen in narrow terminals and beside the docked Sessions sidebar, dropping the preview instead
+- The /share screen keeps the selected action visible in narrow terminals
+- /ask and /btw show answers correctly beside the Sessions sidebar in narrow terminals
+- Keep the /tasks title and borders visible when the task list is longer than the terminal can display
+- `copilot -p "/compact" --silent` no longer prints the compaction result line to stdout, so `--silent` output stays limited to the agent's response
+- Keep the prompt, tab bar, and status line visible when typing a multi-line draft during the startup animation on short terminals
+- /diff shows staged renames under their new names, including edits made while renaming
+- With experimental dynamic workflows, a workflow's own agent can no longer start or resume workflow runs, so a workflow can no longer start copies of itself without limit when all tools are allowed.
+- With the high-contrast theme on a 16 or 256-colour terminal, the Sessions tab shows the status icon of the selected row instead of drawing it blue on blue
+- Follow-ups typed while the agent is working now run in the order they were typed; one that reached the session between two turns is no longer overtaken by follow-ups typed after it.
+- The /usage activity graph counts only the prompts you typed, not sub-agent or autopilot prompts, and its message total matches the days the graph draws
+- Pasted escape sequences no longer change text colours or hide text in search fields
+- copilot -p with --trust-folder, run from a subdirectory of a repository, now warns that the hooks at the repository root were not loaded and says how to load them
+- Custom status lines display non-ASCII characters correctly even when commands write them in pieces
+- Copying inline code from wrapped rows after resizing the terminal no longer includes extra non-breaking spaces.
+- Queued slash commands now show an error when they fail instead of disappearing silently
+- Prompts sent as a turn finishes now run without waiting for background agents to complete
+- Dragging the sessions divider or scrollbar now ends cleanly when the left mouse button is no longer held.
+- Allow your own scratch files under /tmp on macOS without path permission prompts unless --disallow-temp-dir is set
+- Re-attaching an image or document after switching models or compacting a session sends its content to the model
+- Show an error when /update cannot download a release instead of leaving the download progress message indefinitely
+- Sessions started with /new or from the Sessions tab can be controlled from GitHub when remote sessions are enabled
+- Expand ${COPILOT_PLUGIN_ROOT} in plugin hook working directories and environment values
+- Push-to-talk preserves dictated text when held Space key repeats pause and resume
+- OAuth sign-in for remote MCP servers works through proxies that require Kerberos (Negotiate) authentication
+- Show permission prompts, questions, and confirmations directly in the sub-agent view so you can respond without leaving it
+- Keep text after terminal control sequences visible in labels and output, and hide embedded image data
+- Search in /skills, /mcp, and /plugin matches visible text instead of words hidden inside terminal escape sequences
+- Clear the previous profile's routed model from the footer and custom status line when switching Copilot Fusion profiles
+- Prevent @ file mentions and /sandbox path completion from selecting outdated suggestions when typing quickly
+- The /sandbox Credentials tab counts masked environment variables separately from unmasked suggestions
+- /resume keeps session rows aligned and columns visible with --screen-reader, and announces unread status once
+- Show all rows of wrapped Japanese, Chinese, and Korean text without clipping the last row or leaving extra blank rows
+- Resizing the terminal during a text-selection drag preserves the clipboard instead of copying empty lines or unhighlighted text
+- Keep the @ file picker up to date when ignore files change above the working directory
+- Autopilot confirmation hides Assisted Permissions when disabled by administrator policy and explains why they are unavailable.
+- Keep /config view tabs and the selected view readable in screen-reader mode on narrow terminals
+- Exiting the CLI on macOS and Linux now stops attached background shells even when they ignore termination signals.
+- Sandboxed MCP startup errors identify refused filesystem operations even when the server prints a stack trace
+- /mcp token counts exclude tools deferred by client-side tool search
+- Preserve freshly pasted text when stashing or opening the external editor, and prevent Ctrl+D from exiting while a paste is pending
+- Prevent the # issue and pull request picker from selecting outdated results when typing quickly
+- /plugin Details shows repository-local plugins without a User scope label and keeps versions separate from descriptions
+- Workspace MCP servers resolve relative working directories from their config's directory level, including after /cd or when launching from a subdirectory
+- /mcp delete removes a server without restarting other connected MCP servers
+- Keep Sessions sidebar and shell shortcut hints readable in narrow terminals by hiding hints that do not fit
+- Queued Copilot Fusion routing-profile changes show an acknowledgement when the current turn ends, before the next prompt.
+- Keep /diff responsive with large untracked files and show untracked symlinks by their target paths instead of their contents
+- HTML exports and rich-text copies preserve generic types and placeholders written in angle brackets, such as Vec<String> and <file>
+- Allow image generation when settings.json is empty or contains only whitespace
+- Keep the current location highlighted and announced to screen readers in narrow /config views while the area list has focus.
+- Installing MCP servers from the registry with optional fields left blank now preserves server defaults instead of saving placeholder text
+- Show agent IDs in /subagents when custom agents share a name, so you can tell which agent you configure
+- Keep /ask and /btw question headers in plain text when pasting colored terminal output or control characters
+- Keep the terminal's own colors in editors opened with Ctrl+G and shells opened with $ when the CLI's theme changes
+- MCP registry installs preserve npm launch arguments when the server already includes an install confirmation flag
+- Keep text typed immediately after a paste separate, so pasted image paths attach correctly and text after long pastes remains editable
+- Keep /config view tabs intact and the selected area visible on narrow terminals
+- Editor shortcuts stay inactive while the CLI exits, keeping the terminal ready for the shell
+- Show MCP servers that return an empty authentication challenge in the /mcp auth picker
+- Pasting text into Ctrl+R history search ignores escape sequences so matches, colors, and cursor placement stay correct
+- Pasting colored text into /plugin, /skills, and /mcp search matches the visible text and preserves dashboard colors
+- Emoji stay readable under the cursor in /model search, and long /diff search queries scroll on one line
+- Long search queries in the Sessions tab and /resume wrap correctly and keep the cursor aligned with typed text.
+- /diff lists copied files correctly when Git copy detection is enabled and preserves files whose names end in spaces
+- Keep Copilot model access when account lookups are rate-limited
+- Keep the exit status of a collapsed failed shell row whole in narrow terminals, and show as much of the command description as fits beside it
+- Deleting a session through the SDK while one of its client tools is running now cancels that tool's handler, instead of leaving it running after the session is gone.
+- A GITHUB_ASKPASS helper that never answers no longer stalls startup for over five minutes; sign-in now fails after one helper timeout
+- After `/code` hands a session off to VS Code, resuming that session in the same window and switching back no longer brings back the notice that it is open in VS Code Chat
+- Keep Windows drive letters with their paths when wrapping command previews in approval dialogs
+- A config.json that cannot be read, such as one with an extra closing brace or one cut short by an interrupted write, is no longer replaced at startup by a file holding only firstLaunchAt; its trusted folders, plugins, marketplaces and other saved state stay in the file
+- MCP enable/disable and plugin commands work when settings.json is empty
+- A remote MCP server that refuses or closes the first connection at session start, for example while it is still starting, is retried as planned instead of staying failed for the rest of the session
+- With sidebar.hoverFocus off and sidebar.showCloseButton on, moving the mouse over a Sessions sidebar card no longer moves the selection onto it
+- Copying an answer with the mouse keeps the blank lines inside blockquotes
+- The "Compacting conversation history" counter keeps counting from when the compaction started after the queue manager is opened and closed, instead of restarting at 0
+- A plugin whose plugin.json location holds a named pipe or a link to a device such as /dev/zero no longer hangs or exhausts memory when skills, prompts or plugin lists load it; the file is skipped like an unreadable manifest
+- Shell tool results no longer keep terminal escape sequences or hyperlink targets when a sequence is split across two reads of the command's output, as happens with coloured output larger than one read
+- After /compact, the runtime no longer keeps a CPU core busy until the next event, and the session's live event stream no longer skips events that arrive after a compaction removed earlier ones
+- A permission_prompt notification hook no longer runs for a request that Assisted Permissions approves without asking
+- Adding or changing a repository's GitHub remote while the CLI is running is now picked up straight away, so `/pr` no longer keeps saying the repository is not connected to GitHub until the CLI restarts.
+- When an extension fails to load, its log now shows the full error report, including the file and line of a syntax error, the stack trace and any cause, instead of a single line.
+- The Sessions sidebar row of the session you are in shows it working for the whole of a running turn, and screen readers hear "status working" instead of "status done"
+- With Auto selected, the footer's context percentage and the status line's displayed_context_limit now use the window of the model Auto routed to, matching /context, instead of a fixed 200,000 tokens
+- The standalone CLI now re-extracts its cached package when cli-native.node has gone missing from it, instead of failing on every start with Native addon "cli-native" not found
+- A workflow run that a session filesystem SQLite provider committed but reported as postCommitAmbiguous now starts, instead of failing and leaving a pending run that cannot be cancelled or resumed
+- An extension prompt asking for many sensitive environment variables on a short terminal now keeps the first listed name and the count of the rest on screen instead of scrolling every name out of view
+- The CLI's selection copies inline code and color swatches without decorative padding when their background color is shown
+- Context from multiple userPromptSubmitted hooks now reaches the model instead of only the last hook's context
+- Show organization support links in policy guidance and managed settings notices
+- Indexed search becomes available sooner after restarting, and its enabled notice appears only when the index can serve searches.
+
 ## 1.0.110 - 2026-11-12
 
 - Experimental: answer git, ssh, and sudo password prompts from agent commands in a masked dialog (enable with /experimental on)
