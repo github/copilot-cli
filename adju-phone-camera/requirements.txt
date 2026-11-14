@@ -1,0 +1,7 @@
+aiortc>=1.9,<2
+customtkinter>=5.2,<6
+cryptography>=44,<51
+fastapi>=0.110,<1
+Pillow>=10,<13
+qrcode[pil]>=7.4,<9
+uvicorn[standard]>=0.29,<1
