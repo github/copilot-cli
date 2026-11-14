@@ -1,0 +1,13 @@
+{
+  "name": "copilot-next-best-action",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Current-session next-action recommendations for a Copilot CLI extension.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
