@@ -1,3 +1,7 @@
+## 1.0.114 - 2026-11-18
+
+Fixes and changes
+
 ## 1.0.113 - 2026-11-17
 
 - Administrators can disable built-in Browser Use with the managed setting features.browserUse, including in running sessions.
