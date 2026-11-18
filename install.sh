@@ -78,7 +78,8 @@ echo "Downloading from: $DOWNLOAD_URL"
 # Download and extract with error handling
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf -- "$TMP_DIR"' EXIT
-TMP_TARBALL="$TMP_DIR/copilot-${PLATFORM}-${ARCH}.tar.gz"
+TARBALL_NAME="copilot-${PLATFORM}-${ARCH}.tar.gz"
+TMP_TARBALL="$TMP_DIR/$TARBALL_NAME"
 if command -v curl >/dev/null 2>&1; then
   curl -fsSL "${CURL_AUTH[@]}" "$DOWNLOAD_URL" -o "$TMP_TARBALL"
 elif command -v wget >/dev/null 2>&1; then
@@ -98,15 +99,25 @@ elif command -v wget >/dev/null 2>&1; then
 fi
 
 if [ "$CHECKSUMS_AVAILABLE" = true ]; then
+  # Verify the downloaded tarball against its own entry in the checksums
+  # file. Checking the whole file with --ignore-missing is not sufficient:
+  # implementations such as GNU sha256sum report success when every listed
+  # file is absent, so a checksums file lacking an entry for this tarball
+  # would "validate" without verifying anything.
+  awk -v f="$TARBALL_NAME" '{n = split($NF, path, "/"); if (path[n] == f) print}' "$TMP_CHECKSUMS" > "$TMP_DIR/checksum.txt"
+  if [ ! -s "$TMP_DIR/checksum.txt" ]; then
+    echo "Error: Checksums file does not contain an entry for $TARBALL_NAME; cannot verify integrity." >&2
+    exit 1
+  fi
   if command -v sha256sum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && sha256sum -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
+    if (cd "$TMP_DIR" && sha256sum -c checksum.txt >/dev/null 2>&1); then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
       exit 1
     fi
   elif command -v shasum >/dev/null 2>&1; then
-    if (cd "$TMP_DIR" && shasum -a 256 -c --ignore-missing SHA256SUMS.txt >/dev/null 2>&1); then
+    if (cd "$TMP_DIR" && shasum -a 256 -c checksum.txt >/dev/null 2>&1); then
       echo "✓ Checksum validated"
     else
       echo "Error: Checksum validation failed." >&2
@@ -115,6 +126,8 @@ if [ "$CHECKSUMS_AVAILABLE" = true ]; then
   else
     echo "Warning: No sha256sum or shasum found, skipping checksum validation."
   fi
+else
+  echo "Warning: Could not download checksums file, skipping checksum validation."
 fi
 
 # Check that the file is a valid tarball
