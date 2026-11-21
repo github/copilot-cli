@@ -98,6 +98,8 @@ The image contains the `copilot` binary from the matching GitHub release, which 
 
 ## Building locally
 
+The smoke test requires a Unix environment (Linux or macOS), Python 3, and Docker configured to run Linux containers. Native Windows Python is not supported because the bind-mounted Git check uses Unix UID/GID APIs (`os.getuid()` and `os.getgid()`). On Windows, run the commands below from a Linux environment such as WSL 2.
+
 Build from the repository root with the release version, without the leading `v`:
 
 ```sh
@@ -105,7 +107,7 @@ docker build -f container/Dockerfile --build-arg COPILOT_VERSION=1.0.105 -t copi
 python3 container/smoke_test.py copilot-cli:local --version 1.0.105
 ```
 
-The smoke test needs only Python 3 and Docker. It checks the container's configuration, Git access to a bind-mounted repository owned by the host user, and a real client handshake with the running server. Add `--platform linux/arm64` or `--platform linux/amd64` to test a build for another architecture.
+The smoke test checks the container's configuration, Git access to a bind-mounted repository owned by the host user, and a real client handshake with the running server. Add `--platform linux/arm64` or `--platform linux/amd64` to test a build for another architecture.
 
 ## Publishing
 
