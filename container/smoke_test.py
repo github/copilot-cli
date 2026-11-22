@@ -161,14 +161,21 @@ def check_runtime_environment(target):
 
 def check_git_workspace(target):
     with tempfile.TemporaryDirectory(prefix="copilot-git-safe-") as workspace:
+        # The runtime UID needs access, while the host must own the files for cleanup.
+        os.chmod(workspace, 0o755)
         volume = "%s:/home/copilot/workspace" % workspace
         initialized = run_to_completion(
             target,
-            ["--user", "0:0", "--volume", volume, "--entrypoint", "git"],
-            ["init", "--quiet", "/home/copilot/workspace"],
+            [
+                "--user", "%d:%d" % (os.getuid(), os.getgid()),
+                "--volume", "%s:/tmp/workspace" % workspace,
+                "--workdir", "/tmp/workspace",
+                "--entrypoint", "git",
+            ],
+            ["init", "--quiet"],
         )
         if initialized.returncode != 0:
-            raise Failure("could not initialize a root-owned workspace repository: %s" % initialized.stderr.strip())
+            raise Failure("could not initialize a host-owned workspace repository: %s" % initialized.stderr.strip())
 
         result = run_to_completion(
             target,
