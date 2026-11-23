@@ -16,11 +16,11 @@ is the real `connect` handshake.
 import argparse
 import json
 import os
+import re
 import secrets
 import socket
 import subprocess
 import sys
-import tempfile
 import time
 
 SERVER_PORT = 4321
@@ -113,11 +113,28 @@ class Client:
 def check_requires_token(target):
     for label, docker_args in (("unset", []), ("empty", ["--env", "COPILOT_CONNECTION_TOKEN="])):
         result = run_to_completion(target, docker_args)
-        if result.returncode == 0 or "COPILOT_CONNECTION_TOKEN" not in result.stderr:
+        if result.returncode == 0 or 'export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"' not in result.stderr:
             raise Failure(
-                "with COPILOT_CONNECTION_TOKEN %s the container should exit non-zero and name the variable; "
+                "with COPILOT_CONNECTION_TOKEN %s the container should exit non-zero and show how to generate a secret; "
                 "got exit %d: %s" % (label, result.returncode, result.stderr.strip())
             )
+
+
+def check_connection_token_rejects_github_token(target):
+    token = "github_pat_smoke-test-only"
+    result = run_to_completion(target, ["--env", "COPILOT_CONNECTION_TOKEN=" + token], ["--version"])
+    if result.returncode == 0 or "looks like a GitHub token" not in result.stderr:
+        raise Failure("a GitHub-shaped connection token should be rejected")
+    if token in result.stdout or token in result.stderr:
+        raise Failure("the entrypoint printed the connection secret")
+    for token in ("plain-smoke-test-secret", "generate"):
+        result = run_to_completion(target, ["--env", "COPILOT_CONNECTION_TOKEN=" + token], ["--version"])
+        if result.returncode != 0:
+            raise Failure("a non-empty connection token should not prevent startup")
+        if token in result.stdout or token in result.stderr:
+            raise Failure("the entrypoint printed the connection secret")
+        if "Generated COPILOT_CONNECTION_TOKEN=" in result.stderr:
+            raise Failure("the literal connection token 'generate' should not trigger token generation")
 
 
 def check_rejects_invalid_port(target):
@@ -130,6 +147,11 @@ def check_rejects_invalid_port(target):
                 "COPILOT_PORT=%r should be rejected with a message naming the variable; got exit %d: %s"
                 % (port, result.returncode, result.stderr.strip())
             )
+    result = run_to_completion(
+        target, ["--env", "COPILOT_CONNECTION_TOKEN=unused", "--env", "COPILOT_PORT=tcp://10.96.0.10:4321"]
+    )
+    if result.returncode == 0 or "enableServiceLinks" not in result.stderr:
+        raise Failure("a Kubernetes Service link in COPILOT_PORT should be rejected with a hint; got: %s" % result.stderr.strip())
 
 
 def check_cli_version(target):
@@ -146,7 +168,6 @@ def check_runtime_environment(target):
     script = (
         "set -e; id -u; "
         'test -s "$1"; '
-        'test "$(git config --system --get-all safe.directory)" = /home/copilot/workspace; '
         'test -w "$HOME/.copilot"; '
         'test -w "$PWD"'
     )
@@ -157,36 +178,6 @@ def check_runtime_environment(target):
         raise Failure("runtime environment check failed (exit %d): %s" % (result.returncode, result.stderr.strip()))
     if result.stdout.strip() != RUNTIME_UID:
         raise Failure("expected to run as uid %s, got %r" % (RUNTIME_UID, result.stdout.strip()))
-
-
-def check_git_workspace(target):
-    with tempfile.TemporaryDirectory(prefix="copilot-git-safe-") as workspace:
-        # The runtime UID needs access, while the host must own the files for cleanup.
-        os.chmod(workspace, 0o755)
-        volume = "%s:/home/copilot/workspace" % workspace
-        initialized = run_to_completion(
-            target,
-            [
-                "--user", "%d:%d" % (os.getuid(), os.getgid()),
-                "--volume", "%s:/tmp/workspace" % workspace,
-                "--workdir", "/tmp/workspace",
-                "--entrypoint", "git",
-            ],
-            ["init", "--quiet"],
-        )
-        if initialized.returncode != 0:
-            raise Failure("could not initialize a host-owned workspace repository: %s" % initialized.stderr.strip())
-
-        result = run_to_completion(
-            target,
-            ["--volume", volume, "--entrypoint", "git"],
-            ["-C", "/home/copilot/workspace", "rev-parse", "--show-toplevel"],
-        )
-        if result.returncode != 0 or result.stdout.strip() != "/home/copilot/workspace":
-            raise Failure(
-                "Git could not read a differently-owned repository mounted at the workspace: %s"
-                % result.stderr.strip()
-            )
 
 
 def ensure_running(name):
@@ -221,10 +212,52 @@ def connect_when_ready(target, name, port, token):
     raise Failure("the server did not complete the connect handshake within %gs (last error: %s)" % (target.timeout, last_error))
 
 
+def check_generated_token(target):
+    name = container_name()
+    try:
+        conflict = run_to_completion(
+            target,
+            [
+                "--env", "COPILOT_CONNECTION_TOKEN=provided-secret",
+                "--env", "COPILOT_CONNECTION_TOKEN_GENERATE=true",
+            ],
+        )
+        if conflict.returncode == 0 or "cannot be used with COPILOT_CONNECTION_TOKEN" not in conflict.stderr:
+            raise Failure("generation mode should reject a simultaneously supplied token")
+
+        invalid = run_to_completion(target, ["--env", "COPILOT_CONNECTION_TOKEN_GENERATE=maybe"])
+        if invalid.returncode == 0 or "must be true or false" not in invalid.stderr:
+            raise Failure("generation mode should reject values other than true or false")
+
+        started = docker(*run_args(target, name, "--detach", "--publish", "127.0.0.1::%d" % SERVER_PORT,
+                                   "--env", "COPILOT_CONNECTION_TOKEN_GENERATE=true"), target.image)
+        if started.returncode != 0:
+            raise Failure("could not start the server in generated-token mode: " + started.stderr.strip())
+        previous = None
+        for start in (1, 2):
+            if start == 2 and docker("restart", name).returncode != 0:
+                raise Failure("could not restart the server in generated-token mode")
+            port = published_port(name)
+            tokens = re.findall(r"^Generated COPILOT_CONNECTION_TOKEN=([0-9a-f]{64})$", container_logs(name), re.M)
+            if len(tokens) != start:
+                raise Failure("expected one generated token in the logs per start")
+            if previous is not None:
+                client, reply = connect_when_ready(target, name, port, previous)
+                client.close()
+                if (reply.get("error") or {}).get("code") != AUTHENTICATION_FAILED:
+                    raise Failure("server accepted the previous generated token")
+            previous = tokens[-1]
+            client, reply = connect_when_ready(target, name, port, previous)
+            client.close()
+            if (reply.get("result") or {}).get("ok") is not True:
+                raise Failure("server did not accept the generated token from the logs")
+    finally:
+        docker("rm", "--force", name)
+
+
 def check_server(target):
     token = secrets.token_urlsafe(24)
     name = container_name()
-    env = dict(os.environ, COPILOT_CONNECTION_TOKEN=token)
     try:
         started = docker(
             *run_args(
@@ -234,7 +267,7 @@ def check_server(target):
                 "--env", "COPILOT_CONNECTION_TOKEN",
             ),
             target.image,
-            env=env,
+            env=dict(os.environ, COPILOT_CONNECTION_TOKEN=token),
         )
         if started.returncode != 0:
             raise Failure("could not start the server container: %s" % started.stderr.strip())
@@ -266,10 +299,12 @@ def check_server(target):
         exit_code = docker("inspect", "--format", "{{.State.ExitCode}}", name).stdout.strip()
         if stopped.returncode != 0 or exit_code == "137":
             raise Failure("the server did not shut down on SIGTERM within 10s (exit code %s)" % exit_code)
+        if token in container_logs(name):
+            raise Failure("the server printed the connection secret")
 
         return result.get("version")
     except Failure as failure:
-        logs = container_logs(name)
+        logs = container_logs(name).replace(token, "[redacted]")
         raise Failure("%s\n--- container logs ---\n%s" % (failure, logs or "(empty)"))
     finally:
         docker("rm", "--force", name)
@@ -290,11 +325,12 @@ def main():
     target = parse_args()
     checks = [
         ("refuses to start without a connection token", check_requires_token),
+        ("rejects a GitHub-shaped connection token without printing it", check_connection_token_rejects_github_token),
         ("rejects an invalid COPILOT_PORT", check_rejects_invalid_port),
         ("CLI binary runs and reports its version", check_cli_version),
         ("runs as an unprivileged user with the license present", check_runtime_environment),
-        ("Git accepts a differently-owned repository mounted at the workspace", check_git_workspace),
         ("server accepts a token, answers ping, rejects a wrong token and stops on SIGTERM", check_server),
+        ("explicit generation flag prints a working token and rotates it on restart", check_generated_token),
     ]
     for description, check in checks:
         started = time.monotonic()

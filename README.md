@@ -125,18 +125,21 @@ By default, `copilot` utilizes Claude Sonnet 4.5. Run the `/model` slash command
 
 The Copilot CLI is also available as a container image that runs the CLI as a headless server for Copilot SDK clients. Images are published to `ghcr.io/github/copilot-cli` for `linux/amd64` and `linux/arm64`. This image is for connecting SDK clients to a server, not for interactive terminal use.
 
-Set a connection token and a GitHub token, then start the server:
+Client apps use `COPILOT_CONNECTION_TOKEN` to connect to the Copilot server. Sessions use a separate GitHub token to access GitHub Copilot. To start the server, generate a random connection token:
 
 ```bash
 export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"
 docker run --rm \
   -p 127.0.0.1:4321:4321 \
   -e COPILOT_CONNECTION_TOKEN \
-  -e COPILOT_GITHUB_TOKEN \
   ghcr.io/github/copilot-cli:latest
 ```
 
-Set `COPILOT_GITHUB_TOKEN` in your environment before running the command. For version-pinned deployments, use a release tag instead of `latest`. See the [container image guide](./container/README.md) for SDK connection examples, configuration, security considerations, and build instructions.
+On Windows, use the [PowerShell example](./container/README.md#quick-start).
+
+For a local trial, set `COPILOT_CONNECTION_TOKEN_GENERATE=true` to print a generated connection token at startup. On [Kubernetes](./container/README.md#running-on-kubernetes), set `COPILOT_CONNECTION_TOKEN` from a Secret.
+
+For GitHub authentication, your backend can pass each user's GitHub token when it creates or resumes an SDK session. To use one default identity instead, export `COPILOT_GITHUB_TOKEN` and add `-e COPILOT_GITHUB_TOKEN` before the image name. See the [container image guide](./container/README.md) for SDK examples, multi-user deployment, and release tags.
 
 ### Experimental Mode
 

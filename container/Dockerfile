@@ -9,22 +9,20 @@
 # COPILOT_VERSION is a release version without the leading "v" (for example
 # 1.0.105, or 1.0.106-0 for a prerelease). The image contains the checksum-verified
 # `copilot` binary attached to that GitHub release.
-FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
+FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2 AS base
+
+# ca-certificates: HTTPS trust roots. openssl: connection token generation.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates openssl \
+ && rm -rf /var/lib/apt/lists/*
+
+FROM base AS download
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
 
 ARG TARGETARCH
 ARG COPILOT_VERSION
-
-LABEL org.opencontainers.image.title="GitHub Copilot CLI (server mode)" \
-      org.opencontainers.image.description="GitHub Copilot CLI running as a headless server that Copilot SDK clients connect to over TCP" \
-      org.opencontainers.image.source="https://github.com/github/copilot-cli" \
-      org.opencontainers.image.documentation="https://github.com/github/copilot-cli/blob/main/container/README.md" \
-      org.opencontainers.image.version="${COPILOT_VERSION}"
-
-# ca-certificates: TLS to GitHub and the model providers. curl and git: commonly used by agent tools.
-RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl git \
- && rm -rf /var/lib/apt/lists/*
-
 RUN set -eu; \
     : "${COPILOT_VERSION:?Pass --build-arg COPILOT_VERSION=<release version>}"; \
     case "${TARGETARCH}" in \
@@ -44,9 +42,17 @@ RUN set -eu; \
     chmod 0755 /usr/local/bin/copilot; \
     rm -rf "${workdir}"
 
+FROM base AS runtime
+ARG COPILOT_VERSION
+LABEL org.opencontainers.image.title="GitHub Copilot CLI (server mode)" \
+      org.opencontainers.image.description="GitHub Copilot CLI running as a headless server that Copilot SDK clients connect to over TCP" \
+      org.opencontainers.image.source="https://github.com/github/copilot-cli" \
+      org.opencontainers.image.documentation="https://github.com/github/copilot-cli/blob/main/container/README.md" \
+      org.opencontainers.image.version="${COPILOT_VERSION}"
+
 RUN useradd --create-home --uid 10001 copilot \
- && install -d -o copilot -g copilot /home/copilot/workspace /home/copilot/.copilot \
- && git config --system --add safe.directory /home/copilot/workspace
+ && install -d -o copilot -g copilot /home/copilot/workspace /home/copilot/.copilot
+COPY --from=download /usr/local/bin/copilot /usr/local/bin/copilot
 COPY --chmod=0755 container/entrypoint.sh /usr/local/bin/copilot-server
 COPY LICENSE.md /usr/share/licenses/copilot-cli/LICENSE.md
 
