@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.title="GitHub Copilot CLI (server mode)" \
 
 # ca-certificates: TLS to GitHub and the model providers. curl and git: commonly used by agent tools.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl git \
+ && apt-get install -y --no-install-recommends ca-certificates curl git openssl \
  && rm -rf /var/lib/apt/lists/*
 
 RUN set -eu; \
