@@ -140,9 +140,8 @@ spec:
       labels:
         app: copilot
     spec:
-      enableServiceLinks: false # Keeps the "copilot" Service from overriding COPILOT_PORT
       containers:
-        - name: copilot
+        - name: copilot-server
           image: ghcr.io/github/copilot-cli:latest
           env:
             - name: COPILOT_CONNECTION_TOKEN
@@ -159,7 +158,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: copilot
+  name: copilot-server
 spec:
   selector:
     app: copilot
@@ -167,9 +166,9 @@ spec:
     - port: 4321
 ```
 
-SDK clients in the same namespace connect to `copilot:4321` with the same token.
+SDK clients in the same namespace connect to `copilot-server:4321` with the same token.
 
-- **Service links.** Without `enableServiceLinks: false`, Kubernetes sets `COPILOT_PORT=tcp://…` for a Service named `copilot`, and the container exits. Setting `COPILOT_PORT` in `env` also fixes this.
+- **Service links.** The `copilot-server` Service generates `COPILOT_SERVER_PORT` rather than overriding the container's `COPILOT_PORT` default.
 - **Rotation.** After updating the Secret, run `kubectl rollout restart deployment/copilot` so new pods pick up the token, and update clients to use the same value.
 - **Replicas.** Each pod keeps its own sessions under `/home/copilot/.copilot`. Run one replica per server, or route each user's sessions to the same pod. Mount a persistent volume there to keep sessions across restarts.
 - **Network access.** Keep the Service `ClusterIP` and limit which pods can reach it, for example with a NetworkPolicy.
