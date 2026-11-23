@@ -21,7 +21,6 @@ import secrets
 import socket
 import subprocess
 import sys
-import tempfile
 import time
 
 SERVER_PORT = 4321
@@ -169,7 +168,6 @@ def check_runtime_environment(target):
     script = (
         "set -e; id -u; "
         'test -s "$1"; '
-        'test "$(git config --system --get-all safe.directory)" = /home/copilot/workspace; '
         'test -w "$HOME/.copilot"; '
         'test -w "$PWD"'
     )
@@ -180,36 +178,6 @@ def check_runtime_environment(target):
         raise Failure("runtime environment check failed (exit %d): %s" % (result.returncode, result.stderr.strip()))
     if result.stdout.strip() != RUNTIME_UID:
         raise Failure("expected to run as uid %s, got %r" % (RUNTIME_UID, result.stdout.strip()))
-
-
-def check_git_workspace(target):
-    with tempfile.TemporaryDirectory(prefix="copilot-git-safe-") as workspace:
-        # The runtime UID needs access, while the host must own the files for cleanup.
-        os.chmod(workspace, 0o755)
-        volume = "%s:/home/copilot/workspace" % workspace
-        initialized = run_to_completion(
-            target,
-            [
-                "--user", "%d:%d" % (os.getuid(), os.getgid()),
-                "--volume", "%s:/tmp/workspace" % workspace,
-                "--workdir", "/tmp/workspace",
-                "--entrypoint", "git",
-            ],
-            ["init", "--quiet"],
-        )
-        if initialized.returncode != 0:
-            raise Failure("could not initialize a host-owned workspace repository: %s" % initialized.stderr.strip())
-
-        result = run_to_completion(
-            target,
-            ["--volume", volume, "--entrypoint", "git"],
-            ["-C", "/home/copilot/workspace", "rev-parse", "--show-toplevel"],
-        )
-        if result.returncode != 0 or result.stdout.strip() != "/home/copilot/workspace":
-            raise Failure(
-                "Git could not read a differently-owned repository mounted at the workspace: %s"
-                % result.stderr.strip()
-            )
 
 
 def ensure_running(name):
@@ -361,7 +329,6 @@ def main():
         ("rejects an invalid COPILOT_PORT", check_rejects_invalid_port),
         ("CLI binary runs and reports its version", check_cli_version),
         ("runs as an unprivileged user with the license present", check_runtime_environment),
-        ("Git accepts a differently-owned repository mounted at the workspace", check_git_workspace),
         ("server accepts a token, answers ping, rejects a wrong token and stops on SIGTERM", check_server),
         ("explicit generation flag prints a working token and rotates it on restart", check_generated_token),
     ]

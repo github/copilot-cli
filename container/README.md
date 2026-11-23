@@ -106,7 +106,7 @@ Paths in the image:
 - `/home/copilot/workspace` is the working directory. Mount a project here to let the agent work on it.
 - `/home/copilot/.copilot` holds configuration and state. Mount a volume here to keep them across containers.
 
-The container runs as the non-root user `copilot` (uid 10001), so any mounted workspace or state directory it writes to must be writable by that user. Git is configured to trust only `/home/copilot/workspace`, allowing Git operations on a mounted repository even when its host UID differs. This is an exact-path exception, not a wildcard; mount repositories at the workspace path.
+The container runs as the non-root user `copilot` (uid 10001), so any mounted workspace or state directory it writes to must be writable by that user.
 
 To run another `copilot` command instead of the server, override the entrypoint:
 
@@ -202,7 +202,7 @@ The image contains the `copilot` binary from the matching GitHub release, which 
 
 ## Building locally
 
-The smoke test requires a Unix environment (Linux or macOS), Python 3, and Docker configured to run Linux containers. Native Windows Python is not supported because the bind-mounted Git check uses Unix UID/GID APIs (`os.getuid()` and `os.getgid()`). On Windows, run the commands below from a Linux environment such as WSL 2.
+The smoke test requires Python 3 and Docker configured to run Linux containers.
 
 Build from the repository root with the release version, without the leading `v`:
 
@@ -211,7 +211,7 @@ docker build -f container/Dockerfile --build-arg COPILOT_VERSION=1.0.105 -t copi
 python3 container/smoke_test.py copilot-cli:local --version 1.0.105
 ```
 
-The smoke test checks the container's configuration, Git access to a bind-mounted repository owned by the host user, and a real client handshake with the running server. Add `--platform linux/arm64` or `--platform linux/amd64` to test a build for another architecture.
+The smoke test checks the container's configuration and a real client handshake with the running server. Add `--platform linux/arm64` or `--platform linux/amd64` to test a build for another architecture.
 
 ## Publishing
 

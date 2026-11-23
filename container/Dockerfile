@@ -20,9 +20,9 @@ LABEL org.opencontainers.image.title="GitHub Copilot CLI (server mode)" \
       org.opencontainers.image.documentation="https://github.com/github/copilot-cli/blob/main/container/README.md" \
       org.opencontainers.image.version="${COPILOT_VERSION}"
 
-# ca-certificates: TLS to GitHub and the model providers. curl and git: commonly used by agent tools.
+# ca-certificates: HTTPS trust roots. curl: release downloads. openssl: connection token generation.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl git openssl \
+ && apt-get install -y --no-install-recommends ca-certificates curl openssl \
  && rm -rf /var/lib/apt/lists/*
 
 RUN set -eu; \
@@ -45,8 +45,7 @@ RUN set -eu; \
     rm -rf "${workdir}"
 
 RUN useradd --create-home --uid 10001 copilot \
- && install -d -o copilot -g copilot /home/copilot/workspace /home/copilot/.copilot \
- && git config --system --add safe.directory /home/copilot/workspace
+ && install -d -o copilot -g copilot /home/copilot/workspace /home/copilot/.copilot
 COPY --chmod=0755 container/entrypoint.sh /usr/local/bin/copilot-server
 COPY LICENSE.md /usr/share/licenses/copilot-cli/LICENSE.md
 
