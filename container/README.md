@@ -26,7 +26,7 @@ export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"
 docker run --rm \
   -p 127.0.0.1:4321:4321 \
   -e COPILOT_CONNECTION_TOKEN \
-  ghcr.io/github/copilot-cli:1.0.114
+  ghcr.io/github/copilot-cli:latest
 ```
 
 In PowerShell on Windows:
@@ -39,10 +39,10 @@ $env:COPILOT_CONNECTION_TOKEN = -join ($bytes | ForEach-Object { $_.ToString("x2
 docker run --rm `
   -p 127.0.0.1:4321:4321 `
   -e COPILOT_CONNECTION_TOKEN `
-  ghcr.io/github/copilot-cli:1.0.114
+  ghcr.io/github/copilot-cli:latest
 ```
 
-The server waits for an SDK client. No GitHub credential is needed to connect or ping. For example, install the Node.js SDK (`npm install @microsoft/copilot-sdk@2.0.0`) and run this client with the same `COPILOT_CONNECTION_TOKEN` in its environment. The example pins the SDK and image to compatible protocol versions.
+The server waits for an SDK client. No GitHub credential is needed to connect or ping. For example, install the Node.js SDK (`npm install @microsoft/copilot-sdk`) and run this client with the same `COPILOT_CONNECTION_TOKEN` in its environment.
 
 ```js
 import { CopilotClient, RuntimeConnection } from "@microsoft/copilot-sdk";
@@ -143,7 +143,7 @@ spec:
       enableServiceLinks: false # Keeps the "copilot" Service from overriding COPILOT_PORT
       containers:
         - name: copilot
-          image: ghcr.io/github/copilot-cli:1.0.114
+          image: ghcr.io/github/copilot-cli:latest
           env:
             - name: COPILOT_CONNECTION_TOKEN
               valueFrom:
