@@ -198,7 +198,7 @@ gh attestation verify oci://ghcr.io/github/copilot-cli:1.0.105 --repo github/cop
 
 The attestation is stored in the registry next to the image, so the package's tag list also shows a `sha256-<digest>` tag. That tag holds the attestation, not an image to run.
 
-The image contains the `copilot` binary from the matching GitHub release, which the build verifies against the release's `SHA256SUMS.txt`. The license is at `/usr/share/licenses/copilot-cli/LICENSE.md`.
+The build uses curl to download the CLI release archive and verifies it against the release's `SHA256SUMS.txt`. Only the extracted `copilot` binary is copied from the download stage into the runtime image; curl is not included. The license is at `/usr/share/licenses/copilot-cli/LICENSE.md`.
 
 ## Building locally
 
