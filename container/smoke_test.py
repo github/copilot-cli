@@ -120,17 +120,17 @@ def check_requires_token(target):
             )
 
 
-def check_connection_token_warning(target):
-    for token, expect_warning in (
-        ("github_pat_smoke-test-only", True),
-        ("plain-smoke-test-secret", False),
-        ("generate", False),
-    ):
+def check_connection_token_rejects_github_token(target):
+    token = "github_pat_smoke-test-only"
+    result = run_to_completion(target, ["--env", "COPILOT_CONNECTION_TOKEN=" + token], ["--version"])
+    if result.returncode == 0 or "looks like a GitHub token" not in result.stderr:
+        raise Failure("a GitHub-shaped connection token should be rejected")
+    if token in result.stdout or token in result.stderr:
+        raise Failure("the entrypoint printed the connection secret")
+    for token in ("plain-smoke-test-secret", "generate"):
         result = run_to_completion(target, ["--env", "COPILOT_CONNECTION_TOKEN=" + token], ["--version"])
         if result.returncode != 0:
             raise Failure("a non-empty connection token should not prevent startup")
-        if ("looks like a GitHub token" in result.stderr) != expect_warning:
-            raise Failure("expected a warning only for a GitHub-shaped connection token")
         if token in result.stdout or token in result.stderr:
             raise Failure("the entrypoint printed the connection secret")
         if "Generated COPILOT_CONNECTION_TOKEN=" in result.stderr:
@@ -325,7 +325,7 @@ def main():
     target = parse_args()
     checks = [
         ("refuses to start without a connection token", check_requires_token),
-        ("warns without printing a GitHub-shaped connection token", check_connection_token_warning),
+        ("rejects a GitHub-shaped connection token without printing it", check_connection_token_rejects_github_token),
         ("rejects an invalid COPILOT_PORT", check_rejects_invalid_port),
         ("CLI binary runs and reports its version", check_cli_version),
         ("runs as an unprivileged user with the license present", check_runtime_environment),

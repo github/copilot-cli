@@ -18,7 +18,7 @@ Images are available for `linux/amd64` and `linux/arm64`. Tags are mutable: runn
 
 ## Quick start
 
-Start the server with a random shared secret. SDK clients present this value as `connectionToken`; it controls who can connect, not which GitHub account a session uses. Do not use a GitHub token as the connection secret.
+Start the server with a random shared secret. SDK clients present this value as `connectionToken`; it controls who can connect, not which GitHub account a session uses. The entrypoint rejects values that look like GitHub tokens.
 
 ```sh
 export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"

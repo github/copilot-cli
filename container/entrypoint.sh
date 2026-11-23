@@ -27,7 +27,8 @@ fi
 
 case "$COPILOT_CONNECTION_TOKEN" in
     gho_*|ghp_*|ghu_*|ghs_*|ghr_*|github_pat_*)
-        echo "Warning: COPILOT_CONNECTION_TOKEN looks like a GitHub token. Use a random shared secret for SDK connections instead." >&2 ;;
+        echo "COPILOT_CONNECTION_TOKEN looks like a GitHub token. Use a random shared secret for SDK connections instead." >&2
+        exit 1 ;;
 esac
 
 case "${COPILOT_PORT:-}" in
