@@ -238,12 +238,6 @@ def connect_when_ready(target, name, port, token):
     raise Failure("the server did not complete the connect handshake within %gs (last error: %s)" % (target.timeout, last_error))
 
 
-def check_server(target):
-    token = secrets.token_urlsafe(24)
-    env = dict(os.environ, COPILOT_CONNECTION_TOKEN=token)
-    return exercise_server(target, token, ["--env", "COPILOT_CONNECTION_TOKEN"], env=env)
-
-
 def check_generated_token(target):
     name = container_name()
     try:
@@ -272,35 +266,8 @@ def check_generated_token(target):
         docker("rm", "--force", name)
 
 
-def check_token_file(target):
-    secret_path = "/run/secrets/copilot_connection_token"
-    file_env = ["--env", "COPILOT_CONNECTION_TOKEN_FILE=" + secret_path]
+def check_server(target):
     token = secrets.token_urlsafe(24)
-    with tempfile.TemporaryDirectory(prefix="copilot-secret-") as directory:
-        path = os.path.join(directory, "token")
-        with open(path, "w") as secret:
-            secret.write("\n")
-        os.chmod(path, 0o644)  # Readable by the container UID; parent directory is private.
-        mount = ["--volume", "%s:%s:ro" % (path, secret_path)]
-        for args, expected in (
-            ([], "readable regular file"),
-            (mount, "non-empty"),
-            (mount + ["--env", "COPILOT_CONNECTION_TOKEN=" + token], "only one"),
-            (mount + ["--env", "COPILOT_CONNECTION_TOKEN=generate"], "only one"),
-        ):
-            result = run_to_completion(target, file_env + args, ["--version"])
-            if result.returncode == 0 or expected not in result.stderr or "COPILOT_CONNECTION_TOKEN_FILE" not in result.stderr:
-                raise Failure("expected a token file error mentioning %r" % expected)
-            if token in result.stdout or token in result.stderr:
-                raise Failure("the entrypoint printed the connection secret")
-
-        # The opt-in applies to the environment variable, not the contents of a file.
-        with open(path, "w") as secret:
-            secret.write("generate\n")
-        return exercise_server(target, "generate", file_env + mount)
-
-
-def exercise_server(target, token, docker_args, env=None):
     name = container_name()
     try:
         started = docker(
@@ -308,10 +275,10 @@ def exercise_server(target, token, docker_args, env=None):
                 target, name,
                 "--detach",
                 "--publish", "127.0.0.1::%d" % SERVER_PORT,
-                *docker_args,
+                "--env", "COPILOT_CONNECTION_TOKEN",
             ),
             target.image,
-            env=env,
+            env=dict(os.environ, COPILOT_CONNECTION_TOKEN=token),
         )
         if started.returncode != 0:
             raise Failure("could not start the server container: %s" % started.stderr.strip())
@@ -376,7 +343,6 @@ def main():
         ("Git accepts a differently-owned repository mounted at the workspace", check_git_workspace),
         ("server accepts a token, answers ping, rejects a wrong token and stops on SIGTERM", check_server),
         ("explicit opt-in prints a working connection token and rotates it on restart", check_generated_token),
-        ("validates a mounted token file and authenticates with its contents", check_token_file),
     ]
     for description, check in checks:
         started = time.monotonic()

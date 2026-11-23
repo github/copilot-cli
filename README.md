@@ -137,7 +137,7 @@ docker run --rm \
 
 On Windows, use the [PowerShell example](./container/README.md#quick-start).
 
-For a local trial, you can [opt in to a generated connection token](./container/README.md#generate-a-token-for-local-use) printed at startup. For deployments, including [Kubernetes](./container/README.md#running-on-kubernetes), [mount the connection secret as a file](./container/README.md#mounted-connection-secret) instead so it stays out of the logs.
+For a local trial, you can [opt in to a generated connection token](./container/README.md#generate-a-token-for-local-use) printed at startup. On [Kubernetes](./container/README.md#running-on-kubernetes), set `COPILOT_CONNECTION_TOKEN` from a Secret.
 
 For GitHub authentication, your backend can pass each user's GitHub token when it creates or resumes an SDK session. To use one default identity instead, export `COPILOT_GITHUB_TOKEN` and add `-e COPILOT_GITHUB_TOKEN` before the image name. See the [container image guide](./container/README.md) for SDK examples, multi-user deployment, and release tags.
 

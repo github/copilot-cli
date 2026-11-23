@@ -93,8 +93,7 @@ Configure the server with environment variables. Arguments after the image name 
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `COPILOT_CONNECTION_TOKEN` | unset | Shared secret that SDK clients must present to connect, or the exact value `generate` for [local use](#generate-a-token-for-local-use). Supply this or `COPILOT_CONNECTION_TOKEN_FILE`, not both. |
-| `COPILOT_CONNECTION_TOKEN_FILE` | unset | Path inside the container to a file containing the connection secret. |
+| `COPILOT_CONNECTION_TOKEN` | unset | Required. Shared secret that SDK clients must present to connect, or the exact value `generate` for [local use](#generate-a-token-for-local-use). |
 | `COPILOT_PORT` | `4321` | Port the server listens on inside the container, from 1024 to 65535. |
 | `COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, `GITHUB_TOKEN` | unset | Optional server-wide GitHub identity for sessions without their own credential. The first variable set wins. A [fine-grained personal access token with the "Copilot Requests" permission](../README.md#launching-the-cli) works. |
 | `COPILOT_HOME` | `/home/copilot/.copilot` | Where the CLI stores its configuration and state. |
@@ -114,12 +113,6 @@ To run another `copilot` command instead of the server, override the entrypoint:
 docker run --rm --entrypoint copilot ghcr.io/github/copilot-cli:latest --version
 ```
 
-### Mounted connection secret
-
-Mount a Docker or Kubernetes secret read-only, for example at `/run/secrets/copilot_connection_token`, and set `COPILOT_CONNECTION_TOKEN_FILE` to that path **instead of** passing `COPILOT_CONNECTION_TOKEN`. The file must be readable by uid 10001. Store a single text token; a trailing newline is ignored. Configure the SDK client with the same token value, not the path.
-
-With a file, `docker inspect` shows the path instead of the token. The entrypoint reads the file as a literal secret and never prints its contents. Restart the container and update clients when you rotate it. With neither variable set, the container exits.
-
 ## Running on Kubernetes
 
 Create the connection secret as a Kubernetes Secret. `--from-literal` stores it without a trailing newline:
@@ -129,7 +122,7 @@ kubectl create secret generic copilot-connection \
   --from-literal=token="$(openssl rand -hex 32)"
 ```
 
-Mount the Secret as a file and expose the server inside the cluster:
+Set `COPILOT_CONNECTION_TOKEN` from the Secret and expose the server inside the cluster:
 
 ```yaml
 apiVersion: apps/v1
@@ -151,21 +144,16 @@ spec:
         - name: copilot
           image: ghcr.io/github/copilot-cli:1.0.114
           env:
-            - name: COPILOT_CONNECTION_TOKEN_FILE
-              value: /run/secrets/copilot/token
+            - name: COPILOT_CONNECTION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: copilot-connection
+                  key: token
           ports:
             - containerPort: 4321
           readinessProbe:
             tcpSocket:
               port: 4321
-          volumeMounts:
-            - name: connection-token
-              mountPath: /run/secrets/copilot
-              readOnly: true
-      volumes:
-        - name: connection-token
-          secret:
-            secretName: copilot-connection
 ---
 apiVersion: v1
 kind: Service
@@ -181,9 +169,7 @@ spec:
 SDK clients in the same namespace connect to `copilot:4321` with the same token.
 
 - **Service links.** Without `enableServiceLinks: false`, Kubernetes sets `COPILOT_PORT=tcp://…` for a Service named `copilot`, and the container exits. Setting `COPILOT_PORT` in `env` also fixes this.
-- **File permissions.** The default Secret file mode is readable by the container. With a stricter `defaultMode` such as `0400`, also set `securityContext.fsGroup: 10001`.
-- **Environment variable instead of a file.** `COPILOT_CONNECTION_TOKEN` with `valueFrom.secretKeyRef` also works. Apart from the reserved value `generate`, that value is used byte for byte, so if the Secret ends with a newline, clients must send the newline too. The file option ignores a trailing newline.
-- **Rotation.** Kubernetes updates mounted Secret files, but the server reads the token only at startup. After rotating it, run `kubectl rollout restart deployment/copilot` and update clients.
+- **Rotation.** After updating the Secret, run `kubectl rollout restart deployment/copilot` so new pods pick up the token, and update clients to use the same value.
 - **Replicas.** Each pod keeps its own sessions under `/home/copilot/.copilot`. Run one replica per server, or route each user's sessions to the same pod. Mount a persistent volume there to keep sessions across restarts.
 - **Network access.** Keep the Service `ClusterIP` and limit which pods can reach it, for example with a NetworkPolicy.
 
