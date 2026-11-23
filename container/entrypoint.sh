@@ -3,10 +3,25 @@
 # Any arguments are appended to the `copilot` command line.
 set -eu
 
+case "${COPILOT_CONNECTION_TOKEN_GENERATE:-false}" in
+    true)
+        if [ -n "${COPILOT_CONNECTION_TOKEN:-}" ]; then
+            echo "COPILOT_CONNECTION_TOKEN_GENERATE=true cannot be used with COPILOT_CONNECTION_TOKEN" >&2
+            exit 1
+        fi
+        COPILOT_CONNECTION_TOKEN=$(openssl rand -hex 32) || exit 1
+        export COPILOT_CONNECTION_TOKEN
+        printf 'Generated COPILOT_CONNECTION_TOKEN=%s\n' "$COPILOT_CONNECTION_TOKEN" >&2 ;;
+    false|'') ;;
+    *)
+        echo "COPILOT_CONNECTION_TOKEN_GENERATE must be true or false" >&2
+        exit 1 ;;
+esac
+
 # The server listens on all interfaces, so never start it without a secret.
 if [ -z "${COPILOT_CONNECTION_TOKEN:-}" ]; then
-    echo "Set COPILOT_CONNECTION_TOKEN to a shared secret." >&2
-    echo 'To generate a secret locally: export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"' >&2
+    echo "Set COPILOT_CONNECTION_TOKEN to a shared secret, or set COPILOT_CONNECTION_TOKEN_GENERATE=true for local use." >&2
+    echo 'To generate a secret on the host: export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"' >&2
     exit 1
 fi
 
@@ -25,12 +40,6 @@ esac
 if [ "$COPILOT_PORT" -lt 1024 ] || [ "$COPILOT_PORT" -gt 65535 ]; then
     echo "COPILOT_PORT must be an integer between 1024 and 65535" >&2
     exit 1
-fi
-
-if [ "$COPILOT_CONNECTION_TOKEN" = generate ]; then
-    COPILOT_CONNECTION_TOKEN=$(openssl rand -hex 32) || exit 1
-    export COPILOT_CONNECTION_TOKEN
-    printf 'Generated COPILOT_CONNECTION_TOKEN=%s\n' "$COPILOT_CONNECTION_TOKEN" >&2
 fi
 
 exec /usr/local/bin/copilot --headless --no-auto-update \

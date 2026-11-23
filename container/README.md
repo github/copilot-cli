@@ -63,14 +63,14 @@ To use one GitHub account as the default for sessions, export `COPILOT_GITHUB_TO
 
 ### Generate a token for local use
 
-With an image [built from this source](#building-locally), set `COPILOT_CONNECTION_TOKEN=generate` to print a fresh connection token at startup:
+With an image [built from this source](#building-locally), set `COPILOT_CONNECTION_TOKEN_GENERATE=true` to print a fresh connection token at startup:
 
 ```sh
 docker run --rm --name copilot-local -p 127.0.0.1:4321:4321 \
-  -e COPILOT_CONNECTION_TOKEN=generate copilot-cli:local
+  -e COPILOT_CONNECTION_TOKEN_GENERATE=true copilot-cli:local
 ```
 
-Use the value after `Generated COPILOT_CONNECTION_TOKEN=` as the SDK's `connectionToken`. If running detached, read it with `docker logs copilot-local`. **Anyone who can read those logs can see the token**, and restarting the container generates a different one. Use a managed secret for shared deployments. Do not pass `generate` to older images: they accept the word itself as the password.
+Use the value after `Generated COPILOT_CONNECTION_TOKEN=` as the SDK's `connectionToken`. If running detached, read it with `docker logs copilot-local`. **Anyone who can read those logs can see the token**, and restarting the container generates a different one. Use a managed secret for shared deployments. `COPILOT_CONNECTION_TOKEN_GENERATE` must be `true` or `false`, and cannot be enabled when `COPILOT_CONNECTION_TOKEN` is set.
 
 ## Serving multiple users
 
@@ -93,7 +93,8 @@ Configure the server with environment variables. Arguments after the image name 
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `COPILOT_CONNECTION_TOKEN` | unset | Required. Shared secret that SDK clients must present to connect, or the exact value `generate` for [local use](#generate-a-token-for-local-use). |
+| `COPILOT_CONNECTION_TOKEN` | unset | Required. Shared secret that SDK clients must present to connect. |
+| `COPILOT_CONNECTION_TOKEN_GENERATE` | `false` | Set to `true` to generate and print a fresh token at startup for [local use](#generate-a-token-for-local-use). Cannot be combined with `COPILOT_CONNECTION_TOKEN`. |
 | `COPILOT_PORT` | `4321` | Port the server listens on inside the container, from 1024 to 65535. |
 | `COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, `GITHUB_TOKEN` | unset | Optional server-wide GitHub identity for sessions without their own credential. The first variable set wins. A [fine-grained personal access token with the "Copilot Requests" permission](../README.md#launching-the-cli) works. |
 | `COPILOT_HOME` | `/home/copilot/.copilot` | Where the CLI stores its configuration and state. |

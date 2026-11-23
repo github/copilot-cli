@@ -122,7 +122,11 @@ def check_requires_token(target):
 
 
 def check_connection_token_warning(target):
-    for token, expect_warning in (("github_pat_smoke-test-only", True), ("plain-smoke-test-secret", False)):
+    for token, expect_warning in (
+        ("github_pat_smoke-test-only", True),
+        ("plain-smoke-test-secret", False),
+        ("generate", False),
+    ):
         result = run_to_completion(target, ["--env", "COPILOT_CONNECTION_TOKEN=" + token], ["--version"])
         if result.returncode != 0:
             raise Failure("a non-empty connection token should not prevent startup")
@@ -130,6 +134,8 @@ def check_connection_token_warning(target):
             raise Failure("expected a warning only for a GitHub-shaped connection token")
         if token in result.stdout or token in result.stderr:
             raise Failure("the entrypoint printed the connection secret")
+        if "Generated COPILOT_CONNECTION_TOKEN=" in result.stderr:
+            raise Failure("the literal connection token 'generate' should not trigger token generation")
 
 
 def check_rejects_invalid_port(target):
@@ -241,22 +247,37 @@ def connect_when_ready(target, name, port, token):
 def check_generated_token(target):
     name = container_name()
     try:
+        conflict = run_to_completion(
+            target,
+            [
+                "--env", "COPILOT_CONNECTION_TOKEN=provided-secret",
+                "--env", "COPILOT_CONNECTION_TOKEN_GENERATE=true",
+            ],
+        )
+        if conflict.returncode == 0 or "cannot be used with COPILOT_CONNECTION_TOKEN" not in conflict.stderr:
+            raise Failure("generation mode should reject a simultaneously supplied token")
+
+        invalid = run_to_completion(target, ["--env", "COPILOT_CONNECTION_TOKEN_GENERATE=maybe"])
+        if invalid.returncode == 0 or "must be true or false" not in invalid.stderr:
+            raise Failure("generation mode should reject values other than true or false")
+
         started = docker(*run_args(target, name, "--detach", "--publish", "127.0.0.1::%d" % SERVER_PORT,
-                                   "--env", "COPILOT_CONNECTION_TOKEN=generate"), target.image)
+                                   "--env", "COPILOT_CONNECTION_TOKEN_GENERATE=true"), target.image)
         if started.returncode != 0:
             raise Failure("could not start the server in generated-token mode: " + started.stderr.strip())
-        previous = "generate"
+        previous = None
         for start in (1, 2):
             if start == 2 and docker("restart", name).returncode != 0:
                 raise Failure("could not restart the server in generated-token mode")
             port = published_port(name)
-            client, reply = connect_when_ready(target, name, port, previous)
-            client.close()
-            if (reply.get("error") or {}).get("code") != AUTHENTICATION_FAILED:
-                raise Failure("server accepted the literal 'generate' or the previous token")
             tokens = re.findall(r"^Generated COPILOT_CONNECTION_TOKEN=([0-9a-f]{64})$", container_logs(name), re.M)
             if len(tokens) != start:
                 raise Failure("expected one generated token in the logs per start")
+            if previous is not None:
+                client, reply = connect_when_ready(target, name, port, previous)
+                client.close()
+                if (reply.get("error") or {}).get("code") != AUTHENTICATION_FAILED:
+                    raise Failure("server accepted the previous generated token")
             previous = tokens[-1]
             client, reply = connect_when_ready(target, name, port, previous)
             client.close()
@@ -342,7 +363,7 @@ def main():
         ("runs as an unprivileged user with the license present", check_runtime_environment),
         ("Git accepts a differently-owned repository mounted at the workspace", check_git_workspace),
         ("server accepts a token, answers ping, rejects a wrong token and stops on SIGTERM", check_server),
-        ("explicit opt-in prints a working connection token and rotates it on restart", check_generated_token),
+        ("explicit generation flag prints a working token and rotates it on restart", check_generated_token),
     ]
     for description, check in checks:
         started = time.monotonic()
