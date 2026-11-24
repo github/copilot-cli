@@ -1,3 +1,385 @@
+## 1.0.115 - 2026-11-23
+
+- Enable structured clarification questions in ACP editors that support forms
+- Enable Windows sandbox package queries by default; set sandbox.userPolicy.capabilities to [] to opt out.
+- Allow specific macOS Mach service lookups in sandboxed commands with sandbox.userPolicy.seatbelt.extraMachLookups, without enabling Keychain access
+- Add Ctrl+X then A in /model to add and optionally switch to custom provider models in local sessions
+- Add Gemini 4 Hydrogen to the model picker with Extra High reasoning support when available for your account
+- /sandbox policy shows the GitHub account sandboxed gh commands use
+- Add the showTimelineTimestamps setting to show start times, end times, and elapsed durations on timeline items
+- Add support for GPT-6.2 Astra
+- Manage configured provider models directly from /model
+- MAI-Code-2-Flash is available in the /model picker under New models
+- Allow native extensions to activate lazily when users invoke their declared slash commands
+- Show the current model and reasoning effort in the footer when resuming a session.
+- `/worktree new` reliably shows the worktree creation confirmation after switching to the new session.
+- New and resumed ACP sessions honor your image generation setting, enabling image generation by default where supported.
+- Allow sandboxed Git add and commit operations in repositories with many linked worktrees or large directories under .git
+- SDK connection errors no longer overwrite the interactive prompt when the CLI runs with `--ui-server`.
+- `/worktree` and `/move` show the Git reason when a worktree operation fails instead of an internal error wrapper.
+- Keep detached terminals visible and other terminal statuses updating in shared sessions.
+- The /agent wizard keeps text typed immediately after submitting the agent name in the description field, even while the name is being validated.
+- Assisted Permissions keeps reviewing later requests after a message or an answer to an agent question of up to 128,000 characters, instead of asking for approval every time.
+- In Assisted Permissions, approving a custom tool or memory request for the session also clears queued prompts covered by that approval.
+- Assisted Permissions no longer prompts again for parallel tool calls already covered by an approval you granted while they were under review.
+- Clients using `--ui-server` can attach to the resumed CLI session as soon as the server starts listening.
+- Ensure that stopping an npm-installed Copilot CLI during startup does not leave it running in the background
+- Organization-required plugins can install on the next attempt when a temporary policy change interrupts setup, without waiting for the usual retry delay.
+- /delegate now explains that a login is needed instead of doing nothing when you are not signed in.
+- On Unix, canceling a shell command now stops orphaned child processes that remain in the shell's process group.
+- The Sessions sidebar shows Copilot Fusion sessions as working while they choose a model in the background.
+- When you queue a switch from a specific model to Copilot Fusion, the CLI acknowledges the requested routing profile instead of showing the previous profile.
+- Prevent a plugin initialization race from blocking new sessions or making existing sessions fail to resume
+- On Windows, clean up child processes from Git commands, hooks, and language server checks even after their parent process exits.
+- Keep the @ mention picker visible until an empty search finishes, so Ctrl+Y and Tab resume their normal actions when it closes
+- Rapidly switching from Plan to Autopilot keeps the Autopilot confirmation visible before sending your prompt
+- /diff shows staged files and their latest edits in repositories with no commits.
+- Closing a session before its first prompt skips sessionEnd hooks from your user hooks directory, settings, repositories, and plugins.
+- `/chronicle cost-tips` now counts the usage an SDK app session made before it was resumed in the CLI.
+- Long sessions no longer keep up to thousands of past session events, including whole model requests, in memory that nothing reads
+- When an allowed-model policy switches a sub-agent to its fallback model, the sub-agent's started, configured and completed events now name that fallback instead of the blocked model.
+- Pressing Esc in a subagent opened from `/tasks` now returns to that subagent's row instead of the first row.
+- The /session files description now says it lists the files in the session's files/ folder, not the files changed in the session
+- copilot help sessions now says a bare --resume opens the session picker only when there is more than one session, and otherwise resumes the only local session or starts a new one
+- Offer to retry a sandboxed command outside the sandbox when a Rust tool such as uv fails to create a directory the sandbox policy denies.
+- A turn no longer waits for running background agents' undelivered updates before it ends, so new prompts and completion notifications are handled sooner
+- An empty `--available-tools` value (`--available-tools=` or `--available-tools ''`) now gives the model no tools, as the flag's help says, instead of every tool as if the flag had been left out
+- `copilot help config` no longer says `continueOnAutoMode` skips generic rate limit errors; a Copilot rate limit without a specific code also switches to auto mode
+- `copilot help config` no longer says every large paste is collapsed or saved to a workspace file; in shell mode and after a slash command pastes are inserted in full
+- `copilot help config` now says `disableAllHooks` leaves hooks from managed policy running
+- The `disableAllHooks` setting description now says managed policy hooks still run when it is on, instead of saying it disables all hooks
+- `copilot help monitoring` no longer says `NODE_EXTRA_CA_CERTS` is ignored by the OTLP exporter: like other HTTPS requests, it trusts the certificates in `NODE_EXTRA_CA_CERTS`, `SSL_CERT_FILE` and `CURL_CA_BUNDLE`
+- `copilot help sandbox` lists Linux prerequisites and Alpine/musl limitations, clarifies organization policy and default filesystem grants, and corrects `/sandbox ca trust`.
+- The /instructions picker now scrolls when its list is taller than the terminal, so every instruction file stays reachable and Enter always toggles the highlighted one, instead of files vanishing from the middle of the list along with the highlight.
+- `copilot help lsp` no longer says no command-line flag adds a language server: it now says `--plugin-dir` loads a plugin's language servers for that run, shown by `/lsp list` but not `copilot lsp list`
+- A catalogue-installed MCP server started for a session reconnects after `--resume` once managed policy settles, without opening `/mcp`
+- `copilot help parallel-work` no longer says `subagents.maxConcurrency` and `subagents.maxDepth` apply on usage-based billing only: like their settings, it now says they are ignored on Copilot plans without usage-based billing
+- `copilot plugin install` and `/plugin install` now show why a plugin's Agent Plugins manifest was rejected, instead of reporting skills as installed for a plugin that loads nothing.
+- `copilot help providers-env` no longer says every BYOK model is text-only: well-known model IDs such as gpt-4o or o3 accept images by default, and `COPILOT_PROVIDER_VISION=true` or `false` overrides that
+- `--max-ai-credits` passed with `--resume` or `--continue` now sets the resumed session's limit instead of being ignored when the session already had one
+- Run extension exit cleanup with a two-second deadline, then bypass Node shutdown when an unsandboxed extension host on macOS or Linux detects that its parent process exited
+- Sandboxed commands no longer start when a denied-path glob matches more than 100 paths; the error names the glob to narrow.
+- Long tool titles wrap without losing characters or adding extra blank lines in narrow terminals
+- Keep the /model picker's search box and keyboard hints visible as search queries wrap in narrow terminals
+- Shell commands starting with ! written in the Ctrl+G editor preserve tabs when run.
+- Keyboard navigation brings /agent and /rewind pickers back into view after scrolling up in the timeline
+- Replies stay above the next prompt in the conversation, even when the CLI is busy.
+- Escape or Ctrl+G closes completion menus in one press after opening command mode with Ctrl+X / from an empty prompt.
+- Changing the log level in /settings now shows a notice that a CLI restart is required for it to take effect.
+- Keep /sandbox filesystem path entries on one line in narrow terminals
+- Cancelling a prompt while Auto chooses a model removes the unsent prompt from the timeline and shows the next prompt only once
+- Pressing Esc on a hook permission prompt stops the turn instead of letting the agent continue.
+- Tab and Ctrl+Y keep focus on your @ mention while suggestions load, instead of switching tabs or opening the plan
+- /rewind preserves accumulated usage totals and keeps spent AI credits counted toward session limits
+- Browse symbolic links to folders outside the workspace with Tab in @ mentions and the /sandbox path picker
+- Clear the editor waiting notice when the editor exits so it no longer remains in your terminal after Copilot exits
+- Interactive replies display common HTML character references like &amp; and &lt; as their intended characters while preserving code verbatim
+- Navigating plan approval choices brings them back into view after scrolling up, and the Autopilot confirmation opens on screen
+- Reopening a session immediately after /clear keeps the CLI responsive and preserves the session history
+- Preserve repeated spaces in paths used by /collect-debug-logs, /skills add and remove, and /plugin install and marketplace add
+- The /agent creation wizard shows the preview file path when Review content cannot open the generated agent in an external app.
+- Rewinding a turn that invoked a skill keeps its instructions removed after compaction and session resume
+- /move preserves files kept on disk after git rm --cached when moving changes to a new worktree
+- MCP configuration forms preserve commas in environment variable values such as NO_PROXY lists
+- Keep highlighted choices readable in voice setup, voice model, and session deletion dialogs across themes
+- Claude Code hooks with an empty matcher now run for every matching event without preventing other repository hooks and settings from loading
+- Trusting a folder for the current session shows the MCP server reload summary only once.
+- Bring question forms back into view when you change a yes/no or numeric answer after scrolling up
+- The /permissions picker shows Allow All as disabled, with a reason, when your settings or administrator policy prohibit it
+- /session prune shows progress before its result, even when pruning finishes quickly
+- Show a visible keyboard cursor in the Sessions sidebar when colors are disabled
+- Switching sessions while a slash command prepares its prompt keeps the prompt and working indicator in the original session.
+- Show a warning on stderr when an MCP server fails to connect in `copilot -p` text output
+- The /settings Problems tab now reports misspelled nested settings and lets you open the settings file to correct them.
+- /rewind restores images attached to prompts in imported sessions so resubmitting includes them
+- MCP servers disabled for the session in /mcp stay off when other servers or plugins change
+- /search keeps the selected match in view when resizing the terminal
+- Hide unavailable command, file, session, and issue picker hints in Vim NORMAL mode
+- Slash-command dialogs open on screen after scrolling up in short terminals
+- Hide the cursor in Ctrl+R search, MCP form selections, and subagent message boxes when the terminal loses focus
+- Autopilot keeps showing the current prompt and elapsed time after clearing the screen with Ctrl+L
+- /rewind restores existing files changed by shell commands after pushd or PowerShell Push-Location.
+- /restart preserves Plan or Autopilot mode selected before the first prompt
+- Links containing apostrophes within words or paired square brackets in messages and command output now open the full URL.
+- /restart preserves the reasoning effort and context window selected in /model, even when startup flags specify different values
+- Tab moves between sections in the /ide dialog instead of switching home tabs.
+- Resuming a session after /rewind to the first prompt preserves the AI credit status and provider breakdown in the footer and /usage
+- Shortened paths in the @ file picker keep leading and trailing slashes when space allows, making absolute paths and folders easier to identify.
+- After you kill a background shell from /tasks, Copilot is told you stopped it instead of that the shell was never created, and the killed shell can be removed from the list
+- Bash tab completion offers shell names and update channels only where those arguments are expected.
+- Failed shell commands show their full exit status in collapsed timeline rows when output contains tabs.
+- Keep shell command output visible after Ctrl+C in the expanded default view and concise view
+- Choosing Disable for user in /mcp keeps the server off even when started with --enable-mcp-server
+- Stopped background agents' in-progress tool calls now show as interrupted, including when resuming a session
+- Stopping background agents with Ctrl+C or Esc Esc also stops their attached background shells.
+- /chronicle cost-tips shows the ready message after its progress messages
+- Token counts in /usage and in the summary printed on exit round halfway values up again (1,250 tokens shows 1.3k, not 1.2k), and counts just under a million show 1.0m instead of 1000.0k.
+- MCP servers disabled with /mcp disable stay off across automatic reloads when the choice cannot be saved to settings.
+- Prompts sent just before /resume or /continue are processed before switching sessions.
+- The error for a session file that cannot be resumed now names only the line of the malformed record and its column, instead of also saying "at line 1" for every record
+- Repository context and /memory reflect Git remote changes without restarting the CLI
+- Keep confirmation prompts focused when clicking empty space in the Sessions sidebar or double-clicking the current session.
+- Keep /compact failure and cancellation messages out of other sessions after switching sessions or using /clear
+- /diff correctly lists files and shows their patches in folders whose names end in ' b', including renames and mode changes
+- Switching in /model to a providers.json model without reasoning effort levels no longer sends it the previous model's reasoning effort
+- Declining folder trust after switching sessions returns to your previous session instead of quitting the CLI
+- The editor selection chip shows the correct line range when you select whole lines in your editor
+- Retry the package rename during an update when Windows reports a locked file, instead of failing the update after a single immediate retry.
+- Denying an extension tool with "No, and tell Copilot why..." now preserves feedback and continues the turn without running the tool.
+- Shell path access prompts no longer appear for quoted data passed to true, false, :, and printf
+- Preserve shell mode for draft commands across session switches and Ctrl+S stashing, and restore stashed prompts as prompts
+- Continue sessions with earlier PDF attachments when switching to or resuming on a model without native PDF support
+- Skills with sibling symlinks keep their folder names and no longer hide other skills named after the symlinks
+- Paths with globs, query parameters, or fragments in prompts stay as typed instead of invoking a matching skill
+- Report successful sign-ins correctly even when managed account policy fails to refresh
+- Keep your default model unchanged and show a message when compaction for a /model or /config model switch is cancelled or fails
+- Preserve unmatched quotes and apostrophes in positional arguments passed to skills and custom slash commands
+- Plan mode allows Bash commands that write only to /dev/null instead of blocking them as file changes
+- Keep messages typed during /resume, /new or /clear session switches from being sent to the session being left
+- File mentions outside the workspace select the exact filename typed when names differ only by case
+- Load a worktree's repository hooks only after its folder-trust prompt is answered when opening it from the Issues or Pull requests tab
+- The Sessions tab prevents deleting a session while it is opening, keeping the session intact and the CLI responsive.
+- Report invalid tool names during session import before they cause GPT requests to fail
+- Submit rapidly typed lines separately so prompt text after a shell command stays out of that command
+- Show warnings when installing plugins whose MCP servers are skipped because of invalid configuration
+- Memory changes made through /settings take effect immediately, even after using /memory on or /memory off in the same session.
+- Honor trusted repository settings for denied URLs, disabled skills, model, reasoning effort, and context tier in copilot -p
+- Saying No to a foreground sub-agent's permission request now stops the main agent's turn instead of letting it continue and ask again.
+- Pressing Ctrl+C immediately after submitting a slash command cancels that command without stopping an ongoing compaction or model response
+- /rewind shows image labels for image-only turns in the turn list and action menu
+- Prevent enabling a skill in /skills from also enabling another plugin's same-named skill
+- Show where to configure required settings that cannot be changed through `copilot config` or `/settings` when a settings update fails
+- Avoid repeated sandbox permission prompts for files in the same patch after approving a shared directory grant
+- Plugin language servers start correctly when their command or arguments use ${COPILOT_PLUGIN_ROOT}
+- Read project instructions from .claude/CLAUDE.md at the repository root and in the working directory
+- /mcp enable github-mcp-server reports when your organization's policy blocks the server instead of reporting success
+- Allow /mcp disable, /mcp enable, and /mcp auth to wait for slow MCP startup instead of refusing server management
+- Preserve an MCP server's timeout, working directory, and other settings not shown in the /mcp edit form when saving
+- Keep ! shell commands in shell mode when cancelling the Autopilot permission dialog so they run locally instead of being sent to the model
+- Keep /voice models rows on one line in narrow terminals, shortening model names while preserving the selection marker
+- Treat punctuation-only @ mentions as plain text instead of attaching the working directory
+- /move now names nested Git repositories left in the original directory and accurately reports whether uncommitted changes moved
+- /keep-alive status shows why sleep prevention could not start during a busy turn instead of saying it is waiting
+- Require confirmation in Assisted Permissions for detected SSH login-key installations, deploy-key registrations, and changes to live authorization files such as sudoers
+- Ensure Copilot exits when the terminal closes while the `$` shell is open, allowing the session to resume without a session-in-use warning
+- Keep MCP inference approval dialogs with their session when switching between sessions
+- Tables in Autopilot's Task complete summary fit narrow terminals without splitting borders across lines.
+- Keep mouse-selected text readable in the footer, prompt box, and dialogs when its color matches the selection background
+- Shell reads that reach outside approved directories now ask for permission when the path goes through `~`, `~user`, an unset path variable, a PowerShell `FileSystem::` path or backtick escape, or a glob that matches a symlink
+- Keep multiline feedback, the cursor, and key hints visible when sharing feedback with logs through /feedback
+- Include the current IDE selection in prompts sent or queued while the agent is working
+- Start normally instead of hanging when --log-dir points under /proc on Linux
+- Show startup guidance to review /settings Problems when settings.json cannot be parsed
+- Keep session picker search results visible on short or narrow terminals when collecting debug logs
+- Run permission_prompt notification hooks for prompts shown after switching from Assisted Permissions to Manual Approval during a review
+- Keep the requested setting highlighted when opening /settings with a setting name
+- Keep the selected /search match when resizing the terminal
+- Ctrl+C immediately after submitting a prompt cancels it, including prompts queued with Ctrl+Q or still resolving file mentions
+- Report an error and exit with code 1 when copilot -p ends with a completely empty model response
+- Using --continue with -p resumes the most recent session for the current directory or repository instead of an unrelated session
+- Preserve whitespace in /share and /export output paths so files with different spacing are not overwritten
+- Use administrator-configured models even when their IDs differ in capitalization from the model catalog
+- Searching in /model highlights the best match so Enter selects it, with results ranked within each group
+- Keep tables readable in /ask answers and plan approval cards when the Sessions sidebar is docked
+- Preserve backslashes in Windows paths shown in assistant responses
+- Keep plan approval controls and keyboard hints on screen when typed feedback wraps or the full plan is expanded
+- Reject unknown model names in user and local `copilot config model` settings, with suggestions for close matches
+- Keep /sandbox on the correct view when switching sessions, without showing another session's credential review
+- Ctrl+C reliably stops Copilot during startup, even when pressed alongside other keys
+- Show queued prompts and commands stopped by /restart or /update so you can send them again
+- Preserve unrelated files in the extensions folder under a custom --log-dir during log cleanup
+- Tabs in Sessions, Environments, and /plugin fit beside the Sessions sidebar without wrapping or clipping.
+- Plugin hooks run correctly when their executable path uses ${COPILOT_PLUGIN_ROOT}
+- In Vim mode, pressing Esc after a paste reliably exits insert mode, then double Esc interrupts a running turn or clears an idle draft
+- Keep text typed while /rewind completes after the restored prompt
+- /agent correctly marks the selected custom agent and shows it only once with its source when multiple agents share a name
+- ACP clients respect permissions.disableBypassPermissionsMode when enabling Autopilot or allow-all mode
+- Scope options in /config wrap cleanly and respond to clicks correctly in narrow panes
+- Keep /help tables correctly sized when dragging the Sessions sidebar divider
+- Preserve tabs in shell commands edited with Ctrl+G or recalled from history
+- Keep highlighted options visible in /mcp add and /mcp edit forms on short terminals
+- Keep ! commands in shell mode when typed with Shift+Tab so they run locally instead of being sent to the model
+- Keep tables in the plan approval card readable in narrow terminals
+- Windows glob paths in assistant replies retain escaped stars without unexpectedly italicizing surrounding text
+- Recalling steering with Esc Esc consistently removes stale cancellation notices
+- Allow /mcp add and /mcp edit to save servers that require custom authentication headers and reject unauthenticated requests with 403 or other 4xx errors
+- Resolve ~ in --add-dir to your home directory when HOME is empty, allowing the CLI to start normally
+- ACP permission prompts offer "Always allow" only when session-wide approval is permitted; otherwise, approval applies to one run only
+- Keep /sandbox section tabs on one row without clipping in narrow terminals or beside the Sessions sidebar
+- Form field tabs fit beside the docked Sessions sidebar and scroll to the selected field without wrapping or clipping labels.
+- Show accurate override badges and save messages in /settings for merged deny lists, disabled servers and skills, and respectGitignore
+- Fish shell completion offers filenames instead of repeating argument values after a completed shell or update channel
+- Allow /terminal-setup to configure Shift+Enter in VS Code-based terminals when keybindings.json has a UTF-8 byte order mark, preserving existing bindings
+- Show full background agent descriptions containing commas in Read timeline rows
+- Keep the goal panel's todo total accurate after opening full-screen views or resizing the terminal
+- Use the account home directory for path display and directory completion when HOME is empty
+- Using /plan during a running turn queues the plan-model switch only once and shows a single model-change notice
+- Keep Tab and Ctrl+Y from switching tabs or opening the plan while issue mention suggestions are loading
+- Tool calls return a policy denial instead of hanging on named pipes when organization content-based exclusion rules apply
+- Keep steps and keyboard hints visible in the /agent creation wizard as its height changes
+- Show the Executing indicator and Ctrl+C hint for ! commands after switching sessions while another command is still running
+- Avoid duplicate approval prompts in Assisted Permissions for eligible reads and shell commands that access paths outside allowed directories
+- Create worktrees from the Pull requests tab when the GitHub remote is not named origin
+- Show help when pressing Enter after `/model -h` instead of completing to a matching model
+- Treat spaces-only number fields in forms as empty instead of zero, omitting optional answers and requiring a value for required fields
+- Keep the built-in GitHub MCP server restricted to web_search when enabling it mid-session in Azure DevOps-only repositories
+- /delegate shows the correct branch name when creating and pushing a branch for uncommitted changes
+- Left, Right, and ? pressed immediately after pasting text edit the draft instead of toggling the Sessions sidebar or quick help
+- Prevent Ctrl+Y from opening the plan while directory suggestions for /add-dir or /cd are loading
+- Keep /delegate prompts unchanged while navigating the Sessions sidebar, so sidebar keys do not accidentally answer or cancel them
+- Keep your system awake for the full requested duration with long /keep-alive timers, such as /keep-alive 30d
+- Submit MCP forms successfully after clearing optional text fields whose constraints reject empty values
+- Keep command and skill names readable in the / picker beside the docked Sessions sidebar
+- Keep the title, key hints, and highlighted server visible in /mcp search on short terminals
+- Keep /ide settings and connections unchanged when using keys in the focused Sessions sidebar
+- Show extra instructions passed to /chronicle standup in the conversation
+- Unsetting repository or local settings leaves missing settings files absent, keeping your working tree clean.
+- Keep keyboard hints and the footer reachable when scrolling /delegate panels taller than the terminal
+- Keep the "Session in use" prompt unchanged while navigating the focused Sessions sidebar
+- Ctrl+C and Esc Esc act only on the current session, leaving shell commands in other sessions running
+- Timeline errors keep consistent spacing when their text exactly fills a terminal row, and copying them no longer adds a trailing space
+- Keep keyboard focus on open dialogs when clicking the Sessions sidebar or double-clicking the current session
+- /keep-alive reports when sleep prevention stops unexpectedly during a busy turn on macOS and Linux
+- Switching sessions with /tasks open shows the incoming session's task list instead of another session's shell details
+- Esc and Ctrl+O respect newly pasted text, keeping shell mode active, clearing pasted drafts with double Esc, and leaving the timeline collapsed
+- Switching sessions resets /permissions, /statusline, /chronicle and /sandbox dialogs instead of keeping another session's selection or page
+- Keep permission prompts and dialogs focused when hovering into the Sessions sidebar with sidebar.hoverFocus enabled
+- Show the host's error immediately when a message is rejected in an attached AHP session, instead of timing out after two minutes
+- Hide Sessions sidebar focus and keyboard hints while a permission prompt, question, or dialog takes keyboard input
+- Preserve pasted prompts when Ctrl+E is pressed immediately after pasting, instead of starting an unintended /diagnose request
+- Pressing Esc after typing a reason on a tool or hook permission prompt stops the turn without an unnecessary retry warning
+- Keep Assisted Permissions prompts and explanations readable on short terminals, with scrolling for hidden content
+- Keep wrapped file names readable in collapsed tool rows by hiding trailing metadata when it cannot fit in narrow terminals
+- Switching sessions resets /agent, /extensions, and schedule manager dialogs instead of carrying over another session's highlighted row
+- Show session names containing combining accents or joined emoji in full when they fit the session list column
+- /diff shows intent-to-add files and staged submodules before a repository's first commit.
+- Keep the /agent creation wizard aligned with the bottom of the terminal when going back to an edited step
+- The new-agent wizard starts fresh when switching sessions instead of reusing another session's step and answers
+- Show reasoning only once when switching back to a session that finished in the background
+- Switching sessions with `/lsp logs` open returns to the server list instead of showing the other session's selection or log.
+- Switching sessions with /limits open shows the current session's limits without carrying over edits from another session
+- Reset /rewind to the session's newest turn when switching sessions, preventing accidental rewinds caused by another session's selection
+- Switching sessions resets /subagents settings and model menus to the first row instead of using the other session's selection
+- Bring approval prompts, confirmation dialogs, and /permissions back into view when you change the highlighted option after scrolling up
+- Keep slash-command argument suggestions on one line in narrow terminals so the highlighted choice stays visible
+- Tab completes the highlighted slash command after you use arrow keys during Tab cycling
+- Show full failure and denial reasons for Read, Create, and Edit tool calls when expanding the timeline with Ctrl+O
+- Keep emoji and accented characters intact when shortening desktop and terminal notification text
+- Keep command names and argument choices fully visible in completion suggestions beside the docked Sessions sidebar
+- Show an ellipsis when voice status messages do not fit in a narrow footer
+- Keyboard navigation brings /feedback, /ide, and /login dialogs back into view after scrolling up
+- Bring tool approval prompts back into view when typing or pasting feedback after scrolling up
+- Show an ellipsis when Ctrl+X shortcut hints are truncated in narrow footers, without leaving dangling separators
+- Pressing Ctrl+C or Ctrl+D at the login plaintext-storage prompt declines storage and exits instead of hanging
+- Skills added with HOME or COPILOT_HOME set to an empty string now save to the correct personal directory and load correctly
+- Attach to live sessions that require a connection token from the Sessions tab
+- Keep running servers discoverable across directories when HOME is empty, without creating .copilot/servers in your project
+- Keep the background-work indicator and Ctrl+C hint visible after a ! command ends or is cancelled
+- Typing into question forms, /feedback comments, or /agent wizard fields brings them back into view after scrolling up
+- Display folder and branch names containing an unpaired flag letter without cutting off the end
+- Keep /settings text, number, and map editor titles and input visible on short terminals
+- Preserve full-width spaces when copying wrapped text with the mouse, including when colors are disabled
+- Four quick Ctrl+C presses with sidebar.ctrlCClosesSession on and the Sessions sidebar open beside another session now close that session and then exit the CLI, instead of leaving a blank, unresponsive terminal
+- Use image dimensions for more accurate context usage estimates and compaction timing in Claude, OpenAI, Grok and Kimi sessions
+- Hide Remove for plugins loaded with --plugin-dir so it cannot uninstall or disable another plugin with the same name
+- Ensure /share exports the full session history when run immediately after resuming a session
+- /rewind restores files changed by shell commands after changing directories
+- Show both sides of file-to-symlink changes in /diff, with accurate change counts and file status labels
+- Keep column headers and selected rows aligned in the Sessions tab and /resume with screen reader mode enabled
+- Show wrapped tool failure reasons only once in copilot -p output
+- Keep completed question prompts and answers visible in the timeline and show the question that was actually asked
+- Remove a plugin marketplace even when another local marketplace has missing plugins or an unreadable directory
+- Hindi, Bengali, Thai, and other scripts wrap more accurately in prompts and replies, reducing text overflow and overlapping lines
+- Keep masked environment variable names and hosts on one line in /sandbox in narrow terminals
+- Keep long /search queries from pushing the search bar off-screen in very narrow terminals
+- Resume promptly when overlapping background shell commands finish, without an extra wait of up to a minute
+- Tab completion after `copilot ` in fish works without printing error stack traces
+- Browser, chat, and worktree shortcuts on the Issues, Pull requests, and Gists tabs act on the highlighted item after terminal resizing or search page changes
+- Scrolling lists in /settings show every character beside the scrollbar in terminals 22 columns wide or narrower
+- Bring the highlighted row in /tasks, /every, and /subagents back into view when navigating with the keyboard after scrolling up
+- Keep pull requests visible in the session footer on long paths and refresh them when a turn finishes while background work continues
+- Rewinding with Conversation + files also restores files edited through symlinks created or re-pointed in the rewound turns
+- Show "Server not found" for unknown server names in /mcp disable, /mcp enable, and /mcp auth while MCP servers are still starting
+- Show the underlying error when --resume finds an existing session that cannot be loaded instead of reporting it as missing
+- Keep /refine results in the original session's input box when you switch sessions while refinement is running
+- Marketplace removal suggests --force only when it can remove the marketplace, not for marketplaces defined only in repository settings.
+- Keep file names visible at the end of truncated paths in the /instructions picker.
+- /move preserves uncommitted changes when a tracked file or symlink is replaced by a directory containing new files
+- Show the actual token validation error in `copilot -p` when an unused environment variable contains a classic PAT, and include a failed result in JSON output
+- Highlighted paths in the @ file picker and expanded tool descriptions wrap correctly to show their full text.
+- Keep the pull request tag visible in the session footer when it fits alongside the branch on a separate row
+- Escape dismisses resume errors without closing the Sessions picker while the session list is loading
+- Allow cargo install to write Cargo's home directory when sandbox developer-tool access is enabled
+- Offer a sandbox bypass prompt on Windows when a failing command has a captured COM or service-control refusal
+- Read-only tools from third-party MCP servers now follow your permission rules and prompt for approval when needed
+- Restore Windows shell access to network shares when Content Exclusion rules are enabled, subject to normal shell permissions
+- Pending questions wait for your answer when switching from an Autopilot session to an interactive session
+- Preserve your permission mode when restarting the CLI before the first prompt, and show a warning if it cannot be restored
+- Keep /model table columns aligned for model names with wide or combining characters
+- Clear the waiting notice when the configured external editor fails to launch
+- Inline code inherits the surrounding text color in ANSI terminals, keeping it readable on light backgrounds
+- `--continue` skips sessions open in another Copilot process and resumes the next available session, or starts a new one if none is available
+- Pressing Enter with empty denial feedback now rejects the permission request without requiring text
+- Configured background compaction thresholds now set when MAI-Code-2 models start a fresh context window, instead of being ignored
+- Keep picker selections readable on light terminals and update prompt and picker colors when switching terminal themes mid-session
+- Use your account home for settings and personal skills when HOME is set to an empty string
+- Custom agents from the host are available to select immediately after you connect to a shared session
+- `/mcp add` and `/mcp edit` save a remote server that accepts the HTTP headers typed into the form, such as an `Authorization` header, instead of asking for OAuth client credentials it does not need.
+- An MCP tool call that keeps emitting progress notifications is now cancelled once it has run for ten times the server's configured `timeout` — 30 minutes at the 180,000 ms default that applies when no `timeout` is set — instead of continuing indefinitely and leaving the model waiting with no tool result and no error. A tool that legitimately runs longer than that needs its server's `timeout` raised, which raises the ceiling with it.
+- Model switches can compact long conversations when source model capacity metadata is unavailable
+- /remote on now reports that another host is running, or why remote access failed to start, instead of saying incoming connections are disabled while they are turned on
+- Prompt hooks now block, rewrite, and add context to messages sent while the agent is working
+- A custom provider header with a short value, such as "1", no longer turns every occurrence of that text in logs and error messages into **\*\***.
+- /instructions excludes toggled-off instruction files outside Git repositories
+- Multi-session exit summaries omit resume commands for unused sidebar sessions that cannot be resumed
+- Shell permission checks resolve `$PWD` to the directory the command runs in, so `$PWD` paths are no longer denied or allowed based on the directory Copilot was started from
+- OpenTelemetry spans and metrics name `openai` as the provider for a custom provider configured only by its base URL, such as `COPILOT_PROVIDER_BASE_URL` without `COPILOT_PROVIDER_TYPE`, instead of `github`
+- Subagent session-limit messages reflect current usage and stop reporting a reached limit after you raise or remove it
+- Pasted images and files are attached in the order their labels appear in your prompt, even after rearranging them
+- Attaching a named pipe, socket or device whose name ends in an image extension (for example `shot.png`) no longer stalls the turn or blocks other sessions; it is skipped like any other unreadable image
+- Quitting while the CLI is still starting no longer writes errors to the process log about requests the shutdown refused, including advice to clean up a local model download that never existed
+- A `/exit` or `/quit` queued while the agent is working runs after that turn instead of staying queued when the turn finishes while the command is still being admitted, such as under a managed policy that requires sandbox enforcement
+- A tool call whose arguments are nested very deeply no longer leaves its permission prompt unanswerable and the turn stuck: approving or denying it now runs or fails the tool as usual
+- Show a warning when MCP tool name collisions hide tools from the model
+- Fatal-error reports are written to the CLI logs directory instead of the current working directory
+- `--connect` reports no match instead of a lookup failure when a non-UUID ID matches no remote session or task
+- Saving /mcp add or /mcp edit preserves other servers added or restored while the form is open.
+- With a session AI credit limit, the cost meter after each tool result is no longer labelled for the model as guidance from postToolUse hooks
+- /diff respects Git's text and binary settings for untracked files, showing matching diffs and added-line counts
+- A tool declared in an extension's `extension.json` is no longer offered to the model after that extension's process exits, and a call that still reaches it reports that the extension exited instead of an activation failure
+- Stopping background agents closes their pending permission prompts and restores the input area
+- Arrow keys bring the highlighted choice back into view in long question forms after scrolling up
+- OpenTelemetry exports now set a random `service.instance.id` on the resource for every exporter, including file export, so concurrent sessions, even in separate containers, no longer write to the same metric streams.
+- Rewinding a resumed session after a crash restores files changed by the last completed turn
+- Installing a plugin that contains a link to a device such as /dev/zero or to a named pipe no longer hangs; the install fails right away and names the file
+- SDK clients connected through --ui-server can resume a session the CLI has not loaded, instead of waiting forever and blocking later session loads
+- MCP sign-in completes when you manually open the authorization URL if the CLI cannot launch a browser
+- Deleting or pruning a session now removes the MCP OAuth access tokens it saved in the system keychain or token files, instead of leaving one item per session and server behind
+- Single-setting writes now refuse to overwrite malformed settings.json files and report when changes are not saved.
+- The /subagents table highlights the correct agent when switching between sessions in the same folder
+- Rewinding to a prompt whose image or file attachment was moved or deleted no longer re-attaches it silently: the attachment is left out and a warning names the missing file.
+- MCP servers that provide only prompts or resources stay connected and appear without errors in /mcp
+- grep and rg commands no longer request path access for search patterns passed with option values
+- A URL approved for the rest of the session is no longer asked for again after /cd when another CLI process has saved a new allowed URL in the meantime
+- A sessionStart prompt hook or -i prompt is no longer silently skipped when sign-in finishes while a repository startup prompt is running
+- /session prune says it has started before it deletes, and a second prune run while the first is still deleting no longer reports the first one's sessions as its own
+- The MCP tool cache now removes entries older than 14 days when it writes, so sessions started in many different working directories no longer grow it without limit
+- /user switch completes account selection after switching sessions while the account picker is open
+- Startup and resume avoid premature MCP tool and organization plugin-check warnings, and organization settings initialization notices no longer repeat or replay from history
+- Pasting followed by three Escape presses in Vim mode clears an idle draft even when rendering or paste preparation is slow.
+- MCP sign-in can continue when a server grants the required scopes but omits an automatically requested refresh-token scope.
+- Make direct workflow execution wait for project extension workflows to register
+- `--usage-output-file` groups subagent usage by configured name instead of invocation ID and reports how many times each subagent was launched.
+- Assisted Permissions can try another review model when the first stalls or fails, reducing unnecessary approval prompts.
+- Assisted Permissions can reuse a one-time approval for an identical request in the same session, reducing repeat prompts.
+- Long-running local sessions take up less disk space and resume faster.
+- Update Browser Use to 0.2.1 with session-scoped tabs, preview display naming, and support for the matching browser extension
+- Session mode checks no longer wait for unrelated pending events.
+- Concise transcript groups each run of tool calls into one row that opens to its calls and each call to its details
+- Group MCP startup warnings caused by sandbox network restrictions, show blocked hostnames, and point to /sandbox policy for guidance
+- Assisted Permissions prompts show why automatic review failed, including model errors and guidance when no review model is available.
+- Remove the AUTO_APPROVAL feature flag: only managed policy can disable Assisted Permissions, and a leftover AUTO_APPROVAL=false is ignored with a deprecation warning
+
 ## 1.0.114 - 2026-11-18
 
 Fixes and changes
