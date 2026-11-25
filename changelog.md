@@ -1,3 +1,69 @@
+## 1.0.116 - 2026-11-25
+
+- Add a build-time JSON Schema for extension manifests
+- Click "Jump to latest" in the fullscreen timeline to return to the newest output and resume following it.
+- Choose the context size for supported models in ACP-compatible editors without changing your saved defaults.
+- Set environment variables for every process Copilot starts (shell commands, local LSP and MCP servers, hooks and extensions) with the env setting, with or without the sandbox
+- Warn when a plugin and a standalone MCP server connect to the same endpoint, and show how to disable one in /mcp
+- Warn when a plugin and a standalone MCP server connect to the same endpoint, and show how to disable one in /mcp
+- `copilot help parallel-work` no longer says approving a plan can offer to continue in Autopilot with /fleet; plan approval no longer offers that choice
+- Shell approval prompts in ACP clients show the command you're authorizing instead of its description.
+- Configured HTTP hooks still run when TERM_PROGRAM contains invalid characters, so an invalid terminal name no longer blocks tool calls.
+- /rewind reports files it cannot restore because a turn exceeded the file capture limit
+- Keep Incoming connections settings in /environments on one line per row in narrow terminals, including in screen-reader mode
+- PowerShell commands with digits in a parameter name, such as -n1 or -ExpectedSha256, honor allow rules again instead of requiring full-script approval.
+- Choosing "Yes" in the folder trust prompt closes it without waiting for MCP servers to finish reconnecting
+- Allow Swift tools in the Copilot CLI sandbox to write to the compiler module cache and SwiftPM shared cache on macOS and Linux.
+- A prompt passed with -i, a repository startup prompt or a restored schedule now waits for the MCP servers that trusting the folder starts, for up to 30 seconds, so its first request includes their tools
+- Show the selected preview model's name in /model switch notices and /exit print when settings.json is empty.
+- Sub-agent events in a session's event log now record when they happened (`occurredAt`), not only when they reached the main session.
+- Search falls back to ripgrep when another Copilot profile owns the repository's active index. On Windows, search helpers no longer use profile folders as their working directory.
+- Switching models before your first prompt now skips compaction and completes successfully
+- Assisted Permissions honors later chat approvals or withdrawals of earlier permission decisions, including session approvals
+- Keep your place when reading older output in the terminal while a large reply arrives.
+- Open the link when clicking anywhere on linked inline code or color swatches, including their shaded edges.
+- Keep the selected MCP servers or Skills view visible in /config on very narrow terminals.
+- Gemini reasoning summaries honor your saved visibility preference, and Ctrl+T shows or hides them and saves your choice.
+- Built-in search keeps full filenames and correct line numbers when compacting matches from files with numeric suffixes.
+- `/worktree` and `/move` preserve Git diagnostics when branch names, paths, or hook output contain HTML-like text.
+- Cancel pending prompts without waiting for activity to refresh, and avoid showing idle sessions as busy after reconnecting to a host.
+- On Unix, canceled foreground shell commands can finish cleanup even if they write to stdout or stderr during shutdown.
+- Prevent repeated sign-in prompts when multiple CLI sessions refresh access to the same MCP server.
+- The Ctrl+Y hint no longer stays hidden when a research report is created while the CLI starts watching for reports.
+- Reduce memory growth in long sessions: text measurement caches kept a full copy of each streamed reply, which could exhaust the JavaScript heap.
+- Keep the highlighted theme and its description readable in narrow terminals when screen-reader mode is on.
+- Cancel pending prompts without waiting for activity to refresh, and avoid showing idle sessions as busy after reconnecting to a host.
+- On Unix, canceled foreground shell commands can finish cleanup even if they write to stdout or stderr during shutdown.
+- Reduce memory growth in long sessions: text measurement caches kept a full copy of each streamed reply, which could exhaust the JavaScript heap.
+- Keep the highlighted theme and its description readable in narrow terminals when screen-reader mode is on.
+- `copilot help billing` no longer says `--usage-output-file` writes an `agentMetrics` entry for each subagent; entries are per agent name, summed over its runs with `invocationCount`
+- `/restart` keeps the custom agent chosen with `/agent`, or no agent after deselecting one, instead of switching back to the agent given with `--agent` at launch.
+- Load workspace MCP servers from `.mcp.json` and `.github/mcp.json` even when those files contain comments or trailing commas
+- Reduce delays before the final answer on long Copilot Fusion turns when progress updates pile up.
+- Sandboxed shell commands can read the session plan without prompting you to bypass the sandbox.
+- Preserve text styling such as bold, italics, and underlines after /restart when NO_COLOR is set, without re-enabling color.
+- Keep the Home tab bar visible when a draft wraps in a short terminal.
+- Copilot CLI starts normally when settings contain large integers, and `/settings show` displays their exact values without rounding.
+- Keep /mcp search usable when a registry result has a missing or invalid description
+- Pressing Escape cancels push-to-talk without restarting the microphone or inserting a transcript afterward
+- `/diff` shows the patch for a small file or symlink that replaces a directory with many tracked files instead of incorrectly reporting it as too large.
+- Prevent editor shortcuts pressed while submitting /exit or /quit from opening an editor when the CLI quits
+- `--log-dir` puts extension process logs in the same directory as the CLI process log.
+- Closed background sessions appear as saved in the Sessions tab and reopen with their conversation history when you press Enter.
+- Pressing Ctrl+C to cancel a running queued extension command shows a cancellation notice without a misleading failure message.
+- Keep shell output on separate lines in the interactive CLI when it contains an unterminated terminal control sequence
+- `/init suppress` keeps init suggestions hidden in repositories where you suppressed them from another CLI session using the same profile.
+- The Sessions browser now lists cloud sessions beyond the first page.
+- Bun commands can use their caches and read their configuration in the CLI sandbox when developer tool access is enabled.
+- Honor `--effort none` on the first request with GPT-5.4 instead of falling back to medium reasoning effort.
+- Resuming a session no longer attributes an automatic Assisted Permissions denial to you.
+- Skip individual slow-connection and sign-in warnings for organization-managed MCP servers (except Connectors) and flag their sign-in needs in the startup summary.
+- Summarize MCP server status at startup when attention is needed, and wait for /mcp auth <name> before opening a browser for initial sign-in.
+- Experimental extensions use Enabled/Disabled controls. Existing Load Only settings migrate to disabled with a one-time notice.
+- When the sandbox blocks a command, Copilot now stops and, if your policy allows it, says you could disable the sandbox for the session, instead of asking you to hand execution back
+- Assisted Permissions resolves routine requests faster on eligible plans and gives more specific reasons when it asks for approval
+- Plan approval no longer offers the fleet option. You can still start fleet mode with /fleet.
+
 ## 1.0.115 - 2026-11-23
 
 - Enable structured clarification questions in ACP editors that support forms
