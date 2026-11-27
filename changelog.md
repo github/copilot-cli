@@ -1,3 +1,49 @@
+## 1.0.117 - 2026-11-27
+
+- Add sandbox.userPolicy.network.extraCaCertificates, in user or managed settings, to trust custom CA certificates for sandboxed commands through TLS-intercepting proxies
+- Add explicit tool exposure so custom agents can opt in to tools
+- Fix Page Down stalling at a pinned prompt in a 10-row terminal with tabs enabled.
+- Approving an MCP server's tools for the session or for a location no longer also approves Copilot's built-in requests, such as shell commands or memory stores, when the server's name matches a built-in permission type. The approval still covers that server's tools, including after the session is resumed.
+- Starting in autopilot now asks before launching each extension, instead of denying every extension with "no one to approve"
+- Restore original binary skill assets when rejecting a Forge draft and preserve edits made after generation.
+- `/mcp search` explains why a registry server can't be installed instead of showing an endless installation spinner.
+- Quitting a local CLI session with /exit or Ctrl+D discards queued prompts so they don't run after the exit summary.
+- Copilot CLI starts without plugins when it cannot read or parse config.json, leaving the file unchanged.
+- Match MCP server names regardless of capitalization in `/mcp` commands and `--disable-mcp-server`, with exact matches taking precedence.
+- Answering a permission prompt keeps the composer draft unchanged.
+- On Linux and macOS, stop child processes of a GITHUB_ASKPASS sign-in helper that is still running when it times out.
+- Keep existing repository settings files read-only for sandboxed commands and agent edits in writable Git worktrees on macOS and Linux.
+- Git commits, branch creation, and stashing work again in linked worktrees the Copilot CLI sandbox can write to.
+- Fix indexed search results for regular expressions that join groups of alternatives.
+- Stopping Copilot CLI in ACP mode with Ctrl+C no longer reports a false shutdown error or exits with a failure status.
+- Prevent repeated notices about organization-required plugins when resuming a session or when authentication refreshes.
+- Use a recognizable Copilot CLI name for voice input in Windows microphone privacy settings.
+- `copilot help extensions` no longer says your own and plugin extensions load with -p; an extension starts there only if its launch is already approved, by --allow-all-tools or --yolo or by an approval saved earlier
+- Built-in searches no longer fail when Copilot sends flags such as line numbers and result limits, or a list of paths, as text.
+- Resume shared sessions even when their selected model is unavailable, so you can choose a different model with /model.
+- PowerShell hooks on Windows preserve native program exit codes, so exit code 2 is treated as a warning or denial rather than a hook failure.
+- Show an error instead of silently switching providers when a repository pins a model to an unavailable provider.
+- Only announce a new session checkpoint after automatic compaction if the checkpoint was saved.
+- Trusting a folder for the current session reloads MCP servers once and shows a single reload summary.
+- On Linux, Copilot accepts keyboard input again if the interactive shell opened with `$` is killed.
+- Subagents respect the tool list in their custom agent file, even when the file has no prompt.
+- Load connected Copilot Connectors when resuming a CLI session while GitHub sign-in is still finishing.
+- Background agents can continue their conversations after restarting the CLI and resuming a session
+- Pressing Enter more than once on the folder trust prompt trusts the folder and reloads plugins once, instead of restarting every extension for each extra key press
+- Subagent details in /tasks show the reasoning effort the agent uses when the requested level isn't supported.
+- Running tasks in `/tasks` stay on one line and keep their spinners visible in narrow terminals.
+- Successful non-interactive CLI runs exit with code 0 when a session write fails temporarily but the final save succeeds.
+- Remove extra blank lines below wrapped text in narrow terminals, including task descriptions and IDs in /tasks.
+- Keep the MCP tool cache disabled across reloads when `COPILOT_MCP_TOOL_CACHE=false`, so Copilot neither reads nor writes tool snapshots.
+- `/sandbox policy` identifies grants that point to broken symlinks and warns that they can prevent sandboxed commands from starting.
+- Permission prompts and help clarify which approvals stay in effect when you resume the same session.
+- Assisted Permissions no longer denies a shell command retry as a duplicate solely because the previous attempt ran and failed.
+- Autopilot with Assisted Permissions can retry an automatically denied action once if you ask for it in a later chat message. The retry still goes through permission review.
+- In plan mode, Assisted Permissions asks before actions like creating a Git branch or installing packages instead of automatically approving them before you approve the plan.
+- --trust-folder from a subdirectory no longer runs the repository root's hooks when --add-dir names a folder in the same repository, including the root itself
+- Assisted Permissions can avoid unnecessary confirmation prompts when Copilot stops a process it started in the same session by process ID.
+- The /model picker shows service notices and marks retiring models so you can see warnings before choosing a model.
+
 ## 1.0.116 - 2026-11-25
 
 - Add a build-time JSON Schema for extension manifests
