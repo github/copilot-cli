@@ -1,0 +1,10 @@
+{
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ],
+    "extensions.autoRestart": true,
+    "extensions.closeExtensionDetailsOnViewChange": true,
+    "extensions.experimental.deferredStartupFinishedActivation": true,
+    "extensions.ignoreRecommendations": false,
+    "extensions.allowOpenInModalEditor": true
+}
